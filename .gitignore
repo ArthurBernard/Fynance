@@ -1,0 +1,11 @@
+# Ignore some files
+
+# Extensions to ignore
+*.so
+*.html
+*.ipynb_checkpoints
+
+# Folders to ignore
+env/
+*/build
+*/__pycache__
