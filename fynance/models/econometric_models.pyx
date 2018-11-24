@@ -93,7 +93,7 @@ cpdef np.ndarray[np.float64_t, ndim=1] model_ARMA_cython(
     """
     AutoRegressive Moving Average model of order q and p s.t: 
     y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + theta_1 * u_t-1 + ...
-    + theta_q * u_t-q + u_t
+          + theta_q * u_t-q + u_t
     
     Parameters
     ----------
@@ -142,13 +142,13 @@ cpdef tuple model_ARMA_GARCH_cython(
     """ 
     AutoRegressive Moving Average model of order q and p, such that: 
     y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + theta_1 * u_t-1 + ...
-    + theta_q * u_t-q + u_t
+          + theta_q * u_t-q + u_t
     
     With Generalized AutoRegressive Conditional Heteroskedasticity volatility
     model of order Q and P, such that:
     u_t = z_t * h_t 
     h_t^2 = omega + alpha_1 * u^2_t-1 + ... + alpha_Q * u^2_t-Q 
-    + beta_1 * h^2_t-1 + ... + beta_P * h^2_t-P
+            + beta_1 * h^2_t-1 + ... + beta_P * h^2_t-P
     
     Parameters
     ----------
@@ -219,14 +219,14 @@ cpdef tuple model_ARMAX_GARCH_cython(
     ):
     """ 
     AutoRegressive Moving Average model of order q and p, such that: 
-    y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + theta_1 * u_t-1 + ...
-    + theta_q * u_t-q + u_t
+    y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + psi_t * x_t 
+          + theta_1 * u_t-1 + ... + theta_q * u_t-q + u_t
     
     With Generalized AutoRegressive Conditional Heteroskedasticity volatility
     model of order Q and P, such that:
     u_t = z_t * h_t 
     h_t^2 = omega + alpha_1 * u^2_t-1 + ... + alpha_Q * u^2_t-Q 
-    + beta_1 * h^2_t-1 + ... + beta_P * h^2_t-P
+            + beta_1 * h^2_t-1 + ... + beta_P * h^2_t-P
     
     Parameters
     ----------

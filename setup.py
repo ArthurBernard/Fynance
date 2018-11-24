@@ -39,6 +39,11 @@ if USE_CYTHON:
             include_dirs=[numpy.get_include(), '.']
         ),
         Extension(
+            "fynance.tools.momentums_cy", 
+            ["fynance/tools/momentums_cy.pyx"],
+            include_dirs=[numpy.get_include(), '.']
+        ),
+        Extension(
             "fynance.estimator.estimator_cy", 
             ["fynance/estimator/estimator_cy.pyx"],
             include_dirs=[numpy.get_include(), '.']
@@ -59,6 +64,11 @@ else:
             include_dirs=[numpy.get_include(), '.']
         ),
         Extension(
+            "fynance.tools.momentums_cy", 
+            ["fynance/tools/momentums_cy.c"],
+            include_dirs=[numpy.get_include(), '.']
+        ),
+        Extension(
             "fynance.estimator.estimator_cy", 
             ["fynance/estimator/estimator_cy.c"],
             include_dirs=[numpy.get_include(), '.']
@@ -71,7 +81,7 @@ setup(
     description='Some tools for time series applications, especialy in finance, \
         econometric, statistic and machine learning [In progress]',
     url='https://github.com/ArthurBernard/Fynance',
-    author='Arthur Bernard',
+    author=['Arthur Bernard', 'Borahn Tarridec'],
     author_email='arthur.bernard.92@gmail.com',
     packages=['fynance'],
     cmdclass=cmdclass,
