@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 # Set this to True to enable building extensions using Cython.
 # Set it to False to build extensions from the C file (that
 # was previously created using Cython).
@@ -7,6 +10,7 @@ USE_CYTHON = True
 
 
 from distutils.core import setup
+from setuptools import find_packages
 from distutils.extension import Extension
 from Cython.Build import cythonize
 from Cython.Distutils import build_ext
@@ -83,7 +87,7 @@ setup(
     url='https://github.com/ArthurBernard/Fynance',
     author=['Arthur Bernard', 'Borahn Tarridec'],
     author_email='arthur.bernard.92@gmail.com',
-    packages=['fynance'],
+    packages=find_packages(), #['fynance'],
     cmdclass=cmdclass,
     ext_modules=cythonize(extensions, annotate=True),
 )

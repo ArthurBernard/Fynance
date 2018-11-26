@@ -1,6 +1,10 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """
 
-Some estimator
+Some estimators
 
 """
+
 from .estimator_cy import *

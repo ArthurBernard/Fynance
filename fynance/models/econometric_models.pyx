@@ -1,4 +1,6 @@
-#defining NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import numpy as np
 from scipy.optimize import fmin
 cimport numpy as np
@@ -12,7 +14,7 @@ from cpython cimport bool
 #=============================================================================#
 
 
-cdef tuple get_parameters(
+cpdef tuple get_parameters(
         np.ndarray[np.float64_t, ndim=1] params,
         int p, int q, int Q, int P, bool cons
     ):

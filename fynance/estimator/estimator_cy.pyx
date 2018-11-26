@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import numpy as np
 from scipy.optimize import fmin
 cimport numpy as np
@@ -5,7 +8,7 @@ from libc.math cimport sqrt, pi, log
 #from libcpp cimport bool as bool_t
 from cpython cimport bool
 
-from fynance import model_ARMA_GARCH_cython, get_parameters
+from fynance.models.econometric_models import model_ARMA_GARCH_cython, get_parameters
 
 
 #=============================================================================#

@@ -1,6 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """
 
 Some models
 
 """
-from .econometrics_models import *
+from .econometric_models import *

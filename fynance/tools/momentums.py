@@ -1,8 +1,14 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import numpy as np
 import pandas as pd
 
-from momentums_cy import *
+from .momentums_cy import *
 
+__all__ = [
+    'sma', 'wma', 'ema', 'smstd', 'wmstd', 'emstd',
+]
 
 #=============================================================================#
 #                               Moving Averages                               #
