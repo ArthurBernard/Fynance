@@ -118,7 +118,7 @@ def wmstd(series, lags=21):
     :std: np.ndarray[dtype=np.float64, ndim=1]
         Moving standard deviation of series.
     """
-    return wmstd_cy(series.flatten().astype(np.float64), alpha=float(alpha))
+    return wmstd_cy(series.flatten().astype(np.float64), lags=int(lags))
 
 
 def emstd(series, alpha=0.94, lags=None):

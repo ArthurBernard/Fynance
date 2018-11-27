@@ -182,14 +182,14 @@ cpdef tuple model_ARMA_GARCH_cython(
     h: np.ndarray[np.float64, ndim=1]
         Conditional volatility of the model. 
     """
-    cdef np.float64_t arma, garch
+    cdef np.float64_t arma, arch
     cdef int i, j, t, T = np.size(y)
     cdef np.ndarray[np.float64_t, ndim=1] u = np.zeros([T], dtype=np.float64)
     cdef np.ndarray[np.float64_t, ndim=1] h = np.zeros([T], dtype=np.float64)
     
     for t in range(T):
-        arma = 0
-        arch = 0
+        arma = 0.
+        arch = 0.
         for i in range(min(t, max(q, p, Q, P))):
             if i < p:
                 arma += y[t-i-1] * phi[i]
@@ -199,10 +199,10 @@ cpdef tuple model_ARMA_GARCH_cython(
                 arch += u[t-i-1]**2 * alpha[i]
             if i < P:
                 arch += h[t-i-1]**2 * beta[i]
-            if arch < 0:
-                return 'ERROR', 'NEGATIVE VOLATILITY'
+            if arch < 0.:
+                return 1e8 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
             if arch > 1e20 or arma > 1e20:
-                return 'ERROR', 'HUGE VALUE'
+                return 1e6 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
         u[t] = y[t] - c - arma
         h[t] = sqrt(omega + arch)
     return u, h
@@ -264,14 +264,14 @@ cpdef tuple model_ARMAX_GARCH_cython(
     h: np.ndarray[np.float64, ndim=1]
         Conditional volatility of the model. 
     """
-    cdef np.float64_t armax, garch
+    cdef np.float64_t armax, arch
     cdef int i, j, t, T = np.size(y)
     cdef np.ndarray[np.float64_t, ndim=1] u = np.zeros([T], dtype=np.float64)
     cdef np.ndarray[np.float64_t, ndim=1] h = np.zeros([T], dtype=np.float64)
     
     for t in range(T):
         armax = sum(x[t] * psi)
-        arch = 0
+        arch = 0.
         for i in range(min(t, max(q, p, Q, P))):
             if i < p:
                 armax += y[t-i-1] * phi[i]
@@ -281,10 +281,10 @@ cpdef tuple model_ARMAX_GARCH_cython(
                 arch += u[t-i-1]**2 * alpha[i]
             if i < P:
                 arch += h[t-i-1]**2 * beta[i]
-            if arch < 0:
-                return 'ERROR', 'NEGATIVE VOLATILITY'
+            if arch < 0.:
+                return 1e8 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
             if arch > 1e20 or armax > 1e20:
-                return 'ERROR', 'HUGE VALUE'
+                return 1e6 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
         u[t] = y[t] - c - armax
         h[t] = sqrt(omega + arch)
     return u, h
