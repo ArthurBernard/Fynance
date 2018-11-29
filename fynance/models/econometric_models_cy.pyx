@@ -5,7 +5,6 @@ import numpy as np
 from scipy.optimize import fmin
 cimport numpy as np
 from libc.math cimport sqrt, pi, log
-#from libcpp cimport bool as bool_t
 from cpython cimport bool
 
 __all__ = [
@@ -30,21 +29,35 @@ cpdef tuple get_parameters_cy(
     if cons:
         c = params[i]
         i += 1
+    else:
+        c = 0.
     if p > 0:
         phi = params[i: p+i]
         i += p
+    else:
+        phi = np.array([0.], dtype=np.float64)
     if q > 0:
         theta = params[i: q+i]
         i += q
+    else: 
+        theta = np.array([0.], dtype=np.float64)
     if Q > 0 or P > 0:
         omega = params[i]
         i += 1
         if Q > 0:
             alpha = params[i: Q+i]
             i += Q
+        else:
+            alpha = np.array([0.], dtype=np.float64)
         if P > 0:
             beta = params[i: P+i]
             i += P
+        else:
+            beta = np.array([0.], dtype=np.float64)
+    else:
+        omega = 0.
+        alpha = np.array([0.], dtype=np.float64)
+        beta = np.array([0.], dtype=np.float64)
     return phi, theta, alpha, beta, c, omega
 
 
@@ -86,6 +99,8 @@ cpdef np.ndarray[np.float64_t, ndim=1] MA_cy(
         s = 0.
         for i in range(min(t, q)):
             s += u[t-i-1] * theta[i]
+        if s > 1e12 or s < -1e12:
+            return 1e6 * np.ones([T], dtype=np.float64)
         u[t] = y[t] - c - s
     return u
 
@@ -132,6 +147,8 @@ cpdef np.ndarray[np.float64_t, ndim=1] ARMA_cy(
                 s += u[t - i - 1] * theta[i]
             if i < p:
                 s += y[t - i - 1] * phi[i]
+            if s > 1e12 or s < -1e12:
+                return 1e6 * np.ones([T], dtype=np.float64)
         u[t] = y[t] - c - s
     return u
 
@@ -205,7 +222,7 @@ cpdef tuple ARMA_GARCH_cy(
                 arch += h[t-i-1]**2 * beta[i]
             if arch < 0.:
                 return 1e8 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
-            if arch > 1e20 or arma > 1e20:
+            if arch > 1e12 or arma > 1e12 or arma < -1e12:
                 return 1e6 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
         u[t] = y[t] - c - arma
         h[t] = sqrt(omega + arch)
@@ -287,7 +304,7 @@ cpdef tuple ARMAX_GARCH_cy(
                 arch += h[t-i-1]**2 * beta[i]
             if arch < 0.:
                 return 1e8 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
-            if arch > 1e20 or armax > 1e20:
+            if arch > 1e12 or armax > 1e12 or armax < -1e12:
                 return 1e6 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
         u[t] = y[t] - c - armax
         h[t] = sqrt(omega + arch)

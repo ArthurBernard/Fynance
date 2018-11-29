@@ -7,6 +7,7 @@ Some estimators
 
 """
 
-from .estimator_cy import *
+from . import estimator
+from .estimator import *
 
-__all__ = ['estimator_cy']
+__all__ = ['estimator']

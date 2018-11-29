@@ -118,7 +118,7 @@ cpdef np.ndarray[np.float64_t, ndim=1] roll_sharpe_cy(
     return roll_s
 
 
-cdef np.float64_t log_sharpe_cy(
+cpdef np.float64_t log_sharpe_cy(
         np.ndarray[np.float64_t, ndim=1] series, 
         np.float64_t period=252
     ):

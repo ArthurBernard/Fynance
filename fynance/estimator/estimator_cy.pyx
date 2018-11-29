@@ -89,7 +89,9 @@ cpdef np.float64_t loglikelihood_cy(
         np.ndarray[np.float64_t, ndim=1] h
     ):
     """ Normal log-likelihood function """
-    cdef np.float64_t L, l_sq_pi = log(sqrt(pi))
+    cdef np.float64_t L, l_sq_pi = log(2 * pi)
+    cdef int T = u.size
+    h = np.square(h) + 1e-8
     
-    L = - 0.5 - l_sq_pi - np.sum(h) - 0.5 * np.sum(u / (h + 1e-8))
-    return - L
+    L = <double>T * l_sq_pi + np.sum(np.log(h)) + np.sum(np.square(u) / h)
+    return 0.5 * L

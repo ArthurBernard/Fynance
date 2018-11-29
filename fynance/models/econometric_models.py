@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import fmin
 
-from .econemetric_models_cy import *
+from .econometric_models_cy import *
 
 __all__ = [
     'get_parameters', 'MA', 'ARMA', 'ARMA_GARCH', 'ARMAX_GARCH'
@@ -17,25 +17,64 @@ __all__ = [
 
 
 def get_parameters(params, p=0, q=0, Q=0, P=0, cons=True):
-    """ Get parameters for ARMA-GARCH models """
+    """
+    Get parameters for ARMA-GARCH models 
+    
+    Parameters
+    ----------
+    :params: np.ndarray[np.float64, ndim=1]
+        Array of model parameters.
+    :p, q, Q, P: int
+        Order of model.
+    :cons: bool
+        True if model contains constant.
+
+    Returns
+    -------
+    :phi: np.ndarray[np.float64, ndim=1]
+        AR parameters.
+    :theta: np.ndarray[np.float64, ndim=1]
+        MA parameters.
+    :alpha: np.ndarray[np.float64, ndim=1]
+        First part GARCH parameters.
+    :beta: np.ndarray[np.float64, ndim=1]
+        Last part GARCH parameters.
+    :c and omega: float
+        Constants of model.
+    """
+    i = 0
     if cons:
         c = params[i]
         i += 1
+    else:
+        c = 0.
     if p > 0:
         phi = params[i: p+i]
         i += p
+    else:
+        phi = np.array([0.], dtype=np.float64)
     if q > 0:
         theta = params[i: q+i]
         i += q
+    else: 
+        theta = np.array([0.], dtype=np.float64)
     if Q > 0 or P > 0:
         omega = params[i]
         i += 1
         if Q > 0:
             alpha = params[i: Q+i]
             i += Q
+        else:
+            alpha = np.array([0.], dtype=np.float64)
         if P > 0:
             beta = params[i: P+i]
             i += P
+        else:
+            beta = np.array([0.], dtype=np.float64)
+    else:
+        omega = 0.
+        alpha = np.array([0.], dtype=np.float64)
+        beta = np.array([0.], dtype=np.float64)
     return phi, theta, alpha, beta, c, omega
 
 
