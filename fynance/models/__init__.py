@@ -7,6 +7,7 @@ Some models
 
 """
 
+from . import econometric_models
 from .econometric_models import *
 
 __all__ = ['econometric_models']

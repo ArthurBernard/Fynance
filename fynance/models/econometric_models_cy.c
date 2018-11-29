@@ -11,12 +11,12 @@
             "/home/arthur/anaconda3/lib/python3.7/site-packages/numpy/core/include",
             "."
         ],
-        "name": "fynance.models.econometric_models",
+        "name": "fynance.models.econometric_models_cy",
         "sources": [
-            "fynance/models/econometric_models.pyx"
+            "fynance/models/econometric_models_cy.pyx"
         ]
     },
-    "module_name": "fynance.models.econometric_models"
+    "module_name": "fynance.models.econometric_models_cy"
 }
 END: Cython Metadata */
 
@@ -579,8 +579,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__fynance__models__econometric_models
-#define __PYX_HAVE_API__fynance__models__econometric_models
+#define __PYX_HAVE__fynance__models__econometric_models_cy
+#define __PYX_HAVE_API__fynance__models__econometric_models_cy
 /* Early includes */
 #include <string.h>
 #include <stdio.h>
@@ -813,7 +813,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "fynance/models/econometric_models.pyx",
+  "fynance/models/econometric_models_cy.pyx",
   "__init__.pxd",
   "type.pxd",
   "bool.pxd",
@@ -1106,6 +1106,23 @@ typedef npy_clongdouble __pyx_t_5numpy_clongdouble_t;
  * cdef inline object PyArray_MultiIterNew1(a):
  */
 typedef npy_cdouble __pyx_t_5numpy_complex_t;
+struct __pyx_opt_args_7fynance_6models_21econometric_models_cy_get_parameters_cy;
+
+/* "fynance/models/econometric_models_cy.pyx":20
+ * 
+ * 
+ * cpdef tuple get_parameters_cy(             # <<<<<<<<<<<<<<
+ *         np.ndarray[np.float64_t, ndim=1] params,
+ *         int p=0, int q=0, int Q=0, int P=0,
+ */
+struct __pyx_opt_args_7fynance_6models_21econometric_models_cy_get_parameters_cy {
+  int __pyx_n;
+  int p;
+  int q;
+  int Q;
+  int P;
+  PyBoolObject *cons;
+};
 
 /* --- Runtime support code (head) --- */
 /* Refnanny.proto */
@@ -1277,10 +1294,6 @@ static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject 
 #define __Pyx_ErrFetch(type, value, tb)  PyErr_Fetch(type, value, tb)
 #endif
 
-/* RaiseArgTupleInvalid.proto */
-static void __Pyx_RaiseArgtupleInvalid(const char* func_name, int exact,
-    Py_ssize_t num_min, Py_ssize_t num_max, Py_ssize_t num_found);
-
 /* RaiseDoubleKeywords.proto */
 static void __Pyx_RaiseDoubleKeywordsError(const char* func_name, PyObject* kw_name);
 
@@ -1288,6 +1301,10 @@ static void __Pyx_RaiseDoubleKeywordsError(const char* func_name, PyObject* kw_n
 static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
     PyObject *kwds2, PyObject *values[], Py_ssize_t num_pos_args,\
     const char* function_name);
+
+/* RaiseArgTupleInvalid.proto */
+static void __Pyx_RaiseArgtupleInvalid(const char* func_name, int exact,
+    Py_ssize_t num_min, Py_ssize_t num_max, Py_ssize_t num_found);
 
 /* ArgTypeTest.proto */
 #define __Pyx_ArgTypeTest(obj, type, none_allowed, name, exact)\
@@ -1679,18 +1696,18 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *, cha
 
 /* Module declarations from 'libc.math' */
 
-/* Module declarations from 'fynance.models.econometric_models' */
-static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(PyArrayObject *, int, int, int, int, PyBoolObject *, int __pyx_skip_dispatch); /*proto*/
-static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_MA_cython(PyArrayObject *, PyArrayObject *, __pyx_t_5numpy_float64_t, int, int __pyx_skip_dispatch); /*proto*/
-static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_cython(PyArrayObject *, PyArrayObject *, PyArrayObject *, __pyx_t_5numpy_float64_t, int, int, int __pyx_skip_dispatch); /*proto*/
-static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_cython(PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, __pyx_t_5numpy_float64_t, __pyx_t_5numpy_float64_t, int, int, int, int, int __pyx_skip_dispatch); /*proto*/
-static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH_cython(PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, __pyx_t_5numpy_float64_t, __pyx_t_5numpy_float64_t, int, int, int, int, int __pyx_skip_dispatch); /*proto*/
+/* Module declarations from 'fynance.models.econometric_models_cy' */
+static PyObject *__pyx_f_7fynance_6models_21econometric_models_cy_get_parameters_cy(PyArrayObject *, int __pyx_skip_dispatch, struct __pyx_opt_args_7fynance_6models_21econometric_models_cy_get_parameters_cy *__pyx_optional_args); /*proto*/
+static PyArrayObject *__pyx_f_7fynance_6models_21econometric_models_cy_MA_cy(PyArrayObject *, PyArrayObject *, __pyx_t_5numpy_float64_t, int, int __pyx_skip_dispatch); /*proto*/
+static PyArrayObject *__pyx_f_7fynance_6models_21econometric_models_cy_ARMA_cy(PyArrayObject *, PyArrayObject *, PyArrayObject *, __pyx_t_5numpy_float64_t, int, int, int __pyx_skip_dispatch); /*proto*/
+static PyObject *__pyx_f_7fynance_6models_21econometric_models_cy_ARMA_GARCH_cy(PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, __pyx_t_5numpy_float64_t, __pyx_t_5numpy_float64_t, int, int, int, int, int __pyx_skip_dispatch); /*proto*/
+static PyObject *__pyx_f_7fynance_6models_21econometric_models_cy_ARMAX_GARCH_cy(PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, __pyx_t_5numpy_float64_t, __pyx_t_5numpy_float64_t, int, int, int, int, int __pyx_skip_dispatch); /*proto*/
 static __Pyx_TypeInfo __Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t = { "float64_t", NULL, sizeof(__pyx_t_5numpy_float64_t), { 0 }, 0, 'R', 0, 0 };
-#define __Pyx_MODULE_NAME "fynance.models.econometric_models"
-extern int __pyx_module_is_main_fynance__models__econometric_models;
-int __pyx_module_is_main_fynance__models__econometric_models = 0;
+#define __Pyx_MODULE_NAME "fynance.models.econometric_models_cy"
+extern int __pyx_module_is_main_fynance__models__econometric_models_cy;
+int __pyx_module_is_main_fynance__models__econometric_models_cy = 0;
 
-/* Implementation of 'fynance.models.econometric_models' */
+/* Implementation of 'fynance.models.econometric_models_cy' */
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_sum;
 static PyObject *__pyx_builtin_ValueError;
@@ -1704,6 +1721,7 @@ static const char __pyx_k_q[] = "q";
 static const char __pyx_k_x[] = "x";
 static const char __pyx_k_y[] = "y";
 static const char __pyx_k_np[] = "np";
+static const char __pyx_k_all[] = "__all__";
 static const char __pyx_k_phi[] = "phi";
 static const char __pyx_k_psi[] = "psi";
 static const char __pyx_k_sum[] = "sum";
@@ -1714,6 +1732,7 @@ static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_ones[] = "ones";
 static const char __pyx_k_size[] = "size";
 static const char __pyx_k_test[] = "__test__";
+static const char __pyx_k_MA_cy[] = "MA_cy";
 static const char __pyx_k_alpha[] = "alpha";
 static const char __pyx_k_dtype[] = "dtype";
 static const char __pyx_k_numpy[] = "numpy";
@@ -1723,11 +1742,15 @@ static const char __pyx_k_theta[] = "theta";
 static const char __pyx_k_zeros[] = "zeros";
 static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_params[] = "params";
+static const char __pyx_k_ARMA_cy[] = "ARMA_cy";
 static const char __pyx_k_float64[] = "float64";
 static const char __pyx_k_ValueError[] = "ValueError";
 static const char __pyx_k_ImportError[] = "ImportError";
 static const char __pyx_k_RuntimeError[] = "RuntimeError";
+static const char __pyx_k_ARMA_GARCH_cy[] = "ARMA_GARCH_cy";
+static const char __pyx_k_ARMAX_GARCH_cy[] = "ARMAX_GARCH_cy";
 static const char __pyx_k_scipy_optimize[] = "scipy.optimize";
+static const char __pyx_k_get_parameters_cy[] = "get_parameters_cy";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_ndarray_is_not_C_contiguous[] = "ndarray is not C contiguous";
 static const char __pyx_k_numpy_core_multiarray_failed_to[] = "numpy.core.multiarray failed to import";
@@ -1737,14 +1760,19 @@ static const char __pyx_k_Non_native_byte_order_not_suppor[] = "Non-native byte 
 static const char __pyx_k_ndarray_is_not_Fortran_contiguou[] = "ndarray is not Fortran contiguous";
 static const char __pyx_k_numpy_core_umath_failed_to_impor[] = "numpy.core.umath failed to import";
 static const char __pyx_k_Format_string_allocated_too_shor_2[] = "Format string allocated too short.";
+static PyObject *__pyx_n_s_ARMAX_GARCH_cy;
+static PyObject *__pyx_n_s_ARMA_GARCH_cy;
+static PyObject *__pyx_n_s_ARMA_cy;
 static PyObject *__pyx_kp_u_Format_string_allocated_too_shor;
 static PyObject *__pyx_kp_u_Format_string_allocated_too_shor_2;
 static PyObject *__pyx_n_s_ImportError;
+static PyObject *__pyx_n_s_MA_cy;
 static PyObject *__pyx_kp_u_Non_native_byte_order_not_suppor;
 static PyObject *__pyx_n_s_P;
 static PyObject *__pyx_n_s_Q;
 static PyObject *__pyx_n_s_RuntimeError;
 static PyObject *__pyx_n_s_ValueError;
+static PyObject *__pyx_n_s_all;
 static PyObject *__pyx_n_s_alpha;
 static PyObject *__pyx_n_s_beta;
 static PyObject *__pyx_n_s_c;
@@ -1753,6 +1781,7 @@ static PyObject *__pyx_n_s_cons;
 static PyObject *__pyx_n_s_dtype;
 static PyObject *__pyx_n_s_float64;
 static PyObject *__pyx_n_s_fmin;
+static PyObject *__pyx_n_s_get_parameters_cy;
 static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_kp_u_ndarray_is_not_C_contiguous;
@@ -1778,11 +1807,11 @@ static PyObject *__pyx_kp_u_unknown_dtype_code_in_numpy_pxd;
 static PyObject *__pyx_n_s_x;
 static PyObject *__pyx_n_s_y;
 static PyObject *__pyx_n_s_zeros;
-static PyObject *__pyx_pf_7fynance_6models_18econometric_models_get_parameters(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_params, int __pyx_v_p, int __pyx_v_q, int __pyx_v_Q, int __pyx_v_P, PyBoolObject *__pyx_v_cons); /* proto */
-static PyObject *__pyx_pf_7fynance_6models_18econometric_models_2model_MA_cython(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_theta, __pyx_t_5numpy_float64_t __pyx_v_c, int __pyx_v_q); /* proto */
-static PyObject *__pyx_pf_7fynance_6models_18econometric_models_4model_ARMA_cython(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_phi, PyArrayObject *__pyx_v_theta, __pyx_t_5numpy_float64_t __pyx_v_c, int __pyx_v_p, int __pyx_v_q); /* proto */
-static PyObject *__pyx_pf_7fynance_6models_18econometric_models_6model_ARMA_GARCH_cython(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_phi, PyArrayObject *__pyx_v_theta, PyArrayObject *__pyx_v_alpha, PyArrayObject *__pyx_v_beta, __pyx_t_5numpy_float64_t __pyx_v_c, __pyx_t_5numpy_float64_t __pyx_v_omega, int __pyx_v_p, int __pyx_v_q, int __pyx_v_Q, int __pyx_v_P); /* proto */
-static PyObject *__pyx_pf_7fynance_6models_18econometric_models_8model_ARMAX_GARCH_cython(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_x, PyArrayObject *__pyx_v_phi, PyArrayObject *__pyx_v_psi, PyArrayObject *__pyx_v_theta, PyArrayObject *__pyx_v_alpha, PyArrayObject *__pyx_v_beta, __pyx_t_5numpy_float64_t __pyx_v_c, __pyx_t_5numpy_float64_t __pyx_v_omega, int __pyx_v_p, int __pyx_v_q, int __pyx_v_Q, int __pyx_v_P); /* proto */
+static PyObject *__pyx_pf_7fynance_6models_21econometric_models_cy_get_parameters_cy(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_params, int __pyx_v_p, int __pyx_v_q, int __pyx_v_Q, int __pyx_v_P, PyBoolObject *__pyx_v_cons); /* proto */
+static PyObject *__pyx_pf_7fynance_6models_21econometric_models_cy_2MA_cy(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_theta, __pyx_t_5numpy_float64_t __pyx_v_c, int __pyx_v_q); /* proto */
+static PyObject *__pyx_pf_7fynance_6models_21econometric_models_cy_4ARMA_cy(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_phi, PyArrayObject *__pyx_v_theta, __pyx_t_5numpy_float64_t __pyx_v_c, int __pyx_v_p, int __pyx_v_q); /* proto */
+static PyObject *__pyx_pf_7fynance_6models_21econometric_models_cy_6ARMA_GARCH_cy(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_phi, PyArrayObject *__pyx_v_theta, PyArrayObject *__pyx_v_alpha, PyArrayObject *__pyx_v_beta, __pyx_t_5numpy_float64_t __pyx_v_c, __pyx_t_5numpy_float64_t __pyx_v_omega, int __pyx_v_p, int __pyx_v_q, int __pyx_v_Q, int __pyx_v_P); /* proto */
+static PyObject *__pyx_pf_7fynance_6models_21econometric_models_cy_8ARMAX_GARCH_cy(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_x, PyArrayObject *__pyx_v_phi, PyArrayObject *__pyx_v_psi, PyArrayObject *__pyx_v_theta, PyArrayObject *__pyx_v_alpha, PyArrayObject *__pyx_v_beta, __pyx_t_5numpy_float64_t __pyx_v_c, __pyx_t_5numpy_float64_t __pyx_v_omega, int __pyx_v_p, int __pyx_v_q, int __pyx_v_Q, int __pyx_v_P); /* proto */
 static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info); /* proto */
 static PyObject *__pyx_float_1e6;
@@ -1798,16 +1827,29 @@ static PyObject *__pyx_tuple__8;
 static PyObject *__pyx_tuple__9;
 /* Late includes */
 
-/* "fynance/models/econometric_models.pyx":17
+/* "fynance/models/econometric_models_cy.pyx":20
  * 
  * 
- * cpdef tuple get_parameters(             # <<<<<<<<<<<<<<
+ * cpdef tuple get_parameters_cy(             # <<<<<<<<<<<<<<
  *         np.ndarray[np.float64_t, ndim=1] params,
- *         int p, int q, int Q, int P, bool cons
+ *         int p=0, int q=0, int Q=0, int P=0,
  */
 
-static PyObject *__pyx_pw_7fynance_6models_18econometric_models_1get_parameters(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(PyArrayObject *__pyx_v_params, int __pyx_v_p, int __pyx_v_q, int __pyx_v_Q, int __pyx_v_P, PyBoolObject *__pyx_v_cons, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_7fynance_6models_21econometric_models_cy_1get_parameters_cy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_7fynance_6models_21econometric_models_cy_get_parameters_cy(PyArrayObject *__pyx_v_params, CYTHON_UNUSED int __pyx_skip_dispatch, struct __pyx_opt_args_7fynance_6models_21econometric_models_cy_get_parameters_cy *__pyx_optional_args) {
+  int __pyx_v_p = ((int)0);
+  int __pyx_v_q = ((int)0);
+  int __pyx_v_Q = ((int)0);
+  int __pyx_v_P = ((int)0);
+
+  /* "fynance/models/econometric_models_cy.pyx":23
+ *         np.ndarray[np.float64_t, ndim=1] params,
+ *         int p=0, int q=0, int Q=0, int P=0,
+ *         bool cons=True             # <<<<<<<<<<<<<<
+ *     ):
+ *     """ Get parameters for ARMA-GARCH models """
+ */
+  PyBoolObject *__pyx_v_cons = ((PyBoolObject *)Py_True);
   int __pyx_v_i;
   PyArrayObject *__pyx_v_phi = 0;
   PyArrayObject *__pyx_v_theta = 0;
@@ -1839,7 +1881,24 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
   PyObject *__pyx_t_10 = NULL;
   int __pyx_t_11;
   Py_ssize_t __pyx_t_12;
-  __Pyx_RefNannySetupContext("get_parameters", 0);
+  __Pyx_RefNannySetupContext("get_parameters_cy", 0);
+  if (__pyx_optional_args) {
+    if (__pyx_optional_args->__pyx_n > 0) {
+      __pyx_v_p = __pyx_optional_args->p;
+      if (__pyx_optional_args->__pyx_n > 1) {
+        __pyx_v_q = __pyx_optional_args->q;
+        if (__pyx_optional_args->__pyx_n > 2) {
+          __pyx_v_Q = __pyx_optional_args->Q;
+          if (__pyx_optional_args->__pyx_n > 3) {
+            __pyx_v_P = __pyx_optional_args->P;
+            if (__pyx_optional_args->__pyx_n > 4) {
+              __pyx_v_cons = __pyx_optional_args->cons;
+            }
+          }
+        }
+      }
+    }
+  }
   __pyx_pybuffer_phi.pybuffer.buf = NULL;
   __pyx_pybuffer_phi.refcount = 0;
   __pyx_pybuffernd_phi.data = NULL;
@@ -1862,11 +1921,11 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
   __pyx_pybuffernd_params.rcbuffer = &__pyx_pybuffer_params;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_params.rcbuffer->pybuffer, (PyObject*)__pyx_v_params, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 17, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_params.rcbuffer->pybuffer, (PyObject*)__pyx_v_params, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 20, __pyx_L1_error)
   }
   __pyx_pybuffernd_params.diminfo[0].strides = __pyx_pybuffernd_params.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_params.diminfo[0].shape = __pyx_pybuffernd_params.rcbuffer->pybuffer.shape[0];
 
-  /* "fynance/models/econometric_models.pyx":22
+  /* "fynance/models/econometric_models_cy.pyx":26
  *     ):
  *     """ Get parameters for ARMA-GARCH models """
  *     cdef int i = 0             # <<<<<<<<<<<<<<
@@ -1875,17 +1934,17 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
  */
   __pyx_v_i = 0;
 
-  /* "fynance/models/econometric_models.pyx":26
+  /* "fynance/models/econometric_models_cy.pyx":30
  *     cdef np.float64_t c, omega
  * 
  *     if cons:             # <<<<<<<<<<<<<<
  *         c = params[i]
  *         i += 1
  */
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_cons)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 26, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_cons)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 30, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "fynance/models/econometric_models.pyx":27
+    /* "fynance/models/econometric_models_cy.pyx":31
  * 
  *     if cons:
  *         c = params[i]             # <<<<<<<<<<<<<<
@@ -1900,11 +1959,11 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
     } else if (unlikely(__pyx_t_2 >= __pyx_pybuffernd_params.diminfo[0].shape)) __pyx_t_3 = 0;
     if (unlikely(__pyx_t_3 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_3);
-      __PYX_ERR(0, 27, __pyx_L1_error)
+      __PYX_ERR(0, 31, __pyx_L1_error)
     }
     __pyx_v_c = (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_params.rcbuffer->pybuffer.buf, __pyx_t_2, __pyx_pybuffernd_params.diminfo[0].strides));
 
-    /* "fynance/models/econometric_models.pyx":28
+    /* "fynance/models/econometric_models_cy.pyx":32
  *     if cons:
  *         c = params[i]
  *         i += 1             # <<<<<<<<<<<<<<
@@ -1913,7 +1972,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
  */
     __pyx_v_i = (__pyx_v_i + 1);
 
-    /* "fynance/models/econometric_models.pyx":26
+    /* "fynance/models/econometric_models_cy.pyx":30
  *     cdef np.float64_t c, omega
  * 
  *     if cons:             # <<<<<<<<<<<<<<
@@ -1922,7 +1981,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
  */
   }
 
-  /* "fynance/models/econometric_models.pyx":29
+  /* "fynance/models/econometric_models_cy.pyx":33
  *         c = params[i]
  *         i += 1
  *     if p > 0:             # <<<<<<<<<<<<<<
@@ -1932,25 +1991,25 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
   __pyx_t_1 = ((__pyx_v_p > 0) != 0);
   if (__pyx_t_1) {
 
-    /* "fynance/models/econometric_models.pyx":30
+    /* "fynance/models/econometric_models_cy.pyx":34
  *         i += 1
  *     if p > 0:
  *         phi = params[i: p+i]             # <<<<<<<<<<<<<<
  *         i += p
  *     if q > 0:
  */
-    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 30, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 34, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyInt_From_int((__pyx_v_p + __pyx_v_i)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 30, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_int((__pyx_v_p + __pyx_v_i)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 34, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = PySlice_New(__pyx_t_4, __pyx_t_5, Py_None); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 30, __pyx_L1_error)
+    __pyx_t_6 = PySlice_New(__pyx_t_4, __pyx_t_5, Py_None); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 34, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_params), __pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 30, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_params), __pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 34, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (!(likely(((__pyx_t_5) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_5, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 30, __pyx_L1_error)
+    if (!(likely(((__pyx_t_5) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_5, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 34, __pyx_L1_error)
     __pyx_t_7 = ((PyArrayObject *)__pyx_t_5);
     {
       __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -1967,13 +2026,13 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
         __pyx_t_8 = __pyx_t_9 = __pyx_t_10 = 0;
       }
       __pyx_pybuffernd_phi.diminfo[0].strides = __pyx_pybuffernd_phi.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_phi.diminfo[0].shape = __pyx_pybuffernd_phi.rcbuffer->pybuffer.shape[0];
-      if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 30, __pyx_L1_error)
+      if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 34, __pyx_L1_error)
     }
     __pyx_t_7 = 0;
     __pyx_v_phi = ((PyArrayObject *)__pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "fynance/models/econometric_models.pyx":31
+    /* "fynance/models/econometric_models_cy.pyx":35
  *     if p > 0:
  *         phi = params[i: p+i]
  *         i += p             # <<<<<<<<<<<<<<
@@ -1982,7 +2041,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
  */
     __pyx_v_i = (__pyx_v_i + __pyx_v_p);
 
-    /* "fynance/models/econometric_models.pyx":29
+    /* "fynance/models/econometric_models_cy.pyx":33
  *         c = params[i]
  *         i += 1
  *     if p > 0:             # <<<<<<<<<<<<<<
@@ -1991,7 +2050,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
  */
   }
 
-  /* "fynance/models/econometric_models.pyx":32
+  /* "fynance/models/econometric_models_cy.pyx":36
  *         phi = params[i: p+i]
  *         i += p
  *     if q > 0:             # <<<<<<<<<<<<<<
@@ -2001,25 +2060,25 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
   __pyx_t_1 = ((__pyx_v_q > 0) != 0);
   if (__pyx_t_1) {
 
-    /* "fynance/models/econometric_models.pyx":33
+    /* "fynance/models/econometric_models_cy.pyx":37
  *         i += p
  *     if q > 0:
  *         theta = params[i: q+i]             # <<<<<<<<<<<<<<
  *         i += q
  *     if Q > 0 or P > 0:
  */
-    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 33, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 37, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __Pyx_PyInt_From_int((__pyx_v_q + __pyx_v_i)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 33, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_From_int((__pyx_v_q + __pyx_v_i)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 37, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_4 = PySlice_New(__pyx_t_5, __pyx_t_6, Py_None); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 33, __pyx_L1_error)
+    __pyx_t_4 = PySlice_New(__pyx_t_5, __pyx_t_6, Py_None); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 37, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_params), __pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 33, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_params), __pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 37, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 33, __pyx_L1_error)
+    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 37, __pyx_L1_error)
     __pyx_t_7 = ((PyArrayObject *)__pyx_t_6);
     {
       __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -2036,13 +2095,13 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
         __pyx_t_10 = __pyx_t_9 = __pyx_t_8 = 0;
       }
       __pyx_pybuffernd_theta.diminfo[0].strides = __pyx_pybuffernd_theta.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_theta.diminfo[0].shape = __pyx_pybuffernd_theta.rcbuffer->pybuffer.shape[0];
-      if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 33, __pyx_L1_error)
+      if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 37, __pyx_L1_error)
     }
     __pyx_t_7 = 0;
     __pyx_v_theta = ((PyArrayObject *)__pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "fynance/models/econometric_models.pyx":34
+    /* "fynance/models/econometric_models_cy.pyx":38
  *     if q > 0:
  *         theta = params[i: q+i]
  *         i += q             # <<<<<<<<<<<<<<
@@ -2051,7 +2110,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
  */
     __pyx_v_i = (__pyx_v_i + __pyx_v_q);
 
-    /* "fynance/models/econometric_models.pyx":32
+    /* "fynance/models/econometric_models_cy.pyx":36
  *         phi = params[i: p+i]
  *         i += p
  *     if q > 0:             # <<<<<<<<<<<<<<
@@ -2060,7 +2119,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
  */
   }
 
-  /* "fynance/models/econometric_models.pyx":35
+  /* "fynance/models/econometric_models_cy.pyx":39
  *         theta = params[i: q+i]
  *         i += q
  *     if Q > 0 or P > 0:             # <<<<<<<<<<<<<<
@@ -2078,7 +2137,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
   __pyx_L7_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "fynance/models/econometric_models.pyx":36
+    /* "fynance/models/econometric_models_cy.pyx":40
  *         i += q
  *     if Q > 0 or P > 0:
  *         omega = params[i]             # <<<<<<<<<<<<<<
@@ -2093,11 +2152,11 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
     } else if (unlikely(__pyx_t_12 >= __pyx_pybuffernd_params.diminfo[0].shape)) __pyx_t_3 = 0;
     if (unlikely(__pyx_t_3 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_3);
-      __PYX_ERR(0, 36, __pyx_L1_error)
+      __PYX_ERR(0, 40, __pyx_L1_error)
     }
     __pyx_v_omega = (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_params.rcbuffer->pybuffer.buf, __pyx_t_12, __pyx_pybuffernd_params.diminfo[0].strides));
 
-    /* "fynance/models/econometric_models.pyx":37
+    /* "fynance/models/econometric_models_cy.pyx":41
  *     if Q > 0 or P > 0:
  *         omega = params[i]
  *         i += 1             # <<<<<<<<<<<<<<
@@ -2106,7 +2165,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
  */
     __pyx_v_i = (__pyx_v_i + 1);
 
-    /* "fynance/models/econometric_models.pyx":38
+    /* "fynance/models/econometric_models_cy.pyx":42
  *         omega = params[i]
  *         i += 1
  *         if Q > 0:             # <<<<<<<<<<<<<<
@@ -2116,25 +2175,25 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
     __pyx_t_1 = ((__pyx_v_Q > 0) != 0);
     if (__pyx_t_1) {
 
-      /* "fynance/models/econometric_models.pyx":39
+      /* "fynance/models/econometric_models_cy.pyx":43
  *         i += 1
  *         if Q > 0:
  *             alpha = params[i: Q+i]             # <<<<<<<<<<<<<<
  *             i += Q
  *         if P > 0:
  */
-      __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 39, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 43, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_4 = __Pyx_PyInt_From_int((__pyx_v_Q + __pyx_v_i)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 39, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyInt_From_int((__pyx_v_Q + __pyx_v_i)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 43, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_5 = PySlice_New(__pyx_t_6, __pyx_t_4, Py_None); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 39, __pyx_L1_error)
+      __pyx_t_5 = PySlice_New(__pyx_t_6, __pyx_t_4, Py_None); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 43, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_params), __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 39, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_params), __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 43, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 39, __pyx_L1_error)
+      if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 43, __pyx_L1_error)
       __pyx_t_7 = ((PyArrayObject *)__pyx_t_4);
       {
         __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -2151,13 +2210,13 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
           __pyx_t_8 = __pyx_t_9 = __pyx_t_10 = 0;
         }
         __pyx_pybuffernd_alpha.diminfo[0].strides = __pyx_pybuffernd_alpha.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_alpha.diminfo[0].shape = __pyx_pybuffernd_alpha.rcbuffer->pybuffer.shape[0];
-        if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 39, __pyx_L1_error)
+        if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 43, __pyx_L1_error)
       }
       __pyx_t_7 = 0;
       __pyx_v_alpha = ((PyArrayObject *)__pyx_t_4);
       __pyx_t_4 = 0;
 
-      /* "fynance/models/econometric_models.pyx":40
+      /* "fynance/models/econometric_models_cy.pyx":44
  *         if Q > 0:
  *             alpha = params[i: Q+i]
  *             i += Q             # <<<<<<<<<<<<<<
@@ -2166,7 +2225,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
  */
       __pyx_v_i = (__pyx_v_i + __pyx_v_Q);
 
-      /* "fynance/models/econometric_models.pyx":38
+      /* "fynance/models/econometric_models_cy.pyx":42
  *         omega = params[i]
  *         i += 1
  *         if Q > 0:             # <<<<<<<<<<<<<<
@@ -2175,7 +2234,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
  */
     }
 
-    /* "fynance/models/econometric_models.pyx":41
+    /* "fynance/models/econometric_models_cy.pyx":45
  *             alpha = params[i: Q+i]
  *             i += Q
  *         if P > 0:             # <<<<<<<<<<<<<<
@@ -2185,25 +2244,25 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
     __pyx_t_1 = ((__pyx_v_P > 0) != 0);
     if (__pyx_t_1) {
 
-      /* "fynance/models/econometric_models.pyx":42
+      /* "fynance/models/econometric_models_cy.pyx":46
  *             i += Q
  *         if P > 0:
  *             beta = params[i: P+i]             # <<<<<<<<<<<<<<
  *             i += P
  *     return phi, theta, alpha, beta, c, omega
  */
-      __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 42, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 46, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_5 = __Pyx_PyInt_From_int((__pyx_v_P + __pyx_v_i)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 42, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyInt_From_int((__pyx_v_P + __pyx_v_i)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 46, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_6 = PySlice_New(__pyx_t_4, __pyx_t_5, Py_None); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 42, __pyx_L1_error)
+      __pyx_t_6 = PySlice_New(__pyx_t_4, __pyx_t_5, Py_None); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 46, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_params), __pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 42, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_params), __pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 46, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (!(likely(((__pyx_t_5) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_5, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 42, __pyx_L1_error)
+      if (!(likely(((__pyx_t_5) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_5, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 46, __pyx_L1_error)
       __pyx_t_7 = ((PyArrayObject *)__pyx_t_5);
       {
         __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -2220,13 +2279,13 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
           __pyx_t_10 = __pyx_t_9 = __pyx_t_8 = 0;
         }
         __pyx_pybuffernd_beta.diminfo[0].strides = __pyx_pybuffernd_beta.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_beta.diminfo[0].shape = __pyx_pybuffernd_beta.rcbuffer->pybuffer.shape[0];
-        if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 42, __pyx_L1_error)
+        if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 46, __pyx_L1_error)
       }
       __pyx_t_7 = 0;
       __pyx_v_beta = ((PyArrayObject *)__pyx_t_5);
       __pyx_t_5 = 0;
 
-      /* "fynance/models/econometric_models.pyx":43
+      /* "fynance/models/econometric_models_cy.pyx":47
  *         if P > 0:
  *             beta = params[i: P+i]
  *             i += P             # <<<<<<<<<<<<<<
@@ -2235,7 +2294,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
  */
       __pyx_v_i = (__pyx_v_i + __pyx_v_P);
 
-      /* "fynance/models/econometric_models.pyx":41
+      /* "fynance/models/econometric_models_cy.pyx":45
  *             alpha = params[i: Q+i]
  *             i += Q
  *         if P > 0:             # <<<<<<<<<<<<<<
@@ -2244,7 +2303,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
  */
     }
 
-    /* "fynance/models/econometric_models.pyx":35
+    /* "fynance/models/econometric_models_cy.pyx":39
  *         theta = params[i: q+i]
  *         i += q
  *     if Q > 0 or P > 0:             # <<<<<<<<<<<<<<
@@ -2253,7 +2312,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
  */
   }
 
-  /* "fynance/models/econometric_models.pyx":44
+  /* "fynance/models/econometric_models_cy.pyx":48
  *             beta = params[i: P+i]
  *             i += P
  *     return phi, theta, alpha, beta, c, omega             # <<<<<<<<<<<<<<
@@ -2261,11 +2320,11 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_c); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_c); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 48, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = PyFloat_FromDouble(__pyx_v_omega); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_6 = PyFloat_FromDouble(__pyx_v_omega); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 48, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_4 = PyTuple_New(6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_4 = PyTuple_New(6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 48, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_INCREF(((PyObject *)__pyx_v_phi));
   __Pyx_GIVEREF(((PyObject *)__pyx_v_phi));
@@ -2289,12 +2348,12 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
   __pyx_t_4 = 0;
   goto __pyx_L0;
 
-  /* "fynance/models/econometric_models.pyx":17
+  /* "fynance/models/econometric_models_cy.pyx":20
  * 
  * 
- * cpdef tuple get_parameters(             # <<<<<<<<<<<<<<
+ * cpdef tuple get_parameters_cy(             # <<<<<<<<<<<<<<
  *         np.ndarray[np.float64_t, ndim=1] params,
- *         int p, int q, int Q, int P, bool cons
+ *         int p=0, int q=0, int Q=0, int P=0,
  */
 
   /* function exit code */
@@ -2312,7 +2371,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_phi.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_theta.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("fynance.models.econometric_models.get_parameters", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("fynance.models.econometric_models_cy.get_parameters_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   goto __pyx_L2;
   __pyx_L0:;
@@ -2332,9 +2391,9 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_get_parameters(Py
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7fynance_6models_18econometric_models_1get_parameters(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_7fynance_6models_18econometric_models_get_parameters[] = " Get parameters for ARMA-GARCH models ";
-static PyObject *__pyx_pw_7fynance_6models_18econometric_models_1get_parameters(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7fynance_6models_21econometric_models_cy_1get_parameters_cy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_7fynance_6models_21econometric_models_cy_get_parameters_cy[] = " Get parameters for ARMA-GARCH models ";
+static PyObject *__pyx_pw_7fynance_6models_21econometric_models_cy_1get_parameters_cy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyArrayObject *__pyx_v_params = 0;
   int __pyx_v_p;
   int __pyx_v_q;
@@ -2343,10 +2402,19 @@ static PyObject *__pyx_pw_7fynance_6models_18econometric_models_1get_parameters(
   PyBoolObject *__pyx_v_cons = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("get_parameters (wrapper)", 0);
+  __Pyx_RefNannySetupContext("get_parameters_cy (wrapper)", 0);
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_params,&__pyx_n_s_p,&__pyx_n_s_q,&__pyx_n_s_Q,&__pyx_n_s_P,&__pyx_n_s_cons,0};
     PyObject* values[6] = {0,0,0,0,0,0};
+
+    /* "fynance/models/econometric_models_cy.pyx":23
+ *         np.ndarray[np.float64_t, ndim=1] params,
+ *         int p=0, int q=0, int Q=0, int P=0,
+ *         bool cons=True             # <<<<<<<<<<<<<<
+ *     ):
+ *     """ Get parameters for ARMA-GARCH models """
+ */
+    values[5] = (PyObject *)((PyBoolObject *)Py_True);
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
@@ -2373,66 +2441,97 @@ static PyObject *__pyx_pw_7fynance_6models_18econometric_models_1get_parameters(
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_p)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("get_parameters", 1, 6, 6, 1); __PYX_ERR(0, 17, __pyx_L3_error)
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_p);
+          if (value) { values[1] = value; kw_args--; }
         }
         CYTHON_FALLTHROUGH;
         case  2:
-        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_q)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("get_parameters", 1, 6, 6, 2); __PYX_ERR(0, 17, __pyx_L3_error)
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_q);
+          if (value) { values[2] = value; kw_args--; }
         }
         CYTHON_FALLTHROUGH;
         case  3:
-        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_Q)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("get_parameters", 1, 6, 6, 3); __PYX_ERR(0, 17, __pyx_L3_error)
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_Q);
+          if (value) { values[3] = value; kw_args--; }
         }
         CYTHON_FALLTHROUGH;
         case  4:
-        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_P)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("get_parameters", 1, 6, 6, 4); __PYX_ERR(0, 17, __pyx_L3_error)
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_P);
+          if (value) { values[4] = value; kw_args--; }
         }
         CYTHON_FALLTHROUGH;
         case  5:
-        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cons)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("get_parameters", 1, 6, 6, 5); __PYX_ERR(0, 17, __pyx_L3_error)
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cons);
+          if (value) { values[5] = value; kw_args--; }
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "get_parameters") < 0)) __PYX_ERR(0, 17, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "get_parameters_cy") < 0)) __PYX_ERR(0, 20, __pyx_L3_error)
       }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
-      goto __pyx_L5_argtuple_error;
     } else {
-      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-      values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
-      values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+      switch (PyTuple_GET_SIZE(__pyx_args)) {
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
+        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+        CYTHON_FALLTHROUGH;
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        break;
+        default: goto __pyx_L5_argtuple_error;
+      }
     }
     __pyx_v_params = ((PyArrayObject *)values[0]);
-    __pyx_v_p = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_p == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 19, __pyx_L3_error)
-    __pyx_v_q = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_q == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 19, __pyx_L3_error)
-    __pyx_v_Q = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_Q == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 19, __pyx_L3_error)
-    __pyx_v_P = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_P == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 19, __pyx_L3_error)
+    if (values[1]) {
+      __pyx_v_p = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_p == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 22, __pyx_L3_error)
+    } else {
+      __pyx_v_p = ((int)0);
+    }
+    if (values[2]) {
+      __pyx_v_q = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_q == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 22, __pyx_L3_error)
+    } else {
+      __pyx_v_q = ((int)0);
+    }
+    if (values[3]) {
+      __pyx_v_Q = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_Q == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 22, __pyx_L3_error)
+    } else {
+      __pyx_v_Q = ((int)0);
+    }
+    if (values[4]) {
+      __pyx_v_P = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_P == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 22, __pyx_L3_error)
+    } else {
+      __pyx_v_P = ((int)0);
+    }
     __pyx_v_cons = ((PyBoolObject *)values[5]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("get_parameters", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 17, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("get_parameters_cy", 0, 1, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 20, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("fynance.models.econometric_models.get_parameters", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("fynance.models.econometric_models_cy.get_parameters_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_params), __pyx_ptype_5numpy_ndarray, 1, "params", 0))) __PYX_ERR(0, 18, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_cons), __pyx_ptype_7cpython_4bool_bool, 1, "cons", 0))) __PYX_ERR(0, 19, __pyx_L1_error)
-  __pyx_r = __pyx_pf_7fynance_6models_18econometric_models_get_parameters(__pyx_self, __pyx_v_params, __pyx_v_p, __pyx_v_q, __pyx_v_Q, __pyx_v_P, __pyx_v_cons);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_params), __pyx_ptype_5numpy_ndarray, 1, "params", 0))) __PYX_ERR(0, 21, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_cons), __pyx_ptype_7cpython_4bool_bool, 1, "cons", 0))) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_r = __pyx_pf_7fynance_6models_21econometric_models_cy_get_parameters_cy(__pyx_self, __pyx_v_params, __pyx_v_p, __pyx_v_q, __pyx_v_Q, __pyx_v_P, __pyx_v_cons);
+
+  /* "fynance/models/econometric_models_cy.pyx":20
+ * 
+ * 
+ * cpdef tuple get_parameters_cy(             # <<<<<<<<<<<<<<
+ *         np.ndarray[np.float64_t, ndim=1] params,
+ *         int p=0, int q=0, int Q=0, int P=0,
+ */
 
   /* function exit code */
   goto __pyx_L0;
@@ -2443,24 +2542,31 @@ static PyObject *__pyx_pw_7fynance_6models_18econometric_models_1get_parameters(
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7fynance_6models_18econometric_models_get_parameters(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_params, int __pyx_v_p, int __pyx_v_q, int __pyx_v_Q, int __pyx_v_P, PyBoolObject *__pyx_v_cons) {
+static PyObject *__pyx_pf_7fynance_6models_21econometric_models_cy_get_parameters_cy(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_params, int __pyx_v_p, int __pyx_v_q, int __pyx_v_Q, int __pyx_v_P, PyBoolObject *__pyx_v_cons) {
   __Pyx_LocalBuf_ND __pyx_pybuffernd_params;
   __Pyx_Buffer __pyx_pybuffer_params;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
-  __Pyx_RefNannySetupContext("get_parameters", 0);
+  struct __pyx_opt_args_7fynance_6models_21econometric_models_cy_get_parameters_cy __pyx_t_2;
+  __Pyx_RefNannySetupContext("get_parameters_cy", 0);
   __pyx_pybuffer_params.pybuffer.buf = NULL;
   __pyx_pybuffer_params.refcount = 0;
   __pyx_pybuffernd_params.data = NULL;
   __pyx_pybuffernd_params.rcbuffer = &__pyx_pybuffer_params;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_params.rcbuffer->pybuffer, (PyObject*)__pyx_v_params, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 17, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_params.rcbuffer->pybuffer, (PyObject*)__pyx_v_params, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 20, __pyx_L1_error)
   }
   __pyx_pybuffernd_params.diminfo[0].strides = __pyx_pybuffernd_params.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_params.diminfo[0].shape = __pyx_pybuffernd_params.rcbuffer->pybuffer.shape[0];
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_7fynance_6models_18econometric_models_get_parameters(__pyx_v_params, __pyx_v_p, __pyx_v_q, __pyx_v_Q, __pyx_v_P, __pyx_v_cons, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_2.__pyx_n = 5;
+  __pyx_t_2.p = __pyx_v_p;
+  __pyx_t_2.q = __pyx_v_q;
+  __pyx_t_2.Q = __pyx_v_Q;
+  __pyx_t_2.P = __pyx_v_P;
+  __pyx_t_2.cons = __pyx_v_cons;
+  __pyx_t_1 = __pyx_f_7fynance_6models_21econometric_models_cy_get_parameters_cy(__pyx_v_params, 0, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2475,7 +2581,7 @@ static PyObject *__pyx_pf_7fynance_6models_18econometric_models_get_parameters(C
     __Pyx_ErrFetch(&__pyx_type, &__pyx_value, &__pyx_tb);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_params.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("fynance.models.econometric_models.get_parameters", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("fynance.models.econometric_models_cy.get_parameters_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
@@ -2486,16 +2592,16 @@ static PyObject *__pyx_pf_7fynance_6models_18econometric_models_get_parameters(C
   return __pyx_r;
 }
 
-/* "fynance/models/econometric_models.pyx":52
+/* "fynance/models/econometric_models_cy.pyx":56
  * 
  * 
- * cpdef np.ndarray[np.float64_t, ndim=1] model_MA_cython(             # <<<<<<<<<<<<<<
+ * cpdef np.ndarray[np.float64_t, ndim=1] MA_cy(             # <<<<<<<<<<<<<<
  *         np.ndarray[np.float64_t, ndim=1] y,
  *         np.ndarray[np.float64_t, ndim=1] theta,
  */
 
-static PyObject *__pyx_pw_7fynance_6models_18econometric_models_3model_MA_cython(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_MA_cython(PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_theta, __pyx_t_5numpy_float64_t __pyx_v_c, int __pyx_v_q, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_7fynance_6models_21econometric_models_cy_3MA_cy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyArrayObject *__pyx_f_7fynance_6models_21econometric_models_cy_MA_cy(PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_theta, __pyx_t_5numpy_float64_t __pyx_v_c, int __pyx_v_q, CYTHON_UNUSED int __pyx_skip_dispatch) {
   __pyx_t_5numpy_float64_t __pyx_v_s;
   int __pyx_v_i;
   int __pyx_v_t;
@@ -2526,7 +2632,7 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_MA_cyt
   Py_ssize_t __pyx_t_15;
   Py_ssize_t __pyx_t_16;
   Py_ssize_t __pyx_t_17;
-  __Pyx_RefNannySetupContext("model_MA_cython", 0);
+  __Pyx_RefNannySetupContext("MA_cy", 0);
   __pyx_pybuffer_u.pybuffer.buf = NULL;
   __pyx_pybuffer_u.refcount = 0;
   __pyx_pybuffernd_u.data = NULL;
@@ -2541,73 +2647,73 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_MA_cyt
   __pyx_pybuffernd_theta.rcbuffer = &__pyx_pybuffer_theta;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y.rcbuffer->pybuffer, (PyObject*)__pyx_v_y, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 52, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y.rcbuffer->pybuffer, (PyObject*)__pyx_v_y, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 56, __pyx_L1_error)
   }
   __pyx_pybuffernd_y.diminfo[0].strides = __pyx_pybuffernd_y.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_y.diminfo[0].shape = __pyx_pybuffernd_y.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_theta.rcbuffer->pybuffer, (PyObject*)__pyx_v_theta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 52, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_theta.rcbuffer->pybuffer, (PyObject*)__pyx_v_theta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 56, __pyx_L1_error)
   }
   __pyx_pybuffernd_theta.diminfo[0].strides = __pyx_pybuffernd_theta.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_theta.diminfo[0].shape = __pyx_pybuffernd_theta.rcbuffer->pybuffer.shape[0];
 
-  /* "fynance/models/econometric_models.pyx":78
+  /* "fynance/models/econometric_models_cy.pyx":82
  *     """
  *     cdef np.float64_t s
  *     cdef int i, t, T = y.size             # <<<<<<<<<<<<<<
  *     cdef np.ndarray[np.float64_t, ndim=1] u = np.zeros([T], dtype=np.float64)  # Residuals
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_y), __pyx_n_s_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_y), __pyx_n_s_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 82, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 82, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_T = __pyx_t_2;
 
-  /* "fynance/models/econometric_models.pyx":79
+  /* "fynance/models/econometric_models_cy.pyx":83
  *     cdef np.float64_t s
  *     cdef int i, t, T = y.size
  *     cdef np.ndarray[np.float64_t, ndim=1] u = np.zeros([T], dtype=np.float64)  # Residuals             # <<<<<<<<<<<<<<
  * 
  *     for t in range(T):
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = PyList_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __pyx_t_4 = PyList_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_1);
   PyList_SET_ITEM(__pyx_t_4, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_float64); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_float64); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_6) < 0) __PYX_ERR(0, 79, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_6) < 0) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 79, __pyx_L1_error)
+  if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 83, __pyx_L1_error)
   __pyx_t_7 = ((PyArrayObject *)__pyx_t_6);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
     if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_u.rcbuffer->pybuffer, (PyObject*)__pyx_t_7, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 1, 0, __pyx_stack) == -1)) {
       __pyx_v_u = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_u.rcbuffer->pybuffer.buf = NULL;
-      __PYX_ERR(0, 79, __pyx_L1_error)
+      __PYX_ERR(0, 83, __pyx_L1_error)
     } else {__pyx_pybuffernd_u.diminfo[0].strides = __pyx_pybuffernd_u.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_u.diminfo[0].shape = __pyx_pybuffernd_u.rcbuffer->pybuffer.shape[0];
     }
   }
@@ -2615,11 +2721,11 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_MA_cyt
   __pyx_v_u = ((PyArrayObject *)__pyx_t_6);
   __pyx_t_6 = 0;
 
-  /* "fynance/models/econometric_models.pyx":81
+  /* "fynance/models/econometric_models_cy.pyx":85
  *     cdef np.ndarray[np.float64_t, ndim=1] u = np.zeros([T], dtype=np.float64)  # Residuals
  * 
  *     for t in range(T):             # <<<<<<<<<<<<<<
- *         s = 0
+ *         s = 0.
  *         for i in range(min(t, q)):
  */
   __pyx_t_2 = __pyx_v_T;
@@ -2627,18 +2733,18 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_MA_cyt
   for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
     __pyx_v_t = __pyx_t_9;
 
-    /* "fynance/models/econometric_models.pyx":82
+    /* "fynance/models/econometric_models_cy.pyx":86
  * 
  *     for t in range(T):
- *         s = 0             # <<<<<<<<<<<<<<
+ *         s = 0.             # <<<<<<<<<<<<<<
  *         for i in range(min(t, q)):
  *             s += u[t-i-1] * theta[i]
  */
-    __pyx_v_s = 0.0;
+    __pyx_v_s = 0.;
 
-    /* "fynance/models/econometric_models.pyx":83
+    /* "fynance/models/econometric_models_cy.pyx":87
  *     for t in range(T):
- *         s = 0
+ *         s = 0.
  *         for i in range(min(t, q)):             # <<<<<<<<<<<<<<
  *             s += u[t-i-1] * theta[i]
  *         u[t] = y[t] - c - s
@@ -2655,8 +2761,8 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_MA_cyt
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_12; __pyx_t_11+=1) {
       __pyx_v_i = __pyx_t_11;
 
-      /* "fynance/models/econometric_models.pyx":84
- *         s = 0
+      /* "fynance/models/econometric_models_cy.pyx":88
+ *         s = 0.
  *         for i in range(min(t, q)):
  *             s += u[t-i-1] * theta[i]             # <<<<<<<<<<<<<<
  *         u[t] = y[t] - c - s
@@ -2670,7 +2776,7 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_MA_cyt
       } else if (unlikely(__pyx_t_13 >= __pyx_pybuffernd_u.diminfo[0].shape)) __pyx_t_14 = 0;
       if (unlikely(__pyx_t_14 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_14);
-        __PYX_ERR(0, 84, __pyx_L1_error)
+        __PYX_ERR(0, 88, __pyx_L1_error)
       }
       __pyx_t_15 = __pyx_v_i;
       __pyx_t_14 = -1;
@@ -2680,12 +2786,12 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_MA_cyt
       } else if (unlikely(__pyx_t_15 >= __pyx_pybuffernd_theta.diminfo[0].shape)) __pyx_t_14 = 0;
       if (unlikely(__pyx_t_14 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_14);
-        __PYX_ERR(0, 84, __pyx_L1_error)
+        __PYX_ERR(0, 88, __pyx_L1_error)
       }
       __pyx_v_s = (__pyx_v_s + ((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_u.rcbuffer->pybuffer.buf, __pyx_t_13, __pyx_pybuffernd_u.diminfo[0].strides)) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_theta.rcbuffer->pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_theta.diminfo[0].strides))));
     }
 
-    /* "fynance/models/econometric_models.pyx":85
+    /* "fynance/models/econometric_models_cy.pyx":89
  *         for i in range(min(t, q)):
  *             s += u[t-i-1] * theta[i]
  *         u[t] = y[t] - c - s             # <<<<<<<<<<<<<<
@@ -2700,7 +2806,7 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_MA_cyt
     } else if (unlikely(__pyx_t_16 >= __pyx_pybuffernd_y.diminfo[0].shape)) __pyx_t_10 = 0;
     if (unlikely(__pyx_t_10 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_10);
-      __PYX_ERR(0, 85, __pyx_L1_error)
+      __PYX_ERR(0, 89, __pyx_L1_error)
     }
     __pyx_t_17 = __pyx_v_t;
     __pyx_t_10 = -1;
@@ -2710,12 +2816,12 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_MA_cyt
     } else if (unlikely(__pyx_t_17 >= __pyx_pybuffernd_u.diminfo[0].shape)) __pyx_t_10 = 0;
     if (unlikely(__pyx_t_10 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_10);
-      __PYX_ERR(0, 85, __pyx_L1_error)
+      __PYX_ERR(0, 89, __pyx_L1_error)
     }
     *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_u.rcbuffer->pybuffer.buf, __pyx_t_17, __pyx_pybuffernd_u.diminfo[0].strides) = (((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_y.rcbuffer->pybuffer.buf, __pyx_t_16, __pyx_pybuffernd_y.diminfo[0].strides)) - __pyx_v_c) - __pyx_v_s);
   }
 
-  /* "fynance/models/econometric_models.pyx":86
+  /* "fynance/models/econometric_models_cy.pyx":90
  *             s += u[t-i-1] * theta[i]
  *         u[t] = y[t] - c - s
  *     return u             # <<<<<<<<<<<<<<
@@ -2727,10 +2833,10 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_MA_cyt
   __pyx_r = ((PyArrayObject *)__pyx_v_u);
   goto __pyx_L0;
 
-  /* "fynance/models/econometric_models.pyx":52
+  /* "fynance/models/econometric_models_cy.pyx":56
  * 
  * 
- * cpdef np.ndarray[np.float64_t, ndim=1] model_MA_cython(             # <<<<<<<<<<<<<<
+ * cpdef np.ndarray[np.float64_t, ndim=1] MA_cy(             # <<<<<<<<<<<<<<
  *         np.ndarray[np.float64_t, ndim=1] y,
  *         np.ndarray[np.float64_t, ndim=1] theta,
  */
@@ -2750,7 +2856,7 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_MA_cyt
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_u.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_y.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("fynance.models.econometric_models.model_MA_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("fynance.models.econometric_models_cy.MA_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   goto __pyx_L2;
   __pyx_L0:;
@@ -2765,16 +2871,16 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_MA_cyt
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7fynance_6models_18econometric_models_3model_MA_cython(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_7fynance_6models_18econometric_models_2model_MA_cython[] = " \n    Moving Average model of order q s.t: \n    y_t = c + theta_1 * u_t-1 + ... + theta_q * u_t-q + u_t \n    \n    Parameters\n    ----------\n    y: np.ndarray[np.float64, ndim=1]\n        Time series.\n    theta: np.ndarray[np.float64, ndim=1]\n        Coefficients of model.\n    c: np.float64\n        Constant of the model.\n    q: int\n        Order of MA(q) model.\n        \n    Returns\n    -------\n    u: np.ndarray[ndim=1, dtype=np.float64]\n        Residual of the model.\n    ";
-static PyObject *__pyx_pw_7fynance_6models_18econometric_models_3model_MA_cython(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7fynance_6models_21econometric_models_cy_3MA_cy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_7fynance_6models_21econometric_models_cy_2MA_cy[] = " \n    Moving Average model of order q s.t: \n    y_t = c + theta_1 * u_t-1 + ... + theta_q * u_t-q + u_t \n    \n    Parameters\n    ----------\n    y: np.ndarray[np.float64, ndim=1]\n        Time series.\n    theta: np.ndarray[np.float64, ndim=1]\n        Coefficients of model.\n    c: np.float64\n        Constant of the model.\n    q: int\n        Order of MA(q) model.\n        \n    Returns\n    -------\n    u: np.ndarray[ndim=1, dtype=np.float64]\n        Residual of the model.\n    ";
+static PyObject *__pyx_pw_7fynance_6models_21econometric_models_cy_3MA_cy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyArrayObject *__pyx_v_y = 0;
   PyArrayObject *__pyx_v_theta = 0;
   __pyx_t_5numpy_float64_t __pyx_v_c;
   int __pyx_v_q;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("model_MA_cython (wrapper)", 0);
+  __Pyx_RefNannySetupContext("MA_cy (wrapper)", 0);
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_y,&__pyx_n_s_theta,&__pyx_n_s_c,&__pyx_n_s_q,0};
     PyObject* values[4] = {0,0,0,0};
@@ -2802,23 +2908,23 @@ static PyObject *__pyx_pw_7fynance_6models_18econometric_models_3model_MA_cython
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_theta)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_MA_cython", 1, 4, 4, 1); __PYX_ERR(0, 52, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("MA_cy", 1, 4, 4, 1); __PYX_ERR(0, 56, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_c)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_MA_cython", 1, 4, 4, 2); __PYX_ERR(0, 52, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("MA_cy", 1, 4, 4, 2); __PYX_ERR(0, 56, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_q)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_MA_cython", 1, 4, 4, 3); __PYX_ERR(0, 52, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("MA_cy", 1, 4, 4, 3); __PYX_ERR(0, 56, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "model_MA_cython") < 0)) __PYX_ERR(0, 52, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "MA_cy") < 0)) __PYX_ERR(0, 56, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -2830,20 +2936,20 @@ static PyObject *__pyx_pw_7fynance_6models_18econometric_models_3model_MA_cython
     }
     __pyx_v_y = ((PyArrayObject *)values[0]);
     __pyx_v_theta = ((PyArrayObject *)values[1]);
-    __pyx_v_c = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_c == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 55, __pyx_L3_error)
-    __pyx_v_q = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_q == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 55, __pyx_L3_error)
+    __pyx_v_c = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_c == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 59, __pyx_L3_error)
+    __pyx_v_q = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_q == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 59, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("model_MA_cython", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 52, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("MA_cy", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 56, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("fynance.models.econometric_models.model_MA_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("fynance.models.econometric_models_cy.MA_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_y), __pyx_ptype_5numpy_ndarray, 1, "y", 0))) __PYX_ERR(0, 53, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_theta), __pyx_ptype_5numpy_ndarray, 1, "theta", 0))) __PYX_ERR(0, 54, __pyx_L1_error)
-  __pyx_r = __pyx_pf_7fynance_6models_18econometric_models_2model_MA_cython(__pyx_self, __pyx_v_y, __pyx_v_theta, __pyx_v_c, __pyx_v_q);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_y), __pyx_ptype_5numpy_ndarray, 1, "y", 0))) __PYX_ERR(0, 57, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_theta), __pyx_ptype_5numpy_ndarray, 1, "theta", 0))) __PYX_ERR(0, 58, __pyx_L1_error)
+  __pyx_r = __pyx_pf_7fynance_6models_21econometric_models_cy_2MA_cy(__pyx_self, __pyx_v_y, __pyx_v_theta, __pyx_v_c, __pyx_v_q);
 
   /* function exit code */
   goto __pyx_L0;
@@ -2854,7 +2960,7 @@ static PyObject *__pyx_pw_7fynance_6models_18econometric_models_3model_MA_cython
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7fynance_6models_18econometric_models_2model_MA_cython(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_theta, __pyx_t_5numpy_float64_t __pyx_v_c, int __pyx_v_q) {
+static PyObject *__pyx_pf_7fynance_6models_21econometric_models_cy_2MA_cy(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_theta, __pyx_t_5numpy_float64_t __pyx_v_c, int __pyx_v_q) {
   __Pyx_LocalBuf_ND __pyx_pybuffernd_theta;
   __Pyx_Buffer __pyx_pybuffer_theta;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_y;
@@ -2862,7 +2968,7 @@ static PyObject *__pyx_pf_7fynance_6models_18econometric_models_2model_MA_cython
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
-  __Pyx_RefNannySetupContext("model_MA_cython", 0);
+  __Pyx_RefNannySetupContext("MA_cy", 0);
   __pyx_pybuffer_y.pybuffer.buf = NULL;
   __pyx_pybuffer_y.refcount = 0;
   __pyx_pybuffernd_y.data = NULL;
@@ -2873,16 +2979,16 @@ static PyObject *__pyx_pf_7fynance_6models_18econometric_models_2model_MA_cython
   __pyx_pybuffernd_theta.rcbuffer = &__pyx_pybuffer_theta;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y.rcbuffer->pybuffer, (PyObject*)__pyx_v_y, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 52, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y.rcbuffer->pybuffer, (PyObject*)__pyx_v_y, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 56, __pyx_L1_error)
   }
   __pyx_pybuffernd_y.diminfo[0].strides = __pyx_pybuffernd_y.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_y.diminfo[0].shape = __pyx_pybuffernd_y.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_theta.rcbuffer->pybuffer, (PyObject*)__pyx_v_theta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 52, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_theta.rcbuffer->pybuffer, (PyObject*)__pyx_v_theta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 56, __pyx_L1_error)
   }
   __pyx_pybuffernd_theta.diminfo[0].strides = __pyx_pybuffernd_theta.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_theta.diminfo[0].shape = __pyx_pybuffernd_theta.rcbuffer->pybuffer.shape[0];
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_7fynance_6models_18econometric_models_model_MA_cython(__pyx_v_y, __pyx_v_theta, __pyx_v_c, __pyx_v_q, 0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_7fynance_6models_21econometric_models_cy_MA_cy(__pyx_v_y, __pyx_v_theta, __pyx_v_c, __pyx_v_q, 0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 56, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2898,7 +3004,7 @@ static PyObject *__pyx_pf_7fynance_6models_18econometric_models_2model_MA_cython
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_theta.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_y.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("fynance.models.econometric_models.model_MA_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("fynance.models.econometric_models_cy.MA_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
@@ -2910,16 +3016,16 @@ static PyObject *__pyx_pf_7fynance_6models_18econometric_models_2model_MA_cython
   return __pyx_r;
 }
 
-/* "fynance/models/econometric_models.pyx":89
+/* "fynance/models/econometric_models_cy.pyx":93
  * 
  * 
- * cpdef np.ndarray[np.float64_t, ndim=1] model_ARMA_cython(             # <<<<<<<<<<<<<<
+ * cpdef np.ndarray[np.float64_t, ndim=1] ARMA_cy(             # <<<<<<<<<<<<<<
  *         np.ndarray[np.float64_t, ndim=1] y,
  *         np.ndarray[np.float64_t, ndim=1] phi,
  */
 
-static PyObject *__pyx_pw_7fynance_6models_18econometric_models_5model_ARMA_cython(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_cython(PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_phi, PyArrayObject *__pyx_v_theta, __pyx_t_5numpy_float64_t __pyx_v_c, int __pyx_v_p, int __pyx_v_q, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_7fynance_6models_21econometric_models_cy_5ARMA_cy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyArrayObject *__pyx_f_7fynance_6models_21econometric_models_cy_ARMA_cy(PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_phi, PyArrayObject *__pyx_v_theta, __pyx_t_5numpy_float64_t __pyx_v_c, int __pyx_v_p, int __pyx_v_q, CYTHON_UNUSED int __pyx_skip_dispatch) {
   __pyx_t_5numpy_float64_t __pyx_v_s;
   int __pyx_v_i;
   int __pyx_v_t;
@@ -2955,7 +3061,7 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
   Py_ssize_t __pyx_t_18;
   Py_ssize_t __pyx_t_19;
   Py_ssize_t __pyx_t_20;
-  __Pyx_RefNannySetupContext("model_ARMA_cython", 0);
+  __Pyx_RefNannySetupContext("ARMA_cy", 0);
   __pyx_pybuffer_u.pybuffer.buf = NULL;
   __pyx_pybuffer_u.refcount = 0;
   __pyx_pybuffernd_u.data = NULL;
@@ -2974,30 +3080,30 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
   __pyx_pybuffernd_theta.rcbuffer = &__pyx_pybuffer_theta;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y.rcbuffer->pybuffer, (PyObject*)__pyx_v_y, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 89, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y.rcbuffer->pybuffer, (PyObject*)__pyx_v_y, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 93, __pyx_L1_error)
   }
   __pyx_pybuffernd_y.diminfo[0].strides = __pyx_pybuffernd_y.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_y.diminfo[0].shape = __pyx_pybuffernd_y.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_phi.rcbuffer->pybuffer, (PyObject*)__pyx_v_phi, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 89, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_phi.rcbuffer->pybuffer, (PyObject*)__pyx_v_phi, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 93, __pyx_L1_error)
   }
   __pyx_pybuffernd_phi.diminfo[0].strides = __pyx_pybuffernd_phi.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_phi.diminfo[0].shape = __pyx_pybuffernd_phi.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_theta.rcbuffer->pybuffer, (PyObject*)__pyx_v_theta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 89, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_theta.rcbuffer->pybuffer, (PyObject*)__pyx_v_theta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 93, __pyx_L1_error)
   }
   __pyx_pybuffernd_theta.diminfo[0].strides = __pyx_pybuffernd_theta.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_theta.diminfo[0].shape = __pyx_pybuffernd_theta.rcbuffer->pybuffer.shape[0];
 
-  /* "fynance/models/econometric_models.pyx":121
+  /* "fynance/models/econometric_models_cy.pyx":125
  *     """
  *     cdef np.float64_t s
  *     cdef int i, j, t, T = np.size(y)             # <<<<<<<<<<<<<<
  *     cdef np.ndarray[np.float64_t, ndim=1] u = np.zeros([T], dtype=np.float64)
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 121, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 125, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_size); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 121, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_size); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 125, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -3011,13 +3117,13 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
     }
   }
   if (!__pyx_t_2) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, ((PyObject *)__pyx_v_y)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 121, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, ((PyObject *)__pyx_v_y)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_2, ((PyObject *)__pyx_v_y)};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 121, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 125, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else
@@ -3025,73 +3131,73 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_2, ((PyObject *)__pyx_v_y)};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 121, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 125, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else
     #endif
     {
-      __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 121, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 125, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2); __pyx_t_2 = NULL;
       __Pyx_INCREF(((PyObject *)__pyx_v_y));
       __Pyx_GIVEREF(((PyObject *)__pyx_v_y));
       PyTuple_SET_ITEM(__pyx_t_4, 0+1, ((PyObject *)__pyx_v_y));
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 121, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 125, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     }
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 121, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 125, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_T = __pyx_t_5;
 
-  /* "fynance/models/econometric_models.pyx":122
+  /* "fynance/models/econometric_models_cy.pyx":126
  *     cdef np.float64_t s
  *     cdef int i, j, t, T = np.size(y)
  *     cdef np.ndarray[np.float64_t, ndim=1] u = np.zeros([T], dtype=np.float64)             # <<<<<<<<<<<<<<
  * 
  *     for t in range(T):
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 122, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 126, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = PyList_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 122, __pyx_L1_error)
+  __pyx_t_4 = PyList_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 126, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_1);
   PyList_SET_ITEM(__pyx_t_4, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 122, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 126, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 122, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 126, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_float64); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 122, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_float64); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 126, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_6) < 0) __PYX_ERR(0, 122, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_6) < 0) __PYX_ERR(0, 126, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 122, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 126, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 122, __pyx_L1_error)
+  if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 126, __pyx_L1_error)
   __pyx_t_7 = ((PyArrayObject *)__pyx_t_6);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
     if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_u.rcbuffer->pybuffer, (PyObject*)__pyx_t_7, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 1, 0, __pyx_stack) == -1)) {
       __pyx_v_u = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_u.rcbuffer->pybuffer.buf = NULL;
-      __PYX_ERR(0, 122, __pyx_L1_error)
+      __PYX_ERR(0, 126, __pyx_L1_error)
     } else {__pyx_pybuffernd_u.diminfo[0].strides = __pyx_pybuffernd_u.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_u.diminfo[0].shape = __pyx_pybuffernd_u.rcbuffer->pybuffer.shape[0];
     }
   }
@@ -3099,11 +3205,11 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
   __pyx_v_u = ((PyArrayObject *)__pyx_t_6);
   __pyx_t_6 = 0;
 
-  /* "fynance/models/econometric_models.pyx":124
+  /* "fynance/models/econometric_models_cy.pyx":128
  *     cdef np.ndarray[np.float64_t, ndim=1] u = np.zeros([T], dtype=np.float64)
  * 
  *     for t in range(T):             # <<<<<<<<<<<<<<
- *         s = 0
+ *         s = 0.
  *         for i in range(min(t, max(q, p))):
  */
   __pyx_t_5 = __pyx_v_T;
@@ -3111,18 +3217,18 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
   for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
     __pyx_v_t = __pyx_t_9;
 
-    /* "fynance/models/econometric_models.pyx":125
+    /* "fynance/models/econometric_models_cy.pyx":129
  * 
  *     for t in range(T):
- *         s = 0             # <<<<<<<<<<<<<<
+ *         s = 0.             # <<<<<<<<<<<<<<
  *         for i in range(min(t, max(q, p))):
  *             if i < q:
  */
-    __pyx_v_s = 0.0;
+    __pyx_v_s = 0.;
 
-    /* "fynance/models/econometric_models.pyx":126
+    /* "fynance/models/econometric_models_cy.pyx":130
  *     for t in range(T):
- *         s = 0
+ *         s = 0.
  *         for i in range(min(t, max(q, p))):             # <<<<<<<<<<<<<<
  *             if i < q:
  *                 s += u[t - i - 1] * theta[i]
@@ -3146,8 +3252,8 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
     for (__pyx_t_12 = 0; __pyx_t_12 < __pyx_t_11; __pyx_t_12+=1) {
       __pyx_v_i = __pyx_t_12;
 
-      /* "fynance/models/econometric_models.pyx":127
- *         s = 0
+      /* "fynance/models/econometric_models_cy.pyx":131
+ *         s = 0.
  *         for i in range(min(t, max(q, p))):
  *             if i < q:             # <<<<<<<<<<<<<<
  *                 s += u[t - i - 1] * theta[i]
@@ -3156,7 +3262,7 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
       __pyx_t_13 = ((__pyx_v_i < __pyx_v_q) != 0);
       if (__pyx_t_13) {
 
-        /* "fynance/models/econometric_models.pyx":128
+        /* "fynance/models/econometric_models_cy.pyx":132
  *         for i in range(min(t, max(q, p))):
  *             if i < q:
  *                 s += u[t - i - 1] * theta[i]             # <<<<<<<<<<<<<<
@@ -3171,7 +3277,7 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
         } else if (unlikely(__pyx_t_14 >= __pyx_pybuffernd_u.diminfo[0].shape)) __pyx_t_15 = 0;
         if (unlikely(__pyx_t_15 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_15);
-          __PYX_ERR(0, 128, __pyx_L1_error)
+          __PYX_ERR(0, 132, __pyx_L1_error)
         }
         __pyx_t_16 = __pyx_v_i;
         __pyx_t_15 = -1;
@@ -3181,12 +3287,12 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
         } else if (unlikely(__pyx_t_16 >= __pyx_pybuffernd_theta.diminfo[0].shape)) __pyx_t_15 = 0;
         if (unlikely(__pyx_t_15 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_15);
-          __PYX_ERR(0, 128, __pyx_L1_error)
+          __PYX_ERR(0, 132, __pyx_L1_error)
         }
         __pyx_v_s = (__pyx_v_s + ((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_u.rcbuffer->pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_u.diminfo[0].strides)) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_theta.rcbuffer->pybuffer.buf, __pyx_t_16, __pyx_pybuffernd_theta.diminfo[0].strides))));
 
-        /* "fynance/models/econometric_models.pyx":127
- *         s = 0
+        /* "fynance/models/econometric_models_cy.pyx":131
+ *         s = 0.
  *         for i in range(min(t, max(q, p))):
  *             if i < q:             # <<<<<<<<<<<<<<
  *                 s += u[t - i - 1] * theta[i]
@@ -3194,7 +3300,7 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
  */
       }
 
-      /* "fynance/models/econometric_models.pyx":129
+      /* "fynance/models/econometric_models_cy.pyx":133
  *             if i < q:
  *                 s += u[t - i - 1] * theta[i]
  *             if i < p:             # <<<<<<<<<<<<<<
@@ -3204,7 +3310,7 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
       __pyx_t_13 = ((__pyx_v_i < __pyx_v_p) != 0);
       if (__pyx_t_13) {
 
-        /* "fynance/models/econometric_models.pyx":130
+        /* "fynance/models/econometric_models_cy.pyx":134
  *                 s += u[t - i - 1] * theta[i]
  *             if i < p:
  *                 s += y[t - i - 1] * phi[i]             # <<<<<<<<<<<<<<
@@ -3219,7 +3325,7 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
         } else if (unlikely(__pyx_t_17 >= __pyx_pybuffernd_y.diminfo[0].shape)) __pyx_t_15 = 0;
         if (unlikely(__pyx_t_15 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_15);
-          __PYX_ERR(0, 130, __pyx_L1_error)
+          __PYX_ERR(0, 134, __pyx_L1_error)
         }
         __pyx_t_18 = __pyx_v_i;
         __pyx_t_15 = -1;
@@ -3229,11 +3335,11 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
         } else if (unlikely(__pyx_t_18 >= __pyx_pybuffernd_phi.diminfo[0].shape)) __pyx_t_15 = 0;
         if (unlikely(__pyx_t_15 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_15);
-          __PYX_ERR(0, 130, __pyx_L1_error)
+          __PYX_ERR(0, 134, __pyx_L1_error)
         }
         __pyx_v_s = (__pyx_v_s + ((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_y.rcbuffer->pybuffer.buf, __pyx_t_17, __pyx_pybuffernd_y.diminfo[0].strides)) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_phi.rcbuffer->pybuffer.buf, __pyx_t_18, __pyx_pybuffernd_phi.diminfo[0].strides))));
 
-        /* "fynance/models/econometric_models.pyx":129
+        /* "fynance/models/econometric_models_cy.pyx":133
  *             if i < q:
  *                 s += u[t - i - 1] * theta[i]
  *             if i < p:             # <<<<<<<<<<<<<<
@@ -3243,7 +3349,7 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
       }
     }
 
-    /* "fynance/models/econometric_models.pyx":131
+    /* "fynance/models/econometric_models_cy.pyx":135
  *             if i < p:
  *                 s += y[t - i - 1] * phi[i]
  *         u[t] = y[t] - c - s             # <<<<<<<<<<<<<<
@@ -3258,7 +3364,7 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
     } else if (unlikely(__pyx_t_19 >= __pyx_pybuffernd_y.diminfo[0].shape)) __pyx_t_10 = 0;
     if (unlikely(__pyx_t_10 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_10);
-      __PYX_ERR(0, 131, __pyx_L1_error)
+      __PYX_ERR(0, 135, __pyx_L1_error)
     }
     __pyx_t_20 = __pyx_v_t;
     __pyx_t_10 = -1;
@@ -3268,12 +3374,12 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
     } else if (unlikely(__pyx_t_20 >= __pyx_pybuffernd_u.diminfo[0].shape)) __pyx_t_10 = 0;
     if (unlikely(__pyx_t_10 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_10);
-      __PYX_ERR(0, 131, __pyx_L1_error)
+      __PYX_ERR(0, 135, __pyx_L1_error)
     }
     *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_u.rcbuffer->pybuffer.buf, __pyx_t_20, __pyx_pybuffernd_u.diminfo[0].strides) = (((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_y.rcbuffer->pybuffer.buf, __pyx_t_19, __pyx_pybuffernd_y.diminfo[0].strides)) - __pyx_v_c) - __pyx_v_s);
   }
 
-  /* "fynance/models/econometric_models.pyx":132
+  /* "fynance/models/econometric_models_cy.pyx":136
  *                 s += y[t - i - 1] * phi[i]
  *         u[t] = y[t] - c - s
  *     return u             # <<<<<<<<<<<<<<
@@ -3285,10 +3391,10 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
   __pyx_r = ((PyArrayObject *)__pyx_v_u);
   goto __pyx_L0;
 
-  /* "fynance/models/econometric_models.pyx":89
+  /* "fynance/models/econometric_models_cy.pyx":93
  * 
  * 
- * cpdef np.ndarray[np.float64_t, ndim=1] model_ARMA_cython(             # <<<<<<<<<<<<<<
+ * cpdef np.ndarray[np.float64_t, ndim=1] ARMA_cy(             # <<<<<<<<<<<<<<
  *         np.ndarray[np.float64_t, ndim=1] y,
  *         np.ndarray[np.float64_t, ndim=1] phi,
  */
@@ -3309,7 +3415,7 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_u.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_y.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("fynance.models.econometric_models.model_ARMA_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("fynance.models.econometric_models_cy.ARMA_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   goto __pyx_L2;
   __pyx_L0:;
@@ -3325,9 +3431,9 @@ static PyArrayObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_c
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7fynance_6models_18econometric_models_5model_ARMA_cython(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_7fynance_6models_18econometric_models_4model_ARMA_cython[] = "\n    AutoRegressive Moving Average model of order q and p s.t: \n    y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + theta_1 * u_t-1 + ...\n          + theta_q * u_t-q + u_t\n    \n    Parameters\n    ----------\n    y: np.ndarray[np.float64, ndim=1]\n        Time series.\n    phi: np.ndarray[np.float64, ndim=1]\n        Coefficients of AR model.\n    theta: np.ndarray[np.float64, ndim=1]\n        Coefficients of MA model.\n    c: np.float64\n        Constant of the model.\n    p: int\n        Order of AR(p) model.\n    q: int\n        Order of MA(q) model.\n\n    Returns\n    -------\n    u: np.ndarray[np.float64, ndim=1]\n        Residual of the model.\n    ";
-static PyObject *__pyx_pw_7fynance_6models_18econometric_models_5model_ARMA_cython(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7fynance_6models_21econometric_models_cy_5ARMA_cy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_7fynance_6models_21econometric_models_cy_4ARMA_cy[] = "\n    AutoRegressive Moving Average model of order q and p s.t: \n    y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + theta_1 * u_t-1 + ...\n          + theta_q * u_t-q + u_t\n    \n    Parameters\n    ----------\n    y: np.ndarray[np.float64, ndim=1]\n        Time series.\n    phi: np.ndarray[np.float64, ndim=1]\n        Coefficients of AR model.\n    theta: np.ndarray[np.float64, ndim=1]\n        Coefficients of MA model.\n    c: np.float64\n        Constant of the model.\n    p: int\n        Order of AR(p) model.\n    q: int\n        Order of MA(q) model.\n\n    Returns\n    -------\n    u: np.ndarray[np.float64, ndim=1]\n        Residual of the model.\n    ";
+static PyObject *__pyx_pw_7fynance_6models_21econometric_models_cy_5ARMA_cy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyArrayObject *__pyx_v_y = 0;
   PyArrayObject *__pyx_v_phi = 0;
   PyArrayObject *__pyx_v_theta = 0;
@@ -3336,7 +3442,7 @@ static PyObject *__pyx_pw_7fynance_6models_18econometric_models_5model_ARMA_cyth
   int __pyx_v_q;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("model_ARMA_cython (wrapper)", 0);
+  __Pyx_RefNannySetupContext("ARMA_cy (wrapper)", 0);
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_y,&__pyx_n_s_phi,&__pyx_n_s_theta,&__pyx_n_s_c,&__pyx_n_s_p,&__pyx_n_s_q,0};
     PyObject* values[6] = {0,0,0,0,0,0};
@@ -3368,35 +3474,35 @@ static PyObject *__pyx_pw_7fynance_6models_18econometric_models_5model_ARMA_cyth
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_phi)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMA_cython", 1, 6, 6, 1); __PYX_ERR(0, 89, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMA_cy", 1, 6, 6, 1); __PYX_ERR(0, 93, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_theta)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMA_cython", 1, 6, 6, 2); __PYX_ERR(0, 89, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMA_cy", 1, 6, 6, 2); __PYX_ERR(0, 93, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_c)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMA_cython", 1, 6, 6, 3); __PYX_ERR(0, 89, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMA_cy", 1, 6, 6, 3); __PYX_ERR(0, 93, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_p)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMA_cython", 1, 6, 6, 4); __PYX_ERR(0, 89, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMA_cy", 1, 6, 6, 4); __PYX_ERR(0, 93, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_q)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMA_cython", 1, 6, 6, 5); __PYX_ERR(0, 89, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMA_cy", 1, 6, 6, 5); __PYX_ERR(0, 93, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "model_ARMA_cython") < 0)) __PYX_ERR(0, 89, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "ARMA_cy") < 0)) __PYX_ERR(0, 93, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
       goto __pyx_L5_argtuple_error;
@@ -3411,22 +3517,22 @@ static PyObject *__pyx_pw_7fynance_6models_18econometric_models_5model_ARMA_cyth
     __pyx_v_y = ((PyArrayObject *)values[0]);
     __pyx_v_phi = ((PyArrayObject *)values[1]);
     __pyx_v_theta = ((PyArrayObject *)values[2]);
-    __pyx_v_c = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_c == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 93, __pyx_L3_error)
-    __pyx_v_p = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_p == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 93, __pyx_L3_error)
-    __pyx_v_q = __Pyx_PyInt_As_int(values[5]); if (unlikely((__pyx_v_q == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 93, __pyx_L3_error)
+    __pyx_v_c = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_c == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 97, __pyx_L3_error)
+    __pyx_v_p = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_p == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 97, __pyx_L3_error)
+    __pyx_v_q = __Pyx_PyInt_As_int(values[5]); if (unlikely((__pyx_v_q == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 97, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("model_ARMA_cython", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 89, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("ARMA_cy", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 93, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("fynance.models.econometric_models.model_ARMA_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("fynance.models.econometric_models_cy.ARMA_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_y), __pyx_ptype_5numpy_ndarray, 1, "y", 0))) __PYX_ERR(0, 90, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_phi), __pyx_ptype_5numpy_ndarray, 1, "phi", 0))) __PYX_ERR(0, 91, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_theta), __pyx_ptype_5numpy_ndarray, 1, "theta", 0))) __PYX_ERR(0, 92, __pyx_L1_error)
-  __pyx_r = __pyx_pf_7fynance_6models_18econometric_models_4model_ARMA_cython(__pyx_self, __pyx_v_y, __pyx_v_phi, __pyx_v_theta, __pyx_v_c, __pyx_v_p, __pyx_v_q);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_y), __pyx_ptype_5numpy_ndarray, 1, "y", 0))) __PYX_ERR(0, 94, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_phi), __pyx_ptype_5numpy_ndarray, 1, "phi", 0))) __PYX_ERR(0, 95, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_theta), __pyx_ptype_5numpy_ndarray, 1, "theta", 0))) __PYX_ERR(0, 96, __pyx_L1_error)
+  __pyx_r = __pyx_pf_7fynance_6models_21econometric_models_cy_4ARMA_cy(__pyx_self, __pyx_v_y, __pyx_v_phi, __pyx_v_theta, __pyx_v_c, __pyx_v_p, __pyx_v_q);
 
   /* function exit code */
   goto __pyx_L0;
@@ -3437,7 +3543,7 @@ static PyObject *__pyx_pw_7fynance_6models_18econometric_models_5model_ARMA_cyth
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7fynance_6models_18econometric_models_4model_ARMA_cython(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_phi, PyArrayObject *__pyx_v_theta, __pyx_t_5numpy_float64_t __pyx_v_c, int __pyx_v_p, int __pyx_v_q) {
+static PyObject *__pyx_pf_7fynance_6models_21econometric_models_cy_4ARMA_cy(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_phi, PyArrayObject *__pyx_v_theta, __pyx_t_5numpy_float64_t __pyx_v_c, int __pyx_v_p, int __pyx_v_q) {
   __Pyx_LocalBuf_ND __pyx_pybuffernd_phi;
   __Pyx_Buffer __pyx_pybuffer_phi;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_theta;
@@ -3447,7 +3553,7 @@ static PyObject *__pyx_pf_7fynance_6models_18econometric_models_4model_ARMA_cyth
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
-  __Pyx_RefNannySetupContext("model_ARMA_cython", 0);
+  __Pyx_RefNannySetupContext("ARMA_cy", 0);
   __pyx_pybuffer_y.pybuffer.buf = NULL;
   __pyx_pybuffer_y.refcount = 0;
   __pyx_pybuffernd_y.data = NULL;
@@ -3462,21 +3568,21 @@ static PyObject *__pyx_pf_7fynance_6models_18econometric_models_4model_ARMA_cyth
   __pyx_pybuffernd_theta.rcbuffer = &__pyx_pybuffer_theta;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y.rcbuffer->pybuffer, (PyObject*)__pyx_v_y, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 89, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y.rcbuffer->pybuffer, (PyObject*)__pyx_v_y, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 93, __pyx_L1_error)
   }
   __pyx_pybuffernd_y.diminfo[0].strides = __pyx_pybuffernd_y.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_y.diminfo[0].shape = __pyx_pybuffernd_y.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_phi.rcbuffer->pybuffer, (PyObject*)__pyx_v_phi, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 89, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_phi.rcbuffer->pybuffer, (PyObject*)__pyx_v_phi, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 93, __pyx_L1_error)
   }
   __pyx_pybuffernd_phi.diminfo[0].strides = __pyx_pybuffernd_phi.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_phi.diminfo[0].shape = __pyx_pybuffernd_phi.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_theta.rcbuffer->pybuffer, (PyObject*)__pyx_v_theta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 89, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_theta.rcbuffer->pybuffer, (PyObject*)__pyx_v_theta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 93, __pyx_L1_error)
   }
   __pyx_pybuffernd_theta.diminfo[0].strides = __pyx_pybuffernd_theta.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_theta.diminfo[0].shape = __pyx_pybuffernd_theta.rcbuffer->pybuffer.shape[0];
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_7fynance_6models_18econometric_models_model_ARMA_cython(__pyx_v_y, __pyx_v_phi, __pyx_v_theta, __pyx_v_c, __pyx_v_p, __pyx_v_q, 0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 89, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_7fynance_6models_21econometric_models_cy_ARMA_cy(__pyx_v_y, __pyx_v_phi, __pyx_v_theta, __pyx_v_c, __pyx_v_p, __pyx_v_q, 0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 93, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3493,7 +3599,7 @@ static PyObject *__pyx_pf_7fynance_6models_18econometric_models_4model_ARMA_cyth
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_theta.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_y.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("fynance.models.econometric_models.model_ARMA_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("fynance.models.econometric_models_cy.ARMA_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
@@ -3506,16 +3612,16 @@ static PyObject *__pyx_pf_7fynance_6models_18econometric_models_4model_ARMA_cyth
   return __pyx_r;
 }
 
-/* "fynance/models/econometric_models.pyx":135
+/* "fynance/models/econometric_models_cy.pyx":139
  * 
  * 
- * cpdef tuple model_ARMA_GARCH_cython(             # <<<<<<<<<<<<<<
+ * cpdef tuple ARMA_GARCH_cy(             # <<<<<<<<<<<<<<
  *         np.ndarray[np.float64_t, ndim=1] y,
  *         np.ndarray[np.float64_t, ndim=1] phi,
  */
 
-static PyObject *__pyx_pw_7fynance_6models_18econometric_models_7model_ARMA_GARCH_cython(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_cython(PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_phi, PyArrayObject *__pyx_v_theta, PyArrayObject *__pyx_v_alpha, PyArrayObject *__pyx_v_beta, __pyx_t_5numpy_float64_t __pyx_v_c, __pyx_t_5numpy_float64_t __pyx_v_omega, int __pyx_v_p, int __pyx_v_q, int __pyx_v_Q, int __pyx_v_P, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_7fynance_6models_21econometric_models_cy_7ARMA_GARCH_cy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_7fynance_6models_21econometric_models_cy_ARMA_GARCH_cy(PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_phi, PyArrayObject *__pyx_v_theta, PyArrayObject *__pyx_v_alpha, PyArrayObject *__pyx_v_beta, __pyx_t_5numpy_float64_t __pyx_v_c, __pyx_t_5numpy_float64_t __pyx_v_omega, int __pyx_v_p, int __pyx_v_q, int __pyx_v_Q, int __pyx_v_P, CYTHON_UNUSED int __pyx_skip_dispatch) {
   __pyx_t_5numpy_float64_t __pyx_v_arma;
   __pyx_t_5numpy_float64_t __pyx_v_arch;
   int __pyx_v_i;
@@ -3568,7 +3674,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
   Py_ssize_t __pyx_t_27;
   Py_ssize_t __pyx_t_28;
   Py_ssize_t __pyx_t_29;
-  __Pyx_RefNannySetupContext("model_ARMA_GARCH_cython", 0);
+  __Pyx_RefNannySetupContext("ARMA_GARCH_cy", 0);
   __pyx_pybuffer_u.pybuffer.buf = NULL;
   __pyx_pybuffer_u.refcount = 0;
   __pyx_pybuffernd_u.data = NULL;
@@ -3599,40 +3705,40 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
   __pyx_pybuffernd_beta.rcbuffer = &__pyx_pybuffer_beta;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y.rcbuffer->pybuffer, (PyObject*)__pyx_v_y, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 135, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y.rcbuffer->pybuffer, (PyObject*)__pyx_v_y, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 139, __pyx_L1_error)
   }
   __pyx_pybuffernd_y.diminfo[0].strides = __pyx_pybuffernd_y.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_y.diminfo[0].shape = __pyx_pybuffernd_y.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_phi.rcbuffer->pybuffer, (PyObject*)__pyx_v_phi, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 135, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_phi.rcbuffer->pybuffer, (PyObject*)__pyx_v_phi, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 139, __pyx_L1_error)
   }
   __pyx_pybuffernd_phi.diminfo[0].strides = __pyx_pybuffernd_phi.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_phi.diminfo[0].shape = __pyx_pybuffernd_phi.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_theta.rcbuffer->pybuffer, (PyObject*)__pyx_v_theta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 135, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_theta.rcbuffer->pybuffer, (PyObject*)__pyx_v_theta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 139, __pyx_L1_error)
   }
   __pyx_pybuffernd_theta.diminfo[0].strides = __pyx_pybuffernd_theta.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_theta.diminfo[0].shape = __pyx_pybuffernd_theta.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_alpha.rcbuffer->pybuffer, (PyObject*)__pyx_v_alpha, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 135, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_alpha.rcbuffer->pybuffer, (PyObject*)__pyx_v_alpha, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 139, __pyx_L1_error)
   }
   __pyx_pybuffernd_alpha.diminfo[0].strides = __pyx_pybuffernd_alpha.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_alpha.diminfo[0].shape = __pyx_pybuffernd_alpha.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_beta.rcbuffer->pybuffer, (PyObject*)__pyx_v_beta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 135, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_beta.rcbuffer->pybuffer, (PyObject*)__pyx_v_beta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 139, __pyx_L1_error)
   }
   __pyx_pybuffernd_beta.diminfo[0].strides = __pyx_pybuffernd_beta.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_beta.diminfo[0].shape = __pyx_pybuffernd_beta.rcbuffer->pybuffer.shape[0];
 
-  /* "fynance/models/econometric_models.pyx":186
+  /* "fynance/models/econometric_models_cy.pyx":190
  *     """
  *     cdef np.float64_t arma, arch
  *     cdef int i, j, t, T = np.size(y)             # <<<<<<<<<<<<<<
  *     cdef np.ndarray[np.float64_t, ndim=1] u = np.zeros([T], dtype=np.float64)
  *     cdef np.ndarray[np.float64_t, ndim=1] h = np.zeros([T], dtype=np.float64)
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 186, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 190, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_size); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 186, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_size); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 190, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -3646,13 +3752,13 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
     }
   }
   if (!__pyx_t_2) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, ((PyObject *)__pyx_v_y)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 186, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, ((PyObject *)__pyx_v_y)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_2, ((PyObject *)__pyx_v_y)};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 186, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else
@@ -3660,73 +3766,73 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_2, ((PyObject *)__pyx_v_y)};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 186, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else
     #endif
     {
-      __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 186, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 190, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2); __pyx_t_2 = NULL;
       __Pyx_INCREF(((PyObject *)__pyx_v_y));
       __Pyx_GIVEREF(((PyObject *)__pyx_v_y));
       PyTuple_SET_ITEM(__pyx_t_4, 0+1, ((PyObject *)__pyx_v_y));
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 186, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     }
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 186, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 190, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_T = __pyx_t_5;
 
-  /* "fynance/models/econometric_models.pyx":187
+  /* "fynance/models/econometric_models_cy.pyx":191
  *     cdef np.float64_t arma, arch
  *     cdef int i, j, t, T = np.size(y)
  *     cdef np.ndarray[np.float64_t, ndim=1] u = np.zeros([T], dtype=np.float64)             # <<<<<<<<<<<<<<
  *     cdef np.ndarray[np.float64_t, ndim=1] h = np.zeros([T], dtype=np.float64)
  * 
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = PyList_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __pyx_t_4 = PyList_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_1);
   PyList_SET_ITEM(__pyx_t_4, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_float64); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_float64); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_6) < 0) __PYX_ERR(0, 187, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_6) < 0) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 187, __pyx_L1_error)
+  if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 191, __pyx_L1_error)
   __pyx_t_7 = ((PyArrayObject *)__pyx_t_6);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
     if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_u.rcbuffer->pybuffer, (PyObject*)__pyx_t_7, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 1, 0, __pyx_stack) == -1)) {
       __pyx_v_u = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_u.rcbuffer->pybuffer.buf = NULL;
-      __PYX_ERR(0, 187, __pyx_L1_error)
+      __PYX_ERR(0, 191, __pyx_L1_error)
     } else {__pyx_pybuffernd_u.diminfo[0].strides = __pyx_pybuffernd_u.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_u.diminfo[0].shape = __pyx_pybuffernd_u.rcbuffer->pybuffer.shape[0];
     }
   }
@@ -3734,51 +3840,51 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
   __pyx_v_u = ((PyArrayObject *)__pyx_t_6);
   __pyx_t_6 = 0;
 
-  /* "fynance/models/econometric_models.pyx":188
+  /* "fynance/models/econometric_models_cy.pyx":192
  *     cdef int i, j, t, T = np.size(y)
  *     cdef np.ndarray[np.float64_t, ndim=1] u = np.zeros([T], dtype=np.float64)
  *     cdef np.ndarray[np.float64_t, ndim=1] h = np.zeros([T], dtype=np.float64)             # <<<<<<<<<<<<<<
  * 
  *     for t in range(T):
  */
-  __pyx_t_6 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 188, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 188, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 188, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 188, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_6);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_t_6);
   __pyx_t_6 = 0;
-  __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 188, __pyx_L1_error)
+  __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 188, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 188, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 188, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 188, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 188, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 188, __pyx_L1_error)
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 192, __pyx_L1_error)
   __pyx_t_8 = ((PyArrayObject *)__pyx_t_2);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
     if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_h.rcbuffer->pybuffer, (PyObject*)__pyx_t_8, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 1, 0, __pyx_stack) == -1)) {
       __pyx_v_h = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_h.rcbuffer->pybuffer.buf = NULL;
-      __PYX_ERR(0, 188, __pyx_L1_error)
+      __PYX_ERR(0, 192, __pyx_L1_error)
     } else {__pyx_pybuffernd_h.diminfo[0].strides = __pyx_pybuffernd_h.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_h.diminfo[0].shape = __pyx_pybuffernd_h.rcbuffer->pybuffer.shape[0];
     }
   }
@@ -3786,7 +3892,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
   __pyx_v_h = ((PyArrayObject *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "fynance/models/econometric_models.pyx":190
+  /* "fynance/models/econometric_models_cy.pyx":194
  *     cdef np.ndarray[np.float64_t, ndim=1] h = np.zeros([T], dtype=np.float64)
  * 
  *     for t in range(T):             # <<<<<<<<<<<<<<
@@ -3798,7 +3904,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
   for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
     __pyx_v_t = __pyx_t_10;
 
-    /* "fynance/models/econometric_models.pyx":191
+    /* "fynance/models/econometric_models_cy.pyx":195
  * 
  *     for t in range(T):
  *         arma = 0.             # <<<<<<<<<<<<<<
@@ -3807,7 +3913,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
  */
     __pyx_v_arma = 0.;
 
-    /* "fynance/models/econometric_models.pyx":192
+    /* "fynance/models/econometric_models_cy.pyx":196
  *     for t in range(T):
  *         arma = 0.
  *         arch = 0.             # <<<<<<<<<<<<<<
@@ -3816,7 +3922,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
  */
     __pyx_v_arch = 0.;
 
-    /* "fynance/models/econometric_models.pyx":193
+    /* "fynance/models/econometric_models_cy.pyx":197
  *         arma = 0.
  *         arch = 0.
  *         for i in range(min(t, max(q, p, Q, P))):             # <<<<<<<<<<<<<<
@@ -3856,7 +3962,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
     for (__pyx_t_15 = 0; __pyx_t_15 < __pyx_t_12; __pyx_t_15+=1) {
       __pyx_v_i = __pyx_t_15;
 
-      /* "fynance/models/econometric_models.pyx":194
+      /* "fynance/models/econometric_models_cy.pyx":198
  *         arch = 0.
  *         for i in range(min(t, max(q, p, Q, P))):
  *             if i < p:             # <<<<<<<<<<<<<<
@@ -3866,7 +3972,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
       __pyx_t_16 = ((__pyx_v_i < __pyx_v_p) != 0);
       if (__pyx_t_16) {
 
-        /* "fynance/models/econometric_models.pyx":195
+        /* "fynance/models/econometric_models_cy.pyx":199
  *         for i in range(min(t, max(q, p, Q, P))):
  *             if i < p:
  *                 arma += y[t-i-1] * phi[i]             # <<<<<<<<<<<<<<
@@ -3881,7 +3987,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
         } else if (unlikely(__pyx_t_17 >= __pyx_pybuffernd_y.diminfo[0].shape)) __pyx_t_13 = 0;
         if (unlikely(__pyx_t_13 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_13);
-          __PYX_ERR(0, 195, __pyx_L1_error)
+          __PYX_ERR(0, 199, __pyx_L1_error)
         }
         __pyx_t_18 = __pyx_v_i;
         __pyx_t_13 = -1;
@@ -3891,11 +3997,11 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
         } else if (unlikely(__pyx_t_18 >= __pyx_pybuffernd_phi.diminfo[0].shape)) __pyx_t_13 = 0;
         if (unlikely(__pyx_t_13 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_13);
-          __PYX_ERR(0, 195, __pyx_L1_error)
+          __PYX_ERR(0, 199, __pyx_L1_error)
         }
         __pyx_v_arma = (__pyx_v_arma + ((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_y.rcbuffer->pybuffer.buf, __pyx_t_17, __pyx_pybuffernd_y.diminfo[0].strides)) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_phi.rcbuffer->pybuffer.buf, __pyx_t_18, __pyx_pybuffernd_phi.diminfo[0].strides))));
 
-        /* "fynance/models/econometric_models.pyx":194
+        /* "fynance/models/econometric_models_cy.pyx":198
  *         arch = 0.
  *         for i in range(min(t, max(q, p, Q, P))):
  *             if i < p:             # <<<<<<<<<<<<<<
@@ -3904,7 +4010,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
  */
       }
 
-      /* "fynance/models/econometric_models.pyx":196
+      /* "fynance/models/econometric_models_cy.pyx":200
  *             if i < p:
  *                 arma += y[t-i-1] * phi[i]
  *             if i < q:             # <<<<<<<<<<<<<<
@@ -3914,7 +4020,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
       __pyx_t_16 = ((__pyx_v_i < __pyx_v_q) != 0);
       if (__pyx_t_16) {
 
-        /* "fynance/models/econometric_models.pyx":197
+        /* "fynance/models/econometric_models_cy.pyx":201
  *                 arma += y[t-i-1] * phi[i]
  *             if i < q:
  *                 arma += u[t-i-1] * theta[i]             # <<<<<<<<<<<<<<
@@ -3929,7 +4035,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
         } else if (unlikely(__pyx_t_19 >= __pyx_pybuffernd_u.diminfo[0].shape)) __pyx_t_13 = 0;
         if (unlikely(__pyx_t_13 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_13);
-          __PYX_ERR(0, 197, __pyx_L1_error)
+          __PYX_ERR(0, 201, __pyx_L1_error)
         }
         __pyx_t_20 = __pyx_v_i;
         __pyx_t_13 = -1;
@@ -3939,11 +4045,11 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
         } else if (unlikely(__pyx_t_20 >= __pyx_pybuffernd_theta.diminfo[0].shape)) __pyx_t_13 = 0;
         if (unlikely(__pyx_t_13 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_13);
-          __PYX_ERR(0, 197, __pyx_L1_error)
+          __PYX_ERR(0, 201, __pyx_L1_error)
         }
         __pyx_v_arma = (__pyx_v_arma + ((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_u.rcbuffer->pybuffer.buf, __pyx_t_19, __pyx_pybuffernd_u.diminfo[0].strides)) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_theta.rcbuffer->pybuffer.buf, __pyx_t_20, __pyx_pybuffernd_theta.diminfo[0].strides))));
 
-        /* "fynance/models/econometric_models.pyx":196
+        /* "fynance/models/econometric_models_cy.pyx":200
  *             if i < p:
  *                 arma += y[t-i-1] * phi[i]
  *             if i < q:             # <<<<<<<<<<<<<<
@@ -3952,7 +4058,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
  */
       }
 
-      /* "fynance/models/econometric_models.pyx":198
+      /* "fynance/models/econometric_models_cy.pyx":202
  *             if i < q:
  *                 arma += u[t-i-1] * theta[i]
  *             if i < Q:             # <<<<<<<<<<<<<<
@@ -3962,7 +4068,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
       __pyx_t_16 = ((__pyx_v_i < __pyx_v_Q) != 0);
       if (__pyx_t_16) {
 
-        /* "fynance/models/econometric_models.pyx":199
+        /* "fynance/models/econometric_models_cy.pyx":203
  *                 arma += u[t-i-1] * theta[i]
  *             if i < Q:
  *                 arch += u[t-i-1]**2 * alpha[i]             # <<<<<<<<<<<<<<
@@ -3977,7 +4083,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
         } else if (unlikely(__pyx_t_21 >= __pyx_pybuffernd_u.diminfo[0].shape)) __pyx_t_13 = 0;
         if (unlikely(__pyx_t_13 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_13);
-          __PYX_ERR(0, 199, __pyx_L1_error)
+          __PYX_ERR(0, 203, __pyx_L1_error)
         }
         __pyx_t_22 = __pyx_v_i;
         __pyx_t_13 = -1;
@@ -3987,11 +4093,11 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
         } else if (unlikely(__pyx_t_22 >= __pyx_pybuffernd_alpha.diminfo[0].shape)) __pyx_t_13 = 0;
         if (unlikely(__pyx_t_13 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_13);
-          __PYX_ERR(0, 199, __pyx_L1_error)
+          __PYX_ERR(0, 203, __pyx_L1_error)
         }
         __pyx_v_arch = (__pyx_v_arch + (pow((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_u.rcbuffer->pybuffer.buf, __pyx_t_21, __pyx_pybuffernd_u.diminfo[0].strides)), 2.0) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_alpha.rcbuffer->pybuffer.buf, __pyx_t_22, __pyx_pybuffernd_alpha.diminfo[0].strides))));
 
-        /* "fynance/models/econometric_models.pyx":198
+        /* "fynance/models/econometric_models_cy.pyx":202
  *             if i < q:
  *                 arma += u[t-i-1] * theta[i]
  *             if i < Q:             # <<<<<<<<<<<<<<
@@ -4000,7 +4106,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
  */
       }
 
-      /* "fynance/models/econometric_models.pyx":200
+      /* "fynance/models/econometric_models_cy.pyx":204
  *             if i < Q:
  *                 arch += u[t-i-1]**2 * alpha[i]
  *             if i < P:             # <<<<<<<<<<<<<<
@@ -4010,7 +4116,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
       __pyx_t_16 = ((__pyx_v_i < __pyx_v_P) != 0);
       if (__pyx_t_16) {
 
-        /* "fynance/models/econometric_models.pyx":201
+        /* "fynance/models/econometric_models_cy.pyx":205
  *                 arch += u[t-i-1]**2 * alpha[i]
  *             if i < P:
  *                 arch += h[t-i-1]**2 * beta[i]             # <<<<<<<<<<<<<<
@@ -4025,7 +4131,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
         } else if (unlikely(__pyx_t_23 >= __pyx_pybuffernd_h.diminfo[0].shape)) __pyx_t_13 = 0;
         if (unlikely(__pyx_t_13 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_13);
-          __PYX_ERR(0, 201, __pyx_L1_error)
+          __PYX_ERR(0, 205, __pyx_L1_error)
         }
         __pyx_t_24 = __pyx_v_i;
         __pyx_t_13 = -1;
@@ -4035,11 +4141,11 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
         } else if (unlikely(__pyx_t_24 >= __pyx_pybuffernd_beta.diminfo[0].shape)) __pyx_t_13 = 0;
         if (unlikely(__pyx_t_13 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_13);
-          __PYX_ERR(0, 201, __pyx_L1_error)
+          __PYX_ERR(0, 205, __pyx_L1_error)
         }
         __pyx_v_arch = (__pyx_v_arch + (pow((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_h.rcbuffer->pybuffer.buf, __pyx_t_23, __pyx_pybuffernd_h.diminfo[0].strides)), 2.0) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_beta.rcbuffer->pybuffer.buf, __pyx_t_24, __pyx_pybuffernd_beta.diminfo[0].strides))));
 
-        /* "fynance/models/econometric_models.pyx":200
+        /* "fynance/models/econometric_models_cy.pyx":204
  *             if i < Q:
  *                 arch += u[t-i-1]**2 * alpha[i]
  *             if i < P:             # <<<<<<<<<<<<<<
@@ -4048,7 +4154,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
  */
       }
 
-      /* "fynance/models/econometric_models.pyx":202
+      /* "fynance/models/econometric_models_cy.pyx":206
  *             if i < P:
  *                 arch += h[t-i-1]**2 * beta[i]
  *             if arch < 0.:             # <<<<<<<<<<<<<<
@@ -4058,7 +4164,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
       __pyx_t_16 = ((__pyx_v_arch < 0.) != 0);
       if (__pyx_t_16) {
 
-        /* "fynance/models/econometric_models.pyx":203
+        /* "fynance/models/econometric_models_cy.pyx":207
  *                 arch += h[t-i-1]**2 * beta[i]
  *             if arch < 0.:
  *                 return 1e8 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)             # <<<<<<<<<<<<<<
@@ -4066,72 +4172,72 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
  *                 return 1e6 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
  */
         __Pyx_XDECREF(__pyx_r);
-        __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ones); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ones); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_6 = PyList_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_6 = PyList_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_GIVEREF(__pyx_t_2);
         PyList_SET_ITEM(__pyx_t_6, 0, __pyx_t_2);
         __pyx_t_2 = 0;
-        __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_GIVEREF(__pyx_t_6);
         PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_6);
         __pyx_t_6 = 0;
-        __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float64); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float64); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 203, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        __pyx_t_6 = PyNumber_Multiply(__pyx_float_1e8, __pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_6 = PyNumber_Multiply(__pyx_float_1e8, __pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_ones); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_ones); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_GIVEREF(__pyx_t_3);
         PyList_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
         __pyx_t_3 = 0;
-        __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_GIVEREF(__pyx_t_1);
         PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
         __pyx_t_1 = 0;
-        __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_25 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float64); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_25 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float64); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_25);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_25) < 0) __PYX_ERR(0, 203, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_25) < 0) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_25); __pyx_t_25 = 0;
-        __pyx_t_25 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_25 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_25);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_GIVEREF(__pyx_t_6);
         PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_6);
@@ -4143,7 +4249,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
         __pyx_t_1 = 0;
         goto __pyx_L0;
 
-        /* "fynance/models/econometric_models.pyx":202
+        /* "fynance/models/econometric_models_cy.pyx":206
  *             if i < P:
  *                 arch += h[t-i-1]**2 * beta[i]
  *             if arch < 0.:             # <<<<<<<<<<<<<<
@@ -4152,7 +4258,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
  */
       }
 
-      /* "fynance/models/econometric_models.pyx":204
+      /* "fynance/models/econometric_models_cy.pyx":208
  *             if arch < 0.:
  *                 return 1e8 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
  *             if arch > 1e20 or arma > 1e20:             # <<<<<<<<<<<<<<
@@ -4170,7 +4276,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
       __pyx_L13_bool_binop_done:;
       if (__pyx_t_16) {
 
-        /* "fynance/models/econometric_models.pyx":205
+        /* "fynance/models/econometric_models_cy.pyx":209
  *                 return 1e8 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
  *             if arch > 1e20 or arma > 1e20:
  *                 return 1e6 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)             # <<<<<<<<<<<<<<
@@ -4178,72 +4284,72 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
  *         h[t] = sqrt(omega + arch)
  */
         __Pyx_XDECREF(__pyx_r);
-        __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_25 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_ones); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_25 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_ones); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_25);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_6 = PyList_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_6 = PyList_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_GIVEREF(__pyx_t_1);
         PyList_SET_ITEM(__pyx_t_6, 0, __pyx_t_1);
         __pyx_t_1 = 0;
-        __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_GIVEREF(__pyx_t_6);
         PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_6);
         __pyx_t_6 = 0;
-        __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 205, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_25, __pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_25, __pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_25); __pyx_t_25 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        __pyx_t_6 = PyNumber_Multiply(__pyx_float_1e6, __pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_6 = PyNumber_Multiply(__pyx_float_1e6, __pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ones); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ones); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_25 = PyList_New(1); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_25 = PyList_New(1); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_25);
         __Pyx_GIVEREF(__pyx_t_2);
         PyList_SET_ITEM(__pyx_t_25, 0, __pyx_t_2);
         __pyx_t_2 = 0;
-        __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_GIVEREF(__pyx_t_25);
         PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_25);
         __pyx_t_25 = 0;
-        __pyx_t_25 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_25 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_25);
-        __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (PyDict_SetItem(__pyx_t_25, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 205, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_25, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_25); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_25); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_25); __pyx_t_25 = 0;
-        __pyx_t_25 = PyTuple_New(2); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_25 = PyTuple_New(2); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 209, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_25);
         __Pyx_GIVEREF(__pyx_t_6);
         PyTuple_SET_ITEM(__pyx_t_25, 0, __pyx_t_6);
@@ -4255,7 +4361,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
         __pyx_t_25 = 0;
         goto __pyx_L0;
 
-        /* "fynance/models/econometric_models.pyx":204
+        /* "fynance/models/econometric_models_cy.pyx":208
  *             if arch < 0.:
  *                 return 1e8 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
  *             if arch > 1e20 or arma > 1e20:             # <<<<<<<<<<<<<<
@@ -4265,7 +4371,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
       }
     }
 
-    /* "fynance/models/econometric_models.pyx":206
+    /* "fynance/models/econometric_models_cy.pyx":210
  *             if arch > 1e20 or arma > 1e20:
  *                 return 1e6 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
  *         u[t] = y[t] - c - arma             # <<<<<<<<<<<<<<
@@ -4280,7 +4386,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
     } else if (unlikely(__pyx_t_27 >= __pyx_pybuffernd_y.diminfo[0].shape)) __pyx_t_11 = 0;
     if (unlikely(__pyx_t_11 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_11);
-      __PYX_ERR(0, 206, __pyx_L1_error)
+      __PYX_ERR(0, 210, __pyx_L1_error)
     }
     __pyx_t_28 = __pyx_v_t;
     __pyx_t_11 = -1;
@@ -4290,11 +4396,11 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
     } else if (unlikely(__pyx_t_28 >= __pyx_pybuffernd_u.diminfo[0].shape)) __pyx_t_11 = 0;
     if (unlikely(__pyx_t_11 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_11);
-      __PYX_ERR(0, 206, __pyx_L1_error)
+      __PYX_ERR(0, 210, __pyx_L1_error)
     }
     *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_u.rcbuffer->pybuffer.buf, __pyx_t_28, __pyx_pybuffernd_u.diminfo[0].strides) = (((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_y.rcbuffer->pybuffer.buf, __pyx_t_27, __pyx_pybuffernd_y.diminfo[0].strides)) - __pyx_v_c) - __pyx_v_arma);
 
-    /* "fynance/models/econometric_models.pyx":207
+    /* "fynance/models/econometric_models_cy.pyx":211
  *                 return 1e6 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
  *         u[t] = y[t] - c - arma
  *         h[t] = sqrt(omega + arch)             # <<<<<<<<<<<<<<
@@ -4309,12 +4415,12 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
     } else if (unlikely(__pyx_t_29 >= __pyx_pybuffernd_h.diminfo[0].shape)) __pyx_t_11 = 0;
     if (unlikely(__pyx_t_11 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_11);
-      __PYX_ERR(0, 207, __pyx_L1_error)
+      __PYX_ERR(0, 211, __pyx_L1_error)
     }
     *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_h.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_h.diminfo[0].strides) = sqrt((__pyx_v_omega + __pyx_v_arch));
   }
 
-  /* "fynance/models/econometric_models.pyx":208
+  /* "fynance/models/econometric_models_cy.pyx":212
  *         u[t] = y[t] - c - arma
  *         h[t] = sqrt(omega + arch)
  *     return u, h             # <<<<<<<<<<<<<<
@@ -4322,7 +4428,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_25 = PyTuple_New(2); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 208, __pyx_L1_error)
+  __pyx_t_25 = PyTuple_New(2); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_25);
   __Pyx_INCREF(((PyObject *)__pyx_v_u));
   __Pyx_GIVEREF(((PyObject *)__pyx_v_u));
@@ -4334,10 +4440,10 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
   __pyx_t_25 = 0;
   goto __pyx_L0;
 
-  /* "fynance/models/econometric_models.pyx":135
+  /* "fynance/models/econometric_models_cy.pyx":139
  * 
  * 
- * cpdef tuple model_ARMA_GARCH_cython(             # <<<<<<<<<<<<<<
+ * cpdef tuple ARMA_GARCH_cy(             # <<<<<<<<<<<<<<
  *         np.ndarray[np.float64_t, ndim=1] y,
  *         np.ndarray[np.float64_t, ndim=1] phi,
  */
@@ -4362,7 +4468,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_u.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_y.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("fynance.models.econometric_models.model_ARMA_GARCH_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("fynance.models.econometric_models_cy.ARMA_GARCH_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   goto __pyx_L2;
   __pyx_L0:;
@@ -4382,9 +4488,9 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7fynance_6models_18econometric_models_7model_ARMA_GARCH_cython(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_7fynance_6models_18econometric_models_6model_ARMA_GARCH_cython[] = " \n    AutoRegressive Moving Average model of order q and p, such that: \n    y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + theta_1 * u_t-1 + ...\n          + theta_q * u_t-q + u_t\n    \n    With Generalized AutoRegressive Conditional Heteroskedasticity volatility\n    model of order Q and P, such that:\n    u_t = z_t * h_t \n    h_t^2 = omega + alpha_1 * u^2_t-1 + ... + alpha_Q * u^2_t-Q \n            + beta_1 * h^2_t-1 + ... + beta_P * h^2_t-P\n    \n    Parameters\n    ----------\n    y: np.ndarray[np.float64, ndim=1]\n        Time series.\n    phi: np.ndarray[np.float64, ndim=1]\n        Coefficients of AR model.\n    theta: np.ndarray[np.float64, ndim=1]\n        Coefficients of MA model.\n    alpha: np.ndarray[np.float64, ndim=1]\n        Coefficients of MA part of GARCH.\n    beta: np.ndarray[np.float64, ndim=1]\n        Coefficients of AR part of GARCH.\n    c: np.float64\n        Constant of the model.\n    p: int\n        Order of AR(p) model.\n    q: int\n        Order of MA(q) model.\n    Q: int\n        Order of MA part of GARCH.\n    P: int\n        Order of AR part of GARCH.\n\n    Returns\n    -------\n    u: np.ndarray[np.float64, ndim=1]\n        Residual of the model. \n    h: np.ndarray[np.float64, ndim=1]\n        Conditional volatility of the model. \n    ";
-static PyObject *__pyx_pw_7fynance_6models_18econometric_models_7model_ARMA_GARCH_cython(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7fynance_6models_21econometric_models_cy_7ARMA_GARCH_cy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_7fynance_6models_21econometric_models_cy_6ARMA_GARCH_cy[] = " \n    AutoRegressive Moving Average model of order q and p, such that: \n    y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + theta_1 * u_t-1 + ...\n          + theta_q * u_t-q + u_t\n    \n    With Generalized AutoRegressive Conditional Heteroskedasticity volatility\n    model of order Q and P, such that:\n    u_t = z_t * h_t \n    h_t^2 = omega + alpha_1 * u^2_t-1 + ... + alpha_Q * u^2_t-Q \n            + beta_1 * h^2_t-1 + ... + beta_P * h^2_t-P\n    \n    Parameters\n    ----------\n    y: np.ndarray[np.float64, ndim=1]\n        Time series.\n    phi: np.ndarray[np.float64, ndim=1]\n        Coefficients of AR model.\n    theta: np.ndarray[np.float64, ndim=1]\n        Coefficients of MA model.\n    alpha: np.ndarray[np.float64, ndim=1]\n        Coefficients of MA part of GARCH.\n    beta: np.ndarray[np.float64, ndim=1]\n        Coefficients of AR part of GARCH.\n    c: np.float64\n        Constant of the model.\n    p: int\n        Order of AR(p) model.\n    q: int\n        Order of MA(q) model.\n    Q: int\n        Order of MA part of GARCH.\n    P: int\n        Order of AR part of GARCH.\n\n    Returns\n    -------\n    u: np.ndarray[np.float64, ndim=1]\n        Residual of the model. \n    h: np.ndarray[np.float64, ndim=1]\n        Conditional volatility of the model. \n    ";
+static PyObject *__pyx_pw_7fynance_6models_21econometric_models_cy_7ARMA_GARCH_cy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyArrayObject *__pyx_v_y = 0;
   PyArrayObject *__pyx_v_phi = 0;
   PyArrayObject *__pyx_v_theta = 0;
@@ -4398,7 +4504,7 @@ static PyObject *__pyx_pw_7fynance_6models_18econometric_models_7model_ARMA_GARC
   int __pyx_v_P;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("model_ARMA_GARCH_cython (wrapper)", 0);
+  __Pyx_RefNannySetupContext("ARMA_GARCH_cy (wrapper)", 0);
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_y,&__pyx_n_s_phi,&__pyx_n_s_theta,&__pyx_n_s_alpha,&__pyx_n_s_beta,&__pyx_n_s_c,&__pyx_n_s_omega,&__pyx_n_s_p,&__pyx_n_s_q,&__pyx_n_s_Q,&__pyx_n_s_P,0};
     PyObject* values[11] = {0,0,0,0,0,0,0,0,0,0,0};
@@ -4440,65 +4546,65 @@ static PyObject *__pyx_pw_7fynance_6models_18econometric_models_7model_ARMA_GARC
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_phi)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMA_GARCH_cython", 1, 11, 11, 1); __PYX_ERR(0, 135, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMA_GARCH_cy", 1, 11, 11, 1); __PYX_ERR(0, 139, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_theta)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMA_GARCH_cython", 1, 11, 11, 2); __PYX_ERR(0, 135, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMA_GARCH_cy", 1, 11, 11, 2); __PYX_ERR(0, 139, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_alpha)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMA_GARCH_cython", 1, 11, 11, 3); __PYX_ERR(0, 135, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMA_GARCH_cy", 1, 11, 11, 3); __PYX_ERR(0, 139, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_beta)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMA_GARCH_cython", 1, 11, 11, 4); __PYX_ERR(0, 135, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMA_GARCH_cy", 1, 11, 11, 4); __PYX_ERR(0, 139, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_c)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMA_GARCH_cython", 1, 11, 11, 5); __PYX_ERR(0, 135, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMA_GARCH_cy", 1, 11, 11, 5); __PYX_ERR(0, 139, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  6:
         if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_omega)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMA_GARCH_cython", 1, 11, 11, 6); __PYX_ERR(0, 135, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMA_GARCH_cy", 1, 11, 11, 6); __PYX_ERR(0, 139, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  7:
         if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_p)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMA_GARCH_cython", 1, 11, 11, 7); __PYX_ERR(0, 135, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMA_GARCH_cy", 1, 11, 11, 7); __PYX_ERR(0, 139, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  8:
         if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_q)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMA_GARCH_cython", 1, 11, 11, 8); __PYX_ERR(0, 135, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMA_GARCH_cy", 1, 11, 11, 8); __PYX_ERR(0, 139, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  9:
         if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_Q)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMA_GARCH_cython", 1, 11, 11, 9); __PYX_ERR(0, 135, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMA_GARCH_cy", 1, 11, 11, 9); __PYX_ERR(0, 139, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case 10:
         if (likely((values[10] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_P)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMA_GARCH_cython", 1, 11, 11, 10); __PYX_ERR(0, 135, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMA_GARCH_cy", 1, 11, 11, 10); __PYX_ERR(0, 139, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "model_ARMA_GARCH_cython") < 0)) __PYX_ERR(0, 135, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "ARMA_GARCH_cy") < 0)) __PYX_ERR(0, 139, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 11) {
       goto __pyx_L5_argtuple_error;
@@ -4520,27 +4626,27 @@ static PyObject *__pyx_pw_7fynance_6models_18econometric_models_7model_ARMA_GARC
     __pyx_v_theta = ((PyArrayObject *)values[2]);
     __pyx_v_alpha = ((PyArrayObject *)values[3]);
     __pyx_v_beta = ((PyArrayObject *)values[4]);
-    __pyx_v_c = __pyx_PyFloat_AsDouble(values[5]); if (unlikely((__pyx_v_c == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 141, __pyx_L3_error)
-    __pyx_v_omega = __pyx_PyFloat_AsDouble(values[6]); if (unlikely((__pyx_v_omega == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 141, __pyx_L3_error)
-    __pyx_v_p = __Pyx_PyInt_As_int(values[7]); if (unlikely((__pyx_v_p == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 142, __pyx_L3_error)
-    __pyx_v_q = __Pyx_PyInt_As_int(values[8]); if (unlikely((__pyx_v_q == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 142, __pyx_L3_error)
-    __pyx_v_Q = __Pyx_PyInt_As_int(values[9]); if (unlikely((__pyx_v_Q == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 142, __pyx_L3_error)
-    __pyx_v_P = __Pyx_PyInt_As_int(values[10]); if (unlikely((__pyx_v_P == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 142, __pyx_L3_error)
+    __pyx_v_c = __pyx_PyFloat_AsDouble(values[5]); if (unlikely((__pyx_v_c == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 145, __pyx_L3_error)
+    __pyx_v_omega = __pyx_PyFloat_AsDouble(values[6]); if (unlikely((__pyx_v_omega == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 145, __pyx_L3_error)
+    __pyx_v_p = __Pyx_PyInt_As_int(values[7]); if (unlikely((__pyx_v_p == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 146, __pyx_L3_error)
+    __pyx_v_q = __Pyx_PyInt_As_int(values[8]); if (unlikely((__pyx_v_q == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 146, __pyx_L3_error)
+    __pyx_v_Q = __Pyx_PyInt_As_int(values[9]); if (unlikely((__pyx_v_Q == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 146, __pyx_L3_error)
+    __pyx_v_P = __Pyx_PyInt_As_int(values[10]); if (unlikely((__pyx_v_P == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 146, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("model_ARMA_GARCH_cython", 1, 11, 11, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 135, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("ARMA_GARCH_cy", 1, 11, 11, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 139, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("fynance.models.econometric_models.model_ARMA_GARCH_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("fynance.models.econometric_models_cy.ARMA_GARCH_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_y), __pyx_ptype_5numpy_ndarray, 1, "y", 0))) __PYX_ERR(0, 136, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_phi), __pyx_ptype_5numpy_ndarray, 1, "phi", 0))) __PYX_ERR(0, 137, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_theta), __pyx_ptype_5numpy_ndarray, 1, "theta", 0))) __PYX_ERR(0, 138, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_alpha), __pyx_ptype_5numpy_ndarray, 1, "alpha", 0))) __PYX_ERR(0, 139, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_beta), __pyx_ptype_5numpy_ndarray, 1, "beta", 0))) __PYX_ERR(0, 140, __pyx_L1_error)
-  __pyx_r = __pyx_pf_7fynance_6models_18econometric_models_6model_ARMA_GARCH_cython(__pyx_self, __pyx_v_y, __pyx_v_phi, __pyx_v_theta, __pyx_v_alpha, __pyx_v_beta, __pyx_v_c, __pyx_v_omega, __pyx_v_p, __pyx_v_q, __pyx_v_Q, __pyx_v_P);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_y), __pyx_ptype_5numpy_ndarray, 1, "y", 0))) __PYX_ERR(0, 140, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_phi), __pyx_ptype_5numpy_ndarray, 1, "phi", 0))) __PYX_ERR(0, 141, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_theta), __pyx_ptype_5numpy_ndarray, 1, "theta", 0))) __PYX_ERR(0, 142, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_alpha), __pyx_ptype_5numpy_ndarray, 1, "alpha", 0))) __PYX_ERR(0, 143, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_beta), __pyx_ptype_5numpy_ndarray, 1, "beta", 0))) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_r = __pyx_pf_7fynance_6models_21econometric_models_cy_6ARMA_GARCH_cy(__pyx_self, __pyx_v_y, __pyx_v_phi, __pyx_v_theta, __pyx_v_alpha, __pyx_v_beta, __pyx_v_c, __pyx_v_omega, __pyx_v_p, __pyx_v_q, __pyx_v_Q, __pyx_v_P);
 
   /* function exit code */
   goto __pyx_L0;
@@ -4551,7 +4657,7 @@ static PyObject *__pyx_pw_7fynance_6models_18econometric_models_7model_ARMA_GARC
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7fynance_6models_18econometric_models_6model_ARMA_GARCH_cython(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_phi, PyArrayObject *__pyx_v_theta, PyArrayObject *__pyx_v_alpha, PyArrayObject *__pyx_v_beta, __pyx_t_5numpy_float64_t __pyx_v_c, __pyx_t_5numpy_float64_t __pyx_v_omega, int __pyx_v_p, int __pyx_v_q, int __pyx_v_Q, int __pyx_v_P) {
+static PyObject *__pyx_pf_7fynance_6models_21econometric_models_cy_6ARMA_GARCH_cy(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_phi, PyArrayObject *__pyx_v_theta, PyArrayObject *__pyx_v_alpha, PyArrayObject *__pyx_v_beta, __pyx_t_5numpy_float64_t __pyx_v_c, __pyx_t_5numpy_float64_t __pyx_v_omega, int __pyx_v_p, int __pyx_v_q, int __pyx_v_Q, int __pyx_v_P) {
   __Pyx_LocalBuf_ND __pyx_pybuffernd_alpha;
   __Pyx_Buffer __pyx_pybuffer_alpha;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_beta;
@@ -4565,7 +4671,7 @@ static PyObject *__pyx_pf_7fynance_6models_18econometric_models_6model_ARMA_GARC
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
-  __Pyx_RefNannySetupContext("model_ARMA_GARCH_cython", 0);
+  __Pyx_RefNannySetupContext("ARMA_GARCH_cy", 0);
   __pyx_pybuffer_y.pybuffer.buf = NULL;
   __pyx_pybuffer_y.refcount = 0;
   __pyx_pybuffernd_y.data = NULL;
@@ -4588,31 +4694,31 @@ static PyObject *__pyx_pf_7fynance_6models_18econometric_models_6model_ARMA_GARC
   __pyx_pybuffernd_beta.rcbuffer = &__pyx_pybuffer_beta;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y.rcbuffer->pybuffer, (PyObject*)__pyx_v_y, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 135, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y.rcbuffer->pybuffer, (PyObject*)__pyx_v_y, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 139, __pyx_L1_error)
   }
   __pyx_pybuffernd_y.diminfo[0].strides = __pyx_pybuffernd_y.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_y.diminfo[0].shape = __pyx_pybuffernd_y.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_phi.rcbuffer->pybuffer, (PyObject*)__pyx_v_phi, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 135, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_phi.rcbuffer->pybuffer, (PyObject*)__pyx_v_phi, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 139, __pyx_L1_error)
   }
   __pyx_pybuffernd_phi.diminfo[0].strides = __pyx_pybuffernd_phi.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_phi.diminfo[0].shape = __pyx_pybuffernd_phi.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_theta.rcbuffer->pybuffer, (PyObject*)__pyx_v_theta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 135, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_theta.rcbuffer->pybuffer, (PyObject*)__pyx_v_theta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 139, __pyx_L1_error)
   }
   __pyx_pybuffernd_theta.diminfo[0].strides = __pyx_pybuffernd_theta.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_theta.diminfo[0].shape = __pyx_pybuffernd_theta.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_alpha.rcbuffer->pybuffer, (PyObject*)__pyx_v_alpha, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 135, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_alpha.rcbuffer->pybuffer, (PyObject*)__pyx_v_alpha, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 139, __pyx_L1_error)
   }
   __pyx_pybuffernd_alpha.diminfo[0].strides = __pyx_pybuffernd_alpha.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_alpha.diminfo[0].shape = __pyx_pybuffernd_alpha.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_beta.rcbuffer->pybuffer, (PyObject*)__pyx_v_beta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 135, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_beta.rcbuffer->pybuffer, (PyObject*)__pyx_v_beta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 139, __pyx_L1_error)
   }
   __pyx_pybuffernd_beta.diminfo[0].strides = __pyx_pybuffernd_beta.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_beta.diminfo[0].shape = __pyx_pybuffernd_beta.rcbuffer->pybuffer.shape[0];
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_7fynance_6models_18econometric_models_model_ARMA_GARCH_cython(__pyx_v_y, __pyx_v_phi, __pyx_v_theta, __pyx_v_alpha, __pyx_v_beta, __pyx_v_c, __pyx_v_omega, __pyx_v_p, __pyx_v_q, __pyx_v_Q, __pyx_v_P, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_7fynance_6models_21econometric_models_cy_ARMA_GARCH_cy(__pyx_v_y, __pyx_v_phi, __pyx_v_theta, __pyx_v_alpha, __pyx_v_beta, __pyx_v_c, __pyx_v_omega, __pyx_v_p, __pyx_v_q, __pyx_v_Q, __pyx_v_P, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 139, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4631,7 +4737,7 @@ static PyObject *__pyx_pf_7fynance_6models_18econometric_models_6model_ARMA_GARC
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_theta.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_y.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("fynance.models.econometric_models.model_ARMA_GARCH_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("fynance.models.econometric_models_cy.ARMA_GARCH_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
@@ -4646,16 +4752,16 @@ static PyObject *__pyx_pf_7fynance_6models_18econometric_models_6model_ARMA_GARC
   return __pyx_r;
 }
 
-/* "fynance/models/econometric_models.pyx":211
+/* "fynance/models/econometric_models_cy.pyx":215
  * 
  * 
- * cpdef tuple model_ARMAX_GARCH_cython(             # <<<<<<<<<<<<<<
+ * cpdef tuple ARMAX_GARCH_cy(             # <<<<<<<<<<<<<<
  *         np.ndarray[np.float64_t, ndim=1] y,
  *         np.ndarray[np.float64_t, ndim=2] x,
  */
 
-static PyObject *__pyx_pw_7fynance_6models_18econometric_models_9model_ARMAX_GARCH_cython(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH_cython(PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_x, PyArrayObject *__pyx_v_phi, PyArrayObject *__pyx_v_psi, PyArrayObject *__pyx_v_theta, PyArrayObject *__pyx_v_alpha, PyArrayObject *__pyx_v_beta, __pyx_t_5numpy_float64_t __pyx_v_c, __pyx_t_5numpy_float64_t __pyx_v_omega, int __pyx_v_p, int __pyx_v_q, int __pyx_v_Q, int __pyx_v_P, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_7fynance_6models_21econometric_models_cy_9ARMAX_GARCH_cy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_7fynance_6models_21econometric_models_cy_ARMAX_GARCH_cy(PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_x, PyArrayObject *__pyx_v_phi, PyArrayObject *__pyx_v_psi, PyArrayObject *__pyx_v_theta, PyArrayObject *__pyx_v_alpha, PyArrayObject *__pyx_v_beta, __pyx_t_5numpy_float64_t __pyx_v_c, __pyx_t_5numpy_float64_t __pyx_v_omega, int __pyx_v_p, int __pyx_v_q, int __pyx_v_Q, int __pyx_v_P, CYTHON_UNUSED int __pyx_skip_dispatch) {
   __pyx_t_5numpy_float64_t __pyx_v_armax;
   __pyx_t_5numpy_float64_t __pyx_v_arch;
   int __pyx_v_i;
@@ -4713,7 +4819,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
   Py_ssize_t __pyx_t_28;
   Py_ssize_t __pyx_t_29;
   Py_ssize_t __pyx_t_30;
-  __Pyx_RefNannySetupContext("model_ARMAX_GARCH_cython", 0);
+  __Pyx_RefNannySetupContext("ARMAX_GARCH_cy", 0);
   __pyx_pybuffer_u.pybuffer.buf = NULL;
   __pyx_pybuffer_u.refcount = 0;
   __pyx_pybuffernd_u.data = NULL;
@@ -4752,50 +4858,50 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
   __pyx_pybuffernd_beta.rcbuffer = &__pyx_pybuffer_beta;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y.rcbuffer->pybuffer, (PyObject*)__pyx_v_y, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 211, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y.rcbuffer->pybuffer, (PyObject*)__pyx_v_y, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 215, __pyx_L1_error)
   }
   __pyx_pybuffernd_y.diminfo[0].strides = __pyx_pybuffernd_y.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_y.diminfo[0].shape = __pyx_pybuffernd_y.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x.rcbuffer->pybuffer, (PyObject*)__pyx_v_x, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 211, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x.rcbuffer->pybuffer, (PyObject*)__pyx_v_x, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 215, __pyx_L1_error)
   }
   __pyx_pybuffernd_x.diminfo[0].strides = __pyx_pybuffernd_x.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_x.diminfo[0].shape = __pyx_pybuffernd_x.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_x.diminfo[1].strides = __pyx_pybuffernd_x.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_x.diminfo[1].shape = __pyx_pybuffernd_x.rcbuffer->pybuffer.shape[1];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_phi.rcbuffer->pybuffer, (PyObject*)__pyx_v_phi, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 211, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_phi.rcbuffer->pybuffer, (PyObject*)__pyx_v_phi, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 215, __pyx_L1_error)
   }
   __pyx_pybuffernd_phi.diminfo[0].strides = __pyx_pybuffernd_phi.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_phi.diminfo[0].shape = __pyx_pybuffernd_phi.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_psi.rcbuffer->pybuffer, (PyObject*)__pyx_v_psi, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 211, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_psi.rcbuffer->pybuffer, (PyObject*)__pyx_v_psi, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 215, __pyx_L1_error)
   }
   __pyx_pybuffernd_psi.diminfo[0].strides = __pyx_pybuffernd_psi.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_psi.diminfo[0].shape = __pyx_pybuffernd_psi.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_theta.rcbuffer->pybuffer, (PyObject*)__pyx_v_theta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 211, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_theta.rcbuffer->pybuffer, (PyObject*)__pyx_v_theta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 215, __pyx_L1_error)
   }
   __pyx_pybuffernd_theta.diminfo[0].strides = __pyx_pybuffernd_theta.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_theta.diminfo[0].shape = __pyx_pybuffernd_theta.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_alpha.rcbuffer->pybuffer, (PyObject*)__pyx_v_alpha, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 211, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_alpha.rcbuffer->pybuffer, (PyObject*)__pyx_v_alpha, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 215, __pyx_L1_error)
   }
   __pyx_pybuffernd_alpha.diminfo[0].strides = __pyx_pybuffernd_alpha.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_alpha.diminfo[0].shape = __pyx_pybuffernd_alpha.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_beta.rcbuffer->pybuffer, (PyObject*)__pyx_v_beta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 211, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_beta.rcbuffer->pybuffer, (PyObject*)__pyx_v_beta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 215, __pyx_L1_error)
   }
   __pyx_pybuffernd_beta.diminfo[0].strides = __pyx_pybuffernd_beta.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_beta.diminfo[0].shape = __pyx_pybuffernd_beta.rcbuffer->pybuffer.shape[0];
 
-  /* "fynance/models/econometric_models.pyx":268
+  /* "fynance/models/econometric_models_cy.pyx":272
  *     """
  *     cdef np.float64_t armax, arch
  *     cdef int i, j, t, T = np.size(y)             # <<<<<<<<<<<<<<
  *     cdef np.ndarray[np.float64_t, ndim=1] u = np.zeros([T], dtype=np.float64)
  *     cdef np.ndarray[np.float64_t, ndim=1] h = np.zeros([T], dtype=np.float64)
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 268, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 272, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_size); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 268, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_size); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 272, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -4809,13 +4915,13 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
     }
   }
   if (!__pyx_t_2) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, ((PyObject *)__pyx_v_y)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 268, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, ((PyObject *)__pyx_v_y)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 272, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_2, ((PyObject *)__pyx_v_y)};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 268, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 272, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else
@@ -4823,73 +4929,73 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_2, ((PyObject *)__pyx_v_y)};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 268, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 272, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else
     #endif
     {
-      __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 268, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 272, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2); __pyx_t_2 = NULL;
       __Pyx_INCREF(((PyObject *)__pyx_v_y));
       __Pyx_GIVEREF(((PyObject *)__pyx_v_y));
       PyTuple_SET_ITEM(__pyx_t_4, 0+1, ((PyObject *)__pyx_v_y));
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 268, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 272, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     }
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 268, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 272, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_T = __pyx_t_5;
 
-  /* "fynance/models/econometric_models.pyx":269
+  /* "fynance/models/econometric_models_cy.pyx":273
  *     cdef np.float64_t armax, arch
  *     cdef int i, j, t, T = np.size(y)
  *     cdef np.ndarray[np.float64_t, ndim=1] u = np.zeros([T], dtype=np.float64)             # <<<<<<<<<<<<<<
  *     cdef np.ndarray[np.float64_t, ndim=1] h = np.zeros([T], dtype=np.float64)
  * 
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 273, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 273, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 273, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = PyList_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_4 = PyList_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 273, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_1);
   PyList_SET_ITEM(__pyx_t_4, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 273, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 273, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 273, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_float64); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_float64); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 273, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_6) < 0) __PYX_ERR(0, 269, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_6) < 0) __PYX_ERR(0, 273, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 273, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 269, __pyx_L1_error)
+  if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 273, __pyx_L1_error)
   __pyx_t_7 = ((PyArrayObject *)__pyx_t_6);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
     if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_u.rcbuffer->pybuffer, (PyObject*)__pyx_t_7, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 1, 0, __pyx_stack) == -1)) {
       __pyx_v_u = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_u.rcbuffer->pybuffer.buf = NULL;
-      __PYX_ERR(0, 269, __pyx_L1_error)
+      __PYX_ERR(0, 273, __pyx_L1_error)
     } else {__pyx_pybuffernd_u.diminfo[0].strides = __pyx_pybuffernd_u.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_u.diminfo[0].shape = __pyx_pybuffernd_u.rcbuffer->pybuffer.shape[0];
     }
   }
@@ -4897,51 +5003,51 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
   __pyx_v_u = ((PyArrayObject *)__pyx_t_6);
   __pyx_t_6 = 0;
 
-  /* "fynance/models/econometric_models.pyx":270
+  /* "fynance/models/econometric_models_cy.pyx":274
  *     cdef int i, j, t, T = np.size(y)
  *     cdef np.ndarray[np.float64_t, ndim=1] u = np.zeros([T], dtype=np.float64)
  *     cdef np.ndarray[np.float64_t, ndim=1] h = np.zeros([T], dtype=np.float64)             # <<<<<<<<<<<<<<
  * 
  *     for t in range(T):
  */
-  __pyx_t_6 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_6);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_t_6);
   __pyx_t_6 = 0;
-  __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 270, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 270, __pyx_L1_error)
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 274, __pyx_L1_error)
   __pyx_t_8 = ((PyArrayObject *)__pyx_t_2);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
     if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_h.rcbuffer->pybuffer, (PyObject*)__pyx_t_8, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 1, 0, __pyx_stack) == -1)) {
       __pyx_v_h = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_h.rcbuffer->pybuffer.buf = NULL;
-      __PYX_ERR(0, 270, __pyx_L1_error)
+      __PYX_ERR(0, 274, __pyx_L1_error)
     } else {__pyx_pybuffernd_h.diminfo[0].strides = __pyx_pybuffernd_h.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_h.diminfo[0].shape = __pyx_pybuffernd_h.rcbuffer->pybuffer.shape[0];
     }
   }
@@ -4949,7 +5055,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
   __pyx_v_h = ((PyArrayObject *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "fynance/models/econometric_models.pyx":272
+  /* "fynance/models/econometric_models_cy.pyx":276
  *     cdef np.ndarray[np.float64_t, ndim=1] h = np.zeros([T], dtype=np.float64)
  * 
  *     for t in range(T):             # <<<<<<<<<<<<<<
@@ -4961,26 +5067,26 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
   for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
     __pyx_v_t = __pyx_t_10;
 
-    /* "fynance/models/econometric_models.pyx":273
+    /* "fynance/models/econometric_models_cy.pyx":277
  * 
  *     for t in range(T):
  *         armax = sum(x[t] * psi)             # <<<<<<<<<<<<<<
  *         arch = 0.
  *         for i in range(min(t, max(q, p, Q, P))):
  */
-    __pyx_t_2 = __Pyx_GetItemInt(((PyObject *)__pyx_v_x), __pyx_v_t, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 273, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(((PyObject *)__pyx_v_x), __pyx_v_t, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 277, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = PyNumber_Multiply(__pyx_t_2, ((PyObject *)__pyx_v_psi)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 273, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Multiply(__pyx_t_2, ((PyObject *)__pyx_v_psi)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 277, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_sum, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 273, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_sum, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 277, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_11 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_11 == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 273, __pyx_L1_error)
+    __pyx_t_11 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_11 == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 277, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_armax = __pyx_t_11;
 
-    /* "fynance/models/econometric_models.pyx":274
+    /* "fynance/models/econometric_models_cy.pyx":278
  *     for t in range(T):
  *         armax = sum(x[t] * psi)
  *         arch = 0.             # <<<<<<<<<<<<<<
@@ -4989,7 +5095,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
  */
     __pyx_v_arch = 0.;
 
-    /* "fynance/models/econometric_models.pyx":275
+    /* "fynance/models/econometric_models_cy.pyx":279
  *         armax = sum(x[t] * psi)
  *         arch = 0.
  *         for i in range(min(t, max(q, p, Q, P))):             # <<<<<<<<<<<<<<
@@ -5029,7 +5135,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
     for (__pyx_t_16 = 0; __pyx_t_16 < __pyx_t_13; __pyx_t_16+=1) {
       __pyx_v_i = __pyx_t_16;
 
-      /* "fynance/models/econometric_models.pyx":276
+      /* "fynance/models/econometric_models_cy.pyx":280
  *         arch = 0.
  *         for i in range(min(t, max(q, p, Q, P))):
  *             if i < p:             # <<<<<<<<<<<<<<
@@ -5039,7 +5145,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
       __pyx_t_17 = ((__pyx_v_i < __pyx_v_p) != 0);
       if (__pyx_t_17) {
 
-        /* "fynance/models/econometric_models.pyx":277
+        /* "fynance/models/econometric_models_cy.pyx":281
  *         for i in range(min(t, max(q, p, Q, P))):
  *             if i < p:
  *                 armax += y[t-i-1] * phi[i]             # <<<<<<<<<<<<<<
@@ -5054,7 +5160,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
         } else if (unlikely(__pyx_t_18 >= __pyx_pybuffernd_y.diminfo[0].shape)) __pyx_t_14 = 0;
         if (unlikely(__pyx_t_14 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_14);
-          __PYX_ERR(0, 277, __pyx_L1_error)
+          __PYX_ERR(0, 281, __pyx_L1_error)
         }
         __pyx_t_19 = __pyx_v_i;
         __pyx_t_14 = -1;
@@ -5064,11 +5170,11 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
         } else if (unlikely(__pyx_t_19 >= __pyx_pybuffernd_phi.diminfo[0].shape)) __pyx_t_14 = 0;
         if (unlikely(__pyx_t_14 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_14);
-          __PYX_ERR(0, 277, __pyx_L1_error)
+          __PYX_ERR(0, 281, __pyx_L1_error)
         }
         __pyx_v_armax = (__pyx_v_armax + ((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_y.rcbuffer->pybuffer.buf, __pyx_t_18, __pyx_pybuffernd_y.diminfo[0].strides)) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_phi.rcbuffer->pybuffer.buf, __pyx_t_19, __pyx_pybuffernd_phi.diminfo[0].strides))));
 
-        /* "fynance/models/econometric_models.pyx":276
+        /* "fynance/models/econometric_models_cy.pyx":280
  *         arch = 0.
  *         for i in range(min(t, max(q, p, Q, P))):
  *             if i < p:             # <<<<<<<<<<<<<<
@@ -5077,7 +5183,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
  */
       }
 
-      /* "fynance/models/econometric_models.pyx":278
+      /* "fynance/models/econometric_models_cy.pyx":282
  *             if i < p:
  *                 armax += y[t-i-1] * phi[i]
  *             if i < q:             # <<<<<<<<<<<<<<
@@ -5087,7 +5193,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
       __pyx_t_17 = ((__pyx_v_i < __pyx_v_q) != 0);
       if (__pyx_t_17) {
 
-        /* "fynance/models/econometric_models.pyx":279
+        /* "fynance/models/econometric_models_cy.pyx":283
  *                 armax += y[t-i-1] * phi[i]
  *             if i < q:
  *                 armax += u[t-i-1] * theta[i]             # <<<<<<<<<<<<<<
@@ -5102,7 +5208,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
         } else if (unlikely(__pyx_t_20 >= __pyx_pybuffernd_u.diminfo[0].shape)) __pyx_t_14 = 0;
         if (unlikely(__pyx_t_14 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_14);
-          __PYX_ERR(0, 279, __pyx_L1_error)
+          __PYX_ERR(0, 283, __pyx_L1_error)
         }
         __pyx_t_21 = __pyx_v_i;
         __pyx_t_14 = -1;
@@ -5112,11 +5218,11 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
         } else if (unlikely(__pyx_t_21 >= __pyx_pybuffernd_theta.diminfo[0].shape)) __pyx_t_14 = 0;
         if (unlikely(__pyx_t_14 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_14);
-          __PYX_ERR(0, 279, __pyx_L1_error)
+          __PYX_ERR(0, 283, __pyx_L1_error)
         }
         __pyx_v_armax = (__pyx_v_armax + ((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_u.rcbuffer->pybuffer.buf, __pyx_t_20, __pyx_pybuffernd_u.diminfo[0].strides)) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_theta.rcbuffer->pybuffer.buf, __pyx_t_21, __pyx_pybuffernd_theta.diminfo[0].strides))));
 
-        /* "fynance/models/econometric_models.pyx":278
+        /* "fynance/models/econometric_models_cy.pyx":282
  *             if i < p:
  *                 armax += y[t-i-1] * phi[i]
  *             if i < q:             # <<<<<<<<<<<<<<
@@ -5125,7 +5231,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
  */
       }
 
-      /* "fynance/models/econometric_models.pyx":280
+      /* "fynance/models/econometric_models_cy.pyx":284
  *             if i < q:
  *                 armax += u[t-i-1] * theta[i]
  *             if i < Q:             # <<<<<<<<<<<<<<
@@ -5135,7 +5241,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
       __pyx_t_17 = ((__pyx_v_i < __pyx_v_Q) != 0);
       if (__pyx_t_17) {
 
-        /* "fynance/models/econometric_models.pyx":281
+        /* "fynance/models/econometric_models_cy.pyx":285
  *                 armax += u[t-i-1] * theta[i]
  *             if i < Q:
  *                 arch += u[t-i-1]**2 * alpha[i]             # <<<<<<<<<<<<<<
@@ -5150,7 +5256,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
         } else if (unlikely(__pyx_t_22 >= __pyx_pybuffernd_u.diminfo[0].shape)) __pyx_t_14 = 0;
         if (unlikely(__pyx_t_14 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_14);
-          __PYX_ERR(0, 281, __pyx_L1_error)
+          __PYX_ERR(0, 285, __pyx_L1_error)
         }
         __pyx_t_23 = __pyx_v_i;
         __pyx_t_14 = -1;
@@ -5160,11 +5266,11 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
         } else if (unlikely(__pyx_t_23 >= __pyx_pybuffernd_alpha.diminfo[0].shape)) __pyx_t_14 = 0;
         if (unlikely(__pyx_t_14 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_14);
-          __PYX_ERR(0, 281, __pyx_L1_error)
+          __PYX_ERR(0, 285, __pyx_L1_error)
         }
         __pyx_v_arch = (__pyx_v_arch + (pow((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_u.rcbuffer->pybuffer.buf, __pyx_t_22, __pyx_pybuffernd_u.diminfo[0].strides)), 2.0) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_alpha.rcbuffer->pybuffer.buf, __pyx_t_23, __pyx_pybuffernd_alpha.diminfo[0].strides))));
 
-        /* "fynance/models/econometric_models.pyx":280
+        /* "fynance/models/econometric_models_cy.pyx":284
  *             if i < q:
  *                 armax += u[t-i-1] * theta[i]
  *             if i < Q:             # <<<<<<<<<<<<<<
@@ -5173,7 +5279,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
  */
       }
 
-      /* "fynance/models/econometric_models.pyx":282
+      /* "fynance/models/econometric_models_cy.pyx":286
  *             if i < Q:
  *                 arch += u[t-i-1]**2 * alpha[i]
  *             if i < P:             # <<<<<<<<<<<<<<
@@ -5183,7 +5289,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
       __pyx_t_17 = ((__pyx_v_i < __pyx_v_P) != 0);
       if (__pyx_t_17) {
 
-        /* "fynance/models/econometric_models.pyx":283
+        /* "fynance/models/econometric_models_cy.pyx":287
  *                 arch += u[t-i-1]**2 * alpha[i]
  *             if i < P:
  *                 arch += h[t-i-1]**2 * beta[i]             # <<<<<<<<<<<<<<
@@ -5198,7 +5304,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
         } else if (unlikely(__pyx_t_24 >= __pyx_pybuffernd_h.diminfo[0].shape)) __pyx_t_14 = 0;
         if (unlikely(__pyx_t_14 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_14);
-          __PYX_ERR(0, 283, __pyx_L1_error)
+          __PYX_ERR(0, 287, __pyx_L1_error)
         }
         __pyx_t_25 = __pyx_v_i;
         __pyx_t_14 = -1;
@@ -5208,11 +5314,11 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
         } else if (unlikely(__pyx_t_25 >= __pyx_pybuffernd_beta.diminfo[0].shape)) __pyx_t_14 = 0;
         if (unlikely(__pyx_t_14 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_14);
-          __PYX_ERR(0, 283, __pyx_L1_error)
+          __PYX_ERR(0, 287, __pyx_L1_error)
         }
         __pyx_v_arch = (__pyx_v_arch + (pow((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_h.rcbuffer->pybuffer.buf, __pyx_t_24, __pyx_pybuffernd_h.diminfo[0].strides)), 2.0) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_beta.rcbuffer->pybuffer.buf, __pyx_t_25, __pyx_pybuffernd_beta.diminfo[0].strides))));
 
-        /* "fynance/models/econometric_models.pyx":282
+        /* "fynance/models/econometric_models_cy.pyx":286
  *             if i < Q:
  *                 arch += u[t-i-1]**2 * alpha[i]
  *             if i < P:             # <<<<<<<<<<<<<<
@@ -5221,7 +5327,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
  */
       }
 
-      /* "fynance/models/econometric_models.pyx":284
+      /* "fynance/models/econometric_models_cy.pyx":288
  *             if i < P:
  *                 arch += h[t-i-1]**2 * beta[i]
  *             if arch < 0.:             # <<<<<<<<<<<<<<
@@ -5231,7 +5337,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
       __pyx_t_17 = ((__pyx_v_arch < 0.) != 0);
       if (__pyx_t_17) {
 
-        /* "fynance/models/econometric_models.pyx":285
+        /* "fynance/models/econometric_models_cy.pyx":289
  *                 arch += h[t-i-1]**2 * beta[i]
  *             if arch < 0.:
  *                 return 1e8 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)             # <<<<<<<<<<<<<<
@@ -5239,72 +5345,72 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
  *                 return 1e6 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
  */
         __Pyx_XDECREF(__pyx_r);
-        __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ones); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ones); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_6 = PyList_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_6 = PyList_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_GIVEREF(__pyx_t_2);
         PyList_SET_ITEM(__pyx_t_6, 0, __pyx_t_2);
         __pyx_t_2 = 0;
-        __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_GIVEREF(__pyx_t_6);
         PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_6);
         __pyx_t_6 = 0;
-        __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float64); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float64); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        __pyx_t_6 = PyNumber_Multiply(__pyx_float_1e8, __pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_6 = PyNumber_Multiply(__pyx_float_1e8, __pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_ones); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_ones); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_GIVEREF(__pyx_t_3);
         PyList_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
         __pyx_t_3 = 0;
-        __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_GIVEREF(__pyx_t_1);
         PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
         __pyx_t_1 = 0;
-        __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_26 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float64); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_26 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float64); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_26);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_26) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_26) < 0) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_26); __pyx_t_26 = 0;
-        __pyx_t_26 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_26 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_26);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 289, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_GIVEREF(__pyx_t_6);
         PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_6);
@@ -5316,7 +5422,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
         __pyx_t_1 = 0;
         goto __pyx_L0;
 
-        /* "fynance/models/econometric_models.pyx":284
+        /* "fynance/models/econometric_models_cy.pyx":288
  *             if i < P:
  *                 arch += h[t-i-1]**2 * beta[i]
  *             if arch < 0.:             # <<<<<<<<<<<<<<
@@ -5325,7 +5431,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
  */
       }
 
-      /* "fynance/models/econometric_models.pyx":286
+      /* "fynance/models/econometric_models_cy.pyx":290
  *             if arch < 0.:
  *                 return 1e8 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
  *             if arch > 1e20 or armax > 1e20:             # <<<<<<<<<<<<<<
@@ -5343,7 +5449,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
       __pyx_L13_bool_binop_done:;
       if (__pyx_t_17) {
 
-        /* "fynance/models/econometric_models.pyx":287
+        /* "fynance/models/econometric_models_cy.pyx":291
  *                 return 1e8 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
  *             if arch > 1e20 or armax > 1e20:
  *                 return 1e6 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)             # <<<<<<<<<<<<<<
@@ -5351,72 +5457,72 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
  *         h[t] = sqrt(omega + arch)
  */
         __Pyx_XDECREF(__pyx_r);
-        __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_26 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_ones); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_26 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_ones); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_26);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_6 = PyList_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_6 = PyList_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_GIVEREF(__pyx_t_1);
         PyList_SET_ITEM(__pyx_t_6, 0, __pyx_t_1);
         __pyx_t_1 = 0;
-        __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_GIVEREF(__pyx_t_6);
         PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_6);
         __pyx_t_6 = 0;
-        __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 287, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_26, __pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_26, __pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_26); __pyx_t_26 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        __pyx_t_6 = PyNumber_Multiply(__pyx_float_1e6, __pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_6 = PyNumber_Multiply(__pyx_float_1e6, __pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ones); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ones); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_T); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_26 = PyList_New(1); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_26 = PyList_New(1); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_26);
         __Pyx_GIVEREF(__pyx_t_2);
         PyList_SET_ITEM(__pyx_t_26, 0, __pyx_t_2);
         __pyx_t_2 = 0;
-        __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_GIVEREF(__pyx_t_26);
         PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_26);
         __pyx_t_26 = 0;
-        __pyx_t_26 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_26 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_26);
-        __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (PyDict_SetItem(__pyx_t_26, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 287, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_26, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_26); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_26); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_26); __pyx_t_26 = 0;
-        __pyx_t_26 = PyTuple_New(2); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_26 = PyTuple_New(2); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 291, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_26);
         __Pyx_GIVEREF(__pyx_t_6);
         PyTuple_SET_ITEM(__pyx_t_26, 0, __pyx_t_6);
@@ -5428,7 +5534,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
         __pyx_t_26 = 0;
         goto __pyx_L0;
 
-        /* "fynance/models/econometric_models.pyx":286
+        /* "fynance/models/econometric_models_cy.pyx":290
  *             if arch < 0.:
  *                 return 1e8 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
  *             if arch > 1e20 or armax > 1e20:             # <<<<<<<<<<<<<<
@@ -5438,7 +5544,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
       }
     }
 
-    /* "fynance/models/econometric_models.pyx":288
+    /* "fynance/models/econometric_models_cy.pyx":292
  *             if arch > 1e20 or armax > 1e20:
  *                 return 1e6 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
  *         u[t] = y[t] - c - armax             # <<<<<<<<<<<<<<
@@ -5453,7 +5559,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
     } else if (unlikely(__pyx_t_28 >= __pyx_pybuffernd_y.diminfo[0].shape)) __pyx_t_12 = 0;
     if (unlikely(__pyx_t_12 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_12);
-      __PYX_ERR(0, 288, __pyx_L1_error)
+      __PYX_ERR(0, 292, __pyx_L1_error)
     }
     __pyx_t_29 = __pyx_v_t;
     __pyx_t_12 = -1;
@@ -5463,11 +5569,11 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
     } else if (unlikely(__pyx_t_29 >= __pyx_pybuffernd_u.diminfo[0].shape)) __pyx_t_12 = 0;
     if (unlikely(__pyx_t_12 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_12);
-      __PYX_ERR(0, 288, __pyx_L1_error)
+      __PYX_ERR(0, 292, __pyx_L1_error)
     }
     *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_u.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_u.diminfo[0].strides) = (((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_y.rcbuffer->pybuffer.buf, __pyx_t_28, __pyx_pybuffernd_y.diminfo[0].strides)) - __pyx_v_c) - __pyx_v_armax);
 
-    /* "fynance/models/econometric_models.pyx":289
+    /* "fynance/models/econometric_models_cy.pyx":293
  *                 return 1e6 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
  *         u[t] = y[t] - c - armax
  *         h[t] = sqrt(omega + arch)             # <<<<<<<<<<<<<<
@@ -5481,18 +5587,18 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
     } else if (unlikely(__pyx_t_30 >= __pyx_pybuffernd_h.diminfo[0].shape)) __pyx_t_12 = 0;
     if (unlikely(__pyx_t_12 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_12);
-      __PYX_ERR(0, 289, __pyx_L1_error)
+      __PYX_ERR(0, 293, __pyx_L1_error)
     }
     *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float64_t *, __pyx_pybuffernd_h.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_h.diminfo[0].strides) = sqrt((__pyx_v_omega + __pyx_v_arch));
   }
 
-  /* "fynance/models/econometric_models.pyx":290
+  /* "fynance/models/econometric_models_cy.pyx":294
  *         u[t] = y[t] - c - armax
  *         h[t] = sqrt(omega + arch)
  *     return u, h             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_26 = PyTuple_New(2); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 290, __pyx_L1_error)
+  __pyx_t_26 = PyTuple_New(2); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 294, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_26);
   __Pyx_INCREF(((PyObject *)__pyx_v_u));
   __Pyx_GIVEREF(((PyObject *)__pyx_v_u));
@@ -5504,10 +5610,10 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
   __pyx_t_26 = 0;
   goto __pyx_L0;
 
-  /* "fynance/models/econometric_models.pyx":211
+  /* "fynance/models/econometric_models_cy.pyx":215
  * 
  * 
- * cpdef tuple model_ARMAX_GARCH_cython(             # <<<<<<<<<<<<<<
+ * cpdef tuple ARMAX_GARCH_cy(             # <<<<<<<<<<<<<<
  *         np.ndarray[np.float64_t, ndim=1] y,
  *         np.ndarray[np.float64_t, ndim=2] x,
  */
@@ -5534,7 +5640,7 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_x.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_y.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("fynance.models.econometric_models.model_ARMAX_GARCH_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("fynance.models.econometric_models_cy.ARMAX_GARCH_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   goto __pyx_L2;
   __pyx_L0:;
@@ -5556,9 +5662,9 @@ static PyObject *__pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7fynance_6models_18econometric_models_9model_ARMAX_GARCH_cython(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_7fynance_6models_18econometric_models_8model_ARMAX_GARCH_cython[] = " \n    AutoRegressive Moving Average model of order q and p, such that: \n    y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + psi_t * x_t \n          + theta_1 * u_t-1 + ... + theta_q * u_t-q + u_t\n    \n    With Generalized AutoRegressive Conditional Heteroskedasticity volatility\n    model of order Q and P, such that:\n    u_t = z_t * h_t \n    h_t^2 = omega + alpha_1 * u^2_t-1 + ... + alpha_Q * u^2_t-Q \n            + beta_1 * h^2_t-1 + ... + beta_P * h^2_t-P\n    \n    Parameters\n    ----------\n    y: np.ndarray[np.float64, ndim=1]\n        Time series.\n    x: np.ndarray[np.float64, ndim=2]\n        Time series of external features.\n    phi: np.ndarray[np.float64, ndim=1]\n        Coefficients of AR model.\n    psi: np.ndarray[np.float64, ndim=1]\n        Coefficients of external features.\n    theta: np.ndarray[np.float64, ndim=1]\n        Coefficients of MA model.\n    alpha: np.ndarray[np.float64, ndim=1]\n        Coefficients of MA part of GARCH.\n    beta: np.ndarray[np.float64, ndim=1]\n        Coefficients of AR part of GARCH.\n    c: np.float64\n        Constant of the model.\n    p: int\n        Order of AR(p) model.\n    q: int\n        Order of MA(q) model.\n    Q: int\n        Order of MA part of GARCH.\n    P: int\n        Order of AR part of GARCH.\n\n    Returns\n    -------\n    u: np.ndarray[np.float64, ndim=1]\n        Residual of the model. \n    h: np.ndarray[np.float64, ndim=1]\n        Conditional volatility of the model. \n    ";
-static PyObject *__pyx_pw_7fynance_6models_18econometric_models_9model_ARMAX_GARCH_cython(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7fynance_6models_21econometric_models_cy_9ARMAX_GARCH_cy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_7fynance_6models_21econometric_models_cy_8ARMAX_GARCH_cy[] = " \n    AutoRegressive Moving Average model of order q and p, such that: \n    y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + psi_t * x_t \n          + theta_1 * u_t-1 + ... + theta_q * u_t-q + u_t\n    \n    With Generalized AutoRegressive Conditional Heteroskedasticity volatility\n    model of order Q and P, such that:\n    u_t = z_t * h_t \n    h_t^2 = omega + alpha_1 * u^2_t-1 + ... + alpha_Q * u^2_t-Q \n            + beta_1 * h^2_t-1 + ... + beta_P * h^2_t-P\n    \n    Parameters\n    ----------\n    y: np.ndarray[np.float64, ndim=1]\n        Time series.\n    x: np.ndarray[np.float64, ndim=2]\n        Time series of external features.\n    phi: np.ndarray[np.float64, ndim=1]\n        Coefficients of AR model.\n    psi: np.ndarray[np.float64, ndim=1]\n        Coefficients of external features.\n    theta: np.ndarray[np.float64, ndim=1]\n        Coefficients of MA model.\n    alpha: np.ndarray[np.float64, ndim=1]\n        Coefficients of MA part of GARCH.\n    beta: np.ndarray[np.float64, ndim=1]\n        Coefficients of AR part of GARCH.\n    c: np.float64\n        Constant of the model.\n    p: int\n        Order of AR(p) model.\n    q: int\n        Order of MA(q) model.\n    Q: int\n        Order of MA part of GARCH.\n    P: int\n        Order of AR part of GARCH.\n\n    Returns\n    -------\n    u: np.ndarray[np.float64, ndim=1]\n        Residual of the model. \n    h: np.ndarray[np.float64, ndim=1]\n        Conditional volatility of the model. \n    ";
+static PyObject *__pyx_pw_7fynance_6models_21econometric_models_cy_9ARMAX_GARCH_cy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyArrayObject *__pyx_v_y = 0;
   PyArrayObject *__pyx_v_x = 0;
   PyArrayObject *__pyx_v_phi = 0;
@@ -5574,7 +5680,7 @@ static PyObject *__pyx_pw_7fynance_6models_18econometric_models_9model_ARMAX_GAR
   int __pyx_v_P;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("model_ARMAX_GARCH_cython (wrapper)", 0);
+  __Pyx_RefNannySetupContext("ARMAX_GARCH_cy (wrapper)", 0);
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_y,&__pyx_n_s_x,&__pyx_n_s_phi,&__pyx_n_s_psi,&__pyx_n_s_theta,&__pyx_n_s_alpha,&__pyx_n_s_beta,&__pyx_n_s_c,&__pyx_n_s_omega,&__pyx_n_s_p,&__pyx_n_s_q,&__pyx_n_s_Q,&__pyx_n_s_P,0};
     PyObject* values[13] = {0,0,0,0,0,0,0,0,0,0,0,0,0};
@@ -5620,77 +5726,77 @@ static PyObject *__pyx_pw_7fynance_6models_18econometric_models_9model_ARMAX_GAR
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_x)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMAX_GARCH_cython", 1, 13, 13, 1); __PYX_ERR(0, 211, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMAX_GARCH_cy", 1, 13, 13, 1); __PYX_ERR(0, 215, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_phi)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMAX_GARCH_cython", 1, 13, 13, 2); __PYX_ERR(0, 211, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMAX_GARCH_cy", 1, 13, 13, 2); __PYX_ERR(0, 215, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_psi)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMAX_GARCH_cython", 1, 13, 13, 3); __PYX_ERR(0, 211, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMAX_GARCH_cy", 1, 13, 13, 3); __PYX_ERR(0, 215, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_theta)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMAX_GARCH_cython", 1, 13, 13, 4); __PYX_ERR(0, 211, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMAX_GARCH_cy", 1, 13, 13, 4); __PYX_ERR(0, 215, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_alpha)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMAX_GARCH_cython", 1, 13, 13, 5); __PYX_ERR(0, 211, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMAX_GARCH_cy", 1, 13, 13, 5); __PYX_ERR(0, 215, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  6:
         if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_beta)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMAX_GARCH_cython", 1, 13, 13, 6); __PYX_ERR(0, 211, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMAX_GARCH_cy", 1, 13, 13, 6); __PYX_ERR(0, 215, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  7:
         if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_c)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMAX_GARCH_cython", 1, 13, 13, 7); __PYX_ERR(0, 211, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMAX_GARCH_cy", 1, 13, 13, 7); __PYX_ERR(0, 215, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  8:
         if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_omega)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMAX_GARCH_cython", 1, 13, 13, 8); __PYX_ERR(0, 211, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMAX_GARCH_cy", 1, 13, 13, 8); __PYX_ERR(0, 215, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  9:
         if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_p)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMAX_GARCH_cython", 1, 13, 13, 9); __PYX_ERR(0, 211, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMAX_GARCH_cy", 1, 13, 13, 9); __PYX_ERR(0, 215, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case 10:
         if (likely((values[10] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_q)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMAX_GARCH_cython", 1, 13, 13, 10); __PYX_ERR(0, 211, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMAX_GARCH_cy", 1, 13, 13, 10); __PYX_ERR(0, 215, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case 11:
         if (likely((values[11] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_Q)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMAX_GARCH_cython", 1, 13, 13, 11); __PYX_ERR(0, 211, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMAX_GARCH_cy", 1, 13, 13, 11); __PYX_ERR(0, 215, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case 12:
         if (likely((values[12] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_P)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("model_ARMAX_GARCH_cython", 1, 13, 13, 12); __PYX_ERR(0, 211, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ARMAX_GARCH_cy", 1, 13, 13, 12); __PYX_ERR(0, 215, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "model_ARMAX_GARCH_cython") < 0)) __PYX_ERR(0, 211, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "ARMAX_GARCH_cy") < 0)) __PYX_ERR(0, 215, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 13) {
       goto __pyx_L5_argtuple_error;
@@ -5716,29 +5822,29 @@ static PyObject *__pyx_pw_7fynance_6models_18econometric_models_9model_ARMAX_GAR
     __pyx_v_theta = ((PyArrayObject *)values[4]);
     __pyx_v_alpha = ((PyArrayObject *)values[5]);
     __pyx_v_beta = ((PyArrayObject *)values[6]);
-    __pyx_v_c = __pyx_PyFloat_AsDouble(values[7]); if (unlikely((__pyx_v_c == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 219, __pyx_L3_error)
-    __pyx_v_omega = __pyx_PyFloat_AsDouble(values[8]); if (unlikely((__pyx_v_omega == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 219, __pyx_L3_error)
-    __pyx_v_p = __Pyx_PyInt_As_int(values[9]); if (unlikely((__pyx_v_p == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 220, __pyx_L3_error)
-    __pyx_v_q = __Pyx_PyInt_As_int(values[10]); if (unlikely((__pyx_v_q == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 220, __pyx_L3_error)
-    __pyx_v_Q = __Pyx_PyInt_As_int(values[11]); if (unlikely((__pyx_v_Q == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 220, __pyx_L3_error)
-    __pyx_v_P = __Pyx_PyInt_As_int(values[12]); if (unlikely((__pyx_v_P == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 220, __pyx_L3_error)
+    __pyx_v_c = __pyx_PyFloat_AsDouble(values[7]); if (unlikely((__pyx_v_c == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 223, __pyx_L3_error)
+    __pyx_v_omega = __pyx_PyFloat_AsDouble(values[8]); if (unlikely((__pyx_v_omega == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 223, __pyx_L3_error)
+    __pyx_v_p = __Pyx_PyInt_As_int(values[9]); if (unlikely((__pyx_v_p == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 224, __pyx_L3_error)
+    __pyx_v_q = __Pyx_PyInt_As_int(values[10]); if (unlikely((__pyx_v_q == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 224, __pyx_L3_error)
+    __pyx_v_Q = __Pyx_PyInt_As_int(values[11]); if (unlikely((__pyx_v_Q == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 224, __pyx_L3_error)
+    __pyx_v_P = __Pyx_PyInt_As_int(values[12]); if (unlikely((__pyx_v_P == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 224, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("model_ARMAX_GARCH_cython", 1, 13, 13, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 211, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("ARMAX_GARCH_cy", 1, 13, 13, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 215, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("fynance.models.econometric_models.model_ARMAX_GARCH_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("fynance.models.econometric_models_cy.ARMAX_GARCH_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_y), __pyx_ptype_5numpy_ndarray, 1, "y", 0))) __PYX_ERR(0, 212, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_x), __pyx_ptype_5numpy_ndarray, 1, "x", 0))) __PYX_ERR(0, 213, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_phi), __pyx_ptype_5numpy_ndarray, 1, "phi", 0))) __PYX_ERR(0, 214, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_psi), __pyx_ptype_5numpy_ndarray, 1, "psi", 0))) __PYX_ERR(0, 215, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_theta), __pyx_ptype_5numpy_ndarray, 1, "theta", 0))) __PYX_ERR(0, 216, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_alpha), __pyx_ptype_5numpy_ndarray, 1, "alpha", 0))) __PYX_ERR(0, 217, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_beta), __pyx_ptype_5numpy_ndarray, 1, "beta", 0))) __PYX_ERR(0, 218, __pyx_L1_error)
-  __pyx_r = __pyx_pf_7fynance_6models_18econometric_models_8model_ARMAX_GARCH_cython(__pyx_self, __pyx_v_y, __pyx_v_x, __pyx_v_phi, __pyx_v_psi, __pyx_v_theta, __pyx_v_alpha, __pyx_v_beta, __pyx_v_c, __pyx_v_omega, __pyx_v_p, __pyx_v_q, __pyx_v_Q, __pyx_v_P);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_y), __pyx_ptype_5numpy_ndarray, 1, "y", 0))) __PYX_ERR(0, 216, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_x), __pyx_ptype_5numpy_ndarray, 1, "x", 0))) __PYX_ERR(0, 217, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_phi), __pyx_ptype_5numpy_ndarray, 1, "phi", 0))) __PYX_ERR(0, 218, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_psi), __pyx_ptype_5numpy_ndarray, 1, "psi", 0))) __PYX_ERR(0, 219, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_theta), __pyx_ptype_5numpy_ndarray, 1, "theta", 0))) __PYX_ERR(0, 220, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_alpha), __pyx_ptype_5numpy_ndarray, 1, "alpha", 0))) __PYX_ERR(0, 221, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_beta), __pyx_ptype_5numpy_ndarray, 1, "beta", 0))) __PYX_ERR(0, 222, __pyx_L1_error)
+  __pyx_r = __pyx_pf_7fynance_6models_21econometric_models_cy_8ARMAX_GARCH_cy(__pyx_self, __pyx_v_y, __pyx_v_x, __pyx_v_phi, __pyx_v_psi, __pyx_v_theta, __pyx_v_alpha, __pyx_v_beta, __pyx_v_c, __pyx_v_omega, __pyx_v_p, __pyx_v_q, __pyx_v_Q, __pyx_v_P);
 
   /* function exit code */
   goto __pyx_L0;
@@ -5749,7 +5855,7 @@ static PyObject *__pyx_pw_7fynance_6models_18econometric_models_9model_ARMAX_GAR
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7fynance_6models_18econometric_models_8model_ARMAX_GARCH_cython(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_x, PyArrayObject *__pyx_v_phi, PyArrayObject *__pyx_v_psi, PyArrayObject *__pyx_v_theta, PyArrayObject *__pyx_v_alpha, PyArrayObject *__pyx_v_beta, __pyx_t_5numpy_float64_t __pyx_v_c, __pyx_t_5numpy_float64_t __pyx_v_omega, int __pyx_v_p, int __pyx_v_q, int __pyx_v_Q, int __pyx_v_P) {
+static PyObject *__pyx_pf_7fynance_6models_21econometric_models_cy_8ARMAX_GARCH_cy(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_y, PyArrayObject *__pyx_v_x, PyArrayObject *__pyx_v_phi, PyArrayObject *__pyx_v_psi, PyArrayObject *__pyx_v_theta, PyArrayObject *__pyx_v_alpha, PyArrayObject *__pyx_v_beta, __pyx_t_5numpy_float64_t __pyx_v_c, __pyx_t_5numpy_float64_t __pyx_v_omega, int __pyx_v_p, int __pyx_v_q, int __pyx_v_Q, int __pyx_v_P) {
   __Pyx_LocalBuf_ND __pyx_pybuffernd_alpha;
   __Pyx_Buffer __pyx_pybuffer_alpha;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_beta;
@@ -5767,7 +5873,7 @@ static PyObject *__pyx_pf_7fynance_6models_18econometric_models_8model_ARMAX_GAR
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
-  __Pyx_RefNannySetupContext("model_ARMAX_GARCH_cython", 0);
+  __Pyx_RefNannySetupContext("ARMAX_GARCH_cy", 0);
   __pyx_pybuffer_y.pybuffer.buf = NULL;
   __pyx_pybuffer_y.refcount = 0;
   __pyx_pybuffernd_y.data = NULL;
@@ -5798,41 +5904,41 @@ static PyObject *__pyx_pf_7fynance_6models_18econometric_models_8model_ARMAX_GAR
   __pyx_pybuffernd_beta.rcbuffer = &__pyx_pybuffer_beta;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y.rcbuffer->pybuffer, (PyObject*)__pyx_v_y, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 211, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y.rcbuffer->pybuffer, (PyObject*)__pyx_v_y, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 215, __pyx_L1_error)
   }
   __pyx_pybuffernd_y.diminfo[0].strides = __pyx_pybuffernd_y.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_y.diminfo[0].shape = __pyx_pybuffernd_y.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x.rcbuffer->pybuffer, (PyObject*)__pyx_v_x, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 211, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x.rcbuffer->pybuffer, (PyObject*)__pyx_v_x, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 215, __pyx_L1_error)
   }
   __pyx_pybuffernd_x.diminfo[0].strides = __pyx_pybuffernd_x.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_x.diminfo[0].shape = __pyx_pybuffernd_x.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_x.diminfo[1].strides = __pyx_pybuffernd_x.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_x.diminfo[1].shape = __pyx_pybuffernd_x.rcbuffer->pybuffer.shape[1];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_phi.rcbuffer->pybuffer, (PyObject*)__pyx_v_phi, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 211, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_phi.rcbuffer->pybuffer, (PyObject*)__pyx_v_phi, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 215, __pyx_L1_error)
   }
   __pyx_pybuffernd_phi.diminfo[0].strides = __pyx_pybuffernd_phi.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_phi.diminfo[0].shape = __pyx_pybuffernd_phi.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_psi.rcbuffer->pybuffer, (PyObject*)__pyx_v_psi, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 211, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_psi.rcbuffer->pybuffer, (PyObject*)__pyx_v_psi, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 215, __pyx_L1_error)
   }
   __pyx_pybuffernd_psi.diminfo[0].strides = __pyx_pybuffernd_psi.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_psi.diminfo[0].shape = __pyx_pybuffernd_psi.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_theta.rcbuffer->pybuffer, (PyObject*)__pyx_v_theta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 211, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_theta.rcbuffer->pybuffer, (PyObject*)__pyx_v_theta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 215, __pyx_L1_error)
   }
   __pyx_pybuffernd_theta.diminfo[0].strides = __pyx_pybuffernd_theta.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_theta.diminfo[0].shape = __pyx_pybuffernd_theta.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_alpha.rcbuffer->pybuffer, (PyObject*)__pyx_v_alpha, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 211, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_alpha.rcbuffer->pybuffer, (PyObject*)__pyx_v_alpha, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 215, __pyx_L1_error)
   }
   __pyx_pybuffernd_alpha.diminfo[0].strides = __pyx_pybuffernd_alpha.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_alpha.diminfo[0].shape = __pyx_pybuffernd_alpha.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_beta.rcbuffer->pybuffer, (PyObject*)__pyx_v_beta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 211, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_beta.rcbuffer->pybuffer, (PyObject*)__pyx_v_beta, &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 215, __pyx_L1_error)
   }
   __pyx_pybuffernd_beta.diminfo[0].strides = __pyx_pybuffernd_beta.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_beta.diminfo[0].shape = __pyx_pybuffernd_beta.rcbuffer->pybuffer.shape[0];
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_7fynance_6models_18econometric_models_model_ARMAX_GARCH_cython(__pyx_v_y, __pyx_v_x, __pyx_v_phi, __pyx_v_psi, __pyx_v_theta, __pyx_v_alpha, __pyx_v_beta, __pyx_v_c, __pyx_v_omega, __pyx_v_p, __pyx_v_q, __pyx_v_Q, __pyx_v_P, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 211, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_7fynance_6models_21econometric_models_cy_ARMAX_GARCH_cy(__pyx_v_y, __pyx_v_x, __pyx_v_phi, __pyx_v_psi, __pyx_v_theta, __pyx_v_alpha, __pyx_v_beta, __pyx_v_c, __pyx_v_omega, __pyx_v_p, __pyx_v_q, __pyx_v_Q, __pyx_v_P, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 215, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5853,7 +5959,7 @@ static PyObject *__pyx_pf_7fynance_6models_18econometric_models_8model_ARMAX_GAR
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_x.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_y.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("fynance.models.econometric_models.model_ARMAX_GARCH_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("fynance.models.econometric_models_cy.ARMAX_GARCH_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
@@ -8333,28 +8439,28 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_ufunc(void) {
 }
 
 static PyMethodDef __pyx_methods[] = {
-  {"get_parameters", (PyCFunction)__pyx_pw_7fynance_6models_18econometric_models_1get_parameters, METH_VARARGS|METH_KEYWORDS, __pyx_doc_7fynance_6models_18econometric_models_get_parameters},
-  {"model_MA_cython", (PyCFunction)__pyx_pw_7fynance_6models_18econometric_models_3model_MA_cython, METH_VARARGS|METH_KEYWORDS, __pyx_doc_7fynance_6models_18econometric_models_2model_MA_cython},
-  {"model_ARMA_cython", (PyCFunction)__pyx_pw_7fynance_6models_18econometric_models_5model_ARMA_cython, METH_VARARGS|METH_KEYWORDS, __pyx_doc_7fynance_6models_18econometric_models_4model_ARMA_cython},
-  {"model_ARMA_GARCH_cython", (PyCFunction)__pyx_pw_7fynance_6models_18econometric_models_7model_ARMA_GARCH_cython, METH_VARARGS|METH_KEYWORDS, __pyx_doc_7fynance_6models_18econometric_models_6model_ARMA_GARCH_cython},
-  {"model_ARMAX_GARCH_cython", (PyCFunction)__pyx_pw_7fynance_6models_18econometric_models_9model_ARMAX_GARCH_cython, METH_VARARGS|METH_KEYWORDS, __pyx_doc_7fynance_6models_18econometric_models_8model_ARMAX_GARCH_cython},
+  {"get_parameters_cy", (PyCFunction)__pyx_pw_7fynance_6models_21econometric_models_cy_1get_parameters_cy, METH_VARARGS|METH_KEYWORDS, __pyx_doc_7fynance_6models_21econometric_models_cy_get_parameters_cy},
+  {"MA_cy", (PyCFunction)__pyx_pw_7fynance_6models_21econometric_models_cy_3MA_cy, METH_VARARGS|METH_KEYWORDS, __pyx_doc_7fynance_6models_21econometric_models_cy_2MA_cy},
+  {"ARMA_cy", (PyCFunction)__pyx_pw_7fynance_6models_21econometric_models_cy_5ARMA_cy, METH_VARARGS|METH_KEYWORDS, __pyx_doc_7fynance_6models_21econometric_models_cy_4ARMA_cy},
+  {"ARMA_GARCH_cy", (PyCFunction)__pyx_pw_7fynance_6models_21econometric_models_cy_7ARMA_GARCH_cy, METH_VARARGS|METH_KEYWORDS, __pyx_doc_7fynance_6models_21econometric_models_cy_6ARMA_GARCH_cy},
+  {"ARMAX_GARCH_cy", (PyCFunction)__pyx_pw_7fynance_6models_21econometric_models_cy_9ARMAX_GARCH_cy, METH_VARARGS|METH_KEYWORDS, __pyx_doc_7fynance_6models_21econometric_models_cy_8ARMAX_GARCH_cy},
   {0, 0, 0, 0}
 };
 
 #if PY_MAJOR_VERSION >= 3
 #if CYTHON_PEP489_MULTI_PHASE_INIT
 static PyObject* __pyx_pymod_create(PyObject *spec, PyModuleDef *def); /*proto*/
-static int __pyx_pymod_exec_econometric_models(PyObject* module); /*proto*/
+static int __pyx_pymod_exec_econometric_models_cy(PyObject* module); /*proto*/
 static PyModuleDef_Slot __pyx_moduledef_slots[] = {
   {Py_mod_create, (void*)__pyx_pymod_create},
-  {Py_mod_exec, (void*)__pyx_pymod_exec_econometric_models},
+  {Py_mod_exec, (void*)__pyx_pymod_exec_econometric_models_cy},
   {0, NULL}
 };
 #endif
 
 static struct PyModuleDef __pyx_moduledef = {
     PyModuleDef_HEAD_INIT,
-    "econometric_models",
+    "econometric_models_cy",
     0, /* m_doc */
   #if CYTHON_PEP489_MULTI_PHASE_INIT
     0, /* m_size */
@@ -8374,14 +8480,19 @@ static struct PyModuleDef __pyx_moduledef = {
 #endif
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
+  {&__pyx_n_s_ARMAX_GARCH_cy, __pyx_k_ARMAX_GARCH_cy, sizeof(__pyx_k_ARMAX_GARCH_cy), 0, 0, 1, 1},
+  {&__pyx_n_s_ARMA_GARCH_cy, __pyx_k_ARMA_GARCH_cy, sizeof(__pyx_k_ARMA_GARCH_cy), 0, 0, 1, 1},
+  {&__pyx_n_s_ARMA_cy, __pyx_k_ARMA_cy, sizeof(__pyx_k_ARMA_cy), 0, 0, 1, 1},
   {&__pyx_kp_u_Format_string_allocated_too_shor, __pyx_k_Format_string_allocated_too_shor, sizeof(__pyx_k_Format_string_allocated_too_shor), 0, 1, 0, 0},
   {&__pyx_kp_u_Format_string_allocated_too_shor_2, __pyx_k_Format_string_allocated_too_shor_2, sizeof(__pyx_k_Format_string_allocated_too_shor_2), 0, 1, 0, 0},
   {&__pyx_n_s_ImportError, __pyx_k_ImportError, sizeof(__pyx_k_ImportError), 0, 0, 1, 1},
+  {&__pyx_n_s_MA_cy, __pyx_k_MA_cy, sizeof(__pyx_k_MA_cy), 0, 0, 1, 1},
   {&__pyx_kp_u_Non_native_byte_order_not_suppor, __pyx_k_Non_native_byte_order_not_suppor, sizeof(__pyx_k_Non_native_byte_order_not_suppor), 0, 1, 0, 0},
   {&__pyx_n_s_P, __pyx_k_P, sizeof(__pyx_k_P), 0, 0, 1, 1},
   {&__pyx_n_s_Q, __pyx_k_Q, sizeof(__pyx_k_Q), 0, 0, 1, 1},
   {&__pyx_n_s_RuntimeError, __pyx_k_RuntimeError, sizeof(__pyx_k_RuntimeError), 0, 0, 1, 1},
   {&__pyx_n_s_ValueError, __pyx_k_ValueError, sizeof(__pyx_k_ValueError), 0, 0, 1, 1},
+  {&__pyx_n_s_all, __pyx_k_all, sizeof(__pyx_k_all), 0, 0, 1, 1},
   {&__pyx_n_s_alpha, __pyx_k_alpha, sizeof(__pyx_k_alpha), 0, 0, 1, 1},
   {&__pyx_n_s_beta, __pyx_k_beta, sizeof(__pyx_k_beta), 0, 0, 1, 1},
   {&__pyx_n_s_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 0, 1, 1},
@@ -8390,6 +8501,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_dtype, __pyx_k_dtype, sizeof(__pyx_k_dtype), 0, 0, 1, 1},
   {&__pyx_n_s_float64, __pyx_k_float64, sizeof(__pyx_k_float64), 0, 0, 1, 1},
   {&__pyx_n_s_fmin, __pyx_k_fmin, sizeof(__pyx_k_fmin), 0, 0, 1, 1},
+  {&__pyx_n_s_get_parameters_cy, __pyx_k_get_parameters_cy, sizeof(__pyx_k_get_parameters_cy), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_kp_u_ndarray_is_not_C_contiguous, __pyx_k_ndarray_is_not_C_contiguous, sizeof(__pyx_k_ndarray_is_not_C_contiguous), 0, 1, 0, 0},
@@ -8418,8 +8530,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 81, __pyx_L1_error)
-  __pyx_builtin_sum = __Pyx_GetBuiltinName(__pyx_n_s_sum); if (!__pyx_builtin_sum) __PYX_ERR(0, 273, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 85, __pyx_L1_error)
+  __pyx_builtin_sum = __Pyx_GetBuiltinName(__pyx_n_s_sum); if (!__pyx_builtin_sum) __PYX_ERR(0, 277, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(1, 229, __pyx_L1_error)
   __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(1, 810, __pyx_L1_error)
   __pyx_builtin_ImportError = __Pyx_GetBuiltinName(__pyx_n_s_ImportError); if (!__pyx_builtin_ImportError) __PYX_ERR(1, 1000, __pyx_L1_error)
@@ -8651,11 +8763,11 @@ static int __Pyx_modinit_function_import_code(void) {
 
 
 #if PY_MAJOR_VERSION < 3
-__Pyx_PyMODINIT_FUNC initeconometric_models(void) CYTHON_SMALL_CODE; /*proto*/
-__Pyx_PyMODINIT_FUNC initeconometric_models(void)
+__Pyx_PyMODINIT_FUNC initeconometric_models_cy(void) CYTHON_SMALL_CODE; /*proto*/
+__Pyx_PyMODINIT_FUNC initeconometric_models_cy(void)
 #else
-__Pyx_PyMODINIT_FUNC PyInit_econometric_models(void) CYTHON_SMALL_CODE; /*proto*/
-__Pyx_PyMODINIT_FUNC PyInit_econometric_models(void)
+__Pyx_PyMODINIT_FUNC PyInit_econometric_models_cy(void) CYTHON_SMALL_CODE; /*proto*/
+__Pyx_PyMODINIT_FUNC PyInit_econometric_models_cy(void)
 #if CYTHON_PEP489_MULTI_PHASE_INIT
 {
   return PyModuleDef_Init(&__pyx_moduledef);
@@ -8695,7 +8807,7 @@ bad:
 }
 
 
-static int __pyx_pymod_exec_econometric_models(PyObject *__pyx_pyinit_module)
+static int __pyx_pymod_exec_econometric_models_cy(PyObject *__pyx_pyinit_module)
 #endif
 #endif
 {
@@ -8716,7 +8828,7 @@ if (!__Pyx_RefNanny) {
       Py_FatalError("failed to import 'refnanny' module");
 }
 #endif
-  __Pyx_RefNannySetupContext("__Pyx_PyMODINIT_FUNC PyInit_econometric_models(void)", 0);
+  __Pyx_RefNannySetupContext("__Pyx_PyMODINIT_FUNC PyInit_econometric_models_cy(void)", 0);
   if (__Pyx_check_binary_version() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_empty_tuple = PyTuple_New(0); if (unlikely(!__pyx_empty_tuple)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_empty_bytes = PyBytes_FromStringAndSize("", 0); if (unlikely(!__pyx_empty_bytes)) __PYX_ERR(0, 1, __pyx_L1_error)
@@ -8752,7 +8864,7 @@ if (!__Pyx_RefNanny) {
   Py_INCREF(__pyx_m);
   #else
   #if PY_MAJOR_VERSION < 3
-  __pyx_m = Py_InitModule4("econometric_models", __pyx_methods, 0, 0, PYTHON_API_VERSION); Py_XINCREF(__pyx_m);
+  __pyx_m = Py_InitModule4("econometric_models_cy", __pyx_methods, 0, 0, PYTHON_API_VERSION); Py_XINCREF(__pyx_m);
   #else
   __pyx_m = PyModule_Create(&__pyx_moduledef);
   #endif
@@ -8771,14 +8883,14 @@ if (!__Pyx_RefNanny) {
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_fynance__models__econometric_models) {
+  if (__pyx_module_is_main_fynance__models__econometric_models_cy) {
     if (PyObject_SetAttrString(__pyx_m, "__name__", __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "fynance.models.econometric_models")) {
-      if (unlikely(PyDict_SetItemString(modules, "fynance.models.econometric_models", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "fynance.models.econometric_models_cy")) {
+      if (unlikely(PyDict_SetItemString(modules, "fynance.models.econometric_models_cy", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -8799,7 +8911,7 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "fynance/models/econometric_models.pyx":4
+  /* "fynance/models/econometric_models_cy.pyx":4
  * # -*- coding: utf-8 -*-
  * 
  * import numpy as np             # <<<<<<<<<<<<<<
@@ -8811,7 +8923,7 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 4, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "fynance/models/econometric_models.pyx":5
+  /* "fynance/models/econometric_models_cy.pyx":5
  * 
  * import numpy as np
  * from scipy.optimize import fmin             # <<<<<<<<<<<<<<
@@ -8832,7 +8944,34 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "fynance/models/econometric_models.pyx":1
+  /* "fynance/models/econometric_models_cy.pyx":11
+ * from cpython cimport bool
+ * 
+ * __all__ = [             # <<<<<<<<<<<<<<
+ *     'get_parameters_cy', 'MA_cy', 'ARMA_cy', 'ARMA_GARCH_cy', 'ARMAX_GARCH_cy',
+ * ]
+ */
+  __pyx_t_2 = PyList_New(5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_INCREF(__pyx_n_s_get_parameters_cy);
+  __Pyx_GIVEREF(__pyx_n_s_get_parameters_cy);
+  PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s_get_parameters_cy);
+  __Pyx_INCREF(__pyx_n_s_MA_cy);
+  __Pyx_GIVEREF(__pyx_n_s_MA_cy);
+  PyList_SET_ITEM(__pyx_t_2, 1, __pyx_n_s_MA_cy);
+  __Pyx_INCREF(__pyx_n_s_ARMA_cy);
+  __Pyx_GIVEREF(__pyx_n_s_ARMA_cy);
+  PyList_SET_ITEM(__pyx_t_2, 2, __pyx_n_s_ARMA_cy);
+  __Pyx_INCREF(__pyx_n_s_ARMA_GARCH_cy);
+  __Pyx_GIVEREF(__pyx_n_s_ARMA_GARCH_cy);
+  PyList_SET_ITEM(__pyx_t_2, 3, __pyx_n_s_ARMA_GARCH_cy);
+  __Pyx_INCREF(__pyx_n_s_ARMAX_GARCH_cy);
+  __Pyx_GIVEREF(__pyx_n_s_ARMAX_GARCH_cy);
+  PyList_SET_ITEM(__pyx_t_2, 4, __pyx_n_s_ARMAX_GARCH_cy);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_all, __pyx_t_2) < 0) __PYX_ERR(0, 11, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "fynance/models/econometric_models_cy.pyx":1
  * #!/usr/bin/env python             # <<<<<<<<<<<<<<
  * # -*- coding: utf-8 -*-
  * 
@@ -8858,11 +8997,11 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_2);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init fynance.models.econometric_models", 0, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init fynance.models.econometric_models_cy", 0, __pyx_lineno, __pyx_filename);
     }
     Py_DECREF(__pyx_m); __pyx_m = 0;
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init fynance.models.econometric_models");
+    PyErr_SetString(PyExc_ImportError, "init fynance.models.econometric_models_cy");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();
@@ -9646,32 +9785,6 @@ static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject 
 }
 #endif
 
-/* RaiseArgTupleInvalid */
-  static void __Pyx_RaiseArgtupleInvalid(
-    const char* func_name,
-    int exact,
-    Py_ssize_t num_min,
-    Py_ssize_t num_max,
-    Py_ssize_t num_found)
-{
-    Py_ssize_t num_expected;
-    const char *more_or_less;
-    if (num_found < num_min) {
-        num_expected = num_min;
-        more_or_less = "at least";
-    } else {
-        num_expected = num_max;
-        more_or_less = "at most";
-    }
-    if (exact) {
-        more_or_less = "exactly";
-    }
-    PyErr_Format(PyExc_TypeError,
-                 "%.200s() takes %.8s %" CYTHON_FORMAT_SSIZE_T "d positional argument%.1s (%" CYTHON_FORMAT_SSIZE_T "d given)",
-                 func_name, more_or_less, num_expected,
-                 (num_expected == 1) ? "" : "s", num_found);
-}
-
 /* RaiseDoubleKeywords */
   static void __Pyx_RaiseDoubleKeywordsError(
     const char* func_name,
@@ -9786,6 +9899,32 @@ invalid_keyword:
     #endif
 bad:
     return -1;
+}
+
+/* RaiseArgTupleInvalid */
+  static void __Pyx_RaiseArgtupleInvalid(
+    const char* func_name,
+    int exact,
+    Py_ssize_t num_min,
+    Py_ssize_t num_max,
+    Py_ssize_t num_found)
+{
+    Py_ssize_t num_expected;
+    const char *more_or_less;
+    if (num_found < num_min) {
+        num_expected = num_min;
+        more_or_less = "at least";
+    } else {
+        num_expected = num_max;
+        more_or_less = "at most";
+    }
+    if (exact) {
+        more_or_less = "exactly";
+    }
+    PyErr_Format(PyExc_TypeError,
+                 "%.200s() takes %.8s %" CYTHON_FORMAT_SSIZE_T "d positional argument%.1s (%" CYTHON_FORMAT_SSIZE_T "d given)",
+                 func_name, more_or_less, num_expected,
+                 (num_expected == 1) ? "" : "s", num_found);
 }
 
 /* ArgTypeTest */

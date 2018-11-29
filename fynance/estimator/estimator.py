@@ -3,37 +3,24 @@
 
 import numpy as np
 from scipy.optimize import fmin
-cimport numpy as np
-from libc.math cimport sqrt, pi, log
-from cpython cimport bool
 
-from fynance.models.econometric_models_cy import ARMA_cy, ARMA_GARCH_cy
-from fynance.models.econometric_models_cy import get_parameters_cy
+from fynance.models.econometric_models_cy import *
+from .estimator_cy import *
 
-__all__ = ['estimation_cy', 'target_function_cy', 'loglikelihood_cy']
+__all__ = ['estimation', 'target_function', 'loglikelihood']
 
 #=============================================================================#
 #                                 ESTIMATION                                  #
 #=============================================================================#
 
 
-cpdef tuple estimation_cy(
-        np.ndarray[np.float64_t, ndim=1] y,
-        np.ndarray[np.float64_t, ndim=1] x0,
-        int p=0, int q=0, int Q=0, int P=0, 
-        bool cons=True,
-        str model='arch' 
-    ):
+def estimation(y, x0, p=0, q=0, Q=0, P=0, cons=True):
     """ 
     NOT YET WORKING !
     Estimator 
     """
-    cdef np.ndarray[np.float64_t, ndim=1] params=np.zeros([p+q+Q+P+2], dtype=np.float64)
-    cdef np.ndarray[np.float64_t, ndim=1] phi, theta, alpha, beta, u, h
-    cdef np.float64_t c, omega, L
-    
-    params = fmin(target_function_cy, x0, args=(y, p, q, Q, P, cons), disp=0)
-    # NEED TO FIND AN OPTIMIZER (in C or C++) #
+    params = fmin(target_function, x0, args=(y, p, q, Q, P, cons), disp=0)
+    # NEED TO FIND AN OPTIMIZER #
     phi, theta, alpha, beta, c, omega = get_parameters_cy(
         params, p, q, Q, P, cons
     )
@@ -47,21 +34,12 @@ cpdef tuple estimation_cy(
     else:
         print('Unknow model.')
         raise ValueError
-    L = loglikelihood_cy(u, h)
+    L = loglikelihood(u, h)
     return u, h, phi, theta, alpha, beta, c, omega, L
 
 
-cpdef np.float64_t target_function_cy(
-        np.ndarray[np.float64_t, ndim=1] params,
-        np.ndarray[np.float64_t, ndim=1] y,
-        int p=0, int q=0, int Q=0, int P=0, 
-        bool cons=True,
-        str model='arch'
-    ):
+def target_function(params, y, p=0, q=0, Q=0, P=0, cons=True, model='arch'):
     """ Target function """
-    cdef np.ndarray[np.float64_t, ndim=1] phi, theta, alpha, beta, u, h
-    cdef np.float64_t c, omega, L
-
     phi, theta, alpha, beta, c, omega = get_parameters_cy(
         params, p, q, Q, P, cons
     )
@@ -75,7 +53,7 @@ cpdef np.float64_t target_function_cy(
     else:
         print('Unknow model.')
         raise ValueError
-    L = loglikelihood_cy(u, h)
+    L = loglikelihood(u, h)
     return L
         
 
@@ -84,12 +62,8 @@ cpdef np.float64_t target_function_cy(
 #=============================================================================#
 
 
-cpdef np.float64_t loglikelihood_cy(
-        np.ndarray[np.float64_t, ndim=1] u,
-        np.ndarray[np.float64_t, ndim=1] h
-    ):
+def loglikelihood(u, h):
     """ Normal log-likelihood function """
-    cdef np.float64_t L, l_sq_pi = log(sqrt(pi))
-    
+    l_sq_pi = log(sqrt(pi))
     L = - 0.5 - l_sq_pi - np.sum(h) - 0.5 * np.sum(u / (h + 1e-8))
     return - L

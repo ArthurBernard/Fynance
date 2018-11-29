@@ -33,13 +33,13 @@ cmdclass = { }
 if USE_CYTHON:
     extensions = [
         Extension(
-            "fynance.models.econometric_models", 
-            ["fynance/models/econometric_models.pyx"],
+            "fynance.models.econometric_models_cy", 
+            ["fynance/models/econometric_models_cy.pyx"],
             include_dirs=[numpy.get_include(), '.']
         ),
         Extension(
-            "fynance.tools.metrics", 
-            ["fynance/tools/metrics.pyx"],
+            "fynance.tools.metrics_cy", 
+            ["fynance/tools/metrics_cy.pyx"],
             include_dirs=[numpy.get_include(), '.']
         ),
         Extension(
@@ -58,13 +58,13 @@ if USE_CYTHON:
 else:
     extensions = [
         Extension(
-            "fynance.models.econometric_models", 
-            ["fynance/models/econometric_models.c"],
+            "fynance.models.econometric_models_cy", 
+            ["fynance/models/econometric_models_cy.c"],
             include_dirs=[numpy.get_include(), '.']
         ),
         Extension(
-            "fynance.tools.metrics", 
-            ["fynance/tools/metrics.c"],
+            "fynance.tools.metrics_cy", 
+            ["fynance/tools/metrics_cy.c"],
             include_dirs=[numpy.get_include(), '.']
         ),
         Extension(

@@ -7,9 +7,15 @@ from libc.math cimport sqrt
 
 
 # TODO list:
-# - Rolling sharpe
+# - Rolling sharpe (to check and clean)
 # - Calmar
 # - Rolling calmar
+# - move pure python function
+
+
+__all__ = [
+    'sharpe_cy', 'roll_sharpe', 'roll_sharpe_cy', 'log_sharpe_cy',
+]
 
 
 cpdef np.float64_t sharpe_cy(

@@ -2,27 +2,22 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import pandas as pd
 from scipy.optimize import fmin
-cimport numpy as np
-from libc.math cimport sqrt, pi, log
-#from libcpp cimport bool as bool_t
-from cpython cimport bool
 
+from .econemetric_models_cy import *
+
+__all__ = [
+    'get_parameters', 'MA', 'ARMA', 'ARMA_GARCH', 'ARMAX_GARCH'
+]
 
 #=============================================================================#
 #                             PARAMETERS FUNCTION                             #
 #=============================================================================#
 
 
-cpdef tuple get_parameters(
-        np.ndarray[np.float64_t, ndim=1] params,
-        int p, int q, int Q, int P, bool cons
-    ):
+def get_parameters(params, p=0, q=0, Q=0, P=0, cons=True):
     """ Get parameters for ARMA-GARCH models """
-    cdef int i = 0
-    cdef np.ndarray[np.float64_t, ndim=1] phi, theta, alpha, beta
-    cdef np.float64_t c, omega
-
     if cons:
         c = params[i]
         i += 1
@@ -49,11 +44,7 @@ cpdef tuple get_parameters(
 #=============================================================================#
 
 
-cpdef np.ndarray[np.float64_t, ndim=1] model_MA_cython(
-        np.ndarray[np.float64_t, ndim=1] y, 
-        np.ndarray[np.float64_t, ndim=1] theta,
-        np.float64_t c, int q
-    ):
+def MA(y, theta, c, q):
     """ 
     Moving Average model of order q s.t: 
     y_t = c + theta_1 * u_t-1 + ... + theta_q * u_t-q + u_t 
@@ -74,24 +65,15 @@ cpdef np.ndarray[np.float64_t, ndim=1] model_MA_cython(
     u: np.ndarray[ndim=1, dtype=np.float64]
         Residual of the model.
     """
-    cdef np.float64_t s
-    cdef int i, t, T = y.size
-    cdef np.ndarray[np.float64_t, ndim=1] u = np.zeros([T], dtype=np.float64)  # Residuals
-    
-    for t in range(T):
-        s = 0
-        for i in range(min(t, q)):
-            s += u[t-i-1] * theta[i]
-        u[t] = y[t] - c - s
+    if isinstance(y, pd.DataFrame) or isinstance(y, list) or isinstance(y, pd.Series):
+        y = np.asarray(y, dtype=np.float64).reshape([y.size])
+    if isinstance(theta, list):
+        theta = np.asarray(theta, dtype=np.float64)
+    u = MA_cy(y, theta, float(c), int(q))
     return u
 
 
-cpdef np.ndarray[np.float64_t, ndim=1] model_ARMA_cython(
-        np.ndarray[np.float64_t, ndim=1] y,
-        np.ndarray[np.float64_t, ndim=1] phi,
-        np.ndarray[np.float64_t, ndim=1] theta,
-        np.float64_t c, int p, int q
-    ):
+def ARMA(y, phi, theta, c, p, q):
     """
     AutoRegressive Moving Average model of order q and p s.t: 
     y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + theta_1 * u_t-1 + ...
@@ -117,30 +99,17 @@ cpdef np.ndarray[np.float64_t, ndim=1] model_ARMA_cython(
     u: np.ndarray[np.float64, ndim=1]
         Residual of the model.
     """
-    cdef np.float64_t s
-    cdef int i, j, t, T = np.size(y)
-    cdef np.ndarray[np.float64_t, ndim=1] u = np.zeros([T], dtype=np.float64)
-
-    for t in range(T):
-        s = 0
-        for i in range(min(t, max(q, p))):
-            if i < q:
-                s += u[t - i - 1] * theta[i]
-            if i < p:
-                s += y[t - i - 1] * phi[i]
-        u[t] = y[t] - c - s
+    if isinstance(y, pd.DataFrame) or isinstance(y, list) or isinstance(y, pd.Series):
+        y = np.asarray(y, dtype=np.float64).reshape([y.size])
+    if isinstance(theta, list):
+        theta = np.asarray(theta, dtype=np.float64)
+    if isinstance(phi, list):
+        phi = np.asarray(phi, dtype=np.float64)
+    u = ARMA_cy(y, phi, theta, float(c), int(p), int(q))
     return u
 
 
-cpdef tuple model_ARMA_GARCH_cython(
-        np.ndarray[np.float64_t, ndim=1] y,
-        np.ndarray[np.float64_t, ndim=1] phi,
-        np.ndarray[np.float64_t, ndim=1] theta,
-        np.ndarray[np.float64_t, ndim=1] alpha,
-        np.ndarray[np.float64_t, ndim=1] beta,
-        np.float64_t c, np.float64_t omega,
-        int p, int q, int Q, int P
-    ):
+def ARMA_GARCH(y, phi, theta, alpha, beta, c, omega, p, q, Q, P):
     """ 
     AutoRegressive Moving Average model of order q and p, such that: 
     y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + theta_1 * u_t-1 + ...
@@ -165,7 +134,9 @@ cpdef tuple model_ARMA_GARCH_cython(
     beta: np.ndarray[np.float64, ndim=1]
         Coefficients of AR part of GARCH.
     c: np.float64
-        Constant of the model.
+        Constant of ARMA model.
+    omega: np.float64
+        Constant of GARCH model.
     p: int
         Order of AR(p) model.
     q: int
@@ -182,43 +153,24 @@ cpdef tuple model_ARMA_GARCH_cython(
     h: np.ndarray[np.float64, ndim=1]
         Conditional volatility of the model. 
     """
-    cdef np.float64_t arma, arch
-    cdef int i, j, t, T = np.size(y)
-    cdef np.ndarray[np.float64_t, ndim=1] u = np.zeros([T], dtype=np.float64)
-    cdef np.ndarray[np.float64_t, ndim=1] h = np.zeros([T], dtype=np.float64)
-    
-    for t in range(T):
-        arma = 0.
-        arch = 0.
-        for i in range(min(t, max(q, p, Q, P))):
-            if i < p:
-                arma += y[t-i-1] * phi[i]
-            if i < q:
-                arma += u[t-i-1] * theta[i]
-            if i < Q:
-                arch += u[t-i-1]**2 * alpha[i]
-            if i < P:
-                arch += h[t-i-1]**2 * beta[i]
-            if arch < 0.:
-                return 1e8 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
-            if arch > 1e20 or arma > 1e20:
-                return 1e6 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
-        u[t] = y[t] - c - arma
-        h[t] = sqrt(omega + arch)
+    if isinstance(y, pd.DataFrame) or isinstance(y, list) or isinstance(y, pd.Series):
+        y = np.asarray(y, dtype=np.float64).reshape([y.size])
+    if isinstance(theta, list):
+        theta = np.asarray(theta, dtype=np.float64)
+    if isinstance(phi, list):
+        phi = np.asarray(phi, dtype=np.float64)
+    if isinstance(alpha, list):
+        alpha = np.asarray(alpha, dtype=np.float64)
+    if isinstance(beta, list):
+        beta = np.asarray(beta, dtype=np.float64)
+    u, h = ARMA_GARCH_cy(
+        y, phi, theta, alpha, beta, float(c), float(omega), int(p), int(q), 
+        int(Q), int(P)
+    )
     return u, h
 
 
-cpdef tuple model_ARMAX_GARCH_cython(
-        np.ndarray[np.float64_t, ndim=1] y,
-        np.ndarray[np.float64_t, ndim=2] x,
-        np.ndarray[np.float64_t, ndim=1] phi,
-        np.ndarray[np.float64_t, ndim=1] psi,
-        np.ndarray[np.float64_t, ndim=1] theta,
-        np.ndarray[np.float64_t, ndim=1] alpha,
-        np.ndarray[np.float64_t, ndim=1] beta,
-        np.float64_t c, np.float64_t omega,
-        int p, int q, int Q, int P
-    ):
+def ARMAX_GARCH(y, x, phi, psi, theta, alpha, beta, c, omega, p, q, Q, P):
     """ 
     AutoRegressive Moving Average model of order q and p, such that: 
     y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + psi_t * x_t 
@@ -264,27 +216,22 @@ cpdef tuple model_ARMAX_GARCH_cython(
     h: np.ndarray[np.float64, ndim=1]
         Conditional volatility of the model. 
     """
-    cdef np.float64_t armax, arch
-    cdef int i, j, t, T = np.size(y)
-    cdef np.ndarray[np.float64_t, ndim=1] u = np.zeros([T], dtype=np.float64)
-    cdef np.ndarray[np.float64_t, ndim=1] h = np.zeros([T], dtype=np.float64)
-    
-    for t in range(T):
-        armax = sum(x[t] * psi)
-        arch = 0.
-        for i in range(min(t, max(q, p, Q, P))):
-            if i < p:
-                armax += y[t-i-1] * phi[i]
-            if i < q:
-                armax += u[t-i-1] * theta[i]
-            if i < Q:
-                arch += u[t-i-1]**2 * alpha[i]
-            if i < P:
-                arch += h[t-i-1]**2 * beta[i]
-            if arch < 0.:
-                return 1e8 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
-            if arch > 1e20 or armax > 1e20:
-                return 1e6 * np.ones([T], dtype=np.float64), np.ones([T], dtype=np.float64)
-        u[t] = y[t] - c - armax
-        h[t] = sqrt(omega + arch)
+    if isinstance(y, pd.DataFrame) or isinstance(y, list) or isinstance(y, pd.Series):
+        y = np.asarray(y, dtype=np.float64).reshape([y.size])
+    if isinstance(x, pd.DataFrame) or isinstance(x, list) or isinstance(x, pd.Series):
+        x = np.asarray(x, dtype=np.float64)
+    if isinstance(theta, list):
+        theta = np.asarray(theta, dtype=np.float64)
+    if isinstance(phi, list):
+        phi = np.asarray(phi, dtype=np.float64)
+    if isinstance(psi, list):
+        psi = np.asarray(psi, dtype=np.float64)
+    if isinstance(alpha, list):
+        alpha = np.asarray(alpha, dtype=np.float64)
+    if isinstance(beta, list):
+        beta = np.asarray(beta, dtype=np.float64)
+    u, h = ARMAX_GARCH_cy(
+        y, x, phi, theta, psi, alpha, beta, float(c), float(omega), int(p), 
+        int(q), int(Q), int(P)
+    )
     return u, h
