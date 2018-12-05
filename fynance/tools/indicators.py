@@ -98,7 +98,7 @@ def rsi(series, kind_ma='ema', lags=21, alpha=None):
         ma_U = ema(U, lags=lags, alpha=alpha)
         ma_D = ema(D, lags=lags, alpha=alpha)
     RSI = np.zeros([T])
-    RSI[1:] = 100 * ma_U / (ma_U + ma_D)
+    RSI[1:] = 100 * ma_U / (ma_U + ma_D + 1e-8)
     return RSI
 
 
