@@ -13,5 +13,7 @@ from . import estimator
 from .estimator import *
 from . import tools
 from .tools import *
+from . import neural_network
+from .neural_network import *
 
-__all__ = ['models', 'estimator', 'tools']
+__all__ = ['models', 'estimator', 'tools', 'neural_network']
