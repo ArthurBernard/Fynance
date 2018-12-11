@@ -13,12 +13,37 @@ from fynance.tools.momentums_cy import smstd_cy
 
 __all__ = [
     'sharpe', 'mdd', 'calmar', 'roll_sharpe', 'roll_mdd', 'roll_calmar',
+    'drawdown',
 ]
 
 
 #=============================================================================#
 #                                   Metrics                                   #
 #=============================================================================#
+
+
+def drawdown(series):
+    """
+    Function to compute measure of the decline from a historical peak in some 
+    variable (typically the cumulative profit or total open equity of a 
+    financial trading strategy). 
+    
+    Parameters
+    ----------
+    :series: np.ndarray[np.float64, ndim=1]
+        Time series (price, performance or index).
+
+    Returns
+    -------
+    :out: np.ndarray[np.float64, ndim=1]
+        Series of DrawDown.
+
+    Note
+    ----
+    Source: https://en.wikipedia.org/wiki/Drawdown_(economics)
+    """
+    series = np.asarray(series, dtype=np.float64).flatten()
+    return drawdown_cy(series)
 
 
 def mdd(series):
@@ -35,7 +60,7 @@ def mdd(series):
     Returns
     -------
     :out: np.float64
-        Maximum DrawDown.
+        Scalar of Maximum DrawDown.
 
     Note
     ----
@@ -62,7 +87,7 @@ def calmar(series, period=252):
     Returns
     -------
     :out: np.float64
-        Calmar ratio.
+        Scalar of Calmar ratio.
     """
     series = np.asarray(series, dtype=np.float64).flatten()
     return calmar_cy(series, period=float(period))
@@ -85,7 +110,7 @@ def sharpe(series, period=252, log=False):
     Returns
     -------
     :out: np.float64
-        Sharpe ratio.
+        Scalar of Sharpe ratio.
     """
     series = np.asarray(series, dtype=np.float64).flatten()
     if log:
@@ -109,13 +134,14 @@ def roll_mdd(series):
     ----------
     :series: np.ndarray[np.float64, ndim=1]
         Time series (price, performance or index).
-    :win: NOT ALLOWED for the moment. 
-        Compute the roll calmar over all the series.
+    :win: int (default 0) /! NOT YET WORKING /!
+        Size of the rolling window. If less of two, 
+        rolling Max DrawDown is compute on all the past.
 
     Returns
     -------
     :out: np.ndrray[np.float64, ndim=1]
-        Rolling Maximum DrawDown.
+        Series of rolling Maximum DrawDown.
 
     Note
     ----
@@ -136,16 +162,34 @@ def roll_calmar(series, period=252.):
         Time series (price, performance or index).
     :period: int (default 252)
         Number of period per year.
-    :win: NOT ALLOWED for the moment. 
-        Compute the roll calmar over all the series.
+    :win: int (default 0) /! NOT YET WORKING /!
+        Size of the rolling window. If less of two, 
+        rolling calmar is compute on all the past.
 
     Returns
     -------
     :out: np.ndarray[np.float64, ndim=1]
-        Rolling Calmar ratio.
+        Series of rolling Calmar ratio.
     """
+    # Set variables
     series = np.asarray(series, dtype=np.float64).flatten()
-    return roll_calmar_cy(series, float(period))
+    T = series.size
+    t = np.arange(1., T + 1., dtype=np.float64)
+    
+    # Compute roll Returns
+    ret = series / series[0]
+    annual_return = np.sign(ret) * np.float_power(
+        np.abs(ret), period / t, dtype=np.float64) - 1.
+    
+    # Compute roll MaxDrawDown
+    roll_maxdd = roll_mdd_cy(series)
+    
+    # Compute roll calmar
+    roll_cal = np.zeros([T])
+    not_null = roll_maxdd != 0.
+    roll_cal[not_null] = annual_return[not_null] / roll_maxdd[not_null]
+
+    return roll_cal
 
 def roll_sharpe_NOT(series, period=252, win=0):
     """
@@ -173,60 +217,83 @@ def roll_sharpe_NOT(series, period=252, win=0):
             np.asarray(series, dtype=np.float64).flatten(), 
             period=float(period)
         )
-
+    
+    # Set variables
     T = series.size
     t = np.arange(1, T + 1)
     ret_vect = np.zeros([T])
     ret_vect[1: ] = series[1: ] / series[: -1] - 1
+
     # Compute rolling cumulative returns
     ret_cum = series / series[0] 
     ret_cum[win: ] = series[win: ] / series[: -win]
+    
     # Compute rolling mean
     ret_mean = np.cumsum(ret_vect) / t
     ret_mean[win: ] = (ret_mean[win: ] * t[win: ] - ret_mean[: -win] * t[: -win]) / win
+    
     # Compute rolling volatility
     ret_vol = np.cumsum(np.square(ret_vect - ret_mean)) / t
     ret_vol[win: ] = (ret_vol[win: ] * t[win: ] - ret_vol[: -win] * t[: -win]) / win
     ret_vol[ret_vol == 0] = 1e-8
+    
     # Compute rolling sharpe
     t[win: ] = win
+    
     return (np.float_power(ret_cum, period / t) - 1.) / np.sqrt(period * ret_vol)
 
 
-def roll_sharpe(series, period=252, win=0):
+def roll_sharpe(series, period=252, win=0, cap=True):
     """
-    roll_sharpe(series, period=252, win=0)
+    Vectorized function to compute rolling sharpe (compouned annual returns 
+    divided by annual volatility).
     
-    Vectorized rolling sharpe 
     Parameters
     ----------
-    series: np.ndarray[dtype=np.float64, ndim=1]
+    :series: np.ndarray[dtype=np.float64, ndim=1]
         Financial series of prices or indexed values.
-    period: int (default 252)
+    :period: int (default 252)
         Number of period in a year.
-    win: int (default 0)
+    :win: int (default 0)
         Size of the rolling window. If less of two, 
-    rolling sharpe is compute on all the past.
+        rolling sharpe is compute on all the past.
+    :cap: bool (default True)
+        Cap extram values (some time due to small size window).
     
     Returns
     -------
-    rolling_sharpe: np.ndarray[np.float64, ndim=1]
+    :out: np.ndarray[np.float64, ndim=1]
+        Serires of rolling Sharpe ratio.
     """
+    
     # Setting inputs
     series = np.asarray(series, dtype=np.float64).flatten()
     T = series.size
     t = np.arange(1., T + 1., dtype=np.float64)
-    t[t > win] = win + 1.
     if win < 2:
         win = T
-    ret = series[1:] / series[:-1] - 1.
+    t[t > win] = win + 1.
+    ret = np.zeros([T], dtype=np.float64)
+    ret[1:] = series[1:] / series[:-1] - 1.
+    
     # Compute rolling perf
     ma = series / series[0] 
     ma[win:] = series[win: ] / series[: -win]
-    annual_return = np.float_power(ma, period / t, dtype=np.float64) - 1.
+    annual_return = np.sign(ma) * np.float_power(
+        np.abs(ma), period / t, dtype=np.float64) - 1.
+    
     # Compute rolling volatility
-    std = np.zeros([T])
-    std[1:] = smstd_cy(ret, lags=int(win))
-    std[std == 0.] = 1e-8
+    std = smstd_cy(np.asarray(ret).flatten(), lags=int(win))
     vol = np.sqrt(period) * std
-    return annual_return / vol
+    
+    # Compute sharpe
+    roll_shar = np.zeros([T])
+    not_null = vol != 0.
+    roll_shar[not_null] = annual_return[not_null] / vol[not_null]
+
+    # Cap extrem value
+    if cap:
+        xtrem_val = roll_shar[:win] > 10 * np.mean(roll_shar)
+        roll_shar[:win][xtrem_val] = 0.
+    
+    return roll_shar

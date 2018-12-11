@@ -18,5 +18,5 @@ from .indicators import *
 __all__ = [
     'sharpe', 'roll_sharpe', 'sma', 'wma', 'ema', 'smstd', 'wmstd', 'emstd', 
     'z_score', 'rsi', 'bollinger_band', 'hma', 'macd_line', 'signal_line', 
-    'macd_hist', 'mdd', 'calmar', 'roll_mdd', 'roll_calmar',
+    'macd_hist', 'mdd', 'calmar', 'roll_mdd', 'roll_calmar', 'drawdown',
 ]

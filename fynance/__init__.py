@@ -21,6 +21,6 @@ __all__ = [
     'estimator', # not ready
     'sharpe', 'roll_sharpe', 'sma', 'wma', 'ema', 'smstd', 'wmstd', 'emstd', 
     'z_score', 'rsi', 'bollinger_band', 'hma', 'macd_line', 'signal_line', 
-    'macd_hist', 'mdd', 'calmar', 'roll_mdd', 'roll_calmar', # tools 
+    'macd_hist', 'mdd', 'calmar', 'roll_mdd', 'roll_calmar', 'drawdown', # tools 
     'RollNeuralNet', # neural_network
 ]
