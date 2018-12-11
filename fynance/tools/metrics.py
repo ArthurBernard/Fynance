@@ -3,13 +3,69 @@
 
 import numpy as np
 
-from fynance.tools.metrics_cy import sharpe_cy, log_sharpe_cy
+from fynance.tools.metrics_cy import *
 from fynance.tools.momentums_cy import smstd_cy
+
+# TODO list:
+# - Append window size on rolling calmar
+# - Append window size on rolling MDD
 
 
 __all__ = [
-    'sharpe', 'roll_sharpe',
+    'sharpe', 'mdd', 'calmar', 'roll_sharpe', 'roll_mdd', 'roll_calmar',
 ]
+
+
+#=============================================================================#
+#                                   Metrics                                   #
+#=============================================================================#
+
+
+def mdd(series):
+    """
+    Function to compute the maximum drwdown where drawdown is the measure of 
+    the decline from a historical peak in some variable (typically the 
+    cumulative profit or total open equity of a financial trading strategy). 
+    
+    Parameters
+    ----------
+    :series: np.ndarray[np.float64, ndim=1]
+        Time series (price, performance or index).
+
+    Returns
+    -------
+    :out: np.float64
+        Maximum DrawDown.
+
+    Note
+    ----
+    Source: https://en.wikipedia.org/wiki/Drawdown_(economics)
+    """
+    series = np.asarray(series, dtype=np.float64).flatten()
+    return mdd_cy(series)
+
+
+def calmar(series, period=252):
+    """
+    Function to compute the compouned annual return over the Maximum DrawDown, 
+    known as the Calmar ratio.
+    
+    Parameters
+    ----------
+    :series: np.ndarray[np.float64, ndim=1]
+        Time series (price, performance or index).
+    :period: int (default 252)
+        Number of period per year.
+    :log: bool (default False)
+        If true compute sharpe with the formula for log-returns
+
+    Returns
+    -------
+    :out: np.float64
+        Calmar ratio.
+    """
+    series = np.asarray(series, dtype=np.float64).flatten()
+    return calmar_cy(series, period=float(period))
 
 
 def sharpe(series, period=252, log=False):
@@ -19,22 +75,77 @@ def sharpe(series, period=252, log=False):
     
     Parameters
     ----------
-    series: numpy.ndarray(dim=1, dtype=float)
+    :series: numpy.ndarray(dim=1, dtype=float)
         Prices of the index.
-    period: int (default: 252)
+    :period: int (default: 252)
         Number of period per year.
-    log: bool (default False)
+    :log: bool (default False)
         If true compute sharpe with the formula for log-returns
 
     Returns
     -------
-    Float, it's the Sharpe ratio.
+    :out: np.float64
+        Sharpe ratio.
     """
     series = np.asarray(series, dtype=np.float64).flatten()
     if log:
         return log_sharpe_cy(series, period=float(period))
     return sharpe_cy(series, period=float(period))
 
+
+#=============================================================================#
+#                               Rolling metrics                               #
+#=============================================================================#
+
+
+def roll_mdd(series):
+    """
+    Function to compute the rolling maximum drwdown where drawdown is the 
+    measure of the decline from a historical peak in some variable (typically 
+    the cumulative profit or total open equity of a financial trading 
+    strategy).
+    
+    Parameters
+    ----------
+    :series: np.ndarray[np.float64, ndim=1]
+        Time series (price, performance or index).
+    :win: NOT ALLOWED for the moment. 
+        Compute the roll calmar over all the series.
+
+    Returns
+    -------
+    :out: np.ndrray[np.float64, ndim=1]
+        Rolling Maximum DrawDown.
+
+    Note
+    ----
+    Source: https://en.wikipedia.org/wiki/Drawdown_(economics)
+    """
+    series = np.asarray(series, dtype=np.float64).flatten()
+    return roll_mdd_cy(series)
+
+
+def roll_calmar(series, period=252.):
+    """
+    Function to compute the rolling compouned annual return over the rolling 
+    Maximum DrawDown, that give the rolling Calmar ratio.
+    
+    Parameters
+    ----------
+    :series: np.ndarray[np.float64, ndim=1]
+        Time series (price, performance or index).
+    :period: int (default 252)
+        Number of period per year.
+    :win: NOT ALLOWED for the moment. 
+        Compute the roll calmar over all the series.
+
+    Returns
+    -------
+    :out: np.ndarray[np.float64, ndim=1]
+        Rolling Calmar ratio.
+    """
+    series = np.asarray(series, dtype=np.float64).flatten()
+    return roll_calmar_cy(series, float(period))
 
 def roll_sharpe_NOT(series, period=252, win=0):
     """
@@ -60,7 +171,7 @@ def roll_sharpe_NOT(series, period=252, win=0):
     if win < 2:
         return sharpe_cy(
             np.asarray(series, dtype=np.float64).flatten(), 
-            period=period
+            period=float(period)
         )
 
     T = series.size
