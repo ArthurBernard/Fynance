@@ -15,4 +15,8 @@ from .momentums import *
 from . import indicators
 from .indicators import *
 
-__all__ = ['metrics', 'metrics_cy', 'momentums', 'indicators']
+__all__ = [
+    'sharpe', 'roll_sharpe', 'sma', 'wma', 'ema', 'smstd', 'wmstd', 'emstd', 
+    'z_score', 'rsi', 'bollinger_band', 'hma', 'macd_line', 'signal_line', 
+    'macd_hist',
+]

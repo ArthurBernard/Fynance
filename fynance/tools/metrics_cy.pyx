@@ -59,7 +59,7 @@ cpdef np.float64_t sharpe_cy(
 
 cpdef np.ndarray[np.float64_t, ndim=1] roll_sharpe_cy(
         np.ndarray[np.float64_t, ndim=1] series,
-        np.float64_t period=252,
+        np.float64_t period=252.,
         int window=0
     ):
     """
@@ -79,7 +79,7 @@ cpdef np.ndarray[np.float64_t, ndim=1] roll_sharpe_cy(
 
 cpdef np.float64_t log_sharpe_cy(
         np.ndarray[np.float64_t, ndim=1] series, 
-        np.float64_t period=252
+        np.float64_t period=252.
     ):
     """ 
     Function to compute the total return over the volatility, known as the 

@@ -1124,7 +1124,7 @@ struct __pyx_opt_args_7fynance_5tools_10metrics_cy_sharpe_cy {
  * 
  * cpdef np.ndarray[np.float64_t, ndim=1] roll_sharpe_cy(             # <<<<<<<<<<<<<<
  *         np.ndarray[np.float64_t, ndim=1] series,
- *         np.float64_t period=252,
+ *         np.float64_t period=252.,
  */
 struct __pyx_opt_args_7fynance_5tools_10metrics_cy_roll_sharpe_cy {
   int __pyx_n;
@@ -1137,7 +1137,7 @@ struct __pyx_opt_args_7fynance_5tools_10metrics_cy_roll_sharpe_cy {
  * 
  * cpdef np.float64_t log_sharpe_cy(             # <<<<<<<<<<<<<<
  *         np.ndarray[np.float64_t, ndim=1] series,
- *         np.float64_t period=252
+ *         np.float64_t period=252.
  */
 struct __pyx_opt_args_7fynance_5tools_10metrics_cy_log_sharpe_cy {
   int __pyx_n;
@@ -2256,12 +2256,12 @@ static PyObject *__pyx_pf_7fynance_5tools_10metrics_cy_sharpe_cy(CYTHON_UNUSED P
  * 
  * cpdef np.ndarray[np.float64_t, ndim=1] roll_sharpe_cy(             # <<<<<<<<<<<<<<
  *         np.ndarray[np.float64_t, ndim=1] series,
- *         np.float64_t period=252,
+ *         np.float64_t period=252.,
  */
 
 static PyObject *__pyx_pw_7fynance_5tools_10metrics_cy_3roll_sharpe_cy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static PyArrayObject *__pyx_f_7fynance_5tools_10metrics_cy_roll_sharpe_cy(PyArrayObject *__pyx_v_series, CYTHON_UNUSED int __pyx_skip_dispatch, struct __pyx_opt_args_7fynance_5tools_10metrics_cy_roll_sharpe_cy *__pyx_optional_args) {
-  __pyx_t_5numpy_float64_t __pyx_v_period = ((__pyx_t_5numpy_float64_t)252.0);
+  __pyx_t_5numpy_float64_t __pyx_v_period = ((__pyx_t_5numpy_float64_t)252.);
   int __pyx_v_window = ((int)0);
   int __pyx_v_t;
   int __pyx_v_T;
@@ -2502,7 +2502,7 @@ static PyArrayObject *__pyx_f_7fynance_5tools_10metrics_cy_roll_sharpe_cy(PyArra
  * 
  * cpdef np.ndarray[np.float64_t, ndim=1] roll_sharpe_cy(             # <<<<<<<<<<<<<<
  *         np.ndarray[np.float64_t, ndim=1] series,
- *         np.float64_t period=252,
+ *         np.float64_t period=252.,
  */
 
   /* function exit code */
@@ -2594,7 +2594,7 @@ static PyObject *__pyx_pw_7fynance_5tools_10metrics_cy_3roll_sharpe_cy(PyObject 
     if (values[1]) {
       __pyx_v_period = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_period == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 62, __pyx_L3_error)
     } else {
-      __pyx_v_period = ((__pyx_t_5numpy_float64_t)252.0);
+      __pyx_v_period = ((__pyx_t_5numpy_float64_t)252.);
     }
     if (values[2]) {
       __pyx_v_window = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_window == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 63, __pyx_L3_error)
@@ -2674,12 +2674,12 @@ static PyObject *__pyx_pf_7fynance_5tools_10metrics_cy_2roll_sharpe_cy(CYTHON_UN
  * 
  * cpdef np.float64_t log_sharpe_cy(             # <<<<<<<<<<<<<<
  *         np.ndarray[np.float64_t, ndim=1] series,
- *         np.float64_t period=252
+ *         np.float64_t period=252.
  */
 
 static PyObject *__pyx_pw_7fynance_5tools_10metrics_cy_5log_sharpe_cy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static __pyx_t_5numpy_float64_t __pyx_f_7fynance_5tools_10metrics_cy_log_sharpe_cy(PyArrayObject *__pyx_v_series, CYTHON_UNUSED int __pyx_skip_dispatch, struct __pyx_opt_args_7fynance_5tools_10metrics_cy_log_sharpe_cy *__pyx_optional_args) {
-  __pyx_t_5numpy_float64_t __pyx_v_period = ((__pyx_t_5numpy_float64_t)252.0);
+  __pyx_t_5numpy_float64_t __pyx_v_period = ((__pyx_t_5numpy_float64_t)252.);
   __pyx_t_5numpy_float64_t __pyx_v_T;
   PyArrayObject *__pyx_v_ret_vect = 0;
   __pyx_t_5numpy_float64_t __pyx_v_annual_return;
@@ -2916,7 +2916,7 @@ static __pyx_t_5numpy_float64_t __pyx_f_7fynance_5tools_10metrics_cy_log_sharpe_
  * 
  * cpdef np.float64_t log_sharpe_cy(             # <<<<<<<<<<<<<<
  *         np.ndarray[np.float64_t, ndim=1] series,
- *         np.float64_t period=252
+ *         np.float64_t period=252.
  */
 
   /* function exit code */
@@ -2997,7 +2997,7 @@ static PyObject *__pyx_pw_7fynance_5tools_10metrics_cy_5log_sharpe_cy(PyObject *
     if (values[1]) {
       __pyx_v_period = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_period == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 82, __pyx_L3_error)
     } else {
-      __pyx_v_period = ((__pyx_t_5numpy_float64_t)252.0);
+      __pyx_v_period = ((__pyx_t_5numpy_float64_t)252.);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
