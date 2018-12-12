@@ -187,7 +187,7 @@ class RollNeuralNet:
             ax_loss.plot(self.hist.history['val_loss'])
             ax_loss.set_title('Model loss')
             ax_loss.set_ylabel('Loss')
-            ax_loss.set_xlabel('Epoch')
+            ax_loss.set_xlabel('Epoch', x=0.9)
             ax_loss.legend(['Train', 'Estim'])
             ax_loss.set_yscale('log')
 
@@ -198,7 +198,7 @@ class RollNeuralNet:
             ax_perf.plot(self.perf_estim)
             ax_perf.set_title('Model performance')
             ax_perf.set_ylabel('Perf.')
-            ax_perf.set_xlabel('Rolling period')
+            ax_perf.set_xlabel('Rolling period', x=0.9)
             ax_perf.set_yscale('log')
             ax_perf.legend(['Training set', 'Estimation set'])
         f.canvas.draw()

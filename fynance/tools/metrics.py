@@ -293,7 +293,11 @@ def roll_sharpe(series, period=252, win=0, cap=True):
 
     # Cap extrem value
     if cap:
-        xtrem_val = roll_shar[:win] > 10 * np.mean(roll_shar)
+        if win == T:
+            win = T // 3
+        s = np.std(roll_shar[win:])
+        m = np.mean(roll_shar[win:])
+        xtrem_val = np.abs(roll_shar[:win]) > s * m
         roll_shar[:win][xtrem_val] = 0.
     
     return roll_shar
