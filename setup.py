@@ -82,8 +82,8 @@ else:
 setup(
     name='fynance',
     version='0.1',
-    description='Some tools for time series applications, especialy in finance, \
-        econometric, statistic and machine learning [In progress]',
+    description='Python and Cython scripts of machine learning, econometrics \
+        and statistical tools for financial analysis [In progress]',
     url='https://github.com/ArthurBernard/Fynance',
     author=['Arthur Bernard', 'Borahn Tarridec'],
     author_email='arthur.bernard.92@gmail.com',
