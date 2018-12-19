@@ -15,6 +15,8 @@ from . import tools
 from .tools import *
 from . import neural_network
 from .neural_network import *
+from . import backtest
+from .backtest import *
 
 __all__ = [
     'get_parameters', 'MA', 'ARMA', 'ARMA_GARCH', 'ARMAX_GARCH', # models
