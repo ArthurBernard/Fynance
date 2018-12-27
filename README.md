@@ -1,11 +1,11 @@
-# Fynance: Machine learning tools for financial analysis 
+# Fynance - Machine learning tools for financial analysis 
 
 ## Description
 
 This project contains several python (and cython) tools for financial analysis:
 - Econometric models
-- Neural Network
-- Feature extraction method
+- Neural Networks
+- Feature extraction methods
 - Financial indicators
 - Backtesting
 - Notebooks with some exemples
