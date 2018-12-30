@@ -1,4 +1,4 @@
-# Fynance - Machine learning tools for financial analysis 
+# Fynance - Machine learning tools for financial analysis [In Progress]
 
 ## Description
 
