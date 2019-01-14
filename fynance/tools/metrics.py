@@ -13,7 +13,7 @@ from fynance.tools.momentums_cy import smstd_cy
 
 __all__ = [
     'sharpe', 'mdd', 'calmar', 'roll_sharpe', 'roll_mdd', 'roll_calmar',
-    'drawdown',
+    'drawdown', 'accuracy',
 ]
 
 
@@ -301,3 +301,30 @@ def roll_sharpe(series, period=252, win=0, cap=True):
         roll_shar[:win][xtrem_val] = 0.
     
     return roll_shar
+
+
+def accuracy(y_true, y_pred, sign=True):
+    """ 
+    Compute the accuracy of prediction. 
+    
+    Parameters
+    ----------
+    :y_true: np.ndarray[ndim=1, dtype=np.float64]
+        Vector of true series.
+    :y_pred: np.ndarray[ndim=1, dtype=np.float64]
+        Vector of predicted series.
+    :sign: bool
+        Check sign accuracy if true, else check exact accuracy.
+    
+    Return
+    ------
+    Accuracy of prediction as float between 0 and 1.
+    """
+    if sign:
+        y_true = np.sign(y_true)
+        y_pred = np.sign(y_pred)
+    # Check right answeres
+    R = np.sum(y_true == y_pred)
+    # Check wrong answeres
+    W = np.sum(y_true != y_pred)
+    return R / (R + W)
