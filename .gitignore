@@ -1,11 +1,19 @@
-# Ignore some files
+# Files to ignore
+setup.cfg
 
 # Extensions to ignore
 *.so
 *.html
 *.ipynb_checkpoints
+*.pyc
 
 # Folders to ignore
 env/
 build/
+fynance.egg-info/
+dist/
+
+
+# Cache to ignore
 __pycache__/
+.cache/
