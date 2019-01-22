@@ -7,13 +7,20 @@ This is a beta version of python package [*]_ of **machine learning**, **econome
 Description
 ===========
 
-This project contains several **python** (and **cython**) tools for **trading strategy** and **financial analysis**:    
-- Neural Networks    
+This project contains several **python** (and **cython**) tools for **trading strategy** and **financial analysis**:
+
+- Neural Networks 
+
 - Feature extraction methods    
+
 - Financial indicators    
+
 - Backtesting    
+
 - Econometric models   
+
 - Notebooks with some exemples    
+
 - Etc.    
 
 Installation
@@ -30,7 +37,9 @@ From GitHub
 Use the command:
 
     $ git clone https://github.com/ArthurBernard/Fynance.git
+
     $ cd Fynance
+    
     $ python setup.py install --user
 
 Demo

@@ -23,9 +23,9 @@ This project contains several **python** (and **cython**) tools for **trading st
 
 Use the command:
 
-> $ git clone https://github.com/ArthurBernard/Fynance.git
-> $ cd Fynance
-> $ python setup.py install --user
+> $ git clone https://github.com/ArthurBernard/Fynance.git   
+> $ cd Fynance   
+> $ python setup.py install --user   
 
 ## Demo
 
