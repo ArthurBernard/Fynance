@@ -79,15 +79,32 @@ else:
         ),
     ]
 
+with open('README.rst') as f:
+    long_description = f.read()
+
 setup(
     name='fynance',
     version='0.1',
     description='Python and Cython scripts of machine learning, econometrics \
         and statistical tools for financial analysis [In progress]',
+    long_description=str(long_description),
     url='https://github.com/ArthurBernard/Fynance',
-    author=['Arthur Bernard', 'Borahn Tarridec'],
+    author=['Arthur Bernard'],
     author_email='arthur.bernard.92@gmail.com',
     packages=find_packages(), #['fynance'],
     cmdclass=cmdclass,
     ext_modules=cythonize(extensions, annotate=True),
+    install_requires=[
+        'matplotlib>=3.0.1',
+        'numpy>=1.15.3',
+        'pandas>=0.23.4',
+    ],
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'License :: OSI Approved :: MIT License',
+        'Intended Audience :: Financial and Insurance Industry',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Topic :: Office/Business :: Financial',
+    ],
 )
