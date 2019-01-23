@@ -12,21 +12,20 @@ USE_CYTHON = True
 from distutils.core import setup
 from setuptools import find_packages
 from distutils.extension import Extension
-from Cython.Build import cythonize
-from Cython.Distutils import build_ext
 import numpy
 
 if USE_CYTHON:
     try:
+        from Cython.Build import cythonize
         from Cython.Distutils import build_ext
         print('Use cython')
     except ImportError:
-        if USE_CYTHON == 'auto':
-            USE_CYTHON = False
-            print("Can't use cython")
-        else:
-            print('raise')
-            raise
+        #if USE_CYTHON == 'auto':
+        USE_CYTHON = False
+        print("Can't use cython")
+        #else:
+        #    print('raise')
+        #    raise
 
 cmdclass = { }
 
@@ -53,7 +52,7 @@ if USE_CYTHON:
             include_dirs=[numpy.get_include(), '.']
         ),
     ]
-    
+    ext_modules = cythonize(extensions, annotate=True)
     cmdclass.update({ 'build_ext': build_ext })
 else:
     extensions = [
@@ -78,13 +77,14 @@ else:
             include_dirs=[numpy.get_include(), '.']
         ),
     ]
+    ext_modules = extensions
 
 with open('README.rst') as f:
     long_description = f.read()
 
 setup(
     name='fynance',
-    version='0.1',
+    version='0.1.1',
     description='Python and Cython scripts of machine learning, econometrics \
         and statistical tools for financial analysis [In progress]',
     long_description=str(long_description),
@@ -93,18 +93,28 @@ setup(
     author_email='arthur.bernard.92@gmail.com',
     packages=find_packages(), #['fynance'],
     cmdclass=cmdclass,
-    ext_modules=cythonize(extensions, annotate=True),
+    ext_modules=ext_modules,
     install_requires=[
         'matplotlib>=3.0.1',
         'numpy>=1.15.3',
         'pandas>=0.23.4',
+        'Cython>=0.29',
+        'scipy>=1.2.0',
+        'seaborn>=0.9.0'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
         'License :: OSI Approved :: MIT License',
+        'Operating System :: POSIX :: Linux',
         'Intended Audience :: Financial and Insurance Industry',
+        'Intended Audience :: Science/Research',
         'Programming Language :: Python',
+        'Programming Language :: Cython',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Office/Business :: Financial',
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
     ],
 )
