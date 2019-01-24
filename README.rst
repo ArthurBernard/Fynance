@@ -2,6 +2,17 @@
 Fynance - Machine learning tools for financial analysis [In Progress]
 =====================================================================
 
+.. image:: https://img.shields.io/pypi/v/fynance.svg
+    :target: https://pypi.org/project/fynance/
+.. image:: https://img.shields.io/pypi/status/fynance.svg?colorB=blue
+    :target: https://pypi.org/project/fynance/
+.. image:: https://img.shields.io/travis/ArthurBernard/fynance.svg
+    :target: https://travis-ci.org/ArthurBernard/Fynance
+.. image:: https://img.shields.io/github/license/ArthurBernard/fynance.svg
+    :target: https://github.com/ArthurBernard/Fynance/blob/master/LICENSE.txt
+.. image:: https://pepy.tech/badge/fynance 
+    :target: https://pepy.tech/project/fynance
+
 This is a beta version of python package [*]_ of **machine learning**, **econometrics** and **statistical** tools for **trading strategy** and **financial analysis**.
 
 Description
