@@ -6,7 +6,7 @@
 # was previously created using Cython).
 # Set it to 'auto' to build with Cython if available, otherwise
 # from the C file.
-USE_CYTHON = True
+USE_CYTHON = 'auto'
 
 
 from distutils.core import setup
@@ -14,18 +14,18 @@ from setuptools import find_packages
 from distutils.extension import Extension
 import numpy
 
-if USE_CYTHON:
+if USE_CYTHON or USE_CYTHON == 'auto':
     try:
         from Cython.Build import cythonize
         from Cython.Distutils import build_ext
         print('Use cython')
     except ImportError:
-        #if USE_CYTHON == 'auto':
-        USE_CYTHON = False
-        print("Can't use cython")
-        #else:
-        #    print('raise')
-        #    raise
+        if USE_CYTHON == 'auto':
+            USE_CYTHON = False
+            print("Can't use cython")
+        else:
+            print("Install cython or set USE_CYTHON = 'auto'")
+            raise
 
 cmdclass = { }
 
@@ -84,7 +84,7 @@ with open('README.rst') as f:
 
 setup(
     name='fynance',
-    version='0.1.1',
+    version='1.0.0',
     description='Python and Cython scripts of machine learning, econometrics \
         and statistical tools for financial analysis [In progress]',
     long_description=str(long_description),
@@ -98,7 +98,7 @@ setup(
         'matplotlib>=3.0.1',
         'numpy>=1.15.3',
         'pandas>=0.23.4',
-        'Cython>=0.29',
+        #'Cython>=0.29',
         'scipy>=1.2.0',
         'seaborn>=0.9.0'
     ],
