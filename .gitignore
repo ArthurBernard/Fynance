@@ -17,3 +17,4 @@ dist/
 # Cache to ignore
 __pycache__/
 .cache/
+.pytest_cache/
