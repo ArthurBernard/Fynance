@@ -7,8 +7,7 @@
 import numpy as np
 
 # Internal packages
-from fynance.tools.indicators import sharpe, calmar
-from fynance.tools.metrics import accuracy
+from fynance.tools.metrics import accuracy, sharpe, calmar
 
 __all__ = ['set_text_stats']
 
