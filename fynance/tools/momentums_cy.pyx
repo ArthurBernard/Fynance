@@ -1,6 +1,9 @@
 import numpy as np
 cimport numpy as np
 
+__all__ = [
+    'sma_cy', 'wma_cy', 'ema_cy', 'smstd_cy', 'wmstd_cy', 'emstd_cy',
+]
 
 #=============================================================================#
 #                               Moving Averages                               #
