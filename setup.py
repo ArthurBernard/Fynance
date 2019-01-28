@@ -18,11 +18,11 @@ if USE_CYTHON or USE_CYTHON == 'auto':
     try:
         from Cython.Build import cythonize
         from Cython.Distutils import build_ext
-        print('Use cython')
+        print('Installation using cython')
     except ImportError:
         if USE_CYTHON == 'auto':
             USE_CYTHON = False
-            print("Can't use cython")
+            print("Installation not using cython")
         else:
             print("Install cython or set USE_CYTHON = 'auto'")
             raise
@@ -98,16 +98,16 @@ setup(
         'matplotlib>=3.0.1',
         'numpy>=1.15.3',
         'pandas>=0.23.4',
-        #'Cython>=0.29',
+        'Cython>=0.29',
         'scipy>=1.2.0',
         'seaborn>=0.9.0'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
-        'License :: OSI Approved :: MIT License',
-        'Operating System :: POSIX :: Linux',
         'Intended Audience :: Financial and Insurance Industry',
         'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: POSIX :: Linux',
         'Programming Language :: Python',
         'Programming Language :: Cython',
         'Programming Language :: Python :: 3',
