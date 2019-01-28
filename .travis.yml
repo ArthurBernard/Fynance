@@ -5,10 +5,12 @@ python:
   - "3.5"
   - "3.6"
   - "3.7-dev"
+#before_install:
+#  - cd Fynance && python setup.py build_ext --inplace
 # command to install dependencies
 install:
   - pip install -r requirements.txt
+  - python3 setup.py install
 # command to run tests
 script: 
-  - cd Fynance
   - pytest
