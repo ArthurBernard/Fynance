@@ -18,7 +18,7 @@ __all__ = ['iso_vol']
 
 def iso_vol(series, target_vol=0.20, leverage=1., period=252, half_life=11):
     """ 
-    Make an iso-vol vector to apply of signal vector.
+    Make an iso-vol vector to apply to signal vector.
     
     Parameters
     ----------
@@ -37,6 +37,14 @@ def iso_vol(series, target_vol=0.20, leverage=1., period=252, half_life=11):
     -------
     :iv: np.ndarray[ndim=1, dtype=np.float64]
         Series of iso-vol coefficient.
+
+    Examples
+    --------
+    >>> series = np.array([95, 100, 85, 105, 110, 90])
+    >>> iso_vol(series, target_vol=0.5, leverage=2, period=12, half_life=3)
+    array([1.        , 1.        , 2.        , 1.11289534, 0.88580571,
+           1.20664917])
+
     """
     # Set iso-vol vector
     iv = np.ones([series.size])

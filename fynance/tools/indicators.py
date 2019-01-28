@@ -4,7 +4,7 @@
 import numpy as np
 import pandas as pd
 
-from .momentums import *
+from fynance.tools.momentums import *
 
 __all__ = [
     'z_score', 'rsi', 'bollinger_band', 'hma', 'macd_line', 
@@ -32,6 +32,17 @@ def z_score(series, kind_ma='ema', **kwargs):
     -------
     :z: np.ndarray[np.float64, ndim=1]
         Z-score at each period.
+
+    Examples
+    --------
+    >>> series = np.array([70, 100, 80, 120, 160, 80])
+    >>> z_score(series)
+    array([ 0.        ,  3.83753384,  1.04129457,  3.27008748,  3.23259291,
+           -0.00963602])
+    >>> z_score(series, kind_ma='sma', lags=3)
+    array([ 0.        ,  1.        , -0.26726124,  1.22474487,  1.22474487,
+           -1.22474487])
+
     """
     if kind_ma.lower() == 'wma':
         ma_f = wma
@@ -75,6 +86,14 @@ def rsi(series, kind_ma='ema', lags=21, alpha=None):
     -------
     :RSI: np.ndarray[dtype=np.float64, ndim=1]
         Value of RSI for each period.
+
+    Examples
+    --------
+    >>> series = np.array([60, 100, 80, 120, 160, 80])
+    >>> rsi(series, lags=3)
+    array([ 0.        , 99.99999804, 69.59769254, 85.55610891, 91.72201613,
+           30.00294321])
+
     """
     series = series.flatten()
     T = np.size(series)
@@ -123,6 +142,14 @@ def bollinger_band(series, lags=21, n_std=2, kind_ma='sma'):
         Moving average of series.
     :n_std * std: np.ndarray[dtype=np.float64, ndim=1]
         Moving standard deviation of series.
+
+    Examples
+    --------
+    >>> series = np.array([60, 100, 80, 120, 160, 80])
+    >>> bollinger_band(series, lags=3)
+    (array([ 60.,  80.,  80., 100., 120., 120.]), array([ 0.        , 40.        , 32.65986324, 32.65986324, 65.31972647,
+           65.31972647]))
+
     """
     if kind_ma.lower() == 'sma':
         ma = sma(series, lags=lags)
@@ -150,13 +177,21 @@ def hma(series, lags=21, kind_ma='wma'):
         Series of prices or returns.
     :lags: int (default 21)
         Number of lags for ma.
-    :kind_ma: std (default wma)
+    :kind_ma: str (default is 'wma')
         Kind of moving average, eg: 'wma', 'sma' or 'ema'
     
     Returns
     -------
     :hma: np.ndarray[dtype=np.float64, ndim=1]
         Hull moving average of index or returns.
+
+    Examples
+    --------
+    >>> series = np.array([60, 100, 80, 120, 160, 80])
+    >>> hma(series, lags=3)
+    array([ 60.        , 113.33333333,  76.66666667, 136.66666667,
+           186.66666667,  46.66666667])
+
     """
     if kind_ma.lower() == 'ema':
         f = ema
@@ -189,6 +224,14 @@ def macd_line(series, fast_ma=12, slow_ma=26, kind_ma='ema'):
     -------
     :macd_lin: np.ndarray[dtype=np.float64, ndim=1]
         Moving avg convergence/divergence line of index or returns.
+
+    Examples
+    --------
+    >>> series = np.array([60, 100, 80, 120, 160, 80])
+    >>> macd_line(series, fast_ma=2, slow_ma=4)
+    array([ 0.        , 10.66666722,  4.62222282, 12.84740842, 21.73313755,
+           -3.61855386])
+
     """
     if kind_ma.lower() == 'wma':
         f = wma
@@ -223,6 +266,14 @@ def signal_line(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
     -------
     :sign_lin: np.ndarray[dtype=np.float64, ndim=1]
         Signal line of index or returns.
+
+    Examples
+    --------
+    >>> series = np.array([60, 100, 80, 120, 160, 80])
+    >>> signal_line(series, lags=3, fast_ma=2, slow_ma=4)
+    array([ 0.        ,  5.33333361,  4.97777822,  8.91259332, 15.32286544,
+            5.85215579])
+
     """
     macd_lin = macd_line(series, fast_ma=fast_ma, slow_ma=slow_ma)
     if kind_ma.lower() == 'wma':
@@ -256,6 +307,14 @@ def macd_hist(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
     -------
     :hist: np.ndarray[dtype=np.float64, ndim=1]
         Moving avg convergence/divergence histogram of index or returns.
+
+    Examples
+    --------
+    >>> series = np.array([60, 100, 80, 120, 160, 80])
+    >>> macd_hist(series, lags=3, fast_ma=2, slow_ma=4)
+    array([ 0.        ,  5.33333361, -0.35555539,  3.9348151 ,  6.41027212,
+           -9.47070965])
+
     """
     macd_lin = macd_line(
         series, fast_ma=fast_ma, slow_ma=slow_ma, kind_ma=kind_ma
@@ -265,3 +324,7 @@ def macd_hist(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
     )
     hist = macd_lin - sig_lin
     return hist
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()

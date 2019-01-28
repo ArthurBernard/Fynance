@@ -6,7 +6,7 @@ import numpy as np
 from fynance.tools.metrics_cy import *
 from fynance.tools.momentums_cy import smstd_cy
 
-# TODO list:
+# TODO:
 # - Append window size on rolling calmar
 # - Append window size on rolling MDD
 
@@ -25,7 +25,7 @@ __all__ = [
 def drawdown(series):
     """
     Function to compute measure of the decline from a historical peak in some 
-    variable (typically the cumulative profit or total open equity of a 
+    variable [1]_ (typically the cumulative profit or total open equity of a 
     financial trading strategy). 
     
     Parameters
@@ -38,9 +38,16 @@ def drawdown(series):
     :out: np.ndarray[np.float64, ndim=1]
         Series of DrawDown.
 
-    Note
-    ----
-    Source: https://en.wikipedia.org/wiki/Drawdown_(economics)
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
+
+    Examples
+    --------
+    >>> series = np.array([70, 100, 80, 120, 160, 80])
+    >>> drawdown(series)
+    array([0. , 0. , 0.2, 0. , 0. , 0.5])
+
     """
     series = np.asarray(series, dtype=np.float64).flatten()
     return drawdown_cy(series)
@@ -49,7 +56,7 @@ def drawdown(series):
 def mdd(series):
     """
     Function to compute the maximum drwdown where drawdown is the measure of 
-    the decline from a historical peak in some variable (typically the 
+    the decline from a historical peak in some variable [1]_ (typically the 
     cumulative profit or total open equity of a financial trading strategy). 
     
     Parameters
@@ -62,9 +69,16 @@ def mdd(series):
     :out: np.float64
         Scalar of Maximum DrawDown.
 
-    Note
-    ----
-    Source: https://en.wikipedia.org/wiki/Drawdown_(economics)
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
+    
+    Examples
+    --------
+    >>> series = np.array([70, 100, 80, 120, 160, 80])
+    >>> mdd(series)
+    0.5
+
     """
     series = np.asarray(series, dtype=np.float64).flatten()
     return mdd_cy(series)
@@ -88,6 +102,15 @@ def calmar(series, period=252):
     -------
     :out: np.float64
         Scalar of Calmar ratio.
+
+    Examples
+    --------
+    Assume a series of monthly prices:
+
+    >>> series = np.array([70, 100, 80, 120, 160, 80])
+    >>> calmar(series, period=12)
+    0.6122448979591835
+
     """
     series = np.asarray(series, dtype=np.float64).flatten()
     return calmar_cy(series, period=float(period))
@@ -111,6 +134,15 @@ def sharpe(series, period=252, log=False):
     -------
     :out: np.float64
         Scalar of Sharpe ratio.
+
+    Examples
+    --------
+    Assume a series of monthly prices:
+    
+    >>> series = np.array([70, 100, 80, 120, 160, 80])
+    >>> sharpe(series, period=12)
+    0.22494843872918127
+    
     """
     series = np.asarray(series, dtype=np.float64).flatten()
     if log:
@@ -126,9 +158,9 @@ def sharpe(series, period=252, log=False):
 def roll_mdd(series):
     """
     Function to compute the rolling maximum drwdown where drawdown is the 
-    measure of the decline from a historical peak in some variable (typically 
-    the cumulative profit or total open equity of a financial trading 
-    strategy).
+    measure of the decline from a historical peak in some variable [1]_ 
+    (typically the cumulative profit or total open equity of a financial 
+    trading strategy).
     
     Parameters
     ----------
@@ -143,9 +175,16 @@ def roll_mdd(series):
     :out: np.ndrray[np.float64, ndim=1]
         Series of rolling Maximum DrawDown.
 
-    Note
-    ----
-    Source: https://en.wikipedia.org/wiki/Drawdown_(economics)
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
+
+    Examples
+    --------
+    >>> series = np.array([70, 100, 80, 120, 160, 80])
+    >>> roll_mdd(series)
+    array([0. , 0. , 0.2, 0.2, 0.2, 0.5])
+    
     """
     series = np.asarray(series, dtype=np.float64).flatten()
     return roll_mdd_cy(series)
@@ -170,6 +209,16 @@ def roll_calmar(series, period=252.):
     -------
     :out: np.ndarray[np.float64, ndim=1]
         Series of rolling Calmar ratio.
+    
+    Examples
+    --------
+    Assume a monthly series of prices:
+
+    >>> series = np.array([70, 100, 80, 120, 160, 80])
+    >>> roll_calmar(series, period=12)
+    array([ 0.        ,  0.        ,  3.52977926, 20.18950437, 31.35989887,
+            0.6122449 ])
+
     """
     # Set variables
     series = np.asarray(series, dtype=np.float64).flatten()
@@ -264,6 +313,16 @@ def roll_sharpe(series, period=252, win=0, cap=True):
     -------
     :out: np.ndarray[np.float64, ndim=1]
         Serires of rolling Sharpe ratio.
+    
+    Examples
+    --------
+    Assume a monthly series of prices:
+
+    >>> series = np.array([70, 100, 80, 120, 160, 80])
+    >>> roll_sharpe(series, period=12)
+    array([0.        , 0.        , 0.77721579, 3.99243019, 6.754557  ,
+           0.24475518])
+
     """
     
     # Setting inputs
@@ -316,9 +375,19 @@ def accuracy(y_true, y_pred, sign=True):
     :sign: bool
         Check sign accuracy if true, else check exact accuracy.
     
-    Return
-    ------
+    Returns
+    -------
     Accuracy of prediction as float between 0 and 1.
+    
+    Examples
+    --------
+    >>> y_true = np.array([1., .5, -.5, .8, -.2])
+    >>> y_pred = np.array([.5, .2, -.5, .1, .0])
+    >>> accuracy(y_true, y_pred)
+    0.8
+    >>> accuracy(y_true, y_pred, sign=False)
+    0.2
+
     """
     if sign:
         y_true = np.sign(y_true)
@@ -328,3 +397,7 @@ def accuracy(y_true, y_pred, sign=True):
     # Check wrong answeres
     W = np.sum(y_true != y_pred)
     return R / (R + W)
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()

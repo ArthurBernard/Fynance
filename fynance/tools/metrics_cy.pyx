@@ -27,7 +27,7 @@ cpdef np.ndarray[np.float64_t, ndim=1] drawdown_cy(
     ):
     """
     Function to compute measure of the decline from a historical peak in some 
-    variable (typically the cumulative profit or total open equity of a 
+    variable [1]_ (typically the cumulative profit or total open equity of a 
     financial trading strategy). 
     
     Parameters
@@ -40,9 +40,10 @@ cpdef np.ndarray[np.float64_t, ndim=1] drawdown_cy(
     :out: np.ndarray[np.float64, ndim=1]
         DrawDown.
 
-    Note
-    ----
-    Source: https://en.wikipedia.org/wiki/Drawdown_(economics)
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
+
     """
     cdef np.ndarray[np.float64_t, ndim=1] maximums
     
@@ -55,7 +56,7 @@ cpdef np.ndarray[np.float64_t, ndim=1] drawdown_cy(
 cpdef np.float64_t mdd_cy(np.ndarray[np.float64_t, ndim=1] series):
     """
     Function to compute the maximum drwdown where drawdown is the measure of 
-    the decline from a historical peak in some variable (typically the 
+    the decline from a historical peak in some variable [1]_ (typically the 
     cumulative profit or total open equity of a financial trading strategy). 
     
     Parameters
@@ -68,9 +69,10 @@ cpdef np.float64_t mdd_cy(np.ndarray[np.float64_t, ndim=1] series):
     :out: np.float64
         Maximum DrawDown.
 
-    Note
-    ----
-    Source: https://en.wikipedia.org/wiki/Drawdown_(economics)
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
+    
     """
     cdef np.ndarray[np.float64_t, ndim=1] drawdowns
     
@@ -99,6 +101,7 @@ cpdef np.float64_t calmar_cy(
     -------
     :out: np.float64
         Calmar ratio.
+
     """
     cdef np.float64_t ret, annual_return, max_dd, T = series.size
     
@@ -134,6 +137,7 @@ cpdef np.float64_t sharpe_cy(
     Returns
     -------
     Float, it's the Sharpe ratio.
+
     """
     if series[0] == 0.:
         return 0. 
@@ -176,6 +180,7 @@ cpdef np.float64_t log_sharpe_cy(
     Returns
     -------
     Float, it's the Sharpe ratio.
+
     """
     
     cdef np.float64_t T = series.size 
@@ -204,7 +209,7 @@ cpdef np.ndarray[np.float64_t, ndim=1] roll_mdd_cy(
     ):
     """
     Function to compute the maximum drwdown where drawdown is the measure of 
-    the decline from a historical peak in some variable (typically the 
+    the decline from a historical peak in some variable [1]_ (typically the 
     cumulative profit or total open equity of a financial trading strategy). 
     
     Parameters
@@ -220,9 +225,10 @@ cpdef np.ndarray[np.float64_t, ndim=1] roll_mdd_cy(
     :out: np.ndarray[np.float64, ndim=1]
         Series of rolling Maximum DrawDown.
 
-    Note
-    ----
-    Source: https://en.wikipedia.org/wiki/Drawdown_(economics)
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
+    
     """
     cdef np.ndarray[np.float64_t, ndim=1] drawdowns
     
