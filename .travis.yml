@@ -10,7 +10,7 @@ python:
 # command to install dependencies
 install:
   - pip install -r requirements.txt
-  - python3 setup.py install
+  - python3 setup.py build_ext --inplace
 # command to run tests
 script: 
   - cd /home/travis/build/ArthurBernard/Fynance && pytest
