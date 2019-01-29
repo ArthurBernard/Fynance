@@ -84,7 +84,7 @@ with open('README.rst') as f:
 
 setup(
     name='fynance',
-    version='1.0.0',
+    version='1.0.1',
     description='Python and Cython scripts of machine learning, econometrics \
         and statistical tools for financial analysis [In progress]',
     long_description=str(long_description),
