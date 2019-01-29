@@ -1,10 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# Built-in packages
+
+# External packages
 import numpy as np
 import pandas as pd
-from scipy.optimize import fmin
 
+# Internal packages
 from .econometric_models_cy import *
 
 __all__ = [
@@ -41,6 +44,7 @@ def get_parameters(params, p=0, q=0, Q=0, P=0, cons=True):
         Last part GARCH parameters.
     :c and omega: float
         Constants of model.
+    
     """
     i = 0
     if cons:
@@ -85,65 +89,78 @@ def get_parameters(params, p=0, q=0, Q=0, P=0, cons=True):
 
 def MA(y, theta, c, q):
     """ 
-    Moving Average model of order q s.t: 
-    y_t = c + theta_1 * u_t-1 + ... + theta_q * u_t-q + u_t 
+    Moving Average model of order `q` s.t: 
+    
+    .. math:: y_t = c + \\theta_1 * u_t-1 + ... + \\theta_q * u_t-q + u_t 
     
     Parameters
     ----------
-    y: np.ndarray[np.float64, ndim=1]
+    :y: np.ndarray[np.float64, ndim=1]
         Time series.
-    theta: np.ndarray[np.float64, ndim=1]
+    :theta: np.ndarray[np.float64, ndim=1]
         Coefficients of model.
-    c: np.float64
+    :c: np.float64
         Constant of the model.
-    q: int
+    :q: int
         Order of MA(q) model.
         
     Returns
     -------
-    u: np.ndarray[ndim=1, dtype=np.float64]
+    :u: np.ndarray[ndim=1, dtype=np.float64]
         Residual of the model.
+    
+    Examples
+    --------
+    >>> y = np.array([3, 4, 6, 8, 5, 3])
+    >>> MA(y=y, theta=np.array([0.8]), c=3, q=1)
+    array([ 0.    ,  1.    ,  2.2   ,  3.24  , -0.592 ,  0.4736])
+
     """
+    # Set type of variables
     if isinstance(y, pd.DataFrame) or isinstance(y, list) or isinstance(y, pd.Series):
-        y = np.asarray(y, dtype=np.float64).reshape([y.size])
+        y = np.asarray(y)
+    y = y.astype(np.float64).reshape([y.size])
     if isinstance(theta, list):
-        theta = np.asarray(theta, dtype=np.float64)
-    u = MA_cy(y, theta, float(c), int(q))
+        theta = np.asarray(theta)
+    theta = theta.astype(np.float64).reshape([theta.size])
+    # Compute residuals
+    u = MA_cy(y, theta, np.float64(c), int(q))
     return u
 
 
 def ARMA(y, phi, theta, c, p, q):
     """
-    AutoRegressive Moving Average model of order q and p s.t: 
-    y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + theta_1 * u_t-1 + ...
-          + theta_q * u_t-q + u_t
+    AutoRegressive Moving Average model of order `q` and `p` s.t: 
+    
+    .. math:: y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + theta_1 * u_t-1 
+              + ... + theta_q * u_t-q + u_t
     
     Parameters
     ----------
-    y: np.ndarray[np.float64, ndim=1]
+    :y: np.ndarray[np.float64, ndim=1]
         Time series.
-    phi: np.ndarray[np.float64, ndim=1]
+    :phi: np.ndarray[np.float64, ndim=1]
         Coefficients of AR model.
-    theta: np.ndarray[np.float64, ndim=1]
+    :theta: np.ndarray[np.float64, ndim=1]
         Coefficients of MA model.
-    c: np.float64
+    :c: np.float64
         Constant of the model.
-    p: int
+    :p: int
         Order of AR(p) model.
-    q: int
+    :q: int
         Order of MA(q) model.
 
     Returns
     -------
-    u: np.ndarray[np.float64, ndim=1]
+    :u: np.ndarray[np.float64, ndim=1]
         Residual of the model.
+    
     """
-    if isinstance(y, pd.DataFrame) or isinstance(y, list) or isinstance(y, pd.Series):
-        y = np.asarray(y, dtype=np.float64).reshape([y.size])
-    if isinstance(theta, list):
-        theta = np.asarray(theta, dtype=np.float64)
-    if isinstance(phi, list):
-        phi = np.asarray(phi, dtype=np.float64)
+    # Set type variables and parameters
+    y = np.asarray(y, dtype=np.float64).reshape([y.size])
+    theta = np.asarray(theta, dtype=np.float64)
+    phi = np.asarray(phi, dtype=np.float64)
+    # Compute residuals
     u = ARMA_cy(y, phi, theta, float(c), int(p), int(q))
     return u
 
@@ -151,57 +168,55 @@ def ARMA(y, phi, theta, c, p, q):
 def ARMA_GARCH(y, phi, theta, alpha, beta, c, omega, p, q, Q, P):
     """ 
     AutoRegressive Moving Average model of order q and p, such that: 
-    y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + theta_1 * u_t-1 + ...
-          + theta_q * u_t-q + u_t
+    
+    .. math:: y_t = c + \\phi_1 * y_t-1 + ... + \\phi_p * y_t-p 
+              + \\theta_1 * u_t-1 + ... + \\theta_q * u_t-q + u_t
     
     With Generalized AutoRegressive Conditional Heteroskedasticity volatility
-    model of order Q and P, such that:
-    u_t = z_t * h_t 
-    h_t^2 = omega + alpha_1 * u^2_t-1 + ... + alpha_Q * u^2_t-Q 
-            + beta_1 * h^2_t-1 + ... + beta_P * h^2_t-P
+    model of order `Q` and `P`, such that:
+    
+    .. math:: u_t = z_t * h_t 
+    .. math:: h_t^2 = \\omega + \\alpha_1 * u^2_t-1 + ... + \\alpha_Q * u^2_t-Q
+              + \\beta_1 * h^2_t-1 + ... + \\beta_P * h^2_t-P
     
     Parameters
     ----------
-    y: np.ndarray[np.float64, ndim=1]
+    :y: np.ndarray[np.float64, ndim=1]
         Time series.
-    phi: np.ndarray[np.float64, ndim=1]
+    :phi: np.ndarray[np.float64, ndim=1]
         Coefficients of AR model.
-    theta: np.ndarray[np.float64, ndim=1]
+    :theta: np.ndarray[np.float64, ndim=1]
         Coefficients of MA model.
-    alpha: np.ndarray[np.float64, ndim=1]
+    :alpha: np.ndarray[np.float64, ndim=1]
         Coefficients of MA part of GARCH.
-    beta: np.ndarray[np.float64, ndim=1]
+    :beta: np.ndarray[np.float64, ndim=1]
         Coefficients of AR part of GARCH.
-    c: np.float64
+    :c: np.float64
         Constant of ARMA model.
-    omega: np.float64
+    :omega: np.float64
         Constant of GARCH model.
-    p: int
+    :p: int
         Order of AR(p) model.
-    q: int
+    :q: int
         Order of MA(q) model.
-    Q: int
+    :Q: int
         Order of MA part of GARCH.
-    P: int
+    :P: int
         Order of AR part of GARCH.
 
     Returns
     -------
-    u: np.ndarray[np.float64, ndim=1]
+    :u: np.ndarray[np.float64, ndim=1]
         Residual of the model. 
-    h: np.ndarray[np.float64, ndim=1]
+    :h: np.ndarray[np.float64, ndim=1]
         Conditional volatility of the model. 
+    
     """
-    if isinstance(y, pd.DataFrame) or isinstance(y, list) or isinstance(y, pd.Series):
-        y = np.asarray(y, dtype=np.float64).reshape([y.size])
-    if isinstance(theta, list):
-        theta = np.asarray(theta, dtype=np.float64)
-    if isinstance(phi, list):
-        phi = np.asarray(phi, dtype=np.float64)
-    if isinstance(alpha, list):
-        alpha = np.asarray(alpha, dtype=np.float64)
-    if isinstance(beta, list):
-        beta = np.asarray(beta, dtype=np.float64)
+    y = np.asarray(y, dtype=np.float64).reshape([y.size])
+    theta = np.asarray(theta, dtype=np.float64)
+    phi = np.asarray(phi, dtype=np.float64)
+    alpha = np.asarray(alpha, dtype=np.float64)
+    beta = np.asarray(beta, dtype=np.float64)
     u, h = ARMA_GARCH_cy(
         y, phi, theta, alpha, beta, float(c), float(omega), int(p), int(q), 
         int(Q), int(P)
@@ -212,63 +227,65 @@ def ARMA_GARCH(y, phi, theta, alpha, beta, c, omega, p, q, Q, P):
 def ARMAX_GARCH(y, x, phi, psi, theta, alpha, beta, c, omega, p, q, Q, P):
     """ 
     AutoRegressive Moving Average model of order q and p, such that: 
-    y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + psi_t * x_t 
-          + theta_1 * u_t-1 + ... + theta_q * u_t-q + u_t
+    
+    .. math:: y_t = c + \\phi_1 * y_t-1 + ... + \\phi_p * y_t-p + \\psi_t * x_t 
+              + \\theta_1 * u_t-1 + ... + \\theta_q * u_t-q + u_t
     
     With Generalized AutoRegressive Conditional Heteroskedasticity volatility
-    model of order Q and P, such that:
-    u_t = z_t * h_t 
-    h_t^2 = omega + alpha_1 * u^2_t-1 + ... + alpha_Q * u^2_t-Q 
-            + beta_1 * h^2_t-1 + ... + beta_P * h^2_t-P
+    model of order `Q` and `P`, such that:
+    
+    .. math:: u_t = z_t * h_t 
+    .. math:: h_t^2 = \\omega + \\alpha_1 * u^2_t-1 + ... + \\alpha_Q * u^2_t-Q
+              + \\beta_1 * h^2_t-1 + ... + \\beta_P * h^2_t-P
     
     Parameters
     ----------
-    y: np.ndarray[np.float64, ndim=1]
+    :y: np.ndarray[np.float64, ndim=1]
         Time series.
-    x: np.ndarray[np.float64, ndim=2]
+    :x: np.ndarray[np.float64, ndim=2]
         Time series of external features.
-    phi: np.ndarray[np.float64, ndim=1]
+    :phi: np.ndarray[np.float64, ndim=1]
         Coefficients of AR model.
-    psi: np.ndarray[np.float64, ndim=1]
+    :psi: np.ndarray[np.float64, ndim=1]
         Coefficients of external features.
-    theta: np.ndarray[np.float64, ndim=1]
+    :theta: np.ndarray[np.float64, ndim=1]
         Coefficients of MA model.
-    alpha: np.ndarray[np.float64, ndim=1]
+    :alpha: np.ndarray[np.float64, ndim=1]
         Coefficients of MA part of GARCH.
-    beta: np.ndarray[np.float64, ndim=1]
+    :beta: np.ndarray[np.float64, ndim=1]
         Coefficients of AR part of GARCH.
-    c: np.float64
+    :c: np.float64
         Constant of the model.
-    p: int
+    :p: int
         Order of AR(p) model.
-    q: int
+    :q: int
         Order of MA(q) model.
-    Q: int
+    :Q: int
         Order of MA part of GARCH.
-    P: int
+    :P: int
         Order of AR part of GARCH.
 
     Returns
     -------
-    u: np.ndarray[np.float64, ndim=1]
+    :u: np.ndarray[np.float64, ndim=1]
         Residual of the model. 
-    h: np.ndarray[np.float64, ndim=1]
+    :h: np.ndarray[np.float64, ndim=1]
         Conditional volatility of the model. 
+
+    See also
+    --------
+    ARMA_GARCH, ARMA and MA.
+    
     """
-    if isinstance(y, pd.DataFrame) or isinstance(y, list) or isinstance(y, pd.Series):
-        y = np.asarray(y, dtype=np.float64).reshape([y.size])
-    if isinstance(x, pd.DataFrame) or isinstance(x, list) or isinstance(x, pd.Series):
-        x = np.asarray(x, dtype=np.float64)
-    if isinstance(theta, list):
-        theta = np.asarray(theta, dtype=np.float64)
-    if isinstance(phi, list):
-        phi = np.asarray(phi, dtype=np.float64)
-    if isinstance(psi, list):
-        psi = np.asarray(psi, dtype=np.float64)
-    if isinstance(alpha, list):
-        alpha = np.asarray(alpha, dtype=np.float64)
-    if isinstance(beta, list):
-        beta = np.asarray(beta, dtype=np.float64)
+    # Set array variables
+    y = np.asarray(y, dtype=np.float64).reshape([y.size])
+    x = np.asarray(x, dtype=np.float64)
+    theta = np.asarray(theta, dtype=np.float64)
+    phi = np.asarray(phi, dtype=np.float64)
+    psi = np.asarray(psi, dtype=np.float64)
+    alpha = np.asarray(alpha, dtype=np.float64)
+    beta = np.asarray(beta, dtype=np.float64)
+    # Compute residuals and volatility
     u, h = ARMAX_GARCH_cy(
         y, x, phi, theta, psi, alpha, beta, float(c), float(omega), int(p), 
         int(q), int(Q), int(P)
