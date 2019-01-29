@@ -50,7 +50,7 @@ def test_ARMA_GARCH(set_variables):
     assert u[0] == u_est[0]
     assert h[0] == h_est[0]
     for t in range(1, y.size):
-        u[t] = params[0] - y[t-1] * params[1] - u[t-1] * params[2]
+        u[t] = y[t] - params[0] - y[t-1] * params[1] - u[t-1] * params[2]
         h[t] = np.sqrt(params[3] + params[4] * u[t-1] ** 2 + params[5] * h[t-1] ** 2)
         assert u[t] == u_est[t]
         assert h[t] == h_est[t]
