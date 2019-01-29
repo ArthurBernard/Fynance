@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/fynance.svg)](https://pypi.org/project/fynance/)
 [![Status](https://img.shields.io/pypi/status/fynance.svg?colorB=blue)](https://pypi.org/project/fynance/)
-[![Build Status](https://img.shields.io/travis/ArthurBernard/fynance.svg)](https://travis-ci.org/ArthurBernard/Fynance)
+[![Build Status](https://travis-ci.org/ArthurBernard/Fynance.svg?branch=master)](https://travis-ci.org/ArthurBernard/Fynance)
 [![license](https://img.shields.io/github/license/ArthurBernard/fynance.svg)](https://github.com/ArthurBernard/Fynance/blob/master/LICENSE.txt)
 [![Downloads](https://pepy.tech/badge/fynance)](https://pepy.tech/project/fynance)
 
@@ -31,6 +31,7 @@ Use the command:
 
 > $ git clone https://github.com/ArthurBernard/Fynance.git   
 > $ cd Fynance   
+> $ python setup.py build_ext --inplace
 > $ python setup.py install --user   
 
 ## Demo

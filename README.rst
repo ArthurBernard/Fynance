@@ -6,7 +6,7 @@ Fynance - Machine learning tools for financial analysis [In Progress]
     :target: https://pypi.org/project/fynance/
 .. image:: https://img.shields.io/pypi/status/fynance.svg?colorB=blue
     :target: https://pypi.org/project/fynance/
-.. image:: https://img.shields.io/travis/ArthurBernard/fynance.svg
+.. image:: https://travis-ci.org/ArthurBernard/Fynance.svg?branch=master
     :target: https://travis-ci.org/ArthurBernard/Fynance
 .. image:: https://img.shields.io/github/license/ArthurBernard/fynance.svg
     :target: https://github.com/ArthurBernard/Fynance/blob/master/LICENSE.txt
@@ -50,6 +50,8 @@ Use the command:
     $ git clone https://github.com/ArthurBernard/Fynance.git
 
     $ cd Fynance
+
+    $ python setup.py build_ext --inplace
     
     $ python setup.py install --user
 
