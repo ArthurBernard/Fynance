@@ -1,6 +1,10 @@
 notifications:
   email: false
 language: python
+os: 
+  - linux
+  - osx
+  - windows
 python:
   - "3.5"
   - "3.6"
@@ -13,4 +17,4 @@ install:
   - python3 setup.py build_ext --inplace
 # command to run tests
 script: 
-  - cd /home/travis/build/ArthurBernard/Fynance && pytest
+  - pytest
