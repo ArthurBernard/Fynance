@@ -55,6 +55,18 @@ Use the command:
     
     $ python setup.py install --user
 
+Compile from cython files   
+-------------------------
+
+If you want to compile fynance package from cython files you must edit `setup.py` file and set :: USE_CYTHON = True 
+
+And use the commad:
+
+    $ python setup.py build_ext --inplace    
+    
+    $ python setup.py install --user   
+
+
 Demo
 ====
 

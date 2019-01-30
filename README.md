@@ -34,6 +34,13 @@ Use the command:
 > $ python setup.py build_ext --inplace    
 > $ python setup.py install --user   
 
+#### Compile from cython files   
+
+If you want to compile fynance package from cython files you must set `USE_CYTHON = True` in `setup.py` file.    
+
+> $ python setup.py build_ext --inplace    
+> $ python setup.py install --user   
+
 ## Demo
 
 - **Backtest** (performance, drawdown and rolling sharpe ratio) of a **trading strategy** did with a **rolling neural network** (see Notebooks/Exemple_Rolling_NeuralNetwork.ipynb for more details):
