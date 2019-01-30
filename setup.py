@@ -9,6 +9,7 @@ USE_CYTHON = False
 import sys
 from setuptools import setup, find_packages
 from distutils.extension import Extension
+from distutils.command.build_ext import build_ext
 import numpy
 
 CLASSIFIERS = [
