@@ -3,7 +3,7 @@ include README.md
 # Top-level build script
 include setup.py
 # All source files
-recursive-include fynance *.py *.pyx *.c
+recursive-include fynance *
 # Exclude what we don't want to include
 prune */__pycache__
 global-exclude *.pyc *.html *.so
