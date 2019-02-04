@@ -17,8 +17,8 @@ __all__ = ['set_text_stats']
 
 
 def set_text_stats(
-        underly, period=252, accur=True, perf=True, vol=True, sharpe=True, 
-        calmar=True, underlying='Underlying', **kwpred
+        underly, period=252, accur=True, perf=True, vol=True, sharp=True, 
+        calma=True, underlying='Underlying', **kwpred
     ):
     """ 
     Set a table as string with different indicators (accuracy, perf, vol and 
@@ -36,9 +36,9 @@ def set_text_stats(
         If true compute performance else not.
     :vol: bool (default is True)
         If true compute volatility else not.
-    :sharpe: bool (default is True)
+    :sharp: bool (default is True)
         If true compute sharpe ratio else not.
-    :calmar: bool (default is True)
+    :calma: bool (default is True)
         If true compute calmar ratio else not.
     :underlying: str (default is 'Underlying')
         Name of the underlying.
@@ -85,7 +85,7 @@ def set_text_stats(
             vol_pred = np.sqrt(period) * np.std(perf[1:] / perf[:-1] - 1)
             txt += '| {:14} | {:10.2%} |\n'.format(key, vol_pred)
     # Compute sharpe Ratio
-    if sharpe:
+    if sharp:
         txt += '+=============================+\n'
         txt += '|         Sharpe Ratio        |\n'
         txt += '+----------------+------------+\n'
@@ -97,7 +97,7 @@ def set_text_stats(
             )
             txt += '| {:14} | {:10.2f} |\n'.format(key, sharpe_pred)
     # Compute calmar
-    if calmar:
+    if calma:
         txt += '+=============================+\n'
         txt += '|         Calmar Ratio        |\n'
         txt += '+----------------+------------+\n'
