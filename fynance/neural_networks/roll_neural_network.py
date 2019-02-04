@@ -169,7 +169,7 @@ class RollNeuralNet:
         self.perf_estim = [self.V0]
 
         # Set axes and figure
-        f, ax = plt.subplots(plot_loss + plot_perf, 1, figsize=(10, 6))
+        f, ax = plt.subplots(plot_loss + plot_perf, 1, figsize=(9, 6))
         plt.ion()
         if plot_loss and not plot_perf:
             ax_loss, ax_perf = ax, None

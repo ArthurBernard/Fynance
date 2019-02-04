@@ -180,6 +180,8 @@ class RollMultiNeuralNet:
         """
         if isinstance(NN, list):
             n = len(NN)
+        else:
+            n = 1
         self.perf_train = {i: [self.V0] for i in range(n)}
         self.perf_estim = {i: [self.V0] for i in range(n)}
 
