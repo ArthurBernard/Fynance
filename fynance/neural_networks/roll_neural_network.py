@@ -15,10 +15,9 @@ plt.style.use('seaborn')
 
 
 class RollNeuralNet:
-    """
-    Rolling Neural Network object allow you to train your neural network along
-    training periods (from t - n to t) and predict along testing periods (from
-    t to t + s) and roll along this time axis.
+    """ Rolling Neural Network object allow you to train your neural network 
+    along training periods (from t - n to t) and predict along testing periods 
+    (from t to t + s) and roll along this time axis.
 
     Attribute
     ---------
@@ -36,30 +35,73 @@ class RollNeuralNet:
 
     Methods
     -------
-    :run: Train the rolling neural network along pre-specified train period 
-    and predict along test period. Display loss and performance if specified.
+    :run: Train rolling neural network along pre-specified train period and 
+        predict along test period. Display loss and performance if specified.
     :__iter__: Train and predict along time axis from day number n to last day 
-    number T and by step of size s period. 
+        number T and by step of size s period. 
 
     TODO:
     3 - Manager of models (cross val to aggregate or choose signal's model).
     """
     def __init__(
             self, train_period=252, estim_period=63, value_init=100, 
-            dummify_target=True, params=None, init_params=None
+            target_filter='sign', params=None, init_params=None
         ):
-        """ Init method """
+        """ Init method sets size of training and predicting period, inital 
+        value to backtest, a target filter and training parameters.
+
+        Parameters
+        ----------
+        :train_period: int (default 252)
+            Size of the training period.
+        :estim_period: int (default 63)
+            Size of the period to predict (is also the rolling period).
+        :value_init: int (default 100)
+            Initial value to backtest strategy.
+        :target_filter: function (default is np.sign)
+            Function to filtering target. If 'sign' use np.sign() function, 
+            if False doesn't filtering target.
+        :params: dict (default is None)
+            Parameters for training periods
+        :init_params: dict (default is None)
+            Parameters for only first training period
+
+        """
         self.n = train_period
         self.s = estim_period
         self.V0 = value_init
         self._set_parameters(params, init_params)
-        if dummify_target:
+        if target_filter == 'sign':
             self.f = np.sign
-        else:
+        elif target_filter is None:
             self.f = lambda x: x
+        else:
+            self.f = target_filter
     
     def __call__(self, y, X, NN, start=0, end=1e6, x_axis=None):
-        """ Callable method """
+        """ Callable method to set terget and features data, neural network 
+        object (Keras object is prefered).
+
+        Parameters
+        ----------
+        :y: np.ndarray[ndim=1, dtype=np.float32]
+            Target to predict.
+        :X: np.ndarray[ndim=2, dtype=np.float32]
+            Features data.
+        :NN: keras.engine.training.Model
+            Neural network model.
+        :start: int (default 0)
+            Starting observation.
+        :end: int (default 1e6)
+            Ending observation.
+        :x_axis: np.ndarray[ndim=1]
+            X-Axis to use for the backtest.
+
+        Returns
+        -------
+        :self: RollNeuralNet (Object)
+
+        """
         # Set target and features
         self.y = y
         self.X = X
@@ -125,26 +167,45 @@ class RollNeuralNet:
         ).flatten()
     
     def _set_parameters(self, params, init_params=None): 
-        """ 
-        Setting parameters for fit method of neural network. If is None set as 
-        default parameters: batch_size=train_period, epochs=1, shuffle=False
-        and no verbosity.
+        """ Setting parameters to fit method of neural network. If is `None` 
+        set as default parameters: `batch_size=train_period`, `epochs=1`, 
+        `shuffle=False` and no verbosity.
 
         Parameters
         ----------
         :params: dict
-        :init_params: dict 
+            Parameters for training periods
+        :init_params: dict (default is None)
+            Parameters for only first training period
+
+        Returns
+        -------
+        :self: RollNeuralNet (object)
+
         """
-        self.params = {
-            'batch_size': self.n, 'epochs': 1, 'shuffle': False, 'verbose': 0
-        } if params is None else params
-        self.init_params = self.params if init_params is None else init_params
+
+        if params is None:
+            self.params = {
+                'batch_size': self.n, 
+                'epochs': 1, 
+                'shuffle': False, 
+                'verbose': 0,
+            } 
+        else:
+            self.params = params
+
+        # Set parameters for the first training period
+        if init_params is None:
+            self.init_params = self.params 
+        else:
+            self.init_params = init_params
+        
         return self
         
     def run(self, y, X, NN, plot_loss=True, plot_perf=True, x_axis=None):
-        """ 
-        Train the rolling neural network along pre-specified train period and 
-        predict along test period. Display loss and performance if specified.
+        """ Train the rolling neural network along pre-specified train 
+        period and predict along test period. Display loss and performance 
+        if specified.
         
         Parameters
         ----------
@@ -164,6 +225,7 @@ class RollNeuralNet:
         Returns
         -------
         :self: RollNeuralNet (object)
+
         """
         self.perf_train = [self.V0]
         self.perf_estim = [self.V0]
