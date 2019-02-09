@@ -69,10 +69,12 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
 
         Returns
         -------
-        :self: RollMultiNeuralNet (Object)
+        :self: RollAggrMultiNeuralNet (Object)
 
         """
-        RollMultiNeuralNet.__call__(self, y, X, NN, start=0, end=1e6, x_axis=None)
+        RollMultiNeuralNet.__call__(
+            self, y, X, NN, start=start, end=end, x_axis=x_axis
+        )
         self.agg_y = np.zeros([self.T, 1])
         
         return self
@@ -100,7 +102,7 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
 
         Returns
         -------
-        :self: RollMultiNeuralNet (object)
+        :self: RollAggrMultiNeuralNet (object)
 
         """
         if isinstance(NN, list):
@@ -111,6 +113,7 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
         # Set perf and loss arrays
         self.perf_train = self.V0 * np.ones([y.size, self.n_NN])
         self.perf_estim = self.V0 * np.ones([y.size, self.n_NN])
+        self.perf_agg = self.V0 * np.ones([y.size, 1])
 
         # Set axes and figure
         f, ax_loss, ax_perf = self._set_figure(plot_loss, plot_perf)
@@ -129,72 +132,81 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
             cum_ret = np.exp(np.cumsum(returns, axis=0))
             self.perf_estim[t: t + s] = self.perf_estim[t - 1] * cum_ret
 
+            # Aggregate prediction
+            self.aggregate(pred_train, y[t: t + s], t=t, t_s=t + s)
+            returns = np.sign(self.agg_y[t: t + s]) * y[t: t + s]
+            cum_ret = np.exp(np.cumsum(returns, axis=0))
+            self.perf_agg[t: t + s] = self.perf_agg[t - 1] * cum_ret
+
             # Plot loss and perf
             self._dynamic_plot(f, ax_loss=ax_loss, ax_perf=ax_perf)
 
         return self
     
-    def _dynamic_plot(self, f, ax_loss=None, ax_perf=None):
-        """ Dynamic plot """
-        t, s, t_s = self.t, self.s, min(self.t + self.s, self.T)
-        k = self.params['epochs'] * (t - self.n) // s
+    def aggregate(self, mat_pred, y, t=0, t_s=-1):
+        """ Method to aggregate predictions from several neural networks.
 
-        # Plot progress of loss
-        if ax_loss is not None:
-            # Set dynamic plot 
-            dpbt = DynaPlotBackTest(
-                fig=f, ax=ax_loss, title='Model loss', ylabel='Loss', 
-                xlabel='Epoch', yscale='log',
-                tick_params={'axis': 'x', 'labelsize': 10}
-            )
-            
-            # Set graphs
-            dpbt.plot(
-                self.loss_estim[: k], names='Estim NN', col='BuGn', lw=2.
-            )
-            dpbt.plot(
-                self.loss_train[: k], names='Train NN', col='YlOrBr', lw=1.5
-            )
-            ax_loss.legend(loc='upper right', ncol=2, fontsize=10, 
-                handlelength=0.8, columnspacing=0.5, frameon=True)
-
-        # Plot progress of performance
-        if ax_perf is not None:
-            # Set axes
-            dpbt = DynaPlotBackTest(
-                fig=f, ax=ax_perf, title='Model performance', ylabel='Perf.', 
-                xlabel='Date', yscale='log',
-                tick_params={'axis': 'x', 'rotation': 30, 'labelsize': 10}
-            )
-            
-            # Set graphs
-            dpbt.plot(
-                self.perf_estim[: t_s], x=self.x_axis[: t_s],  
-                names='Estim NN', col='GnBu', lw=1.7, unit='perf',
-            )
-            dpbt.plot(
-                self.perf_train[: t], x=self.x_axis[: t], 
-                names='Train NN', col='OrRd', lw=1.2, unit='perf'
-            )
-            ax_perf.legend(loc='upper left', ncol=2, fontsize=10, 
-                handlelength=0.8, columnspacing=0.5, frameon=True)
-                
-        f.canvas.draw()
-
-    def _set_figure(self, plot_loss, plot_perf):
-        """ Set figure, axes and parameters for dynamic plot. """
-        # Set figure and axes
-        f, ax = plt.subplots(plot_loss + plot_perf, 1, figsize=(9, 6))
-        plt.ion()
+        Parameters
+        ----------
+        :mat_pred: np.ndarray[np.float32, ndim=2] with shape=(T, n_NN)
+            Several time series of neural networks predictions.
+        :y: np.ndarray[np.float32, ndim=2] with shape=(T, 1)
+            Time series of target to estimate or predict.
+        :t: int
+            First observation.
+        :t_s: int
+            Last observation.
         
-        # Specify axes
-        if plot_loss and not plot_perf:
-            ax_loss, ax_perf = ax, None
-        elif not plot_loss and plot_perf:
-            ax_loss, ax_perf = None, ax
-        elif plot_loss and plot_perf:
-            ax_loss, ax_perf = ax
-        else: 
-            ax_loss, ax_perf = None, None
+        Returns
+        -------
+        :self: RollAggrMultiNeuralNet (object)
 
-        return f, ax_loss, ax_perf
+        """
+        # TODO : Define `_aggregate method` 
+        self.agg_y[t: t_s, 0] = self._aggregate(mat_pred, y)
+        return self
+
+    def _aggregate(self, mat_pred, y):
+        """ """
+        return np.mean(mat_pred, axis=1)
+
+    def plot_perf(self, f, ax):
+        """ Plot loss 
+        
+        Parameters
+        ----------
+        :fig: matplotlib.figure.Figure
+            Figure to display backtest.
+        :ax: matplotlib.axes
+            Axe(s) to display a part of backtest.
+
+        Returns
+        -------
+        :self: RollMultiNeuralNet (object)
+
+        """
+        t, t_s = self.t, min(self.t + self.s, self.T)
+        
+        dpbt = DynaPlotBackTest(
+            fig=f, ax=ax, title='Model performance', ylabel='Perf.', 
+            xlabel='Date', yscale='log',
+            tick_params={'axis': 'x', 'rotation': 30, 'labelsize': 10}
+        )
+        
+        # Set graphs
+        dpbt.plot(
+            self.perf_estim[: t_s], x=self.x_axis[: t_s],  
+            names='Estim NN', col='GnBu', lw=1.7, unit='perf',
+        )
+        dpbt.plot(
+            self.perf_train[: t], x=self.x_axis[: t], 
+            names='Train NN', col='OrRd', lw=1.2, unit='perf'
+        )
+        dpbt.plot(
+            self.perf_agg[: t_s], x=self.x_axis[: t_s], 
+            names='Aggr NN', col='Reds', lw=2., unit='perf'
+        )
+        ax.legend(loc='upper left', ncol=2, fontsize=10, 
+            handlelength=0.8, columnspacing=0.5, frameon=True)
+
+        return self
