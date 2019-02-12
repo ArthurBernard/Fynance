@@ -9,13 +9,14 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 
 # Internal packages
+from fynance.backtest.dynamic_plot_backtest import DynaPlotBackTest
+from fynance.neural_networks.roll_neural_network import RollNeuralNet
 
 # Set plot style
 plt.style.use('seaborn')
 
-# TODO: Merge with RollNeuralNet object
 
-class RollMultiNeuralNet:
+class RollMultiNeuralNet(RollNeuralNet):
     """ Rolling Multi Neural Networks object allow you to train several 
     neural networks along training periods (from t - n to t) and predict 
     along testing periods (from t to t + s) and roll along this time axis.
@@ -27,7 +28,7 @@ class RollMultiNeuralNet:
     :X: np.ndarray[np.float32, ndim=2] with shape=(T, N)
         Features (inputs).
     :NN: list of keras.Model
-        Neural network to train and predict.
+        Neural network models to train and predict.
     :y_train: np.ndarray[np.float64, ndim=1]
         Prediction on training set.
     :y_estim: np.ndarray[np.float64, ndim=1]
@@ -45,39 +46,6 @@ class RollMultiNeuralNet:
     TODO:
     3 - Manager of models (cross val to aggregate or choose signal's model).
     """
-    def __init__(
-            self, train_period=252, estim_period=63, value_init=100, 
-            target_filter='sign', params=None,
-        ):
-        """ Init method sets size of training and predicting period, inital 
-        value to backtest, a target filter and training parameters.
-
-        Parameters
-        ----------
-        :train_period: int (default 252)
-            Size of the training period.
-        :estim_period: int (default 63)
-            Size of the period to predict (is also the rolling period).
-        :value_init: int (default 100)
-            Initial value to backtest strategy.
-        :target_filter: function (default is np.sign)
-            Function to filtering target. If 'sign' use np.sign() function, 
-            if False doesn't filtering target.
-        :params: dict (default is None)
-            Parameters for training periods
-
-        """
-        self.n = train_period
-        self.s = estim_period
-        self.V0 = value_init
-        self._set_parameters(params)
-        if target_filter or target_filter == 'sign':
-            self.f = np.sign
-        elif target_filter is None:
-            self.f = lambda x: x
-        else:
-            self.f = target_filter
-    
     def __call__(self, y, X, NN, start=0, end=1e6, x_axis=None):
         """ Callable method to set terget and features data, neural network 
         object (Keras object is prefered).
@@ -89,7 +57,7 @@ class RollMultiNeuralNet:
         :X: np.ndarray[ndim=2, dtype=np.float32]
             Features data.
         :NN: list of keras.engine.training.Model
-            Neural network model.
+            Neural network models.
         :start: int (default 0)
             Starting observation.
         :end: int (default 1e6)
@@ -102,10 +70,9 @@ class RollMultiNeuralNet:
         :self: RollMultiNeuralNet (Object)
 
         """
-        # Set target and features
-        self.y = y
-        self.X = X
-        
+        RollNeuralNet.__call__(
+            self, y, X, NN, start=start, end=end, x_axis=x_axis
+        )
         # Set neural network model 
         if isinstance(NN, list):
             self.NN = NN
@@ -113,14 +80,6 @@ class RollMultiNeuralNet:
         else:
             self.NN = [NN]
             self.n_NN = 1
-        
-        # Set periodicity
-        self.t = max(self.n, start)
-        self.T = min(y.size, end)
-        if x_axis is None:
-            self.x_axis = range(self.T)
-        else:
-            self.x_axis = x_axis
         
         return self
         
@@ -138,7 +97,7 @@ class RollMultiNeuralNet:
         # Incremant time
         self.t += self.s
         t = self.t
-        if self.t > self.T:
+        if self.t >= self.T:
             raise StopIteration
         
         # Splitting
@@ -179,33 +138,6 @@ class RollMultiNeuralNet:
         return self.NN[i].predict(
             X[-self.s: ], verbose=self.params['verbose']
         ).flatten()
-    
-    def _set_parameters(self, params): 
-        """ Setting parameters to fit method of neural network. If is `None` 
-        set as default parameters: `batch_size=train_period`, `epochs=1`, 
-        `shuffle=False` and no verbosity.
-
-        Parameters
-        ----------
-        :params: dict
-            Parameters for training periods
-        
-        Returns
-        -------
-        :self: RollMultiNeuralNet (object)
-
-        """
-        if params is None:
-            self.params = {
-                'batch_size': self.n, 
-                'epochs': 1, 
-                'shuffle': False, 
-                'verbose': 0
-            } 
-        else: 
-            self.params = params 
-        
-        return self
         
     def run(self, y, X, NN, plot_loss=True, plot_perf=True, x_axis=None):
         """ Train several rolling neural networks along pre-specified train 
@@ -262,98 +194,3 @@ class RollMultiNeuralNet:
             self._dynamic_plot(f, ax_loss=ax_loss, ax_perf=ax_perf)
 
         return self
-    
-    def _dynamic_plot(self, f, ax_loss=None, ax_perf=None):
-        """ Dynamic plot """
-        t, s, t_s = self.t, self.s, min(self.t + self.s, self.T)
-        k = self.params['epochs'] * (t - self.n) // s
-
-        # Plot progress of loss
-        if ax_loss is not None:
-            # Set axes
-            ax_loss = self._set_axes(
-                ax_loss, _title='Model loss', ylabel='Loss', 
-                xlabel='Epoch', _tick_params={'axis': 'x', 'labelsize': 10}
-            )
-            
-            # Set graphs
-            l_estim = ax_loss.plot(self.loss_estim[: k], LineWidth=2.)
-            l_train = ax_loss.plot(self.loss_train[: k], LineWidth=1.5)
-
-            # Set lines
-            for i in range(self.n_NN):
-                l_estim[i].set_color(self.col_loss_estim[i])
-                l_estim[i].set_label('Estim {}: {:.2f}'.format(
-                    self.NN[i].name, self.loss_estim[k - 1, i]
-                ))
-                l_train[i].set_color(self.col_loss_train[i])
-                l_train[i].set_label('Estim {}: {:.2f}'.format(
-                    self.NN[i].name, self.loss_train[k - 1, i]
-                ))
-            ax_loss.legend(loc='upper right', ncol=2, fontsize=10, 
-                handlelength=0.8, columnspacing=0.5, frameon=True)
-
-        # Plot progress of performance
-        if ax_perf is not None:
-            # Set axes
-            ax_perf = self._set_axes(
-                ax_perf, _title='Model performance', ylabel='Perf.', xlabel='Date', 
-                _tick_params={'axis': 'x', 'rotation': 30, 'labelsize': 10}
-            )
-            
-            # Set graphs
-            l_estim = ax_perf.plot(
-                self.x_axis[: t + s], self.perf_estim[: t_s], LineWidth=1.7,
-            )
-            l_train = ax_perf.plot(
-                self.x_axis[: t], self.perf_train[: t], LineWidth=1.2,
-            )
-            
-            # Set lines
-            for i in range(self.n_NN):
-                l_estim[i].set_color(self.col_perf_estim[i])
-                l_estim[i].set_label('Estim {}: {:.0f} %'.format(
-                    self.NN[i].name, self.perf_estim[t_s - 1, i] - 100.
-                ))
-                l_train[i].set_color(self.col_perf_train[i])
-                l_train[i].set_label('Train {}: {:.0f} %'.format(
-                    self.NN[i].name, self.perf_train[t - 1, i] - 100.
-                ))
-            ax_perf.legend(loc='upper left', ncol=2, fontsize=10, 
-                handlelength=0.8, columnspacing=0.5, frameon=True)
-                
-        f.canvas.draw()
-
-    def _set_figure(self, plot_loss, plot_perf):
-        """ Set figure, axes and parameters for dynamic plot. """
-        # Set figure and axes
-        f, ax = plt.subplots(plot_loss + plot_perf, 1, figsize=(9, 6))
-        plt.ion()
-        
-        # Specify axes
-        if plot_loss and not plot_perf:
-            ax_loss, ax_perf = ax, None
-        elif not plot_loss and plot_perf:
-            ax_loss, ax_perf = None, ax
-        elif plot_loss and plot_perf:
-            ax_loss, ax_perf = ax
-        else: 
-            ax_loss, ax_perf = None, None
-
-        # Set color palettes
-        self.col_perf_estim = sns.color_palette('GnBu', self.n_NN)
-        self.col_perf_train = sns.color_palette('OrRd', self.n_NN)
-        self.col_loss_estim = sns.color_palette('BuGn', self.n_NN)
-        self.col_loss_train = sns.color_palette('YlOrBr', self.n_NN)
-
-        return f, ax_loss, ax_perf
-
-    def _set_axes(self, ax, ylabel='', xlabel='', _title='', _tick_params={}):
-        """ Set axes parameters """
-        ax.clear()
-        ax.set_yscale('log')
-        ax.set_ylabel(ylabel)
-        ax.set_xlabel(xlabel, x=0.9)
-        ax.set_title(_title)
-        ax.tick_params(**_tick_params)
-        return ax
