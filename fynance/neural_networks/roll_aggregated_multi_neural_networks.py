@@ -48,6 +48,11 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
     TODO:
     3 - Manager of models (cross val to aggregate or choose signal's model).
     """
+    def __init__(self, *args, agg_fun='mean', **kwargs):
+        RollMultiNeuralNet.__init__(self, *args, **kwargs)
+        self.agg_fun = agg_fun
+
+
     def __call__(self, y, X, NN, start=0, end=1e6, x_axis=None):
         """ Callable method to set terget and features data, neural network 
         object (Keras object is prefered).
@@ -120,7 +125,7 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
 
         # Start Rolling Neural Network
         for pred_train, pred_estim in self(y, X, NN, x_axis=x_axis):
-            t, s = self.t, self.s
+            t, s, t_s = self.t, self.s, min(self.t + self.s, self.T)
             
             # Set performances of training period
             returns = np.sign(pred_train) * y[t - s: t]
@@ -128,15 +133,15 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
             self.perf_train[t - s: t] = self.perf_train[t - s - 1] * cum_ret
 
             # Set performances of estimated period
-            returns = np.sign(pred_estim) * y[t: t + s]
+            returns = np.sign(pred_estim) * y[t: t_s]
             cum_ret = np.exp(np.cumsum(returns, axis=0))
-            self.perf_estim[t: t + s] = self.perf_estim[t - 1] * cum_ret
-
+            self.perf_estim[t: t_s] = self.perf_estim[t - 1] * cum_ret
+            
             # Aggregate prediction
-            self.aggregate(pred_train, y[t: t + s], t=t, t_s=t + s)
-            returns = np.sign(self.agg_y[t: t + s]) * y[t: t + s]
+            self.aggregate(pred_estim, y[t: t_s], t=t, t_s=t_s)
+            returns = np.sign(self.agg_y[t: t_s]) * y[t: t_s]
             cum_ret = np.exp(np.cumsum(returns, axis=0))
-            self.perf_agg[t: t + s] = self.perf_agg[t - 1] * cum_ret
+            self.perf_agg[t: t_s] = self.perf_agg[t - 1] * cum_ret
 
             # Plot loss and perf
             self._dynamic_plot(f, ax_loss=ax_loss, ax_perf=ax_perf)
@@ -162,13 +167,58 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
         :self: RollAggrMultiNeuralNet (object)
 
         """
-        # TODO : Define `_aggregate method` 
         self.agg_y[t: t_s, 0] = self._aggregate(mat_pred, y)
         return self
 
     def _aggregate(self, mat_pred, y):
         """ """
-        return np.mean(mat_pred, axis=1)
+        # TODO : find a better aggregation method
+        if self.agg_fun == 'mean':
+            return np.mean(mat_pred, axis=1)
+        elif self.agg_fun == 'sum':
+            return np.sum(mat_pred, axis=1)
+        elif self.agg_fun == 'best':
+            i = np.argmax(self.perf_estim[self.t])
+            return mat_pred[:, i]
+        elif self.agg_fun == 'bests':
+            perfs = self.perf_estim[self.t]
+            perf_list = []
+            arg_list = []
+            for i in range(self.n_NN): 
+                if len(perf_list) < 3:
+                    perf_list += [perfs[i]]
+                    arg_list += [i]
+                elif perfs[i] > min(perf_list):
+                    j = np.argmin(perf_list)
+                    perf_list[j] = perfs[i]
+                    arg_list[j] = i
+                else: 
+                    pass
+            y = mat_pred[:, arg_list[0]]
+            y += mat_pred[:, arg_list[1]]
+            y += mat_pred[:, arg_list[2]]
+            y /= 3
+            return y
+
+    
+    # TODO : Make method to customize aggregation function
+    def set_aggregate(self, *args):
+        """ Set your own aggregation method. 
+
+        Parameters
+        ----------
+        :args: tuple of function
+            Any function such that the final value is a numpy array.
+
+        Returns
+        -------
+        :self: RollAggrMultiNeuralNet (object)
+
+        """
+        self._aggregate = lambda x: x
+        for arg in args:
+            self._aggregate = lambda x: arg(self._aggregate(x))
+        return self
 
     def plot_perf(self, f, ax):
         """ Plot loss 
@@ -199,12 +249,12 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
             names='Estim NN', col='GnBu', lw=1.7, unit='perf',
         )
         dpbt.plot(
-            self.perf_train[: t], x=self.x_axis[: t], 
-            names='Train NN', col='OrRd', lw=1.2, unit='perf'
-        )
-        dpbt.plot(
             self.perf_agg[: t_s], x=self.x_axis[: t_s], 
             names='Aggr NN', col='Reds', lw=2., unit='perf'
+        )
+        dpbt.plot(
+            self.perf_train[: t], x=self.x_axis[: t], 
+            names='Train NN', col='OrRd', lw=1.2, unit='perf'
         )
         ax.legend(loc='upper left', ncol=2, fontsize=10, 
             handlelength=0.8, columnspacing=0.5, frameon=True)
