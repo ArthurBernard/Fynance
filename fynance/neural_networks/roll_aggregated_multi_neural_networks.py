@@ -23,58 +23,69 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
     predict along testing periods (from t to t + s) and aggregate prediction 
     following a specified rule and roll along this time axis.
 
-    Attribute
-    ---------
-    :y: np.ndarray[np.float32, ndim=2] with shape=(T, 1)
+    Attributes
+    ----------
+    y : np.ndarray[np.float32, ndim=2] with shape=(T, 1)
         Target to estimate or predict.
-    :X: np.ndarray[np.float32, ndim=2] with shape=(T, N)
+    X : np.ndarray[np.float32, ndim=2] with shape=(T, N)
         Features (inputs).
-    :NN: list of keras.Model
+    NN : list of keras.Model
         Neural network to train and predict.
-    :y_train: np.ndarray[np.float64, ndim=1]
+    y_train : np.ndarray[np.float64, ndim=1]
         Prediction on training set.
-    :y_estim: np.ndarray[np.float64, ndim=1]
+    y_estim : np.ndarray[np.float64, ndim=1]
         Prediction on estimating set.
 
 
     Methods
     -------
-    :run: Train several rolling neural networks along pre-specified training 
-        period and predict along test period. Display loss and performance if 
-        specified.
-    :__iter__: Train and predict along time axis from day number n to last day 
+    run(y, X, NN, plot_loss=True, plot_perf=True, x_axis=None)
+        Train several rolling neural networks along pre-specified training 
+        period and predict along test period. Display loss and performance 
+        if specified.
+    __call__(y, X, NN, start=0, end=1e8, x_axis=None)
+        Callable method to set target and features data, neural network 
+        object (Keras object is prefered).
+    __iter__()
+        Train and predict along time axis from day number n to last day 
         number T and by step of size s period. 
+    aggregate(mat_pred, y, t=0, t_s=-1)
+        Method to aggregate predictions from several neural networks.
+    set_aggregate(*args)
+        Set your own aggregation method.
+    plot_loss(self, f, ax)
+        Plot loss function
+    plot_perf(self, f, ax)
+        Plot perfomances.
 
-    TODO:
-    3 - Manager of models (cross val to aggregate or choose signal's model).
     """
     def __init__(self, *args, agg_fun='mean', **kwargs):
         RollMultiNeuralNet.__init__(self, *args, **kwargs)
         self.agg_fun = agg_fun
 
 
-    def __call__(self, y, X, NN, start=0, end=1e6, x_axis=None):
+    def __call__(self, y, X, NN, start=0, end=1e8, x_axis=None):
         """ Callable method to set terget and features data, neural network 
         object (Keras object is prefered).
 
         Parameters
         ----------
-        :y: np.ndarray[ndim=1, dtype=np.float32]
+        y : np.ndarray[ndim=1, dtype=np.float32]
             Target to predict.
-        :X: np.ndarray[ndim=2, dtype=np.float32]
+        X : np.ndarray[ndim=2, dtype=np.float32]
             Features data.
-        :NN: list of keras.engine.training.Model
+        NN : list of keras.engine.training.Model
             Neural network model.
-        :start: int (default 0)
-            Starting observation.
-        :end: int (default 1e6)
-            Ending observation.
-        :x_axis: np.ndarray[ndim=1]
+        start : int, optional
+            Starting observation, default is 0.
+        end : int, optional
+            Ending observation, default is end.
+        x_axis : np.ndarray[ndim=1], optional
             X-Axis to use for the backtest.
 
         Returns
         -------
-        :self: RollAggrMultiNeuralNet (Object)
+        ramnn : RollAggrMultiNeuralNet
 
         """
         RollMultiNeuralNet.__call__(
@@ -92,22 +103,22 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
         
         Parameters
         ----------
-        :y: np.ndarray[np.float32, ndim=2] with shape=(T, 1)
+        y : np.ndarray[np.float32, ndim=2] with shape=(T, 1)
             Time series of target to estimate or predict.
-        :X: np.ndarray[np.float32, ndim=2] with shape=(T, N)
+        X : np.ndarray[np.float32, ndim=2] with shape=(T, N)
             Several time series of features.
-        :NN: keras.Model or list of keras.Model
+        NN : keras.Model or list of keras.Model
             Neural networks to train and predict.
-        :plot_loss: bool
-            If true dynamic plot of loss function.
-        :plot_perf: bool
-            If true dynamic plot of strategy performance.
-        :x_axis: list or array
+        plot_loss : bool, optional
+            If true dynamic plot of loss function, default is True.
+        plot_perf : bool, optional
+            If true dynamic plot of strategy performance, default is True.
+        x_axis : list or array, optional
             x-axis to plot (e.g. list of dates).
 
         Returns
         -------
-        :self: RollAggrMultiNeuralNet (object)
+        ramnn : RollAggrMultiNeuralNet
 
         """
         if isinstance(NN, list):
@@ -153,18 +164,18 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
 
         Parameters
         ----------
-        :mat_pred: np.ndarray[np.float32, ndim=2] with shape=(T, n_NN)
+        mat_pred : np.ndarray[np.float32, ndim=2] with shape=(T, n_NN)
             Several time series of neural networks predictions.
-        :y: np.ndarray[np.float32, ndim=2] with shape=(T, 1)
+        y : np.ndarray[np.float32, ndim=2] with shape=(T, 1)
             Time series of target to estimate or predict.
-        :t: int
-            First observation.
-        :t_s: int
-            Last observation.
+        t : int, optional
+            First observation, default is first one.
+        t_s : int, optional
+            Last observation, default is last one.
         
         Returns
         -------
-        :self: RollAggrMultiNeuralNet (object)
+        ramnn : RollAggrMultiNeuralNet
 
         """
         self.agg_y[t: t_s, 0] = self._aggregate(mat_pred, y)
@@ -207,12 +218,12 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
 
         Parameters
         ----------
-        :args: tuple of function
+        args : tuple of function
             Any function such that the final value is a numpy array.
 
         Returns
         -------
-        :self: RollAggrMultiNeuralNet (object)
+        ramnn : RollAggrMultiNeuralNet
 
         """
         self._aggregate = lambda x: x
@@ -221,18 +232,18 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
         return self
 
     def plot_perf(self, f, ax):
-        """ Plot loss 
+        """ Plot performances method 
         
         Parameters
         ----------
-        :fig: matplotlib.figure.Figure
+        fig : matplotlib.figure.Figure
             Figure to display backtest.
-        :ax: matplotlib.axes
+        ax : matplotlib.axes
             Axe(s) to display a part of backtest.
 
         Returns
         -------
-        :self: RollMultiNeuralNet (object)
+        ramnn : RollAggrMultiNeuralNet
 
         """
         t, t_s = self.t, min(self.t + self.s, self.T)
