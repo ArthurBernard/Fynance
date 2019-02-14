@@ -17,20 +17,26 @@ __all__ = [
 
 
 def z_score(series, kind_ma='ema', **kwargs):
-    """ 
-    Compute a Z-score function for a specific moving average function. 
+    """ Compute a Z-score function for a specific moving average function such
+    that:
+
+    .. math:: z = \\frac{seres - \\mu_t}{\\sigma_t}
+
+    Where :math:`\\mu_t` is the moving average and :math:`\\sigma_t` is the 
+    moving standard deviation.
     
     Parameters
     ----------
-    :series: np.ndarray[np.float64, ndim=1]
+    series : np.ndarray[np.float64, ndim=1]
         Series of index, prices or returns.
-    :kind_ma: str (default 'ema')
-        Kind of moving average, eg: 'ema', 'sma' or 'wma'.
-    :kwargs: Any parameters for the moving average function.
+    kind_ma : str {'ema', 'sma', 'wma'}, optional
+        Kind of moving average, default is 'ema'.
+    kwargs : dict, optional
+        Any parameters for the moving average function.
 
     Returns
     -------
-    :z: np.ndarray[np.float64, ndim=1]
+    z : np.ndarray[np.float64, ndim=1]
         Z-score at each period.
 
     Examples
@@ -66,25 +72,27 @@ def z_score(series, kind_ma='ema', **kwargs):
 
 
 def rsi(series, kind_ma='ema', lags=21, alpha=None):
-    """ 
-    Relative Strenght Index is the average gain of upward periods (noted U) 
-    divided by the average loss of downward (noted D) periods during the 
-    specified time frame, such that : RSI = 100 - 100 / (1 + U / D)
+    """ Relative Strenght Index is the average gain of upward periods 
+    (noted `U`) divided by the average loss of downward (noted `D`) periods 
+    during the specified time frame, such that : 
 
-    Paramaters
+    .. math:: RSI = 100 - \\frac{100}{1 + \\frac{U}{D}}
+
+    Parameters
     ----------
-    :series: np.ndarray[dtype=np.float64, ndim=1]
+    series : np.ndarray[dtype=np.float64, ndim=1]
         Index series.
-    :kind_ma: str (default is 'ema')
-        Kind of maving average, eg: 'ma', 'sma' or 'ema'.
-    :lags: int (default is None)
-        Number of days.
-    :alpha: float (default 0.94)
-        Multiplier, 0.94 corresponding at 20 (or 30 ?) lags days.
+    kind_ma : str {'ema', 'sma', 'wma'}, optional
+        Kind of moving average, default is 'ema'.
+    lags : int, optional
+        Number of lagged period, default is 21.
+    alpha : float, optional
+        Coefficiant, default is 0.94 corresponding at 20 lags days (only for 
+        'ema').
     
     Returns
     -------
-    :RSI: np.ndarray[dtype=np.float64, ndim=1]
+    RSI : np.ndarray[dtype=np.float64, ndim=1]
         Value of RSI for each period.
 
     Examples
@@ -122,26 +130,25 @@ def rsi(series, kind_ma='ema', lags=21, alpha=None):
 
 
 def bollinger_band(series, lags=21, n_std=2, kind_ma='sma'):
-    """ 
-    Compute the bollinger bands.
+    """ Compute the bollinger bands.
 
     Parameters
     ----------
-    :series: np.ndarray[dtype=np.float64, ndim=1]
+    series : np.ndarray[dtype=np.float64, ndim=1]
         Series.
-    :lags: int (default 21)
-        Number of lags for ma.
-    :n_std: float (default 1)
-        Number of standard deviation.
-    :kind_ma: str (default 'sma')
-        Kind of moving average, eg: 'sma', 'ema', etc.
+    lags : int, optional
+        Number of lags for ma, default is 21.
+    n_std : float (default 1)
+        Number of standard deviation, default is 1.
+    kind_ma : str {'ema', 'sma', 'wma'}, optional
+        Kind of moving average, default is 'ema'.
 
     Returns
     -------
-    :ma: np.ndarray[dtype=np.float64, ndim=1]
+    ma : np.ndarray[dtype=np.float64, ndim=1]
         Moving average of series.
-    :n_std * std: np.ndarray[dtype=np.float64, ndim=1]
-        Moving standard deviation of series.
+    std : np.ndarray[dtype=np.float64, ndim=1]
+        `n_std` moving standard deviation of series.
 
     Examples
     --------
@@ -167,22 +174,22 @@ def bollinger_band(series, lags=21, n_std=2, kind_ma='sma'):
 
 
 def hma(series, lags=21, kind_ma='wma'):
-    """
-    Indicator Hull moving average following:
-    hma = wma(2 * wma(x, k / 2) - wma(x, k), sqrt(k))
+    """ Indicator Hull moving average following:
+    
+    .. math:: hma = wma(2 \\times wma(x, \\frac{k}{2}) - wma(x, k), \\sqrt{k})
 
     Parameters
     ----------
-    :series: np.ndarray[dtype=np.float64, ndim=1]
+    series : np.ndarray[dtype=np.float64, ndim=1]
         Series of prices or returns.
-    :lags: int (default 21)
-        Number of lags for ma.
-    :kind_ma: str (default is 'wma')
-        Kind of moving average, eg: 'wma', 'sma' or 'ema'
+    lags : int, optional
+        Number of lags for ma, default is 21.
+    kind_ma : str {'ema', 'sma', 'wma'}, optional
+        Kind of moving average, default is 'ema'.
     
     Returns
     -------
-    :hma: np.ndarray[dtype=np.float64, ndim=1]
+    hma : np.ndarray[dtype=np.float64, ndim=1]
         Hull moving average of index or returns.
 
     Examples
@@ -206,23 +213,22 @@ def hma(series, lags=21, kind_ma='wma'):
 
 
 def macd_line(series, fast_ma=12, slow_ma=26, kind_ma='ema'):
-    """ 
-    Indicator Moving Average Convergence Divergence Line:
+    """ Indicator Moving Average Convergence Divergence Line
     
     Parameters
     ----------
-    :series: np.ndarray[dtype=np.float64, ndim=1]
+    series : np.ndarray[dtype=np.float64, ndim=1]
         Series of index or returns.
-    :fast_ma: int (default 12)
-        Number of lags for short ma.
-    :slow_ma: int (default 26)
-        Number of lags for long ma.
-    :kind_ma: str (default 'ema')
-        Kind of moving average, eg: 'sma', 'ema' or 'wma'.
+    fast_ma : int, optional
+        Number of lags for short ma, default is 12.
+    slow_ma : int, optional
+        Number of lags for long ma, default is 26.
+    kind_ma : str {'ema', 'sma', 'wma'}, optional
+        Kind of moving average, default is 'ema'.
     
     Returns
     -------
-    :macd_lin: np.ndarray[dtype=np.float64, ndim=1]
+    macd_lin : np.ndarray[dtype=np.float64, ndim=1]
         Moving avg convergence/divergence line of index or returns.
 
     Examples
@@ -246,25 +252,24 @@ def macd_line(series, fast_ma=12, slow_ma=26, kind_ma='ema'):
 
 
 def signal_line(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
-    """ 
-    Signal Line for k lags with slow and fast lenght 
+    """ Signal Line for k lags with slow and fast lenght 
     
     Parameters
     ----------
-    :series: np.ndarray[dtype=np.float64, ndim=1]
+    series : np.ndarray[dtype=np.float64, ndim=1]
         Index or returns ?
-    :lags: int (default 9)
-        Number of lags.
-    :fast_ma: int (default 12)
-        Number of lags for short ma.
-    :slow_ma: int (default 26)
-        Number of lags for long ma.
-    :kind_ma: str (default 'ema')
-        Kind of moving average, eg: 'sma', 'ema' or 'wma'.
+    lags : int, optional
+        Number of lags, default is 9.
+    fast_ma : int, optional
+        Number of lags for short ma, default is 12.
+    slow_ma : int, optional
+        Number of lags for long ma, default is 26.
+    kind_ma : str {'ema', 'sma', 'wma'}, optional
+        Kind of moving average, default is 'ema'.
     
     Returns
     -------
-    :sign_lin: np.ndarray[dtype=np.float64, ndim=1]
+    sign_lin : np.ndarray[dtype=np.float64, ndim=1]
         Signal line of index or returns.
 
     Examples
@@ -292,20 +297,20 @@ def macd_hist(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
 
     Parameters
     ----------
-    :series: np.ndarray[dtype=np.float64, ndim=1]
+    series : np.ndarray[dtype=np.float64, ndim=1]
         Series of index or returns.
-    :lags: int (default 9)
-        Number of lags.
-    :fast_ma: int (default 12)
-        Number of lags for short ma.
-    :slow_ma: int (default 26)
-        Number of lags for long ma.
-    :kind_ma: str (default 'ema')
-        Kind of moving average, eg: 'sma', 'ema' or 'wma'.
+    lags : int, optional
+        Number of lags, default is 9.
+    fast_ma : int, optional
+        Number of lags for short ma, default is 12.
+    slow_ma : int, optional
+        Number of lags for long ma, default is 26.
+    kind_ma : str {'ema', 'sma', 'wma'}, optional
+        Kind of moving average, default is 'ema'.
     
     Returns
     -------
-    :hist: np.ndarray[dtype=np.float64, ndim=1]
+    hist : np.ndarray[dtype=np.float64, ndim=1]
         Moving avg convergence/divergence histogram of index or returns.
 
     Examples
