@@ -16,38 +16,38 @@ __all__ = ['set_text_stats']
 #=============================================================================#
 
 
-def set_text_stats(
-        underly, period=252, accur=True, perf=True, vol=True, sharp=True, 
-        calma=True, underlying='Underlying', **kwpred
-    ):
+def set_text_stats(underly, period=252, accur=True, perf=True, vol=True, 
+    sharp=True, calma=True, underlying='Underlying', **kwpred):
     """ 
     Set a table as string with different indicators (accuracy, perf, vol and 
     sharpe) for underlying and several strategies. 
     
     Parameters
     ----------
-    :underly: np.ndarray[ndim=1, dtype=np.float64]
+    underly : np.ndarray[ndim=1, dtype=np.float64]
         Series of underlying prices.
-    :period: int (default 252)
-        Number of period per day.
-    :accur: bool (default is True)
-        If true compute accuracy else not.
-    :perf: bool (default is True)
-        If true compute performance else not.
-    :vol: bool (default is True)
-        If true compute volatility else not.
-    :sharp: bool (default is True)
-        If true compute sharpe ratio else not.
-    :calma: bool (default is True)
-        If true compute calmar ratio else not.
-    :underlying: str (default is 'Underlying')
-        Name of the underlying.
-    :kwpred: Any strategies or predictions that you want to compare.
+    period : int, optional
+        Number of period per day, default is 252.
+    accur : bool, optional
+        If true compute accuracy else not, default is True.
+    perf : bool, optional
+        If true compute performance else not, default is True.
+    vol : bool, optional
+        If true compute volatility else not, default is True.
+    sharp : bool, optional
+        If true compute sharpe ratio else not, default is True.
+    calma : bool, optional
+        If true compute calmar ratio else not, default is True.
+    underlying : str, optional
+        Name of the underlying, default is 'Underlying'.
+    kwpred : dict of np.ndarray
+        Any strategies or predictions that you want to compare.
 
-    Return
-    ------
-    :txt: str
+    Returns
+    -------
+    txt : str
         Table of results.
+    
     """
     txt = ''
     # Compute Accuracy
