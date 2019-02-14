@@ -34,32 +34,32 @@ def display_perf(
     
     Parameters
     ----------
-    :y_idx: np.ndarray[np.float64, ndim=1]
+    y_idx : np.ndarray[np.float64, ndim=1]
         Time series of log-returns of the underlying.
-    :y_est: np.ndarray[np.float64, ndim=1]
+    y_est : np.ndarray[np.float64, ndim=1]
         Time series of the signal's strategy.
-    :period: int
+    period : int
         Number of period per year.
-    :title: str or list of str
+    title : str or list of str
         Title of performance strategy.
-    :plot_drawdown: bool (default is True)
-        If true plot drawdowns.
-    :plot_roll_sharpe: bool (default is True)
-        If true plot rolling sharpe ratios.
-    :x_axis: list or np.asarray
+    plot_drawdown : bool
+        If true plot drawdowns, default is True.
+    plot_roll_sharpe : bool
+        If true plot rolling sharpe ratios, default is True.
+    x_axis : list or np.asarray, optional
         x-axis to plot (e.g. list of dates).
-    :underlying: str (default is 'Underlying')
-        Name of the underlying.
-    :win: int (default is 252)
-        Size of the window of rolling sharpe.
+    underlying : str, optional
+        Name of the underlying, default is 'Underlying'.
+    win : int, optional
+        Size of the window of rolling sharpe, default is 252.
 
     Returns
     -------
-    :perf_idx: np.ndarray[np.float64, ndim=1]
+    perf_idx : np.ndarray[np.float64, ndim=1]
         Time series of underlying performance.
-    :perf_est: np.ndarray[np.float64, ndim=1]
+    perf_est : np.ndarray[np.float64, ndim=1]
         Time series of raw strategy performance.
-    :perf_ivo: np.ndarray[np.float64, ndim=1]
+    perf_ivo : np.ndarray[np.float64, ndim=1]
         Time series of iso-vol strategy performance.
     """
     if x_axis is None:

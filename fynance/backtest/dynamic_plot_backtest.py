@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Built-in packages
@@ -63,7 +63,7 @@ class DynaPlotBackTest(PlotBackTest):
             names = [r'${}_{}$'.format(names, i) for i in range(N)]
         
         col = sns.color_palette(col, N)
-
+        
         # Set graphs
         l = self.ax.plot(x, y, LineWidth=lw)
 

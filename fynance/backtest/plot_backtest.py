@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Built-in packages
@@ -15,50 +15,64 @@ plt.style.use('seaborn')
 
 __all__ = ['PlotBackTest']
 
-# TODO: FINISH DOCSTRING
 
 class PlotBackTest:
     """ Plot backtest
     
-    Attribute
-    ---------
-    :fig: matplotlib.figure.Figure
+    Attributes
+    ----------
+    fig : matplotlib.figure.Figure
         Figure to display backtest.
-    :ax: matplotlib.axes
+    ax : matplotlib.axes
         Axe(s) to display a part of backtest.
     
     Methods
     -------
-    :plot: plot
+    plot(y, x=None, names=None, col='Blues', lw=1., **kwargs)
+        Plot performances.
     
     """
-    def __init__(self, fig=None, ax=None, size=(9, 6), **kwargs):
+    def __init__(self, fig=None, ax=None, size=(9, 6), dynamic=False, **kwargs):
         """ Init method sets size of training and predicting period, inital 
         value to backtest, a target filter and training parameters.
 
         Parameters
         ----------
-        :fig: matplotlib.figure.Figure
+        fig : matplotlib.figure.Figure, optional
             Figure to display backtest.
-        :ax: matplotlib.axes
+        ax : matplotlib.axes, optional
             Axe(s) to display a part of backtest.
+        size : tuple, optional
+            Size of figure, default is (9, 6)
+        dynamic : bool, optional
+            If True set on interactive plot.
+        kwargs : dict, optional
+            Axes configuration, cf matplotlib documentation [1]_. Default is
+            {'yscale': 'linear', 'xscale': 'linear', 'ylabel': '', 
+            'xlabel': '', 'title': '', 'tick_params': {}}
+
+        References
+        ----------
+        .. [1] https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes
 
         """
         
         # Set Figure
-        self._set_figure(fig, ax, size)
+        self._set_figure(fig, ax, size, dynamic=dynamic)
         
         # Set axes
         self._set_axes(**kwargs)
         
 
-    def _set_figure(self, fig, ax, size):
+    def _set_figure(self, fig, ax, size, dynamic=False):
         """ Set figure, axes and parameters for dynamic plot. """
         # Set figure and axes
         if fig is None and ax is None:
             self.fig, self.ax = plt.subplots(1, 1, size)
         else:
             self.fig, self.ax = fig, ax
+        if dynamic:
+            plt.ion()
         return self
 
 
@@ -67,11 +81,30 @@ class PlotBackTest:
 
         Parameters
         ----------
-        :y: np.ndarray[np.float64, ndim=2] with shape=(T, N)
+        y : np.ndarray[np.float64, ndim=2], with shape (`T`, `N`)
             Returns or indexes.
-        :x: np.ndarray[ndim=2] with shape=(T, 1)
+        x : np.ndarray[ndim=2], with shape (`T`, 1), optional
             x-axis, can be series of int or dates or string.
+        names : str, optional
+            Names y lines for legend.
+        col : str, optional
+            Color of palette, cf seaborn documentation [2]_. 
+            Default is 'Blues'.
+        lw : float, optional
+            Line width of lines.
+        kwargs : dict, optional
+            Parameters for `ax.legend` method, cf matplotlib documentation [3]_.
         
+        Returns
+        -------
+        pbt : PlotBackTest
+            Self object.
+
+        References
+        ----------
+        .. [2] https://seaborn.pydata.org/api.html
+        .. [3] https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes
+
         """
 
         # Set data
@@ -92,7 +125,7 @@ class PlotBackTest:
         # Set lines
         for i in range(N):
             l[i].set_color(col[i])
-            l[i].set_label(self._set_name(names[i]))
+            l[i].set_label(self._set_name(names[i], y[:, i], unit=unit))
         
         # display
         self.ax.legend(**kwargs)
@@ -101,8 +134,13 @@ class PlotBackTest:
         return self
 
 
-    def _set_name(self, name):
-        return '{}'.format(name)
+    def _set_name(self, name, y, unit='raw'):
+        if unit.lower() == 'raw':
+            return '{}: {:.2f}'.format(name, y[-1])
+        elif unit.lower() == 'perf':
+            return '{}: {:.0%}'.format(name, y[-1] / y[0] - 1)
+        else:
+            raise ValueError
 
 
     def _set_axes(self, yscale='linear', xscale='linear', ylabel='', xlabel='', title='', tick_params={}):
