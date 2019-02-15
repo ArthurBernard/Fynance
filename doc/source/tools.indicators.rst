@@ -1,8 +1,8 @@
-Indicators package
-==================
+Indicators module
+=================
 Some tools to compute financial indicators.
 
-.. currentmodule:: fynance
+.. currentmodule:: fynance.tools.indicators
 
 .. autofunction:: z_score
 

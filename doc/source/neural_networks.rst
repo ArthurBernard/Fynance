@@ -2,7 +2,7 @@ Neural Networks package
 =======================
 Several kind of rolling neural networks.
 
-.. currentmodule:: fynance
+.. currentmodule:: fynance.neural_networks
 
 .. autoclass:: RollNeuralNet
     :special-members:

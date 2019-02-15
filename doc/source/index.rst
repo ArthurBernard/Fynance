@@ -8,4 +8,4 @@ This is the documentation of `fynance` package.
 
     neural_networks
     backtest
-    indicators
+    tools

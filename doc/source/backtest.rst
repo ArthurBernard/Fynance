@@ -2,7 +2,7 @@ BackTest package
 ================
 Some tools to plot strategy's performances, rolling sharpe or drawdowns. And tools to display some metrics and statistics.
 
-.. currentmodule:: fynance
+.. currentmodule:: fynance.backtest
 
 .. autoclass:: PlotBackTest
     :members:
