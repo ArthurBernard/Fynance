@@ -5,6 +5,17 @@ from sphinx.ext.autosummary import _import_by_name
 from numpydoc.docscrape import NumpyDocString
 from numpydoc.docscrape_sphinx import SphinxDocString
 
+# Check Sphinx version
+import sphinx
+if sphinx.__version__ < "1.6":
+    raise RuntimeError("Sphinx 1.6 or newer required")
+
+needs_sphinx = '1.6'
+
+#-----------------------------------------------------------------------------#
+#                           General configuration                             #
+#-----------------------------------------------------------------------------#
+
 sys.path.insert(0, os.path.abspath('../..'))
 
 extensions = [
