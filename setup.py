@@ -51,7 +51,7 @@ if USE_CYTHON or USE_CYTHON == 'auto':
         ext = '.pyx'
         print('Using cython.')
     except ImportError:
-        if USE_CYTHON:
+        if not USE_CYTHON == 'auto':
             print("If USE_CYTHON is set to True, Cython is required to", 
                 "compile fynance. Please install Cython or don't set", 
                 "USE_CYTHON to True.")
