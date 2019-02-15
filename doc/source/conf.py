@@ -23,8 +23,8 @@ author = 'Arthur Bernard'
 
 import fynance as fy
 
-version = fy.__version__
-release = fy.__version__
+version = "1.0" #fy.__version__
+release = "1.0.4" #fy.__version__
 
 templates_path = ['_templates']
 source_suffix = '.rst'
