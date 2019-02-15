@@ -4,7 +4,7 @@
 # Set this to True to enable building extensions using Cython.
 # Set it to False to build extensions from the C file (that
 # was previously created using Cython).
-USE_CYTHON = False
+USE_CYTHON = 'auto'
 
 import sys
 from setuptools import setup, find_packages
@@ -44,17 +44,22 @@ build_requires = [
     'seaborn>=0.9.0',
 ]
 
-if USE_CYTHON:
+if USE_CYTHON or USE_CYTHON == 'auto':
     try:
         from Cython.Build import cythonize
         from Cython.Distutils import build_ext
         ext = '.pyx'
         print('Using cython.')
     except ImportError:
-        print("If USE_CYTHON is set to True, Cython is required to compile",  
-            "fynance. Please install Cython or don't set USE_CYTHON to True.")
-        ext = '.c'
-        USE_CYTHON = False
+        if USE_CYTHON:
+            print("If USE_CYTHON is set to True, Cython is required to", 
+                "compile fynance. Please install Cython or don't set", 
+                "USE_CYTHON to True.")
+            raise Error
+        else:
+            print('Not using cython.')
+            ext = '.c'
+            USE_CYTHON = False
 else:
     ext = '.c'
 
