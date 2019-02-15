@@ -21,8 +21,6 @@ project = 'fynance'
 copyright = '2018-2019, Arthur Bernard'
 author = 'Arthur Bernard'
 
-import fynance as fy
-
 version = "1.0" #fy.__version__
 release = "1.0.4" #fy.__version__
 
