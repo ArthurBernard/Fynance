@@ -18,6 +18,8 @@ from .neural_networks import *
 from . import backtest
 from .backtest import *
 
+__version__ = '1.0.4'
+
 __all__ = models.__all__
 __all__ += estimator.__all__
 __all__ += tools.__all__
