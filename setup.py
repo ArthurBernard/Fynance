@@ -50,6 +50,7 @@ if USE_CYTHON or USE_CYTHON == 'auto':
         from Cython.Distutils import build_ext
         ext = '.pyx'
         print('Using cython.')
+        USE_CYTHON = True
     except ImportError:
         if not USE_CYTHON == 'auto':
             print("If USE_CYTHON is set to True, Cython is required to", 
