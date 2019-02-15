@@ -13,11 +13,11 @@ extensions = [
     'sphinx.ext.intersphinx', 
     'sphinx.ext.coverage',
     'sphinx.ext.autosummary',
+    'sphinx.ext.mathjax',
+    'matplotlib.sphinxext.plot_directive',
 ]
 
-
-
-project = 'dccd'
+project = 'fynance'
 copyright = '2018-2019, Arthur Bernard'
 author = 'Arthur Bernard'
 version = "1.0"
