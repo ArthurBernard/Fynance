@@ -55,7 +55,7 @@ if USE_CYTHON or USE_CYTHON == 'auto':
             print("If USE_CYTHON is set to True, Cython is required to", 
                 "compile fynance. Please install Cython or don't set", 
                 "USE_CYTHON to True.")
-            raise Error
+            raise ImportError
         else:
             print('Not using cython.')
             ext = '.c'
