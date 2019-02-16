@@ -6,4 +6,4 @@ python:
           path: .
 submodules:
     include: all
-recursive: true
+    recursive: true
