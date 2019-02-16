@@ -1,7 +1,9 @@
 version: 2
-
-requirements_file: requirements.txt
-
+formats: all
 python:
-  version: 3.5
-  setup_py_install: true
+    install:
+        - method: setuptools
+          path: .
+submodules:
+    include: all
+recursive: true
