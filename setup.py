@@ -37,6 +37,7 @@ DESCRIPTION = 'Python and Cython scripts of machine learning, econometrics '
 DESCRIPTION += 'and statistical tools for financial analysis [In progress]'
 
 build_requires = [
+    'Cython>=0.29.0',
     'matplotlib>=3.0.1',
     'numpy>=1.15.3',
     'pandas>=0.23.4',
@@ -64,7 +65,7 @@ if USE_CYTHON or USE_CYTHON == 'auto':
 else:
     ext = '.c'
 
-if 'build_ext' in sys.argv[1:] or USE_CYTHON:
+if 'build_ext' in sys.argv[1:] or USE_CYTHON or USE_CYTHON == 'auto':
     cmdclass = {'build_ext': build_ext}
 else:
     cmdclass = {}
