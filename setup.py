@@ -93,7 +93,7 @@ extensions = [
     ),
 ]
 
-if USE_CYTHON:
+if USE_CYTHON or USE_CYTHON == 'auto':
     ext_modules = cythonize(extensions, annotate=True)
 else:
     ext_modules = extensions
