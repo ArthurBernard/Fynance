@@ -4,7 +4,7 @@ python:
     version: 3.5
     install:
         - requirements: requirements.txt
-        - method: setuptools
+        - method: pip
           path: .
     system_packages: true
 submodules:
