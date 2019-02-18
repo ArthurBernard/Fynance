@@ -4,9 +4,13 @@ python:
     version: 3.5
     install:
         - requirements: requirements.txt
-        - method: pip
+        - method: setuptools
           path: .
     system_packages: true
 submodules:
     include: all
     recursive: true
+sphinx:
+  builder: html
+  configuration: conf.py
+  fail_on_warning: False
