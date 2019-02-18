@@ -17,6 +17,9 @@ needs_sphinx = '1.6'
 #-----------------------------------------------------------------------------#
 
 sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('.fynance'))
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -31,6 +34,8 @@ extensions = [
 project = 'fynance'
 copyright = '2018-2019, Arthur Bernard'
 author = 'Arthur Bernard'
+
+import fynance as fy
 
 version = "1.0" #fy.__version__
 release = "1.0.4" #fy.__version__
