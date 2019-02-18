@@ -1,6 +1,6 @@
 Welcome to Fynance project
 ==========================
-This is the documentation of `fynance` package.
+This is the documentation of `fynance` package. 
 
 .. toctree::
     :maxdepth: 2
@@ -9,3 +9,4 @@ This is the documentation of `fynance` package.
     neural_networks
     backtest
     tools
+    models

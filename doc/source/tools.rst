@@ -6,3 +6,4 @@ Several financial tools as metrics, indicators, etc.
     
     tools.indicators
     tools.metrics
+    tools.momentums
