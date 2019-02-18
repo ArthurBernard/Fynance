@@ -4,6 +4,7 @@ import sys
 from sphinx.ext.autosummary import _import_by_name
 from numpydoc.docscrape import NumpyDocString
 from numpydoc.docscrape_sphinx import SphinxDocString
+import importlib
 
 # Check Sphinx version
 import sphinx
@@ -19,7 +20,7 @@ needs_sphinx = '1.6'
 sys.path.insert(0, os.path.abspath('../../'))
 sys.path.insert(0, os.path.abspath('./'))
 sys.path.insert(0, os.path.abspath('../'))
-sys.path.insert(0, os.path.abspath('./fynance/'))
+sys.path.insert(0, os.path.abspath('./fynance/models/'))
 
 extensions = [
     'sphinx.ext.autodoc',
