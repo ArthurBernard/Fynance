@@ -6,4 +6,4 @@ include setup.py
 recursive-include fynance *
 # Exclude what we don't want to include
 prune */__pycache__
-global-exclude *.pyc *.html *.so
+global-exclude *.pyc *.html
