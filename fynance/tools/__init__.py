@@ -3,7 +3,10 @@
 
 """
 
-Some financial, statistic and econometric tools
+Some financial, statistic and econometric tools.
+
+.. automodule:: fynance.tools
+   :members:
 
 """
 from . import metrics_cy
