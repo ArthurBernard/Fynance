@@ -7,6 +7,6 @@ python:
         - method: setuptools
           path: .
     system_packages: true
-ubmodules:
+submodules:
     include: all
     recursive: true
