@@ -58,6 +58,10 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
     plot_perf(self, f, ax)
         Plot perfomances.
 
+    See Also
+    --------
+    RollNeuralNet, RollMultiNeuralNet, RollMultiRollNeuralNet
+
     """
     def __init__(self, *args, agg_fun='mean', **kwargs):
         RollMultiNeuralNet.__init__(self, *args, **kwargs)

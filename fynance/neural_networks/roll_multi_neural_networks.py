@@ -52,6 +52,10 @@ class RollMultiNeuralNet(RollNeuralNet):
     plot_perf(self, f, ax)
         Plot perfomances.
 
+    See Also
+    --------
+    RollNeuralNet, RollAggrMultiNeuralNet, RollMultiRollNeuralNet
+
     """
     def __call__(self, y, X, NN, start=0, end=1e8, x_axis=None):
         """ Callable method to set terget and features data, neural network 

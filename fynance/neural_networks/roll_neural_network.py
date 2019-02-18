@@ -50,6 +50,10 @@ class RollNeuralNet:
     Plot_perf(self, f, ax)
         Plot perfomances.
 
+    See Also
+    --------
+    RollMultiNeuralNet, RollAggrMultiNeuralNet, RollMultiRollNeuralNet
+
     """
     def __init__(self, train_period=252, estim_period=63, value_init=100, 
         target_filter='sign', params=None):

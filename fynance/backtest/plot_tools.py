@@ -61,6 +61,11 @@ def display_perf(
         Time series of raw strategy performance.
     perf_ivo : np.ndarray[np.float64, ndim=1]
         Time series of iso-vol strategy performance.
+
+    See Also
+    --------
+    PlotBackTest, set_text_stats
+    
     """
     if x_axis is None:
         x_axis=range(y_idx.size)

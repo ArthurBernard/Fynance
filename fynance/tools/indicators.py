@@ -48,6 +48,10 @@ def z_score(series, kind_ma='ema', **kwargs):
     >>> z_score(series, kind_ma='sma', lags=3)
     array([ 0.        ,  1.        , -0.26726124,  1.22474487,  1.22474487,
            -1.22474487])
+    
+    See Also
+    --------
+    rsi, bollinger_band, hma, macd_hist
 
     """
     if kind_ma.lower() == 'wma':
@@ -101,6 +105,10 @@ def rsi(series, kind_ma='ema', lags=21, alpha=None):
     >>> rsi(series, lags=3)
     array([ 0.        , 99.99999804, 69.59769254, 85.55610891, 91.72201613,
            30.00294321])
+
+    See Also
+    --------
+    z_score, bollinger_band, hma, macd_hist
 
     """
     series = series.flatten()
@@ -157,6 +165,10 @@ def bollinger_band(series, lags=21, n_std=2, kind_ma='sma'):
     (array([ 60.,  80.,  80., 100., 120., 120.]), array([ 0.        , 40.        , 32.65986324, 32.65986324, 65.31972647,
            65.31972647]))
 
+    See Also
+    --------
+    z_score, rsi, hma, macd_hist
+
     """
     if kind_ma.lower() == 'sma':
         ma = sma(series, lags=lags)
@@ -199,6 +211,10 @@ def hma(series, lags=21, kind_ma='wma'):
     array([ 60.        , 113.33333333,  76.66666667, 136.66666667,
            186.66666667,  46.66666667])
 
+    See Also
+    --------
+    z_score, bollinger_band, rsi, macd_hist
+
     """
     if kind_ma.lower() == 'ema':
         f = ema
@@ -237,6 +253,10 @@ def macd_line(series, fast_ma=12, slow_ma=26, kind_ma='ema'):
     >>> macd_line(series, fast_ma=2, slow_ma=4)
     array([ 0.        , 10.66666722,  4.62222282, 12.84740842, 21.73313755,
            -3.61855386])
+
+    See Also
+    --------
+    z_score, bollinger_band, hma, macd_hist, signal_line
 
     """
     if kind_ma.lower() == 'wma':
@@ -279,6 +299,10 @@ def signal_line(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
     array([ 0.        ,  5.33333361,  4.97777822,  8.91259332, 15.32286544,
             5.85215579])
 
+    See Also
+    --------
+    z_score, bollinger_band, hma, macd_hist, macd_line
+
     """
     macd_lin = macd_line(series, fast_ma=fast_ma, slow_ma=slow_ma)
     if kind_ma.lower() == 'wma':
@@ -319,6 +343,10 @@ def macd_hist(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
     >>> macd_hist(series, lags=3, fast_ma=2, slow_ma=4)
     array([ 0.        ,  5.33333361, -0.35555539,  3.9348151 ,  6.41027212,
            -9.47070965])
+
+    See Also
+    --------
+    z_score, bollinger_band, hma, macd_line, signal_line
 
     """
     macd_lin = macd_line(

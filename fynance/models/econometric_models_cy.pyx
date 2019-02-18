@@ -71,25 +71,26 @@ cpdef np.ndarray[np.float64_t, ndim=1] MA_cy(
         np.ndarray[np.float64_t, ndim=1] theta,
         np.float64_t c, int q
     ):
-    """ 
-    Moving Average model of order q s.t: 
+    """ Moving Average model of order q s.t: 
+    
     y_t = c + theta_1 * u_t-1 + ... + theta_q * u_t-q + u_t 
     
     Parameters
     ----------
-    y: np.ndarray[np.float64, ndim=1]
+    y : np.ndarray[np.float64, ndim=1]
         Time series.
     theta: np.ndarray[np.float64, ndim=1]
         Coefficients of model.
-    c: np.float64
+    c : np.float64
         Constant of the model.
-    q: int
+    q : int
         Order of MA(q) model.
         
     Returns
     -------
-    u: np.ndarray[ndim=1, dtype=np.float64]
+    u : np.ndarray[ndim=1, dtype=np.float64]
         Residual of the model.
+    
     """
     cdef np.float64_t s
     cdef int i, t, T = y.size
@@ -111,30 +112,31 @@ cpdef np.ndarray[np.float64_t, ndim=1] ARMA_cy(
         np.ndarray[np.float64_t, ndim=1] theta,
         np.float64_t c, int p, int q
     ):
-    """
-    AutoRegressive Moving Average model of order q and p s.t: 
+    """ AutoRegressive Moving Average model of order q and p s.t: 
+
     y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + theta_1 * u_t-1 + ...
           + theta_q * u_t-q + u_t
     
     Parameters
     ----------
-    y: np.ndarray[np.float64, ndim=1]
+    y : np.ndarray[np.float64, ndim=1]
         Time series.
-    phi: np.ndarray[np.float64, ndim=1]
+    phi : np.ndarray[np.float64, ndim=1]
         Coefficients of AR model.
-    theta: np.ndarray[np.float64, ndim=1]
+    theta : np.ndarray[np.float64, ndim=1]
         Coefficients of MA model.
-    c: np.float64
+    c : np.float64
         Constant of the model.
-    p: int
+    p : int
         Order of AR(p) model.
-    q: int
+    q : int
         Order of MA(q) model.
 
     Returns
     -------
-    u: np.ndarray[np.float64, ndim=1]
+    u : np.ndarray[np.float64, ndim=1]
         Residual of the model.
+    
     """
     cdef np.float64_t s
     cdef int i, j, t, T = np.size(y)
@@ -162,46 +164,48 @@ cpdef tuple ARMA_GARCH_cy(
         np.float64_t c, np.float64_t omega,
         int p, int q, int Q, int P
     ):
-    """ 
-    AutoRegressive Moving Average model of order q and p, such that: 
+    """ AutoRegressive Moving Average model of order q and p, such that: 
+    
     y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + theta_1 * u_t-1 + ...
           + theta_q * u_t-q + u_t
     
     With Generalized AutoRegressive Conditional Heteroskedasticity volatility
     model of order Q and P, such that:
+    
     u_t = z_t * h_t 
     h_t^2 = omega + alpha_1 * u^2_t-1 + ... + alpha_Q * u^2_t-Q 
             + beta_1 * h^2_t-1 + ... + beta_P * h^2_t-P
     
     Parameters
     ----------
-    y: np.ndarray[np.float64, ndim=1]
+    y : np.ndarray[np.float64, ndim=1]
         Time series.
-    phi: np.ndarray[np.float64, ndim=1]
+    phi : np.ndarray[np.float64, ndim=1]
         Coefficients of AR model.
-    theta: np.ndarray[np.float64, ndim=1]
+    theta : np.ndarray[np.float64, ndim=1]
         Coefficients of MA model.
-    alpha: np.ndarray[np.float64, ndim=1]
+    alpha : np.ndarray[np.float64, ndim=1]
         Coefficients of MA part of GARCH.
-    beta: np.ndarray[np.float64, ndim=1]
+    beta : np.ndarray[np.float64, ndim=1]
         Coefficients of AR part of GARCH.
-    c: np.float64
+    c : np.float64
         Constant of the model.
-    p: int
+    p : int
         Order of AR(p) model.
-    q: int
+    q : int
         Order of MA(q) model.
-    Q: int
+    Q : int
         Order of MA part of GARCH.
-    P: int
+    P : int
         Order of AR part of GARCH.
 
     Returns
     -------
-    u: np.ndarray[np.float64, ndim=1]
+    u : np.ndarray[np.float64, ndim=1]
         Residual of the model. 
-    h: np.ndarray[np.float64, ndim=1]
+    h : np.ndarray[np.float64, ndim=1]
         Conditional volatility of the model. 
+    
     """
     cdef np.float64_t arma, arch
     cdef int i, j, t, T = np.size(y)
@@ -240,50 +244,52 @@ cpdef tuple ARMAX_GARCH_cy(
         np.float64_t c, np.float64_t omega,
         int p, int q, int Q, int P
     ):
-    """ 
-    AutoRegressive Moving Average model of order q and p, such that: 
+    """ AutoRegressive Moving Average model of order q and p, such that: 
+    
     y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + psi_t * x_t 
           + theta_1 * u_t-1 + ... + theta_q * u_t-q + u_t
     
     With Generalized AutoRegressive Conditional Heteroskedasticity volatility
     model of order Q and P, such that:
+    
     u_t = z_t * h_t 
     h_t^2 = omega + alpha_1 * u^2_t-1 + ... + alpha_Q * u^2_t-Q 
             + beta_1 * h^2_t-1 + ... + beta_P * h^2_t-P
     
     Parameters
     ----------
-    y: np.ndarray[np.float64, ndim=1]
+    y : np.ndarray[np.float64, ndim=1]
         Time series.
-    x: np.ndarray[np.float64, ndim=2]
+    x : np.ndarray[np.float64, ndim=2]
         Time series of external features.
-    phi: np.ndarray[np.float64, ndim=1]
+    phi : np.ndarray[np.float64, ndim=1]
         Coefficients of AR model.
-    psi: np.ndarray[np.float64, ndim=1]
+    psi : np.ndarray[np.float64, ndim=1]
         Coefficients of external features.
-    theta: np.ndarray[np.float64, ndim=1]
+    theta : np.ndarray[np.float64, ndim=1]
         Coefficients of MA model.
-    alpha: np.ndarray[np.float64, ndim=1]
+    alpha : np.ndarray[np.float64, ndim=1]
         Coefficients of MA part of GARCH.
-    beta: np.ndarray[np.float64, ndim=1]
+    beta : np.ndarray[np.float64, ndim=1]
         Coefficients of AR part of GARCH.
-    c: np.float64
+    c : np.float64
         Constant of the model.
-    p: int
+    p : int
         Order of AR(p) model.
-    q: int
+    q : int
         Order of MA(q) model.
-    Q: int
+    Q : int
         Order of MA part of GARCH.
-    P: int
+    P : int
         Order of AR part of GARCH.
 
     Returns
     -------
-    u: np.ndarray[np.float64, ndim=1]
+    u : np.ndarray[np.float64, ndim=1]
         Residual of the model. 
-    h: np.ndarray[np.float64, ndim=1]
+    h : np.ndarray[np.float64, ndim=1]
         Conditional volatility of the model. 
+    
     """
     cdef np.float64_t armax, arch
     cdef int i, j, t, T = np.size(y)

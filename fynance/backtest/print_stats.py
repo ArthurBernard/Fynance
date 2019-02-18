@@ -48,6 +48,10 @@ def set_text_stats(underly, period=252, accur=True, perf=True, vol=True,
     txt : str
         Table of results.
     
+    See Also
+    --------
+    PlotBackTest, display_perf
+    
     """
     txt = ''
     # Compute Accuracy

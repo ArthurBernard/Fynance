@@ -9,6 +9,8 @@ from fynance.tools.momentums_cy import smstd_cy
 # TODO:
 # - Append window size on rolling calmar
 # - Append window size on rolling MDD
+# - Append performance 
+# - Append rolling performance
 
 
 __all__ = [
@@ -23,19 +25,18 @@ __all__ = [
 
 
 def drawdown(series):
-    """
-    Function to compute measure of the decline from a historical peak in some 
-    variable [1]_ (typically the cumulative profit or total open equity of a 
-    financial trading strategy). 
+    """ Function to compute measure of the decline from a historical peak in 
+    some variable [1]_ (typically the cumulative profit or total open equity 
+    of a financial trading strategy). 
     
     Parameters
     ----------
-    :series: np.ndarray[np.float64, ndim=1]
+    series : np.ndarray[np.float64, ndim=1]
         Time series (price, performance or index).
 
     Returns
     -------
-    :out: np.ndarray[np.float64, ndim=1]
+    np.ndarray[np.float64, ndim=1]
         Series of DrawDown.
 
     References
@@ -48,30 +49,33 @@ def drawdown(series):
     >>> drawdown(series)
     array([0. , 0. , 0.2, 0. , 0. , 0.5])
 
+    See Also
+    --------
+    mdd, calmar, sharpe, roll_mdd
+
     """
     series = np.asarray(series, dtype=np.float64).flatten()
     return drawdown_cy(series)
 
 
 def mdd(series):
-    """
-    Function to compute the maximum drwdown where drawdown is the measure of 
-    the decline from a historical peak in some variable [1]_ (typically the 
+    """ Function to compute the maximum drwdown where drawdown is the measure 
+    of the decline from a historical peak in some variable [2]_ (typically the 
     cumulative profit or total open equity of a financial trading strategy). 
     
     Parameters
     ----------
-    :series: np.ndarray[np.float64, ndim=1]
+    series : np.ndarray[np.float64, ndim=1]
         Time series (price, performance or index).
 
     Returns
     -------
-    :out: np.float64
+    np.float64
         Scalar of Maximum DrawDown.
 
     References
     ----------
-    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
+    .. [2] https://en.wikipedia.org/wiki/Drawdown_(economics)
     
     Examples
     --------
@@ -79,28 +83,29 @@ def mdd(series):
     >>> mdd(series)
     0.5
 
+    See Also
+    --------
+    drawdown, calmar, sharpe, roll_mdd
+
     """
     series = np.asarray(series, dtype=np.float64).flatten()
     return mdd_cy(series)
 
 
 def calmar(series, period=252):
-    """
-    Function to compute the compouned annual return over the Maximum DrawDown, 
-    known as the Calmar ratio.
+    """ Function to compute the compouned annual return over the Maximum 
+    DrawDown, known as the Calmar ratio.
     
     Parameters
     ----------
-    :series: np.ndarray[np.float64, ndim=1]
+    series : np.ndarray[np.float64, ndim=1]
         Time series (price, performance or index).
-    :period: int (default 252)
-        Number of period per year.
-    :log: bool (default False)
-        If true compute sharpe with the formula for log-returns
+    period : int, optional
+        Number of period per year, default is 252 (trading days).
 
     Returns
     -------
-    :out: np.float64
+    np.float64
         Scalar of Calmar ratio.
 
     Examples
@@ -111,28 +116,32 @@ def calmar(series, period=252):
     >>> calmar(series, period=12)
     0.6122448979591835
 
+    See Also
+    --------
+    mdd, drawdown, sharpe, roll_calmar
+
     """
     series = np.asarray(series, dtype=np.float64).flatten()
     return calmar_cy(series, period=float(period))
 
 
 def sharpe(series, period=252, log=False):
-    """ 
-    Function to compute the total return over the volatility, known as the 
+    """ Function to compute the total return over the volatility, known as the 
     Sharpe ratio.
     
     Parameters
     ----------
-    :series: numpy.ndarray(dim=1, dtype=float)
+    series : numpy.ndarray(dim=1, dtype=float)
         Prices of the index.
-    :period: int (default: 252)
-        Number of period per year.
-    :log: bool (default False)
-        If true compute sharpe with the formula for log-returns
+    period : int, optional
+        Number of period per year, default is 252 (trading days).
+    log : bool, optional
+        If true compute sharpe with the formula for log-returns, default 
+        is False.
 
     Returns
     -------
-    :out: np.float64
+    np.float64
         Scalar of Sharpe ratio.
 
     Examples
@@ -143,11 +152,25 @@ def sharpe(series, period=252, log=False):
     >>> sharpe(series, period=12)
     0.22494843872918127
     
+    See Also
+    --------
+    mdd, calmar, drawdown, roll_sharpe
+
     """
     series = np.asarray(series, dtype=np.float64).flatten()
     if log:
         return log_sharpe_cy(series, period=float(period))
     return sharpe_cy(series, period=float(period))
+
+# TODO : perf metric and rolling perf metric
+def perf(series, signals=None, exp=False):
+    if signals is None:
+        signals = np.ones(series.shape[0])
+    if exp:
+        f = np.exp
+    else:
+        f = lambda x: x
+    np.cumsum(series * signals) 
 
 
 #=============================================================================#
@@ -156,28 +179,27 @@ def sharpe(series, period=252, log=False):
 
 
 def roll_mdd(series):
-    """
-    Function to compute the rolling maximum drwdown where drawdown is the 
-    measure of the decline from a historical peak in some variable [1]_ 
+    """ Function to compute the rolling maximum drwdown where drawdown is the 
+    measure of the decline from a historical peak in some variable [3]_ 
     (typically the cumulative profit or total open equity of a financial 
     trading strategy).
     
     Parameters
     ----------
-    :series: np.ndarray[np.float64, ndim=1]
+    series : np.ndarray[np.float64, ndim=1]
         Time series (price, performance or index).
-    :win: int (default 0) /! NOT YET WORKING /!
-        Size of the rolling window. If less of two, 
-        rolling Max DrawDown is compute on all the past.
+    win : int, optional /! NOT YET WORKING /!
+        Size of the rolling window. If less of two, rolling Max DrawDown is 
+        compute on all the past. Default is 0.
 
     Returns
     -------
-    :out: np.ndrray[np.float64, ndim=1]
+    np.ndrray[np.float64, ndim=1]
         Series of rolling Maximum DrawDown.
 
     References
     ----------
-    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
+    .. [3] https://en.wikipedia.org/wiki/Drawdown_(economics)
 
     Examples
     --------
@@ -185,29 +207,32 @@ def roll_mdd(series):
     >>> roll_mdd(series)
     array([0. , 0. , 0.2, 0.2, 0.2, 0.5])
     
+    See Also
+    --------
+    mdd, roll_calmar, roll_sharpe, drawdown
+
     """
     series = np.asarray(series, dtype=np.float64).flatten()
     return roll_mdd_cy(series)
 
 
 def roll_calmar(series, period=252.):
-    """
-    Function to compute the rolling compouned annual return over the rolling 
-    Maximum DrawDown, that give the rolling Calmar ratio.
+    """ Function to compute the rolling compouned annual return over the 
+    rolling Maximum DrawDown, that give the rolling Calmar ratio.
     
     Parameters
     ----------
-    :series: np.ndarray[np.float64, ndim=1]
+    series : np.ndarray[np.float64, ndim=1]
         Time series (price, performance or index).
-    :period: int (default 252)
-        Number of period per year.
-    :win: int (default 0) /! NOT YET WORKING /!
-        Size of the rolling window. If less of two, 
-        rolling calmar is compute on all the past.
+    period : int, optional
+        Number of period per year, default is 252 (trading days).
+    win : int, optional /! NOT YET WORKING /!
+        Size of the rolling window. If less of two, rolling calmar is 
+        compute on all the past. Default is 0.
 
     Returns
     -------
-    :out: np.ndarray[np.float64, ndim=1]
+    np.ndarray[np.float64, ndim=1]
         Series of rolling Calmar ratio.
     
     Examples
@@ -218,6 +243,10 @@ def roll_calmar(series, period=252.):
     >>> roll_calmar(series, period=12)
     array([ 0.        ,  0.        ,  3.52977926, 20.18950437, 31.35989887,
             0.6122449 ])
+
+    See Also
+    --------
+    roll_mdd, roll_sharpe, calmar
 
     """
     # Set variables
@@ -240,78 +269,27 @@ def roll_calmar(series, period=252.):
 
     return roll_cal
 
-def roll_sharpe_NOT(series, period=252, win=0):
-    """
-    /! WRONG FORMULA /!
-    roll_sharpe(series, period=252, win=0)
-    
-    Vectorized rolling sharpe 
-    Parameters
-    ----------
-    series: np.ndarray[dtype=np.float64, ndim=1]
-        Financial series of prices or indexed values.
-    period: int (default 252)
-        Number of period in a year.
-    win: int (default 0)
-        Size of the rolling window. If less of two, 
-    rolling sharpe is compute on all the past.
-    
-    Returns
-    -------
-    rolling_sharpe: np.ndarray[np.float64, ndim=1]
-    """
-    
-    if win < 2:
-        return sharpe_cy(
-            np.asarray(series, dtype=np.float64).flatten(), 
-            period=float(period)
-        )
-    
-    # Set variables
-    T = series.size
-    t = np.arange(1, T + 1)
-    ret_vect = np.zeros([T])
-    ret_vect[1: ] = series[1: ] / series[: -1] - 1
-
-    # Compute rolling cumulative returns
-    ret_cum = series / series[0] 
-    ret_cum[win: ] = series[win: ] / series[: -win]
-    
-    # Compute rolling mean
-    ret_mean = np.cumsum(ret_vect) / t
-    ret_mean[win: ] = (ret_mean[win: ] * t[win: ] - ret_mean[: -win] * t[: -win]) / win
-    
-    # Compute rolling volatility
-    ret_vol = np.cumsum(np.square(ret_vect - ret_mean)) / t
-    ret_vol[win: ] = (ret_vol[win: ] * t[win: ] - ret_vol[: -win] * t[: -win]) / win
-    ret_vol[ret_vol == 0] = 1e-8
-    
-    # Compute rolling sharpe
-    t[win: ] = win
-    
-    return (np.float_power(ret_cum, period / t) - 1.) / np.sqrt(period * ret_vol)
-
 
 def roll_sharpe(series, period=252, win=0, cap=True):
-    """
-    Vectorized function to compute rolling sharpe (compouned annual returns 
-    divided by annual volatility).
+    """ Vectorized function to compute rolling sharpe (compouned annual 
+    returns divided by annual volatility).
     
     Parameters
     ----------
-    :series: np.ndarray[dtype=np.float64, ndim=1]
+    series : np.ndarray[dtype=np.float64, ndim=1]
         Financial series of prices or indexed values.
-    :period: int (default 252)
-        Number of period in a year.
-    :win: int (default 0)
-        Size of the rolling window. If less of two, 
-        rolling sharpe is compute on all the past.
-    :cap: bool (default True)
-        Cap extram values (some time due to small size window).
+    period : int, optional
+        Number of period in a year, default is 252 (trading days).
+    win : int, optional
+        Size of the rolling window. If less of two, rolling sharpe is 
+        compute on all the past. Default is 0.
+    cap : bool, optional
+        Cap extram values (some time due to small size window), default 
+        is True.
     
     Returns
     -------
-    :out: np.ndarray[np.float64, ndim=1]
+    np.ndarray[np.float64, ndim=1]
         Serires of rolling Sharpe ratio.
     
     Examples
@@ -322,6 +300,10 @@ def roll_sharpe(series, period=252, win=0, cap=True):
     >>> roll_sharpe(series, period=12)
     array([0.        , 0.        , 0.77721579, 3.99243019, 6.754557  ,
            0.24475518])
+
+    See Also
+    --------
+    roll_calmar, sharpe, roll_mdd
 
     """
     
@@ -363,21 +345,22 @@ def roll_sharpe(series, period=252, win=0, cap=True):
 
 
 def accuracy(y_true, y_pred, sign=True):
-    """ 
-    Compute the accuracy of prediction. 
+    """ Compute the accuracy of prediction. 
     
     Parameters
     ----------
-    :y_true: np.ndarray[ndim=1, dtype=np.float64]
+    y_true : np.ndarray[ndim=1, dtype=np.float64]
         Vector of true series.
-    :y_pred: np.ndarray[ndim=1, dtype=np.float64]
+    y_pred : np.ndarray[ndim=1, dtype=np.float64]
         Vector of predicted series.
-    :sign: bool
-        Check sign accuracy if true, else check exact accuracy.
+    sign : bool, optional
+        Check sign accuracy if true, else check exact accuracy, default 
+        is True.
     
     Returns
     -------
-    Accuracy of prediction as float between 0 and 1.
+    float
+        Accuracy of prediction as float between 0 and 1.
     
     Examples
     --------
@@ -387,6 +370,10 @@ def accuracy(y_true, y_pred, sign=True):
     0.8
     >>> accuracy(y_true, y_pred, sign=False)
     0.2
+
+    See Also
+    --------
+    mdd, calmar, sharpe, drawdown
 
     """
     if sign:

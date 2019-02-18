@@ -10,25 +10,28 @@ __all__ = [
     'sma', 'wma', 'ema', 'smstd', 'wmstd', 'emstd',
 ]
 
+# TODO : - Momentums of order 3
+#        - Momentums of order 4
+#        - Momentums of order k
+
 #=============================================================================#
 #                               Moving Averages                               #
 #=============================================================================#
 
 
 def sma(series, lags=21):
-    """ 
-    Simple moving average along k lags. 
+    """ Simple moving average along k lags. 
 
     Parameters
     ----------
-    :series: np.ndarray[dtype=np.float64, ndim=1]
+    series : np.ndarray[dtype=np.float64, ndim=1]
         Index or returns.
-    :lags: int (default 21)
-        Number of lags for ma.
+    lags : int, optional
+        Number of lags for ma, default is 21.
     
     Returns
     -------
-    :ma: np.ndarray[dtype=np.float64, ndim=1]
+    np.ndarray[dtype=np.float64, ndim=1]
         Moving average of series.
 
     Examples
@@ -37,24 +40,27 @@ def sma(series, lags=21):
     >>> sma(series, lags=3)
     array([ 60.,  80.,  80., 100., 120., 120.])
 
+    See Also
+    --------
+    wma, ema
+
     """
     return sma_cy(series.flatten().astype(np.float64), lags=int(lags))
 
 
 def wma(series, lags=21):
-    """ 
-    Weighted moving average along k lags. 
+    """ Weighted moving average along k lags. 
 
     Parameters
     ----------
-    :series: np.ndarray[dtype=np.float64, ndim=1]
+    series : np.ndarray[dtype=np.float64, ndim=1]
         Index or returns.
-    :lags: int (default 21)
-        Number of lags for ma.
+    lags : int, optional
+        Number of lags for ma, default is 21.
     
     Returns
     -------
-    :ma: np.ndarray[dtype=np.float64, ndim=1]
+    np.ndarray[dtype=np.float64, ndim=1]
         Moving average of series.
 
     Examples
@@ -64,26 +70,29 @@ def wma(series, lags=21):
     array([ 60.        ,  86.66666667,  83.33333333, 103.33333333,
            133.33333333, 113.33333333])
 
+    See Also
+    --------
+    sma, ema
+
     """
     return wma_cy(series.flatten().astype(np.float64), lags=int(lags))
 
 
 def ema(series, alpha=0.94, lags=None):
-    """ 
-    Exponential moving average along k lags. 
+    """ Exponential moving average along k lags. 
 
     Parameters
     ----------
-    :series: np.ndarray[dtype=np.float64, ndim=1]
-        Index or returns ?
-    :alpha: float (default 0.94)
-        Multiplier, 0.94 corresponding at 20 (or 30 ?) lags memory.
-    :lags: int (default is None)
-        Number of days. If not None => alpha = 1 - 2 / (1 + lags)
+    series : np.ndarray[dtype=np.float64, ndim=1]
+        Index or returns.
+    alpha : float, optional
+        Multiplier, default is 0.94 corresponding at 20 lags memory.
+    lags : int, optional
+        Number of days. 
     
     Returns
     -------
-    :ma: np.ndarray[dtype=np.float64, ndim=1]
+    np.ndarray[dtype=np.float64, ndim=1]
         Moving average of series.
 
     Examples
@@ -93,6 +102,14 @@ def ema(series, alpha=0.94, lags=None):
     array([ 60.,  80.,  80., 100., 130., 105.])
     >>> ema(series, alpha=0.5)
     array([ 60.,  80.,  80., 100., 130., 105.])
+
+    Notes
+    -----
+    If `lags` is specified :math:`alpha = 1 - \\frac{2}{1 + lags}`
+
+    See Also
+    --------
+    sma, wma
 
     """
     if lags is not None:
@@ -106,19 +123,18 @@ def ema(series, alpha=0.94, lags=None):
 
 
 def smstd(series, lags=21):
-    """
-    Simple moving standard deviation along k lags.
+    """ Simple moving standard deviation along k lags.
 
     Parameters
     ----------
-    :series: np.ndarray[dtype=np.float64, ndim=1]
+    series : np.ndarray[dtype=np.float64, ndim=1]
         Index or returns.
-    :lags: int (default 21)
-        Number of lags for ma.
+    lags : int, optional
+        Number of lags for ma, default is 21.
     
     Returns
     -------
-    :std: np.ndarray[dtype=np.float64, ndim=1]
+    np.ndarray[dtype=np.float64, ndim=1]
         Moving standard deviation of series.
 
     Examples
@@ -128,26 +144,27 @@ def smstd(series, lags=21):
     array([ 0.        , 20.        , 16.32993162, 16.32993162, 32.65986324,
            32.65986324])
 
+    See Also
+    --------
+    wmstd, emstd
+
     """
     return smstd_cy(series.flatten().astype(np.float64), lags=int(lags))
 
 
 def wmstd(series, lags=21):
-    """ 
-    Weighted moving standard deviation along k lags. 
+    """ Weighted moving standard deviation along k lags. 
 
     Parameters
     ----------
-    :series: np.ndarray[dtype=np.float64, ndim=1]
+    series : np.ndarray[dtype=np.float64, ndim=1]
         Series of prices, index or returns.
-    :alpha: float (default 0.94)
-        Multiplier, 0.94 corresponding at 20 (or 30 ?) lags memory.
-    :lags: int (default is None)
-        Number of days. If not None => alpha = 1 - 2 / (1 + lags)
+    lags : int, optional
+        Number of days, default is 21.
     
     Returns
     -------
-    :std: np.ndarray[dtype=np.float64, ndim=1]
+    np.ndarray[dtype=np.float64, ndim=1]
         Moving standard deviation of series.
 
     Examples
@@ -157,6 +174,9 @@ def wmstd(series, lags=21):
     array([ 0.        , 18.85618083, 13.74368542, 17.95054936, 29.8142397 ,
            35.90109871])
 
+    See Also
+    --------
+    smstd, emstd
 
     """
     return wmstd_cy(series.flatten().astype(np.float64), lags=int(lags))
@@ -168,16 +188,16 @@ def emstd(series, alpha=0.94, lags=None):
 
     Parameters
     ----------
-    :series: np.ndarray[dtype=np.float64, ndim=1]
-        Index or returns ?
-    :alpha: float (default 0.94)
-        Multiplier, 0.94 corresponding at 20 (or 30 ?) lags memory.
-    :lags: int (default is None)
-        Number of days. If not None => alpha = 1 - 2 / (1 + lags)
+    series : np.ndarray[dtype=np.float64, ndim=1]
+        Index or returns.
+    alpha : float, optional
+        Multiplier, default is 0.94 corresponding at 20 lags memory.
+    lags : int, optional
+        Number of days.
     
     Returns
     -------
-    :std: np.ndarray[dtype=np.float64, ndim=1]
+    np.ndarray[dtype=np.float64, ndim=1]
         Moving standard deviation of series.
 
     Examples
@@ -186,6 +206,14 @@ def emstd(series, alpha=0.94, lags=None):
     >>> emstd(series, lags=3)
     array([ 0.        , 28.28427125, 20.        , 31.6227766 , 47.95831523,
            48.98979486])
+
+    Notes
+    -----
+    If `lags` is specified :math:`alpha = 1 - \\frac{2}{1 + lags}`
+
+    See Also
+    --------
+    smstd, wmstd
 
     """
     if lags is not None:

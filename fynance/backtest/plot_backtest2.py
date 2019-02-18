@@ -13,11 +13,11 @@ import seaborn as sns
 # Set plot style
 plt.style.use('seaborn')
 
-__all__ = ['PlotBackTest']
+__all__ = ['PlotPerf', 'PlotLoss']
 
 
-class PlotBackTest:
-    """ Plot backtest
+class _PlotBase:
+    """ Base class for plot backtest.
     
     Attributes
     ----------
@@ -28,12 +28,7 @@ class PlotBackTest:
     
     Methods
     -------
-    plot(y, x=None, names=None, col='Blues', lw=1., **kwargs)
-        Plot performances.
-
-    See Also
-    --------
-    display_perf, set_text_stats
+    plot : Plot performance.
     
     """
     def __init__(self, fig=None, ax=None, size=(9, 6), dynamic=False, **kwargs):
@@ -80,7 +75,7 @@ class PlotBackTest:
         return self
 
 
-    def plot(self, y, x=None, names=None, col='Blues', lw=1., **kwargs):
+    def _plot(self, y, x=None, names=None, col='Blues', lw=1., **kwargs):
         """ Plot performances
 
         Parameters
@@ -92,12 +87,12 @@ class PlotBackTest:
         names : str, optional
             Names y lines for legend.
         col : str, optional
-            Color of palette, cf seaborn documentation [2]_. 
+            Color of palette, cf seaborn documentation [1]_. 
             Default is 'Blues'.
         lw : float, optional
             Line width of lines.
         kwargs : dict, optional
-            Parameters for `ax.legend` method, cf matplotlib documentation [3]_.
+            Parameters for `ax.legend` method, cf matplotlib documentation [2]_.
         
         Returns
         -------
@@ -106,8 +101,8 @@ class PlotBackTest:
 
         References
         ----------
-        .. [2] https://seaborn.pydata.org/api.html
-        .. [3] https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes
+        .. [1] https://seaborn.pydata.org/api.html
+        .. [2] https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes
 
         """
 
@@ -138,15 +133,6 @@ class PlotBackTest:
         return self
 
 
-    def _set_name(self, name, y, unit='raw'):
-        if unit.lower() == 'raw':
-            return '{}: {:.2f}'.format(name, y[-1])
-        elif unit.lower() == 'perf':
-            return '{}: {:.0%}'.format(name, y[-1] / y[0] - 1)
-        else:
-            raise ValueError
-
-
     def _set_axes(self, yscale='linear', xscale='linear', ylabel='', xlabel='', title='', tick_params={}):
         """ Set axes parameters """
         self.ax.clear()
@@ -157,3 +143,28 @@ class PlotBackTest:
         self.ax.set_title(title)
         self.ax.tick_params(**tick_params)
         return self
+
+
+class PlotPerf(_PlotBase):
+    """ """
+    def _set_name(self, name, y):
+        """ Set name of perf plot """
+        return 'Perf {}: {:.0%}'.format(name, y[-1] / y[0] - 1)
+
+    def plot(self,):
+        """ """
+        y_label = 'Perf'
+        title = 'Model performance'
+
+
+class PlotLoss(_PlotBase):
+    """ """
+    def _set_name(self, name, y):
+        """ Set name of loss plot """
+        return 'Loss {}: {:.2f}'.format(name, y[-1])
+
+    def plot(self, y_loss):
+        """ """
+        self._plot(
+            y_loss, names='Estim NN', col='BuGn', lw=2.
+        )
