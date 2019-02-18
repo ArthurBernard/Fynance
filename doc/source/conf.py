@@ -16,7 +16,7 @@ needs_sphinx = '1.6'
 #                           General configuration                             #
 #-----------------------------------------------------------------------------#
 
-sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath('../../'))
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('.fynance'))

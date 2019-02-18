@@ -1,9 +1,12 @@
 version: 2
 formats: all
 python:
+    version: 3.5
     install:
+        - requirements: requirements.txt
         - method: setuptools
           path: .
-submodules:
+    system_packages: true
+ubmodules:
     include: all
     recursive: true
