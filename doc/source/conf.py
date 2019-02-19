@@ -38,7 +38,7 @@ copyright = '2018-2019, Arthur Bernard'
 author = 'Arthur Bernard'
 
 #import fynance as fy
-fy = importlib.import_module('fynance', package=None)
+fynance = importlib.import_module('fynance', package=None)
 
 version = "1.0" #fy.__version__
 release = "1.0.4" #version
