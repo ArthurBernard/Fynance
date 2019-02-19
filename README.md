@@ -5,6 +5,7 @@
 [![Build Status](https://travis-ci.org/ArthurBernard/Fynance.svg?branch=master)](https://travis-ci.org/ArthurBernard/Fynance)
 [![license](https://img.shields.io/github/license/ArthurBernard/fynance.svg)](https://github.com/ArthurBernard/Fynance/blob/master/LICENSE.txt)
 [![Downloads](https://pepy.tech/badge/fynance)](https://pepy.tech/project/fynance)
+[![Documentation Status](https://readthedocs.org/projects/fynance/badge/?version=latest)](https://fynance.readthedocs.io/en/latest/?badge=latest)
 
 This is a beta version of python package of **machine learning**, **econometrics** and **statistical** tools for **trading strategy** and **financial analysis**.
 

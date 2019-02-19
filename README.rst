@@ -12,6 +12,9 @@ Fynance - Machine learning tools for financial analysis [In Progress]
     :target: https://github.com/ArthurBernard/Fynance/blob/master/LICENSE.txt
 .. image:: https://pepy.tech/badge/fynance 
     :target: https://pepy.tech/project/fynance
+.. image:: https://readthedocs.org/projects/fynance/badge/?version=latest
+    :target: https://fynance.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 
 This is a beta version of python package [*]_ of **machine learning**, **econometrics** and **statistical** tools for **trading strategy** and **financial analysis**.
 
