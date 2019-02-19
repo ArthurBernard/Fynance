@@ -70,11 +70,13 @@ if 'build_ext' in sys.argv[1:] or USE_CYTHON or USE_CYTHON == 'auto':
 else:
     cmdclass = {}
 
+import os
+
 extensions = [
     Extension(
         'fynance.models.econometric_models_cy', 
         ['fynance/models/econometric_models_cy' + ext],
-        include_dirs=[numpy.get_include(), '.']
+        include_dirs=[numpy.get_include(), os.path.abspath('.')]
     ),
     Extension(
         'fynance.tools.metrics_cy', 
