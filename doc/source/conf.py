@@ -20,7 +20,7 @@ needs_sphinx = '1.6'
 #sys.path.insert(0, os.path.abspath('./'))
 #sys.path.insert(0, os.path.abspath('../'))
 #sys.path.insert(0, os.path.abspath('../../fynance/'))
-#sys.path.insert(0, os.path.abspath('../../'))
+sys.path.insert(1, os.path.abspath('../../'))
 
 
 extensions = [
