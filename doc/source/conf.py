@@ -40,7 +40,7 @@ author = 'Arthur Bernard'
 #import fynance as fy
 #fynance = importlib.import_module('fynance', package=None)
 
-version = "1.0" #fy.__version__
+version = "1.0.4" #fy.__version__
 release = "1.0.4" #version
 
 templates_path = ['_templates']
