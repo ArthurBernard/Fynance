@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# TO DELETE WHEN DOC ISSUES WILL BE FIXED
+import sys
+sys.argv.append('--inplace')
+
 # Set this to True to enable building extensions using Cython.
 # Set it to False to build extensions from the C file (that
 # was previously created using Cython).
@@ -70,13 +74,11 @@ if 'build_ext' in sys.argv[1:] or USE_CYTHON or USE_CYTHON == 'auto':
 else:
     cmdclass = {}
 
-import os
-
 extensions = [
     Extension(
         'fynance.models.econometric_models_cy', 
         ['fynance/models/econometric_models_cy' + ext],
-        include_dirs=[numpy.get_include(), os.path.abspath('.')]
+        include_dirs=[numpy.get_include(), '.']
     ),
     Extension(
         'fynance.tools.metrics_cy', 
