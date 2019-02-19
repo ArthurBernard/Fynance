@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# TO DELETE WHEN DOC ISSUES WILL BE FIXED
-import sys
-sys.argv.append('--inplace')
-
 # Set this to True to enable building extensions using Cython.
 # Set it to False to build extensions from the C file (that
 # was previously created using Cython).
