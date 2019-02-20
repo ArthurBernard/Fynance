@@ -21,4 +21,5 @@ __all__ = ['RollNeuralNet']
 __all__ += ['RollMultiNeuralNet']
 __all__ += ['RollAggrMultiNeuralNet']
 __all__ += ['RollMultiRollNeuralNet']
+# TODO : dev setter function
 #__all__ += set_neuralnetwork_tools.__all__
