@@ -88,7 +88,21 @@ cpdef np.float64_t loglikelihood_cy(
         np.ndarray[np.float64_t, ndim=1] u,
         np.ndarray[np.float64_t, ndim=1] h
     ):
-    """ Normal log-likelihood function """
+    """ Normal log-likelihood function. 
+
+    Parameters
+    ----------
+    u : np.ndarray[dtype=np.float64, ndim=1] 
+        Standardized residuals series.
+    h : np.ndarray[dtype=np.float64, ndim=1]
+        Conditional standard deviation series of residuals.
+
+    Returns
+    -------
+    np.float64
+        Normal log likelihood of residuals.
+
+    """
     cdef np.float64_t L, l_sq_pi = log(2 * pi)
     cdef int T = u.size
     h = np.square(h) + 1e-8

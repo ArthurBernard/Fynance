@@ -64,7 +64,21 @@ def target_function(params, y, p=0, q=0, Q=0, P=0, cons=True, model='arch'):
 
 
 def loglikelihood(u, h):
-    """ Normal log-likelihood function """
+    """ Normal log-likelihood function. 
+
+    Parameters
+    ----------
+    u : np.ndarray[dtype=np.float64, ndim=1] 
+        Standardized residuals series.
+    h : np.ndarray[dtype=np.float64, ndim=1]
+        Conditional standard deviation series of residuals.
+
+    Returns
+    -------
+    np.float64
+        Normal log likelihood of residuals.
+
+    """
     l_sq_pi = np.log(2 * np.pi)
     T = h.size
     h[h == 0] = 1e-8
