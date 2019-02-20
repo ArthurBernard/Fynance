@@ -21,7 +21,37 @@ cpdef tuple get_parameters_cy(
         int p=0, int q=0, int Q=0, int P=0, 
         bool cons=True
     ):
-    """ Get parameters for ARMA-GARCH models """
+    """ Get parameters for ARMA-GARCH models 
+    
+    Parameters
+    ----------
+    params : np.ndarray[np.float64, ndim=1]
+        Array of model parameters.
+    p, q, Q, P : int, optional
+        Order of model, default is 0.
+    cons : bool, optional
+        True if model contains constant, default is True.
+
+    Returns
+    -------
+    phi : np.ndarray[np.float64, ndim=1]
+        AR parameters.
+    theta : np.ndarray[np.float64, ndim=1]
+        MA parameters.
+    alpha : np.ndarray[np.float64, ndim=1]
+        First part GARCH parameters.
+    beta : np.ndarray[np.float64, ndim=1]
+        Last part GARCH parameters.
+    c : float
+        Constant of ARMA part. 
+    omega : float
+        Constants of GARCH part.
+
+    See also
+    --------
+    ARMAX_GARCH, ARMA_GARCH, ARMA and MA.
+    
+    """
     cdef int i = 0
     cdef np.ndarray[np.float64_t, ndim=1] phi, theta, alpha, beta
     cdef np.float64_t c, omega
@@ -71,15 +101,15 @@ cpdef np.ndarray[np.float64_t, ndim=1] MA_cy(
         np.ndarray[np.float64_t, ndim=1] theta,
         np.float64_t c, int q
     ):
-    """ Moving Average model of order q s.t: 
+    """ Moving Average model of order `q` s.t: 
     
-    y_t = c + theta_1 * u_t-1 + ... + theta_q * u_t-q + u_t 
+    .. math:: y_t = c + \\theta_1 * u_{t-1} + ... + \\theta_q * u_{t-q} + u_t 
     
     Parameters
     ----------
     y : np.ndarray[np.float64, ndim=1]
         Time series.
-    theta: np.ndarray[np.float64, ndim=1]
+    theta : np.ndarray[np.float64, ndim=1]
         Coefficients of model.
     c : np.float64
         Constant of the model.
@@ -91,6 +121,16 @@ cpdef np.ndarray[np.float64_t, ndim=1] MA_cy(
     u : np.ndarray[ndim=1, dtype=np.float64]
         Residual of the model.
     
+    Examples
+    --------
+    >>> y = np.array([3, 4, 6, 8, 5, 3])
+    >>> MA(y=y, theta=np.array([0.8]), c=3, q=1)
+    array([ 0.    ,  1.    ,  2.2   ,  3.24  , -0.592 ,  0.4736])
+
+    See also
+    --------
+    ARMA_GARCH, ARMA and ARMAX_GARCH
+
     """
     cdef np.float64_t s
     cdef int i, t, T = y.size
@@ -112,10 +152,12 @@ cpdef np.ndarray[np.float64_t, ndim=1] ARMA_cy(
         np.ndarray[np.float64_t, ndim=1] theta,
         np.float64_t c, int p, int q
     ):
-    """ AutoRegressive Moving Average model of order q and p s.t: 
+    """ AutoRegressive Moving Average model of order `q` and `p` s.t: 
+    
+    .. math:: 
 
-    y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + theta_1 * u_t-1 + ...
-          + theta_q * u_t-q + u_t
+        y_t = c + \\phi_1 * y_{t-1} + ... + \\phi_p * y_{t-p} 
+        + \\theta_1 * u_{t-1} + ... + \\theta_q * u_{t-q} + u_t
     
     Parameters
     ----------
@@ -136,6 +178,10 @@ cpdef np.ndarray[np.float64_t, ndim=1] ARMA_cy(
     -------
     u : np.ndarray[np.float64, ndim=1]
         Residual of the model.
+
+    See also
+    --------
+    ARMA_GARCH, ARMAX_GARCH and MA.
     
     """
     cdef np.float64_t s
@@ -166,15 +212,19 @@ cpdef tuple ARMA_GARCH_cy(
     ):
     """ AutoRegressive Moving Average model of order q and p, such that: 
     
-    y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + theta_1 * u_t-1 + ...
-          + theta_q * u_t-q + u_t
+    .. math:: 
+
+        y_t = c + \\phi_1 * y_{t-1} + ... + \\phi_p * y_{t-p} 
+        + \\theta_1 * u_{t-1} + ... + \\theta_q * u_{t-q} + u_t
     
     With Generalized AutoRegressive Conditional Heteroskedasticity volatility
-    model of order Q and P, such that:
+    model of order `Q` and `P`, such that:
     
-    u_t = z_t * h_t 
-    h_t^2 = omega + alpha_1 * u^2_t-1 + ... + alpha_Q * u^2_t-Q 
-            + beta_1 * h^2_t-1 + ... + beta_P * h^2_t-P
+    .. math:: 
+        u_t = z_t * h_t
+
+        h_t^2 = \\omega + \\alpha_1 * u^2_{t-1} + ... + \\alpha_Q * u^2_{t-Q}
+        + \\beta_1 * h^2_{t-1} + ... + \\beta_P * h^2_{t-P}
     
     Parameters
     ----------
@@ -189,7 +239,9 @@ cpdef tuple ARMA_GARCH_cy(
     beta : np.ndarray[np.float64, ndim=1]
         Coefficients of AR part of GARCH.
     c : np.float64
-        Constant of the model.
+        Constant of ARMA model.
+    omega : np.float64
+        Constant of GARCH model.
     p : int
         Order of AR(p) model.
     q : int
@@ -205,6 +257,10 @@ cpdef tuple ARMA_GARCH_cy(
         Residual of the model. 
     h : np.ndarray[np.float64, ndim=1]
         Conditional volatility of the model. 
+
+    See also
+    --------
+    ARMAX_GARCH, ARMA and MA.
     
     """
     cdef np.float64_t arma, arch
@@ -246,15 +302,19 @@ cpdef tuple ARMAX_GARCH_cy(
     ):
     """ AutoRegressive Moving Average model of order q and p, such that: 
     
-    y_t = c + phi_1 * y_t-1 + ... + phi_p * y_t-p + psi_t * x_t 
-          + theta_1 * u_t-1 + ... + theta_q * u_t-q + u_t
+    .. math:: 
+
+        y_t = c + \\phi_1 * y_{t-1} + ... + \\phi_p * y_{t-p} + \\psi_t * x_t 
+        + \\theta_1 * u_{t-1} + ... + \\theta_q * u_{t-q} + u_t
     
     With Generalized AutoRegressive Conditional Heteroskedasticity volatility
-    model of order Q and P, such that:
+    model of order `Q` and `P`, such that:
     
-    u_t = z_t * h_t 
-    h_t^2 = omega + alpha_1 * u^2_t-1 + ... + alpha_Q * u^2_t-Q 
-            + beta_1 * h^2_t-1 + ... + beta_P * h^2_t-P
+    .. math:: 
+        u_t = z_t * h_t
+
+        h_t^2 = \\omega + \\alpha_1 * u^2_{t-1} + ... + \\alpha_Q * u^2_{t-Q}
+        + \\beta_1 * h^2_{t-1} + ... + \\beta_P * h^2_{t-P}
     
     Parameters
     ----------
@@ -277,7 +337,7 @@ cpdef tuple ARMAX_GARCH_cy(
     p : int
         Order of AR(p) model.
     q : int
-        Order of MA(q) model.
+       Order of MA(q) model.
     Q : int
         Order of MA part of GARCH.
     P : int
@@ -289,6 +349,10 @@ cpdef tuple ARMAX_GARCH_cy(
         Residual of the model. 
     h : np.ndarray[np.float64, ndim=1]
         Conditional volatility of the model. 
+
+    See also
+    --------
+    ARMA_GARCH, ARMA and MA.
     
     """
     cdef np.float64_t armax, arch
