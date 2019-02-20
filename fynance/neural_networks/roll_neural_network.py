@@ -6,7 +6,7 @@
 # External packages
 import numpy as np
 from matplotlib import pyplot as plt
-import seaborn as sns
+#import seaborn as sns
 
 # Internal packages
 from fynance.backtest.dynamic_plot_backtest import DynaPlotBackTest
@@ -47,7 +47,7 @@ class RollNeuralNet:
         number T and by step of size s period. 
     plot_loss(self, f, ax)
         Plot loss function
-    Plot_perf(self, f, ax)
+    plot_perf(self, f, ax)
         Plot perfomances.
 
     See Also

@@ -28,9 +28,9 @@ def display_perf(
         plot_drawdown=True, plot_roll_sharpe=True, x_axis=None, 
         underlying='Underlying', win=252,
     ):
-    """ 
-    Print dynamic plot of performance indicators (perf, rolling sharpe and draw 
-    down) of a strategy (raw and iso-volatility) versus its underlying.
+    """ Print dynamic plot of performance indicators (perf, rolling sharpe 
+    and draw down) of a strategy (raw and iso-volatility) versus its 
+    underlying.
     
     Parameters
     ----------
@@ -38,13 +38,13 @@ def display_perf(
         Time series of log-returns of the underlying.
     y_est : np.ndarray[np.float64, ndim=1]
         Time series of the signal's strategy.
-    period : int
-        Number of period per year.
-    title : str or list of str
-        Title of performance strategy.
-    plot_drawdown : bool
+    period : int, optional
+        Number of period per year. Default is 252.
+    title : str or list of str, optional
+        Title of performance strategy, default is empty.
+    plot_drawdown : bool, optional
         If true plot drawdowns, default is True.
-    plot_roll_sharpe : bool
+    plot_roll_sharpe : bool, optional
         If true plot rolling sharpe ratios, default is True.
     x_axis : list or np.asarray, optional
         x-axis to plot (e.g. list of dates).
@@ -97,19 +97,19 @@ def display_perf(
     else:
         ax_perf, ax_dd, ax_roll = ax[0], ax[1], ax[2]
     # Plot performances
-    l_idx, = ax_perf.plot(
+    ax_perf.plot(
         x_axis,
         100 * perf_est, 
         color=sns.xkcd_rgb["pale red"], 
         LineWidth=2.
     )
-    l_str, = ax_perf.plot(
+    ax_perf.plot(
         x_axis,
         100 * perf_ivo, 
         color=sns.xkcd_rgb["medium green"], 
         LineWidth=1.8
     )
-    l_siv, = ax_perf.plot(
+    ax_perf.plot(
         x_axis,
         100 * perf_idx, 
         color=sns.xkcd_rgb["denim blue"], 
@@ -196,7 +196,7 @@ def display_perf(
         ax_roll.set_title('Rolling Sharpe ratio')
         ax_roll.tick_params(axis='x', rotation=30, labelsize=10)
 
-    cid = f.canvas.mpl_connect('motion_notify_event', motion)
+    f.canvas.mpl_connect('motion_notify_event', motion)
     plt.show()
 
     return perf_idx, perf_est, perf_ivo

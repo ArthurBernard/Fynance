@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import numpy as np
-import pandas as pd
+# Built-in packages
 
+# External packages
+import numpy as np
+
+# Internal packages
 from fynance.tools.momentums import *
 
 __all__ = [
