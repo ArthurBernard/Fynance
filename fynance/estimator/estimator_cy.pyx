@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import numpy as np
-from scipy.optimize import fmin
-cimport numpy as np
+# Built-in packages
 from libc.math cimport sqrt, pi, log
 from cpython cimport bool
 
+# External packages
+import numpy as np
+from scipy.optimize import fmin
+cimport numpy as np
+
+# Internal packages
 from fynance.models.econometric_models_cy import ARMA_cy, ARMA_GARCH_cy
 from fynance.models.econometric_models_cy import get_parameters_cy
 

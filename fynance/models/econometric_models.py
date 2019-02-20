@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 # Internal packages
-from .econometric_models_cy import *
+from fynance.models.econometric_models_cy import *
 
 __all__ = [
     'get_parameters', 'MA', 'ARMA', 'ARMA_GARCH', 'ARMAX_GARCH'

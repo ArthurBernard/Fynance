@@ -5,6 +5,9 @@
 
 Some models, tools, etc for neural network
 
+.. automodule:: fynance.neural_networks
+   :members:
+
 """
 from . import roll_neural_network
 from .roll_neural_network import RollNeuralNet

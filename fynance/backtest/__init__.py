@@ -5,6 +5,9 @@
 
 Some tools to backtest strategies
 
+.. automodule:: fynance.backtest
+   :members:
+
 """
 
 from . import print_stats

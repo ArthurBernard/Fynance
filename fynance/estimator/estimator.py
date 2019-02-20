@@ -1,12 +1,16 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# Built-in packages
+
+# External packages
 import numpy as np
 from scipy.optimize import fmin
 
+# Internal packages
 from fynance.models.econometric_models_cy import *
 from fynance.models.econometric_models import *
-from .estimator_cy import *
+from fynance.estimator.estimator_cy import *
 
 __all__ = ['estimation', 'target_function', 'loglikelihood']
 

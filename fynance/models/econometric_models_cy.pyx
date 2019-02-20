@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# Built-in packages
+from libc.math cimport sqrt, pi, log
+from cpython cimport bool
+
+# External packages
 import numpy as np
 from scipy.optimize import fmin
 cimport numpy as np
-from libc.math cimport sqrt, pi, log
-from cpython cimport bool
+
+# Internal packages
 
 __all__ = [
     'get_parameters_cy', 'MA_cy', 'ARMA_cy', 'ARMA_GARCH_cy', 'ARMAX_GARCH_cy',
