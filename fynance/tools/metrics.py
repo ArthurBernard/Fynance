@@ -163,14 +163,14 @@ def sharpe(series, period=252, log=False):
     return sharpe_cy(series, period=float(period))
 
 # TODO : perf metric and rolling perf metric
-def perf(series, signals=None, exp=False):
-    if signals is None:
-        signals = np.ones(series.shape[0])
-    if exp:
-        f = np.exp
-    else:
-        f = lambda x: x
-    np.cumsum(series * signals) 
+#def perf(series, signals=None, exp=False):
+#    if signals is None:
+#        signals = np.ones(series.shape[0])
+#    if exp:
+#        f = np.exp
+#    else:
+#        f = lambda x: x
+#    np.cumsum(series * signals) 
 
 
 #=============================================================================#
