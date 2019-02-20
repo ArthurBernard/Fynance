@@ -80,7 +80,7 @@ class PlotBackTest:
         return self
 
 
-    def plot(self, y, x=None, names=None, col='Blues', lw=1., **kwargs):
+    def plot(self, y, x=None, names=None, col='Blues', lw=1., unit='raw', **kwargs):
         """ Plot performances
 
         Parameters

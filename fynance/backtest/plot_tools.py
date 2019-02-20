@@ -92,7 +92,7 @@ def display_perf(
         ax_perf.set_xlabel('Date')
     elif n == 2: 
         ax_perf = ax[0]
-        ax_dd, ax_roll = ax[1], None if plot_drawdown else None, ax[1]
+        (ax_dd, ax_roll) = (ax[1], None) if plot_drawdown else (None, ax[1])
         ax[-1].set_xlabel('Date')
     else:
         ax_perf, ax_dd, ax_roll = ax[0], ax[1], ax[2]
