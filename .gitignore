@@ -12,7 +12,8 @@ env/
 build/
 fynance.egg-info/
 dist/
-
+old_scripts/
+dev/
 
 # Cache to ignore
 __pycache__/
