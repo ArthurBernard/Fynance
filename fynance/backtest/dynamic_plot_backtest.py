@@ -19,18 +19,23 @@ __all__ = ['DynaPlotBackTest']
 # TODO: FINISH DOCSTRING
 
 class DynaPlotBackTest(PlotBackTest):
-    """ Plot dynamically backtest.
-
-    Attribute
-    ---------
-    :fig: matplotlib.figure.Figure
+    """ Dynamic plot backtest
+    
+    Attributes
+    ----------
+    fig : matplotlib.figure.Figure
         Figure to display backtest.
-    :ax: matplotlib.axes
+    ax : matplotlib.axes
         Axe(s) to display a part of backtest.
-
+    
     Methods
     -------
-    :plot: plot
+    plot(y, x=None, names=None, col='Blues', lw=1., **kwargs)
+        Plot performances.
+
+    See Also
+    --------
+    PlotBackTest, display_perf, set_text_stats
     
     """
     def _set_figure(self, fig, ax, size):
@@ -41,15 +46,34 @@ class DynaPlotBackTest(PlotBackTest):
 
 
     def plot(self, y, x=None, names=None, col='Blues', lw=1., unit='raw', **kwargs):
-        """ Plot performances
+        """ Dynamic plot performances
 
         Parameters
         ----------
-        :x: np.ndarray[ndim=2] with shape=(T, 1)
-            x-axis, can be series of int or dates or string.
-        :y: np.ndarray[np.float64, ndim=2] with shape=(T, N)
+        y : np.ndarray[np.float64, ndim=2], with shape (`T`, `N`)
             Returns or indexes.
+        x : np.ndarray[ndim=2], with shape (`T`, 1), optional
+            x-axis, can be series of int or dates or string.
+        names : str, optional
+            Names y lines for legend.
+        col : str, optional
+            Color of palette, cf seaborn documentation [2]_. 
+            Default is 'Blues'.
+        lw : float, optional
+            Line width of lines.
+        kwargs : dict, optional
+            Parameters for `ax.legend` method, cf matplotlib documentation [3]_.
         
+        Returns
+        -------
+        pbt : PlotBackTest
+            Self object.
+
+        References
+        ----------
+        .. [2] https://seaborn.pydata.org/api.html
+        .. [3] https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes
+
         """
 
         # Set data

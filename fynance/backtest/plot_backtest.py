@@ -33,7 +33,7 @@ class PlotBackTest:
 
     See Also
     --------
-    display_perf, set_text_stats
+    DynaPlotBackTest, display_perf, set_text_stats
     
     """
     def __init__(self, fig=None, ax=None, size=(9, 6), dynamic=False, **kwargs):
