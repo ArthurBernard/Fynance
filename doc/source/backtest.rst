@@ -1,12 +1,8 @@
 BackTest package
 ================
-Some tools to plot strategy's performances, rolling sharpe or drawdowns. And tools to display some metrics and statistics.
+Different tools to backtest or analyze financial strategies or models.
 
-.. autoclass:: fynance.backtest.PlotBackTest
-    :members:
-    :show-inheritance:
-    :special-members:
-
-.. autofunction:: fynance.backtest.display_perf
-
-.. autofunction:: fynance.backtest.set_text_stats
+.. toctree::
+    
+    backtest.tools
+    backtest.plot_objects
