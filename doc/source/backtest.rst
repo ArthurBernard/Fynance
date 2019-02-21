@@ -5,4 +5,4 @@ Different tools to backtest or analyze financial strategies or models.
 .. toctree::
     
     backtest.tools
-    backtest.plot_objects
+    backtest.plot_object
