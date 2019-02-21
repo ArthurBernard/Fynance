@@ -1,25 +1,7 @@
 Neural Networks package
 =======================
-Several kind of rolling neural networks.
+Several kind of neural networks and tools to applied them to financial strategies.
 
-.. currentmodule:: fynance.neural_networks
-
-.. autoclass:: RollNeuralNet
-    :special-members:
-    :members:
-    :show-inheritance:
-
-.. autoclass:: RollMultiNeuralNet
-    :special-members:
-    :members:
-    :show-inheritance:
-
-.. autoclass:: RollAggrMultiNeuralNet
-    :special-members:
-    :members:
-    :show-inheritance:
-
-.. autoclass:: RollMultiRollNeuralNet
-    :special-members:
-    :members:
-    :show-inheritance:
+.. toctree::
+    
+    neural_networks.rolling_neural_networks.rst
