@@ -15,6 +15,9 @@ Fynance - Machine learning tools for financial analysis [In Progress]
 .. image:: https://readthedocs.org/projects/fynance/badge/?version=latest
     :target: https://fynance.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
+.. image:: https://img.shields.io/lgtm/grade/python/g/ArthurBernard/Fynance.svg?logo=lgtm&logoWidth=18
+    :target: https://lgtm.com/projects/g/ArthurBernard/Fynance/context:python)
+    :alt: Language grade: Python
 
 `fynance` is a beta version of **python/cython project** [*]_ that includes several **machine learning**, **econometric** and **statistical** tools specialy adapted for **trading strategy** and **financial analysis**.
 

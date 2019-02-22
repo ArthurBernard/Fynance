@@ -6,6 +6,7 @@
 [![license](https://img.shields.io/github/license/ArthurBernard/fynance.svg)](https://github.com/ArthurBernard/Fynance/blob/master/LICENSE.txt)
 [![Downloads](https://pepy.tech/badge/fynance)](https://pepy.tech/project/fynance)
 [![Documentation Status](https://readthedocs.org/projects/fynance/badge/?version=latest)](https://fynance.readthedocs.io/en/latest/?badge=latest)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/ArthurBernard/Fynance.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ArthurBernard/Fynance/context:python)
 
 `fynance` is a beta version of **python/cython project** that includes several **machine learning**, **econometric** and **statistical** tools specialy adapted for **trading strategy** and **financial analysis**.
 
