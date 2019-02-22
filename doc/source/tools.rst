@@ -2,8 +2,6 @@ Financial tools package
 =======================
 Several financial tools as metrics, indicators, etc.
 
-Usage informations
-------------------
 Some precisions on parameters in following modules:
 - `series` means the time-series of price or index values for an asset or strategy.
 
