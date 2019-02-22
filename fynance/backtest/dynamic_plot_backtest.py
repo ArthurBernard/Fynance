@@ -38,11 +38,12 @@ class DynaPlotBackTest(PlotBackTest):
     PlotBackTest, display_perf, set_text_stats
     
     """
-    def _set_figure(self, fig, ax, size):
-        """ Set figure, axes and parameters for dynamic plot. """
-        PlotBackTest._set_figure(self, fig, ax, size)
-        plt.ion()
-        return self
+    plt.ion()
+    #def _set_figure(self, fig, ax, size):
+    #    """ Set figure, axes and parameters for dynamic plot. """
+    #    PlotBackTest._set_figure(self, fig, ax, size)
+    #    plt.ion()
+    #    return self
 
 
     def plot(self, y, x=None, names=None, col='Blues', lw=1., unit='raw', **kwargs):
