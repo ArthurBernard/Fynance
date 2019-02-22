@@ -23,7 +23,7 @@ class RollNeuralNet:
     Attributes
     ----------
     y : np.ndarray[np.float32, ndim=2] with shape=(T, 1)
-        Target to estimate or predict.
+        Target to predict, a good practice is to use log-returns.
     X : np.ndarray[np.float32, ndim=2] with shape=(T, N)
         Features (inputs).
     NN : keras.Model
