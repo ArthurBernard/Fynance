@@ -16,7 +16,7 @@ Fynance - Machine learning tools for financial analysis [In Progress]
     :target: https://fynance.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
-This is a beta version of python package [*]_ of **machine learning**, **econometrics** and **statistical** tools for **trading strategy** and **financial analysis**.
+`fynance` is a beta version of **python/cython project** [*]_ that includes several **machine learning**, **econometric** and **statistical** tools specialy adapted for **trading strategy** and **financial analysis**.
 
 Description
 ===========
@@ -36,6 +36,10 @@ This project contains several **python** (and **cython**) tools for **trading st
 - Notebooks with some exemples    
 
 - Etc.    
+
+Please refer you to the `documentation`_ to see more details on different tools available in `fynance` package. Documentation contains some descriptions and examples for functions, classes and methods.    
+
+.. _documentation: https://fynance.readthedocs.io/en/latest/index.html
 
 Installation
 ============

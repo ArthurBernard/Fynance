@@ -7,7 +7,7 @@
 [![Downloads](https://pepy.tech/badge/fynance)](https://pepy.tech/project/fynance)
 [![Documentation Status](https://readthedocs.org/projects/fynance/badge/?version=latest)](https://fynance.readthedocs.io/en/latest/?badge=latest)
 
-This is a beta version of python package of **machine learning**, **econometrics** and **statistical** tools for **trading strategy** and **financial analysis**.
+`fynance` is a beta version of **python/cython project** that includes several **machine learning**, **econometric** and **statistical** tools specialy adapted for **trading strategy** and **financial analysis**.
 
 ## Description
 
@@ -19,6 +19,8 @@ This project contains several **python** (and **cython**) tools for **trading st
 - Backtesting
 - Notebooks with some exemples
 - Etc.
+
+Please refer you to the [documentation](https://fynance.readthedocs.io/en/latest/index.html) to see more details on different tools available in `fynance` package. Documentation contains some descriptions and examples for functions, classes and methods.    
 
 ## Installation
 
