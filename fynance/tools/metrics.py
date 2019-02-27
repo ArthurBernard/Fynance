@@ -162,21 +162,120 @@ def sharpe(series, period=252, log=False):
         return log_sharpe_cy(series, period=float(period))
     return sharpe_cy(series, period=float(period))
 
-# TODO : perf metric and rolling perf metric
-#def perf(series, signals=None, exp=False):
-#    if signals is None:
-#        signals = np.ones(series.shape[0])
-#    if exp:
-#        f = np.exp
-#    else:
-#        f = lambda x: x
-#    np.cumsum(series * signals) 
+
+def perf_index(series, init_value=100.):
+    """ Compute performance of prices or index values along time axis.
+
+    Parameters
+    ----------
+    series : np.ndarray[ndim=1, dtype=np.float64]
+        Time-series of prices or index values.
+    init_value : float, optional
+        Initial value for measure the performance, default is 100.
+
+    Returns 
+    -------
+    np.ndarray[ndim=1, dtype=np.float64]
+        Performances along time axis.
+
+    See Also
+    --------
+    perf_returns, perf_strat
+
+    Examples
+    --------
+    >>> series = np.array([10., 12., 15., 14., 16., 18., 16.])
+    >>> perf_index(series, init_value=100.)
+    array([100., 120., 150., 140., 160., 180., 160.])
+
+    """
+    return init_value * series / series[0]
+
+
+def perf_returns(returns, log=False, init_value=100.):
+    """ Compute performance of returns along time axis.
+
+    Parameters
+    ----------
+    returns : np.ndarray[ndim=1, dtype=np.float64]
+        Time-series of returns.
+    log : bool, optional
+        Considers returns as log-returns if True. Default is False.
+    init_value : float, optional
+        Initial value for measure the performance, default is 100.
+
+    Returns 
+    -------
+    np.ndarray[ndim=1, dtype=np.float64]
+        Performances along time axis.
+
+    See Also
+    --------
+    perf_index, perf_strat
+
+    Examples
+    --------
+    >>> returns = np.array([0., 20., 30., -10., 20., 20., -20.])
+    >>> perf_returns(returns, init_value=100., log=False)
+    array([100., 120., 150., 140., 160., 180., 160.])
+
+    """
+    series = np.cumsum(returns) + init_value
+    if log:
+        series = np.exp(index)
+    return perf_index(series, init_value=init_value)
+
+
+# TODO : finish perf strat metric (add reinvest option)
+def perf_strat(underlying, signals=None, log=False, init_value=100., 
+    reinvest=False):
+    """ Compute performance of a strategy with respect to this underlying and 
+    signal series along time axis.
+
+    Parameters
+    ----------
+    underlying : np.ndarray[ndim=1, dtype=np.float64]
+        Time-series of prices or index values.
+    signals : np.ndarray[ndim=1, dtype=np.float64]
+        Time-series of signals, if `None` considering a long position.
+    log : bool, optional
+        Considers underlying series as log values if True. Default is False.
+    init_value : float, optional
+        Initial value for measure the performance, default is 100.
+    reinvest : bool, optional
+        Reinvest profit/loss if true.
+
+    Returns 
+    -------
+    np.ndarray[ndim=1, dtype=np.float64]
+        Performances along time axis.
+
+    See Also
+    --------
+    perf_returns, perf_index
+
+    Examples
+    --------
+    >>> underlying = np.array([10., 12., 15., 14., 16., 18., 16.])
+    >>> signals = np.array([1., 1., 1., 0., 1., 1., -1.])
+    >>> perf_strat(underlying, signals, init_value=100., log=False)
+    array([100., 120., 150., 150., 170., 190., 210.])
+
+    """
+    returns = np.zeros(underlying.shape)
+    returns[1:] = (underlying[1:] - underlying[:-1]) * init_value / underlying[0]
+    if signals is None:
+        signals = np.ones(underlying.shape[0])
+    series = returns * signals
+    return perf_returns(series, log=log, init_value=init_value)
+     
 
 
 #=============================================================================#
 #                               Rolling metrics                               #
 #=============================================================================#
 
+# TODO : rolling perf metric
 
 def roll_mdd(series):
     """ Function to compute the rolling maximum drwdown where drawdown is the 
