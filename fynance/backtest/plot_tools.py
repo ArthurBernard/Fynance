@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# coding: utf-8
 
 # Built-in packages
 
@@ -18,20 +18,20 @@ plt.style.use('seaborn')
 
 __all__ = ['display_perf']
 
-#=============================================================================#
+# =========================================================================== #
 #                              Printer Tools                                  #
-#=============================================================================#
+# =========================================================================== #
 
 
 def display_perf(
-        y_idx, y_est, period=252, title='', params_iv={}, 
-        plot_drawdown=True, plot_roll_sharpe=True, x_axis=None, 
-        underlying='Underlying', win=252,
-    ):
-    """ Print dynamic plot of performance indicators (perf, rolling sharpe 
-    and draw down) of a strategy (raw and iso-volatility) versus its 
+    y_idx, y_est, period=252, title='', params_iv={},
+    plot_drawdown=True, plot_roll_sharpe=True, x_axis=None,
+    underlying='Underlying', win=252, fees=0,
+):
+    """ Print dynamic plot of performance indicators (perf, rolling sharpe
+    and draw down) of a strategy (raw and iso-volatility) versus its
     underlying.
-    
+
     Parameters
     ----------
     y_idx : np.ndarray[np.float64, ndim=1]
@@ -52,6 +52,8 @@ def display_perf(
         Name of the underlying, default is 'Underlying'.
     win : int, optional
         Size of the window of rolling sharpe, default is 252.
+    fees : float, optional
+        Fees to apply at the strategy performance.
 
     Returns
     -------
@@ -65,22 +67,29 @@ def display_perf(
     See Also
     --------
     PlotBackTest, set_text_stats
-    
+
     """
     if x_axis is None:
-        x_axis=range(y_idx.size)
-    # Compute perf. 
-    perf_idx = np.exp(np.cumsum(y_idx))
-    perf_est = np.exp(np.cumsum(y_idx * y_est))
-    iv = iso_vol(np.exp(np.cumsum(y_idx)), **params_iv) 
-    perf_ivo = np.exp(np.cumsum(y_idx * y_est * iv))
+        x_axis = range(y_idx.size)
 
-    # Print stats. table 
+    # Compute returns
+    vect_fee = np.zeros(y_est.shape)
+    vect_fee[1:] += np.abs(y_est[1:] - y_est[:-1]) * fees
+    vect_ret = y_idx * y_est
+
+    # Compute perf.
+    perf_idx = np.exp(np.cumsum(y_idx))
+    perf_est = np.exp(np.cumsum(vect_ret - vect_fee))
+    iv = iso_vol(np.exp(np.cumsum(y_idx)), **params_iv)
+    perf_ivo = np.exp(np.cumsum(vect_ret - vect_fee * iv))
+
+    # Print stats. table
     txt = set_text_stats(
         y_idx, period=period,
         Strategy=y_est,
         Strat_IsoVol=y_est * iv,
-        underlying=underlying
+        underlying=underlying,
+        fees=fees
     )
     print(txt)
 
@@ -90,7 +99,7 @@ def display_perf(
     if n == 1:
         ax_perf, ax_dd, ax_dd = ax, None, None
         ax_perf.set_xlabel('Date')
-    elif n == 2: 
+    elif n == 2:
         ax_perf = ax[0]
         (ax_dd, ax_roll) = (ax[1], None) if plot_drawdown else (None, ax[1])
         ax[-1].set_xlabel('Date')
@@ -99,20 +108,20 @@ def display_perf(
     # Plot performances
     ax_perf.plot(
         x_axis,
-        100 * perf_est, 
-        color=sns.xkcd_rgb["pale red"], 
+        100 * perf_est,
+        color=sns.xkcd_rgb["pale red"],
         LineWidth=2.
     )
     ax_perf.plot(
         x_axis,
-        100 * perf_ivo, 
-        color=sns.xkcd_rgb["medium green"], 
+        100 * perf_ivo,
+        color=sns.xkcd_rgb["medium green"],
         LineWidth=1.8
     )
     ax_perf.plot(
         x_axis,
-        100 * perf_idx, 
-        color=sns.xkcd_rgb["denim blue"], 
+        100 * perf_idx,
+        color=sns.xkcd_rgb["denim blue"],
         LineWidth=1.5
     )
 
@@ -152,20 +161,20 @@ def display_perf(
     if plot_drawdown is not None:
         ax_dd.plot(
             x_axis,
-            100 * drawdown(perf_est), 
-            color=sns.xkcd_rgb["pale red"], 
+            100 * drawdown(perf_est),
+            color=sns.xkcd_rgb["pale red"],
             LineWidth=1.4
         )
         ax_dd.plot(
             x_axis,
-            100 * drawdown(perf_ivo), 
-            color=sns.xkcd_rgb["medium green"], 
+            100 * drawdown(perf_ivo),
+            color=sns.xkcd_rgb["medium green"],
             LineWidth=1.2
         )
         ax_dd.plot(
             x_axis,
-            100 * drawdown(perf_idx), 
-            color=sns.xkcd_rgb["denim blue"], 
+            100 * drawdown(perf_idx),
+            color=sns.xkcd_rgb["denim blue"],
             LineWidth=1.
         )
         ax_dd.set_ylabel('% DrawDown')
@@ -175,20 +184,20 @@ def display_perf(
     if plot_roll_sharpe is not None:
         ax_roll.plot(
             x_axis,
-            roll_sharpe(perf_est, period=period, win=win), 
-            color=sns.xkcd_rgb["pale red"], 
+            roll_sharpe(perf_est, period=period, win=win),
+            color=sns.xkcd_rgb["pale red"],
             LineWidth=1.4
         )
         ax_roll.plot(
             x_axis,
-            roll_sharpe(perf_ivo, period=period, win=win), 
-            color=sns.xkcd_rgb["medium green"], 
+            roll_sharpe(perf_ivo, period=period, win=win),
+            color=sns.xkcd_rgb["medium green"],
             LineWidth=1.2
         )
         ax_roll.plot(
             x_axis,
-            roll_sharpe(perf_idx, period=period, win=win), 
-            color=sns.xkcd_rgb["denim blue"], 
+            roll_sharpe(perf_idx, period=period, win=win),
+            color=sns.xkcd_rgb["denim blue"],
             LineWidth=1.
         )
         ax_roll.set_ylabel('Sharpe ratio')
