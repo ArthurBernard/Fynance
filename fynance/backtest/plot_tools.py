@@ -81,7 +81,7 @@ def display_perf(
     perf_idx = np.exp(np.cumsum(y_idx))
     perf_est = np.exp(np.cumsum(vect_ret - vect_fee))
     iv = iso_vol(np.exp(np.cumsum(y_idx)), **params_iv)
-    perf_ivo = np.exp(np.cumsum(vect_ret - vect_fee * iv))
+    perf_ivo = np.exp(np.cumsum((vect_ret - vect_fee) * iv))
 
     # Print stats. table
     txt = set_text_stats(
