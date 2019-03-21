@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
+# coding: utf-8
 
 # Built-in packages
 
@@ -11,17 +11,17 @@ from fynance.tools.metrics import accuracy, sharpe, calmar
 
 __all__ = ['set_text_stats']
 
-#=============================================================================#
+# =========================================================================== #
 #                              Printer Tools                                  #
-#=============================================================================#
+# =========================================================================== #
 
 
-def set_text_stats(underly, period=252, accur=True, perf=True, vol=True, 
-    sharp=True, calma=True, underlying='Underlying', **kwpred):
-    """ 
-    Set a table as string with different indicators (accuracy, perf, vol and 
-    sharpe) for underlying and several strategies. 
-    
+def set_text_stats(underly, period=252, accur=True, perf=True, vol=True,
+                   sharp=True, calma=True, underlying='Underlying', fees=0,
+                   **kwpred):
+    """ Set a table as string with different indicators (accuracy, perf, vol
+    and sharpe) for underlying and several strategies.
+
     Parameters
     ----------
     underly : np.ndarray[ndim=1, dtype=np.float64]
@@ -42,16 +42,18 @@ def set_text_stats(underly, period=252, accur=True, perf=True, vol=True,
         Name of the underlying, default is 'Underlying'.
     kwpred : dict of np.ndarray
         Any strategies or predictions that you want to compare.
+    fees : float, optional
+        Fees to apply at the strategy performance.
 
     Returns
     -------
     txt : str
         Table of results.
-    
+
     See Also
     --------
     PlotBackTest, display_perf
-    
+
     """
     txt = ''
     # Compute Accuracy
@@ -72,7 +74,9 @@ def set_text_stats(underly, period=252, accur=True, perf=True, vol=True,
             np.abs(perf[-1] / perf[0]), period / perf.size) - 1.
         txt += '| {:14} | {:10.2%} |\n'.format(underlying, perf_targ)
         for key, pred in kwpred.items():
-            perf = np.exp(np.cumsum(underly * pred))
+            vect_fee = np.zeros(pred.shape)
+            vect_fee[1:] += np.abs(pred[1:] - pred[:-1]) * fees
+            perf = np.exp(np.cumsum(underly * pred - vect_fee))
             perf_pred = np.sign(perf[-1] / perf[0]) * np.float_power(
                 np.abs(perf[-1] / perf[0]), period / perf.size) - 1.
             txt += '| {:14} | {:10.2%} |\n'.format(key, perf_pred)
@@ -85,7 +89,9 @@ def set_text_stats(underly, period=252, accur=True, perf=True, vol=True,
         vol_targ = np.sqrt(period) * np.std(perf[1:] / perf[:-1] - 1)
         txt += '| {:14} | {:10.2%} |\n'.format(underlying, vol_targ)
         for key, pred in kwpred.items():
-            perf = np.exp(np.cumsum(underly * pred))
+            vect_fee = np.zeros(pred.shape)
+            vect_fee[1:] += np.abs(pred[1:] - pred[:-1]) * fees
+            perf = np.exp(np.cumsum(underly * pred - vect_fee))
             vol_pred = np.sqrt(period) * np.std(perf[1:] / perf[:-1] - 1)
             txt += '| {:14} | {:10.2%} |\n'.format(key, vol_pred)
     # Compute sharpe Ratio
@@ -96,9 +102,10 @@ def set_text_stats(underly, period=252, accur=True, perf=True, vol=True,
         sharpe_targ = sharpe(np.exp(np.cumsum(underly)), period=period)
         txt += '| {:14} | {:10.2f} |\n'.format(underlying, sharpe_targ)
         for key, pred in kwpred.items():
-            sharpe_pred = sharpe(
-                np.exp(np.cumsum(underly * pred)), period=period
-            )
+            vect_fee = np.zeros(pred.shape)
+            vect_fee[1:] += np.abs(pred[1:] - pred[:-1]) * fees
+            perf = np.exp(np.cumsum(underly * pred - vect_fee))
+            sharpe_pred = sharpe(perf, period=period)
             txt += '| {:14} | {:10.2f} |\n'.format(key, sharpe_pred)
     # Compute calmar
     if calma:
@@ -108,9 +115,10 @@ def set_text_stats(underly, period=252, accur=True, perf=True, vol=True,
         calmar_targ = calmar(np.exp(np.cumsum(underly)), period=period)
         txt += '| {:14} | {:10.2f} |\n'.format(underlying, calmar_targ)
         for key, pred in kwpred.items():
-            calmar_pred = calmar(
-                np.exp(np.cumsum(underly * pred)), period=period
-            )
+            vect_fee = np.zeros(pred.shape)
+            vect_fee[1:] += np.abs(pred[1:] - pred[:-1]) * fees
+            perf = np.exp(np.cumsum(underly * pred - vect_fee))
+            calmar_pred = calmar(perf, period=period)
             txt += '| {:14} | {:10.2f} |\n'.format(key, calmar_pred)
     txt += '+=============================+\n'
     return txt
