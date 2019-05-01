@@ -4,12 +4,16 @@
 # Built-in packages
 
 # External packages
-import torch
-import torch.nn as nn
+try:
+    import torch
+    import torch.nn as nn
+except ImportError:
+    print('You must install torch package')
+    exit()
 
 # Internal packages
 
-__all__ = []
+__all__ = ['NeuralNetwork']
 
 
 class NeuralNetwork(nn.Module):
@@ -23,6 +27,10 @@ class NeuralNetwork(nn.Module):
     -------
 
     """
+
+    def __init__(self):
+        """ Initialize """
+        nn.Module.__init__(self)
 
     def set_optimizer(self, criterion, optimizer, **kwargs):
         """ Setting optimizer object for all parameters (weights and bias)
