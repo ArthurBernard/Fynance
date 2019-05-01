@@ -9,7 +9,8 @@ try:
     import torch.nn as nn
 except ImportError:
     print('You must install torch package')
-    exit()
+    import sys
+    sys.exit(0)
 
 # Internal packages
 
