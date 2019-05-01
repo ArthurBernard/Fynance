@@ -4,13 +4,8 @@
 # Built-in packages
 
 # External packages
-try:
-    import torch
-    import torch.nn as nn
-except ImportError:
-    print('You must install torch package')
-    import sys
-    sys.exit(0)
+import torch
+import torch.nn as nn
 
 # Internal packages
 
