@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-05-02 20:08:16
+# @Last modified time: 2019-05-02 20:21:59
 
 # Built-in packages
 
@@ -238,7 +238,7 @@ def perf_returns(returns, log=False, init_value=100.):
     series = np.cumsum(returns) + init_value
 
     if log:
-        series = np.exp(index)
+        series = np.exp(series)
 
     return perf_index(series, init_value=init_value)
 
@@ -434,8 +434,10 @@ def roll_sharpe(series, period=252, win=0, cap=True):
     series = np.asarray(series, dtype=np.float64).flatten()
     T = series.size
     t = np.arange(1., T + 1., dtype=np.float64)
+
     if win < 2:
         win = T
+
     t[t > win] = win + 1.
     ret = np.zeros([T], dtype=np.float64)
     ret[1:] = series[1:] / series[:-1] - 1.
@@ -506,6 +508,7 @@ def accuracy(y_true, y_pred, sign=True):
 
     # Check right answeres
     R = np.sum(y_true == y_pred)
+
     # Check wrong answeres
     W = np.sum(y_true != y_pred)
 
