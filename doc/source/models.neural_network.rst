@@ -2,14 +2,14 @@ Neural network models module
 ============================
 Some basis of neural network models with PyTorch package.
 
-.. currentmodule:: fynance.models.neural_network
+.. currentmodule:: fynance.models
 
-.. autoclass:: fynance.models.neural_network.BaseNeuralNet
+.. autoclass:: BaseNeuralNet
     :special-members:
     :members:
     :show-inheritance:
 
-.. autoclass:: fynance.models.neural_network.MultiLayerPerceptron
+.. autoclass:: MultiLayerPerceptron
     :special-members:
     :members:
     :show-inheritance:
