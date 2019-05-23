@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 10:39:56
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-05-23 16:45:46
+# @Last modified time: 2019-05-23 17:31:40
 
 """ Econometric models. """
 
@@ -53,9 +53,9 @@ def get_parameters(params, p=0, q=0, Q=0, P=0, cons=True):
     omega : float
         Constants of GARCH part.
 
-    See also
+    See Also
     --------
-    ARMAX_GARCH, ARMA_GARCH, ARMA and MA.
+    ARMAX_GARCH, ARMA_GARCH, ARMA, MA.
 
     """
     i = 0
@@ -126,9 +126,9 @@ def MA(y, theta, c, q):
     >>> MA(y=y, theta=np.array([0.8]), c=3, q=1)
     array([ 0.    ,  1.    ,  2.2   ,  3.24  , -0.592 ,  0.4736])
 
-    See also
+    See Also
     --------
-    ARMA_GARCH, ARMA and ARMAX_GARCH
+    ARMA_GARCH, ARMA, ARMAX_GARCH
 
     """
     # Set type of variables
@@ -178,9 +178,9 @@ def ARMA(y, phi, theta, c, p, q):
     u : np.ndarray[np.float64, ndim=1]
         Residual of the model.
 
-    See also
+    See Also
     --------
-    ARMA_GARCH, ARMAX_GARCH and MA.
+    ARMA_GARCH, ARMAX_GARCH, MA.
 
     """
     # Set type variables and parameters
@@ -243,9 +243,9 @@ def ARMA_GARCH(y, phi, theta, alpha, beta, c, omega, p, q, Q, P):
     h : np.ndarray[np.float64, ndim=1]
         Conditional volatility of the model.
 
-    See also
+    See Also
     --------
-    ARMAX_GARCH, ARMA and MA.
+    ARMAX_GARCH, ARMA, MA.
 
     """
     y = np.asarray(y, dtype=np.float64).reshape([y.size])
@@ -313,9 +313,9 @@ def ARMAX_GARCH(y, x, phi, psi, theta, alpha, beta, c, omega, p, q, Q, P):
     h : np.ndarray[np.float64, ndim=1]
         Conditional volatility of the model.
 
-    See also
+    See Also
     --------
-    ARMA_GARCH, ARMA and MA.
+    ARMA_GARCH, ARMA, MA.
 
     """
     # Set array variables
