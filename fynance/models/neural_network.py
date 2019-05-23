@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-05-06 20:16:31
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-05-23 14:39:13
+# @Last modified time: 2019-05-23 17:38:36
 
 """ Basis of neural networks models. """
 
@@ -18,7 +18,7 @@ import torch.nn
 
 # Local packages
 
-__all__ = ['BaseNeuralNet']
+__all__ = ['BaseNeuralNet', 'MultiLayerPerceptron']
 
 
 class BaseNeuralNet(torch.nn.Module):
@@ -42,6 +42,10 @@ class BaseNeuralNet(torch.nn.Module):
         Trains the neural network on `X` as inputs and `y` as ouputs.
     predict(X)
         Predicts the outputs of neural network model for `X` as inputs.
+
+    See Also
+    --------
+    MultiLayerPerceptron
 
     """
 
@@ -148,6 +152,10 @@ class MultiLayerPerceptron(BaseNeuralNet):
         Predicts the outputs of neural network model for `X` as inputs.
     set_data(X, y)
         Set respectively input and ouputs data tensor.
+
+    See Also
+    --------
+    BaseNeuralNet
 
     """
 
