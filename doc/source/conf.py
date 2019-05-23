@@ -5,6 +5,7 @@ from sphinx.ext.autosummary import _import_by_name
 from numpydoc.docscrape import NumpyDocString
 from numpydoc.docscrape_sphinx import SphinxDocString
 import importlib
+from unittest.mock import MagicMock
 
 # Check Sphinx version
 import sphinx
@@ -12,6 +13,16 @@ if sphinx.__version__ < "1.6":
     raise RuntimeError("Sphinx 1.6 or newer required")
 
 needs_sphinx = '1.6'
+
+
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+        return MagicMock()
+
+
+MOCK_MODULES = ['torch', 'xgboost']
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 #-----------------------------------------------------------------------------#
 #                           General configuration                             #
