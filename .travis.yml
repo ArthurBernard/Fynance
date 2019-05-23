@@ -2,13 +2,12 @@ notifications:
   email: false
 language: python
 os: linux
+git:
+  quiet: true
 python:
   - "3.5"
   - "3.6"
   - "3.7-dev"
-cache:
-  directories:
-    - $HOME/.cache # cache
 #before_install:
 #  - cd Fynance && python setup.py build_ext --inplace
 # command to install dependencies
