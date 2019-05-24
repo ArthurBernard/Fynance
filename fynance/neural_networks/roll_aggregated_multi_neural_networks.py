@@ -6,7 +6,7 @@
 # External packages
 import numpy as np
 from matplotlib import pyplot as plt
-#import seaborn as sns
+# import seaborn as sns
 
 # Internal packages
 from fynance.backtest.dynamic_plot_backtest import DynaPlotBackTest
