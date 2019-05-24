@@ -21,8 +21,8 @@ class Mock(MagicMock):
         return MagicMock()
 
 
-MOCK_MODULES = ['torch', 'torch.nn', 'xgboost']
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+# MOCK_MODULES = ['torch', 'torch.nn', 'xgboost']
+# sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 #-----------------------------------------------------------------------------#
 #                           General configuration                             #
