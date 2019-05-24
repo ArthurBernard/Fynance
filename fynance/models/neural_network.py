@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-05-06 20:16:31
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-05-23 17:38:36
+# @Last modified time: 2019-05-24 08:58:07
 
 """ Basis of neural networks models. """
 
@@ -126,7 +126,7 @@ class MultiLayerPerceptron(BaseNeuralNet):
     r""" Neural network with MultiLayer Perceptron architecture.
 
     Refered as vanilla neural network model, with `n` hidden layers s.t
-    .. math:: n \geq 1, with each one a specified number of neurons.
+    n :math:`\geq` 1, with each one a specified number of neurons.
 
     Attributes
     ----------
