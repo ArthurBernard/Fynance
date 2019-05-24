@@ -4,7 +4,9 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-05-02 20:21:59
+# @Last modified time: 2019-05-24 13:06:53
+
+""" Metric functons used in financial analysis. """
 
 # Built-in packages
 
@@ -20,6 +22,7 @@ from fynance.tools.momentums_cy import smstd_cy
 # - Append window size on rolling MDD
 # - Append performance
 # - Append rolling performance
+# - verify and fix error to perf_strat, perf_returns, perf_index
 
 
 __all__ = [
@@ -34,9 +37,11 @@ __all__ = [
 
 
 def drawdown(series):
-    """ Function to compute measure of the decline from a historical peak in
-    some variable [1]_ (typically the cumulative profit or total open equity
-    of a financial trading strategy).
+    """ Measures the drawdown of `series`.
+
+    Function to compute measure of the decline from a historical peak in some
+    variable [1]_ (typically the cumulative profit or total open equity of a
+    financial trading strategy).
 
     Parameters
     ----------
@@ -69,9 +74,11 @@ def drawdown(series):
 
 
 def mdd(series):
-    """ Function to compute the maximum drwdown where drawdown is the measure
-    of the decline from a historical peak in some variable [2]_ (typically the
-    cumulative profit or total open equity of a financial trading strategy).
+    """ Compute the maximum drwdown.
+
+    Drawdown is the measure of the decline from a historical peak in some
+    variable [2]_ (typically the cumulative profit or total open equity of a
+    financial trading strategy).
 
     Parameters
     ----------
@@ -104,8 +111,7 @@ def mdd(series):
 
 
 def calmar(series, period=252):
-    """ Function to compute the compouned annual return over the Maximum
-    DrawDown, known as the Calmar ratio.
+    """ Compute the compouned annual return over the Maximum DrawDown.
 
     Parameters
     ----------
@@ -138,8 +144,7 @@ def calmar(series, period=252):
 
 
 def sharpe(series, period=252, log=False):
-    """ Function to compute the total return over the volatility, known as the
-    Sharpe ratio.
+    """ Compute the total return over the volatility.
 
     Parameters
     ----------
@@ -203,7 +208,6 @@ def perf_index(series, init_value=100.):
     array([100., 120., 150., 140., 160., 180., 160.])
 
     """
-
     return init_value * series / series[0]
 
 
@@ -246,8 +250,9 @@ def perf_returns(returns, log=False, init_value=100.):
 # TODO : finish perf strat metric (add reinvest option)
 def perf_strat(underlying, signals=None, log=False, init_value=100.,
                reinvest=False):
-    """ Compute performance of a strategy with respect to this underlying and
-    signal series along time axis.
+    """ Compute the performance of a strategy.
+
+    With respect to this underlying and signal series along time axis.
 
     Parameters
     ----------
@@ -301,10 +306,11 @@ def perf_strat(underlying, signals=None, log=False, init_value=100.,
 # TODO : rolling perf metric
 
 def roll_mdd(series):
-    """ Function to compute the rolling maximum drwdown where drawdown is the
-    measure of the decline from a historical peak in some variable [3]_
-    (typically the cumulative profit or total open equity of a financial
-    trading strategy).
+    """ Compute the rolling maximum drwdown.
+
+    Where drawdown is the measure of the decline from a historical peak in
+    some variable [3]_ (typically the cumulative profit or total open equity
+    of a financial trading strategy).
 
     Parameters
     ----------
@@ -340,8 +346,9 @@ def roll_mdd(series):
 
 
 def roll_calmar(series, period=252.):
-    """ Function to compute the rolling compouned annual return over the
-    rolling Maximum DrawDown, that give the rolling Calmar ratio.
+    """ Compute the rolling Calmar ratio.
+
+    It is the compouned annual return over the rolling Maximum DrawDown.
 
     Parameters
     ----------
@@ -394,8 +401,10 @@ def roll_calmar(series, period=252.):
 
 
 def roll_sharpe(series, period=252, win=0, cap=True):
-    """ Vectorized function to compute rolling sharpe (compouned annual
-    returns divided by annual volatility).
+    """ Compute rolling sharpe ratio.
+
+    It is the rolling compouned annual returns divided by rolling annual
+    volatility.
 
     Parameters
     ----------
@@ -429,7 +438,6 @@ def roll_sharpe(series, period=252, win=0, cap=True):
     roll_calmar, sharpe, roll_mdd
 
     """
-
     # Setting inputs
     series = np.asarray(series, dtype=np.float64).flatten()
     T = series.size

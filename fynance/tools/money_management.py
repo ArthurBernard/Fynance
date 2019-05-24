@@ -1,5 +1,12 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
+# coding: utf-8
+# @Author: ArthurBernard
+# @Email: arthur.bernard.92@gmail.com
+# @Date: 2019-03-15 12:23:04
+# @Last modified by: ArthurBernard
+# @Last modified time: 2019-05-24 13:05:59
+
+""" Module with function to compute some money management coefficients. """
 
 # Built-in packages
 
@@ -11,31 +18,30 @@ from fynance.tools.momentums import ema
 
 __all__ = ['iso_vol']
 
-#=============================================================================#
+# =========================================================================== #
 #                         Money-management Tools                              #
-#=============================================================================#
+# =========================================================================== #
 
 
 def iso_vol(series, target_vol=0.20, leverage=1., period=252, half_life=11):
-    """ 
-    Make an iso-vol vector to apply to signal vector.
-    
+    """ Make an iso-vol vector to apply to signal vector.
+
     Parameters
     ----------
-    :series: np.ndarray[ndim=1, dtype=np.float64]
+    series : np.ndarray[ndim=1, dtype=np.float64]
         Series of price of underlying.
-    :target_vol: float (default 20 %)
+    target_vol : float (default 20 %)
         Volatility to target.
-    :leverage: float (default 1)
+    leverage : float (default 1)
         Max leverage to use.
-    :period: int (default 250)
+    period : int (default 250)
         Number of period per year.
-    :half_life: int (default 11)
+    half_life : int (default 11)
         Half-life of exponential moving average used to compute volatility.
-    
+
     Returns
     -------
-    :iv: np.ndarray[ndim=1, dtype=np.float64]
+    iv : np.ndarray[ndim=1, dtype=np.float64]
         Series of iso-vol coefficient.
 
     Examples
