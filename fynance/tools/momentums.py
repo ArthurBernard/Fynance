@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:13
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-06-12 15:05:53
+# @Last modified time: 2019-06-12 15:25:18
 
 # Built-in packages
 
@@ -30,7 +30,7 @@ __all__ = [
 def sma(series, lags=21):
     r""" Simple moving average along k lags.
 
-    .. math:: sma_t = \frac{1}{k} \sum^{k - 1}{i=0} series_{t-i}
+    .. math:: sma_t = \frac{1}{k} \sum^{k-1}_{i=0} series_{t-i}
 
     Parameters
     ----------
@@ -95,7 +95,7 @@ def ema(series, alpha=0.94, lags=None):
     r""" Exponential moving average along k lags.
 
     .. math::
-        ema_t = \alpha \times ema_{t-1} + (1 - \alpha) \times series_t
+        ema_t = \alpha \times ema_{t-1} + (1-\alpha) \times series_t
 
     Parameters
     ----------
@@ -121,7 +121,7 @@ def ema(series, alpha=0.94, lags=None):
 
     Notes
     -----
-    If `lags` is specified :math:`\alpha = 1 - \frac{2}{1 + lags}`
+    If `lags` is specified :math:`\alpha = 1 - \frac{2}{1 + k}`
 
     See Also
     --------
@@ -140,7 +140,10 @@ def ema(series, alpha=0.94, lags=None):
 
 
 def smstd(series, lags=21):
-    """ Simple moving standard deviation along k lags.
+    r""" Simple moving standard deviation along k lags.
+
+    .. math::
+        \smstd_t = \sqrt( \frac{1}{k} \sum^{k-1}_{i=0} (p_{t-i} - \sma_t)^2)
 
     Parameters
     ----------
@@ -178,7 +181,7 @@ def wmstd(series, lags=21):
         Series of prices, index or returns.
     lags : int, optional
         Number of days, default is 21.
-    
+
     Returns
     -------
     np.ndarray[dtype=np.float64, ndim=1]
@@ -201,6 +204,9 @@ def wmstd(series, lags=21):
 
 def emstd(series, alpha=0.94, lags=None):
     r""" Exponential moving standard deviation along k lags.
+
+    .. math::
+        emstd_t = \sqrt(\alpha \times emstd_{t-1}^2 + (1-\alpha) \times series_t^2)
 
     Parameters
     ----------
@@ -225,7 +231,7 @@ def emstd(series, alpha=0.94, lags=None):
 
     Notes
     -----
-    If `lags` is specified :math:`\alpha = 1 - \frac{2}{1 + lags}`
+    If `lags` is specified :math:`\alpha = 1 - \frac{2}{1 + k}`
 
     See Also
     --------
