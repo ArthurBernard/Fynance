@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:13
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-06-12 15:01:53
+# @Last modified time: 2019-06-12 15:05:53
 
 # Built-in packages
 
@@ -121,7 +121,7 @@ def ema(series, alpha=0.94, lags=None):
 
     Notes
     -----
-    If `lags` is specified :math:`alpha = 1 - \frac{2}{1 + lags}`
+    If `lags` is specified :math:`\alpha = 1 - \frac{2}{1 + lags}`
 
     See Also
     --------
@@ -200,7 +200,7 @@ def wmstd(series, lags=21):
 
 
 def emstd(series, alpha=0.94, lags=None):
-    """ Exponential moving standard deviation along k lags.
+    r""" Exponential moving standard deviation along k lags.
 
     Parameters
     ----------
@@ -225,7 +225,7 @@ def emstd(series, alpha=0.94, lags=None):
 
     Notes
     -----
-    If `lags` is specified :math:`alpha = 1 - \\frac{2}{1 + lags}`
+    If `lags` is specified :math:`\alpha = 1 - \frac{2}{1 + lags}`
 
     See Also
     --------
