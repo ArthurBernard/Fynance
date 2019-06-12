@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:13
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-06-12 15:41:57
+# @Last modified time: 2019-06-12 16:09:32
 
 # Built-in packages
 
@@ -177,7 +177,9 @@ def wmstd(series, lags=21):
 
     .. math::
         wma_t = \frac{2}{k (k-1)} \sum^{k-1}_{i=0} (k-i) \times series_{t-i}
-        wmstd_t = \sqrt{\frac{2}{k(k-1)}\sum^{k-1}_{i=0}(k-i)\times (series_{t-i}-wma_t)^2}
+
+        wmstd_t = \sqrt{\frac{2}{k(k-1)} \sum^{k-1}_{i=0}
+        (k-i) \times (series_{t-i} - wma_t)^2}
 
     Parameters
     ----------
