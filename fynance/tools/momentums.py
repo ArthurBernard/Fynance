@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:13
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-06-12 15:25:18
+# @Last modified time: 2019-06-12 15:30:27
 
 # Built-in packages
 
@@ -143,7 +143,7 @@ def smstd(series, lags=21):
     r""" Simple moving standard deviation along k lags.
 
     .. math::
-        \smstd_t = \sqrt( \frac{1}{k} \sum^{k-1}_{i=0} (p_{t-i} - \sma_t)^2)
+        \smstd_t = \sqrt{\frac{1}{k} \sum^{k-1}_{i=0} (p_{t-i} - \sma_t)^2}
 
     Parameters
     ----------
@@ -206,7 +206,7 @@ def emstd(series, alpha=0.94, lags=None):
     r""" Exponential moving standard deviation along k lags.
 
     .. math::
-        emstd_t = \sqrt(\alpha \times emstd_{t-1}^2 + (1-\alpha) \times series_t^2)
+        emstd_t^2 = \alpha \times emstd_{t-1}^2 + (1-\alpha) \times series_t^2
 
     Parameters
     ----------
