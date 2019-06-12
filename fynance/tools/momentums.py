@@ -1,12 +1,17 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
+# coding: utf-8
+# @Author: ArthurBernard
+# @Email: arthur.bernard.92@gmail.com
+# @Date: 2019-02-20 19:57:13
+# @Last modified by: ArthurBernard
+# @Last modified time: 2019-06-12 15:01:53
 
 # Built-in packages
 
 # External packages
 import numpy as np
 
-# Internal packages
+# Local packages
 from .momentums_cy import *
 
 __all__ = [
@@ -17,13 +22,15 @@ __all__ = [
 #        - Momentums of order 4
 #        - Momentums of order k
 
-#=============================================================================#
+# =========================================================================== #
 #                               Moving Averages                               #
-#=============================================================================#
+# =========================================================================== #
 
 
 def sma(series, lags=21):
-    """ Simple moving average along k lags. 
+    r""" Simple moving average along k lags.
+
+    .. math:: sma_t = \frac{1}{k} \sum^{k - 1}{i=0} series_{t-i}
 
     Parameters
     ----------
@@ -31,11 +38,11 @@ def sma(series, lags=21):
         Index or returns.
     lags : int, optional
         Number of lags for ma, default is 21.
-    
+
     Returns
     -------
     np.ndarray[dtype=np.float64, ndim=1]
-        Moving average of series.
+        Vector of moving average of series.
 
     Examples
     --------
@@ -52,7 +59,10 @@ def sma(series, lags=21):
 
 
 def wma(series, lags=21):
-    """ Weighted moving average along k lags. 
+    r""" Weighted moving average along k lags.
+
+    .. math::
+        wma_t = \frac{2}{k (k-1)} \sum^{k-1}_{i=0} (k-i) \times series_{t-i}
 
     Parameters
     ----------
@@ -60,7 +70,7 @@ def wma(series, lags=21):
         Index or returns.
     lags : int, optional
         Number of lags for ma, default is 21.
-    
+
     Returns
     -------
     np.ndarray[dtype=np.float64, ndim=1]
@@ -82,7 +92,10 @@ def wma(series, lags=21):
 
 
 def ema(series, alpha=0.94, lags=None):
-    """ Exponential moving average along k lags. 
+    r""" Exponential moving average along k lags.
+
+    .. math::
+        ema_t = \alpha \times ema_{t-1} + (1 - \alpha) \times series_t
 
     Parameters
     ----------
@@ -91,8 +104,8 @@ def ema(series, alpha=0.94, lags=None):
     alpha : float, optional
         Multiplier, default is 0.94 corresponding at 20 lags memory.
     lags : int, optional
-        Number of days. 
-    
+        Number of days.
+
     Returns
     -------
     np.ndarray[dtype=np.float64, ndim=1]
@@ -108,7 +121,7 @@ def ema(series, alpha=0.94, lags=None):
 
     Notes
     -----
-    If `lags` is specified :math:`alpha = 1 - \\frac{2}{1 + lags}`
+    If `lags` is specified :math:`alpha = 1 - \frac{2}{1 + lags}`
 
     See Also
     --------
@@ -117,12 +130,13 @@ def ema(series, alpha=0.94, lags=None):
     """
     if lags is not None:
         alpha = 1 - 2 / (1 + lags)
+
     return ema_cy(series.flatten().astype(np.float64), alpha=float(alpha))
 
 
-#=============================================================================#
+# =========================================================================== #
 #                          Moving Standard Deviation                          #
-#=============================================================================#
+# =========================================================================== #
 
 
 def smstd(series, lags=21):
@@ -134,7 +148,7 @@ def smstd(series, lags=21):
         Index or returns.
     lags : int, optional
         Number of lags for ma, default is 21.
-    
+
     Returns
     -------
     np.ndarray[dtype=np.float64, ndim=1]
@@ -156,7 +170,7 @@ def smstd(series, lags=21):
 
 
 def wmstd(series, lags=21):
-    """ Weighted moving standard deviation along k lags. 
+    """ Weighted moving standard deviation along k lags.
 
     Parameters
     ----------
@@ -186,8 +200,7 @@ def wmstd(series, lags=21):
 
 
 def emstd(series, alpha=0.94, lags=None):
-    """ 
-    Exponential moving standard deviation along k lags. 
+    """ Exponential moving standard deviation along k lags.
 
     Parameters
     ----------
@@ -197,7 +210,7 @@ def emstd(series, alpha=0.94, lags=None):
         Multiplier, default is 0.94 corresponding at 20 lags memory.
     lags : int, optional
         Number of days.
-    
+
     Returns
     -------
     np.ndarray[dtype=np.float64, ndim=1]
@@ -221,7 +234,9 @@ def emstd(series, alpha=0.94, lags=None):
     """
     if lags is not None:
         alpha = 1 - 2 / (1 + lags)
+
     return emstd_cy(series.flatten().astype(np.float64), alpha=float(alpha))
+
 
 if __name__ == '__main__':
     import doctest
