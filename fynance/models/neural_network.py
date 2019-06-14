@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-05-06 20:16:31
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-05-24 08:58:07
+# @Last modified time: 2019-06-14 12:09:36
 
 """ Basis of neural networks models. """
 
@@ -101,6 +101,7 @@ class BaseNeuralNet(torch.nn.Module):
         outputs = self(X)
         loss = self.criterion(outputs, y)
         loss.backward()
+        self.optimizer.step()
 
         return loss
 
