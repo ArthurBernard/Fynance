@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-05-06 20:16:31
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-06-14 12:09:36
+# @Last modified time: 2019-06-15 16:49:22
 
 """ Basis of neural networks models. """
 
@@ -186,10 +186,10 @@ class MultiLayerPerceptron(BaseNeuralNet):
             # Set hidden layers
             layers_list += [torch.nn.Linear(input_size, output_size)]
             input_size = output_size
-        else:
-            # Set output layer
-            layers_list += [torch.nn.Linear(input_size, self.M)]
-            self.layers = torch.nn.ModuleList(layers_list)
+
+        # Set output layer
+        layers_list += [torch.nn.Linear(input_size, self.M)]
+        self.layers = torch.nn.ModuleList(layers_list)
 
         # Set activation functions
         if activation is not None:
