@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-04-23 19:15:17
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-06-15 16:52:15
+# @Last modified time: 2019-06-21 15:10:40
 
 """ Basis of rolling models.
 
@@ -23,9 +23,10 @@ import numpy as np
 
 # Local packages
 from fynance.models.xgb import XGBData
+from fynance.models.neural_network import MultiLayerPerceptron
 
 
-__all__ = ['RollingBasis']
+__all__ = ['RollingBasis', 'RollMultiLayerPerceptron']
 
 
 class RollingBasis:
@@ -153,3 +154,62 @@ class RollingXGB(RollingBasis):
     def _train(self):
         # self.bst = xgb.train(params, )
         pass
+
+
+class RollMultiLayerPerceptron(MultiLayerPerceptron, RollingBasis):
+    """ Rolling version of the vanilla neural network model.
+
+    TODO:
+    - fix train and predict methods
+    - finish docstring
+    - finish methods
+
+    """
+
+    def __init__(self, X, y, layers=[], activation=None, drop=None):
+        RollingBasis.__init__(self, X, y)
+        MultiLayerPerceptron.__init__(self, X, y, layers=layers,
+                                      activation=activation, drop=drop)
+
+    def set_roll_period(self, train_period, test_period, start=0, end=None,
+                        roll_period=None, eval_period=None):
+        """ Callable method to set target features data, and model.
+
+        Parameters
+        ----------
+        train_period, test_period : int
+            Size of respectively training and testing sub-periods.
+        start : int, optional
+            Starting observation, default is first observation.
+        end : int, optional
+            Ending observation, default is last observation.
+        roll_period : int, optional
+            Size of the rolling period, default is the same size of the
+            testing sub-period.
+        eval_period : int, optional
+            Size of the evaluating period, default is the same size of the
+            testing sub-period if training sub-period is large enough.
+
+        Returns
+        -------
+        RollingBasis
+            The rolling basis model.
+
+        """
+        return RollingBasis.__call__(self, train_period, test_period,
+                                     start=start, end=end,
+                                     roll_period=roll_period,
+                                     eval_period=eval_period)
+
+    def _train(self, X, y):
+        return self.train_on(X, y)
+
+    def sub_predict(self, X):
+        return self.predict(X)
+
+    def run(self):
+        """ Running neural network model """
+        for _ in self:
+            pass
+
+        return self
