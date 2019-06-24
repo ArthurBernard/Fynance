@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-04-23 19:15:17
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-06-21 15:10:40
+# @Last modified time: 2019-06-24 12:34:39
 
 """ Basis of rolling models.
 
@@ -115,6 +115,15 @@ class RollingBasis:
 
         return self
 
+    def run(self):
+        """ Running neural network model """
+        # TODO : get stats, loss, etc.
+        # TODO : plot loss, perf, etc.
+        for _ in self:
+            pass
+
+        return self
+
 
 class RollingXGB(RollingBasis):
     """ Rolling version of eXtrem Gradient Boosting model.
@@ -206,10 +215,3 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, RollingBasis):
 
     def sub_predict(self, X):
         return self.predict(X)
-
-    def run(self):
-        """ Running neural network model """
-        for _ in self:
-            pass
-
-        return self
