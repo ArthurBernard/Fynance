@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-04-23 19:15:17
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-06-24 17:02:30
+# @Last modified time: 2019-06-24 17:36:45
 
 """ Basis of rolling models.
 
@@ -198,7 +198,8 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, RollingBasis):
                                       activation=activation, drop=drop)
 
     def set_roll_period(self, train_period, test_period, start=0, end=None,
-                        roll_period=None, eval_period=None, batch_size=64):
+                        roll_period=None, eval_period=None, batch_size=64,
+                        epochs=1):
         """ Callable method to set target features data, and model.
 
         Parameters
@@ -217,6 +218,8 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, RollingBasis):
             testing sub-period if training sub-period is large enough.
         batch_size : int, optional
             Size of a training batch, default is 64.
+        epochs : int, optional
+            Number of epochs, default is 1.
 
         Returns
         -------
@@ -224,11 +227,11 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, RollingBasis):
             The rolling basis model.
 
         """
-        return RollingBasis.__call__(self, train_period, test_period,
-                                     start=start, end=end,
-                                     roll_period=roll_period,
-                                     eval_period=eval_period,
-                                     batch_size=batch_size)
+        return RollingBasis.__call__(
+            self, train_period, test_period, start=start, end=end,
+            roll_period=roll_period, eval_period=eval_period,
+            batch_size=batch_size, epochs=epochs
+        )
 
     def _train(self, X, y):
         return self.train_on(X, y)
