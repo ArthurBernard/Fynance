@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-04-23 19:15:17
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-06-24 16:31:32
+# @Last modified time: 2019-06-24 17:02:30
 
 """ Basis of rolling models.
 
@@ -39,12 +39,12 @@ class RollingBasis:
     ----------
     n, s, r : int
         Respectively size of training, testing and rolling period.
-    b, T : int
-        Respectively batch size and size of entire dataset.
+    b, e, T : int
+        Respectively batch size, number of epochs and size of entire dataset.
     t : int
         The current time period.
     y_train, y_eval : np.ndarray[ndim=1, dtype=np.float64]
-        Respectively 
+        Respectively training and evaluating predictions.
 
     """
 
@@ -56,7 +56,7 @@ class RollingBasis:
 
     # TODO : fix callable method to overwritten problem with torch.nn.Module
     def __call__(self, train_period, test_period, start=0, end=None,
-                 roll_period=None, eval_period=None, batch_size=64):
+                 roll_period=None, eval_period=None, batch_size=64, epochs=1):
         """ Callable method to set target features data, and model.
 
         Parameters
@@ -75,6 +75,8 @@ class RollingBasis:
             testing sub-period if training sub-period is large enough.
         batch_size : int, optional
             Size of a training batch, default is 64.
+        epochs : int, optional
+            Number of epochs, default is 1.
 
         Returns
         -------
@@ -87,6 +89,7 @@ class RollingBasis:
         self.s = test_period
         self.r = test_period if roll_period is None else roll_period
         self.b = batch_size
+        self.e = epochs
 
         # Set boundary of period
         self.t = max(self.n - self.r, start)
@@ -111,12 +114,15 @@ class RollingBasis:
 
             raise StopIteration
 
-        for t in range(self.t - self.n, self.t, self.b):
-            # Set new train periods
-            s = min(t + self.b, self.t)
-            train_slice = slice(t, s)
-            # Train model
-            self._train(X=self.X[train_slice], y=self.y[train_slice])
+        # Run epochs
+        for epoch in range(self.e):
+            # Run batchs
+            for t in range(self.t - self.n, self.t, self.b):
+                # Set new train periods
+                s = min(t + self.b, self.t)
+                train_slice = slice(t, s)
+                # Train model
+                self._train(X=self.X[train_slice], y=self.y[train_slice])
 
         # Set new test periods
         test_slice = slice(self.t, self.t + self.s)
