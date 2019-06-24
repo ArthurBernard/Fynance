@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-04-23 19:15:17
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-06-24 12:34:39
+# @Last modified time: 2019-06-24 16:04:14
 
 """ Basis of rolling models.
 
@@ -50,7 +50,7 @@ class RollingBasis:
 
     # TODO : fix callable method to overwritten problem with torch.nn.Module
     def __call__(self, train_period, test_period, start=0, end=None,
-                 roll_period=None, eval_period=None):
+                 roll_period=None, eval_period=None, batch_size=64):
         """ Callable method to set target features data, and model.
 
         Parameters
@@ -67,6 +67,8 @@ class RollingBasis:
         eval_period : int, optional
             Size of the evaluating period, default is the same size of the
             testing sub-period if training sub-period is large enough.
+        batch_size : int, optional
+            Size of a training batch, default is 64.
 
         Returns
         -------
@@ -78,6 +80,7 @@ class RollingBasis:
         self.n = train_period
         self.s = test_period
         self.r = test_period if roll_period is None else roll_period
+        self.b = batch_size
 
         # Set boundary of period
         self.t = max(self.n - self.r, start)
@@ -102,13 +105,15 @@ class RollingBasis:
 
             raise StopIteration
 
-        # Set new train and test periods
-        train_slice = slice(self.t - self.n, self.t)
+        for t in range(self.t - self.n, self.t, self.b):
+            # Set new train periods
+            s = min(t + self.b, self.t)
+            train_slice = slice(t, s)
+            # Train model
+            self._train(X=self.X[train_slice], y=self.y[train_slice])
+
+        # Set new test periods
         test_slice = slice(self.t, self.t + self.s)
-
-        # Train model
-        self._train(X=self.X[train_slice], y=self.y[train_slice])
-
         # Predict on training and testing period
         self.y_eval[train_slice] = self.sub_predict(self.X[train_slice])
         self.y_test[test_slice] = self.sub_predict(self.X[test_slice])
