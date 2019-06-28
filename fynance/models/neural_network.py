@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-05-06 20:16:31
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-06-15 16:49:22
+# @Last modified time: 2019-06-28 12:46:22
 
 """ Basis of neural networks models. """
 
@@ -122,6 +122,52 @@ class BaseNeuralNet(torch.nn.Module):
         """
         return self(X).detach()
 
+    def set_data(self, X, y, x_type=None, y_type=None):
+        """ Set data inputs and outputs.
+
+        Parameters
+        ----------
+        X, y : array-like
+            Respectively input and output data.
+        x_type, y_type : torch.dtype
+            Respectively input and ouput data types. Default is `None`.
+
+        """
+        if hasattr(self, 'N') and self.N != X.size(1):
+            raise ValueError('X must have {} input columns'.foramt(self.N))
+
+        if hasattr(self, 'M') and self.M != y.size(1):
+            raise ValueError('y must have {} output columns'.format(self.M))
+
+        self.X = self._set_data(X, dtype=x_type)
+        self.y = self._set_data(y, dtype=y_type)
+        self.T, self.N = self.X.size()
+        T_veri, self.M = self.y.size()
+
+        if self.T != T_veri:
+            raise ValueError('{} time periods in X differents of {} time \
+                             periods in y'.format(self.T, T_veri))
+
+        return self
+
+    def _set_data(self, X, dtype=None):
+        """ Convert array-like data to tensor. """
+        # TODO : Verify dtype of data torch tensor
+        if isinstance(X, np.ndarray):
+
+            return torch.from_numpy(X)
+
+        elif isinstance(X, pd.DataFrame):
+            # TODO : Verify memory efficiancy
+            return torch.from_numpy(X.values)
+
+        elif isinstance(X, torch.Tensor):
+
+            return X
+
+        else:
+            raise ValueError('Unkwnown data type: {}'.format(type(X)))
+
 
 class MultiLayerPerceptron(BaseNeuralNet):
     r""" Neural network with MultiLayer Perceptron architecture.
@@ -211,52 +257,6 @@ class MultiLayerPerceptron(BaseNeuralNet):
             x = self.activation(layer(x))
 
         return x
-
-    def set_data(self, X, y, x_type=None, y_type=None):
-        """ Set data inputs and outputs.
-
-        Parameters
-        ----------
-        X, y : array-like
-            Respectively input and output data.
-        x_type, y_type : torch.dtype
-            Respectively input and ouput data types. Default is `None`.
-
-        """
-        if hasattr(self, 'N') and self.N != X.size(1):
-            raise ValueError('X must have {} input columns'.foramt(self.N))
-
-        if hasattr(self, 'M') and self.M != y.size(1):
-            raise ValueError('y must have {} output columns'.format(self.M))
-
-        self.X = self._set_data(X, dtype=x_type)
-        self.y = self._set_data(y, dtype=y_type)
-        self.T, self.N = self.X.size()
-        T_veri, self.M = self.y.size()
-
-        if self.T != T_veri:
-            raise ValueError('{} time periods in X differents of {} time \
-                             periods in y'.format(self.T, T_veri))
-
-        return self
-
-    def _set_data(self, X, dtype=None):
-        """ Convert array-like data to tensor. """
-        # TODO : Verify dtype of data torch tensor
-        if isinstance(X, np.ndarray):
-
-            return torch.from_numpy(X)
-
-        elif isinstance(X, pd.DataFrame):
-            # TODO : Verify memory efficiancy
-            return torch.from_numpy(X.values)
-
-        elif isinstance(X, torch.Tensor):
-
-            return X
-
-        else:
-            raise ValueError('Unkwnown data type: {}'.format(type(X)))
 
 
 def type_convert(dtype):
