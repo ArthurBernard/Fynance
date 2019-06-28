@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-05-06 20:16:31
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-06-28 14:23:03
+# @Last modified time: 2019-06-28 16:58:07
 
 """ Basis of neural networks models. """
 
@@ -85,6 +85,7 @@ class BaseNeuralNet(torch.nn.Module):
 
         return self
 
+    @torch.enable_grad()
     def train_on(self, X, y):
         """ Trains the neural network model.
 
