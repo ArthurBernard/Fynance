@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-05-06 20:16:31
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-06-28 12:46:22
+# @Last modified time: 2019-06-28 14:23:03
 
 """ Basis of neural networks models. """
 
@@ -32,6 +32,8 @@ class BaseNeuralNet(torch.nn.Module):
         A loss function.
     optimizer : torch.optim
         An optimizer algorithm.
+    N, M : int
+        Respectively input and output dimension.
 
     Methods
     -------
