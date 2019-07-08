@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-07-08 13:04:16
+# @Last modified time: 2019-07-08 13:54:10
 
 """ Metric functons used in financial analysis. """
 
@@ -308,10 +308,11 @@ def diversified_ratio(series, w=None, std_method='std'):
 
     .. math::
 
-        D(P) = \frac{P' \Sigma}{\sqrt{P'VP}} \\
-        \text{With }\Sigma\textit{ vector of asset volatilities,} \\
-        P\text{ vector of weights of asset of protfolio,} \\
-        text{and }V\text{ matrix of variance-covariance of these assets.}
+        D(P) = \frac{P' \Sigma}{\sqrt{P'VP}}
+
+    With :math:`\Sigma` vector of asset volatilities, :math:`P` vector of
+    weights of asset of portfolio, and :math:`V` matrix of variance-covariance
+    of these assets.
 
     Parameters
     ----------
