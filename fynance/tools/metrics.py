@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-07-08 12:50:39
+# @Last modified time: 2019-07-08 13:01:33
 
 """ Metric functons used in financial analysis. """
 
@@ -306,7 +306,8 @@ def diversified_ratio(series, w=None, std_method='std'):
     portfolio's weighted average volatility to its overll volatility,
     developed by Choueifaty and Coignard [1]_.
 
-    math::
+    .. math::
+
         D(P) = \frac{P' \Sigma}{\sqrt{P'VP}} \\
         \text{With }\Sigma\textit{ vector of asset volatilities, }
         P\text{ vector of weights of asset of protfolio, and }
