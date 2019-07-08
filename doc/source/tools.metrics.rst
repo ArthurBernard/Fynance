@@ -4,16 +4,18 @@ Some tools to compute financial metrics.
 
 .. currentmodule:: fynance.tools.metrics
 
-.. autofunction:: sharpe
+.. autofunction:: accuracy
+
+.. autofunction:: calmar
+
+.. autofunction:: diversified_ratio
+
+.. autofunction:: drawdown
 
 .. autofunction:: mdd
 
-.. autofunction:: calmar
+.. autofunction:: sharpe
 
 .. autofunction:: roll_sharpe
 
 .. autofunction:: roll_calmar
-
-.. autofunction:: drawdown
-
-.. autofunction:: accuracy
