@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-07-08 12:46:15
+# @Last modified time: 2019-07-08 12:50:39
 
 """ Metric functons used in financial analysis. """
 
@@ -27,7 +27,7 @@ from fynance.tools.momentums_cy import smstd_cy
 
 __all__ = [
     'sharpe', 'mdd', 'calmar', 'roll_sharpe', 'roll_mdd', 'roll_calmar',
-    'drawdown', 'accuracy',
+    'drawdown', 'accuracy', 'diversified_ratio',
 ]
 
 
@@ -319,7 +319,7 @@ def diversified_ratio(series, w=None, std_method='std'):
         correspond to one series of prices.
     w : np.array[ndim=1 or 2, dtype=np.float64] of size N, optional
         Vector of weights, default is None it means it will equaly weighted.
-    std_method : str, optional
+    std_method : str, optional /!\ Not yet implemented /!\
         Method to compute variance vector and covariance matrix.
 
     Returns
