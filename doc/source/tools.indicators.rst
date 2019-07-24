@@ -1,10 +1,17 @@
+*****************
 Indicators module
-=================
+*****************
 Some tools to compute financial indicators.
 
 .. currentmodule:: fynance.tools.indicators
 
+Tools
+=====
+
 .. autofunction:: z_score
+
+Indicators
+==========
 
 .. autofunction:: bollinger_band
 
