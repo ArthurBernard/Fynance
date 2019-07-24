@@ -1,8 +1,12 @@
+**************
 Metrics module
-==============
+**************
 Some tools to compute financial metrics.
 
 .. currentmodule:: fynance.tools.metrics
+
+Metrics
+=======
 
 .. autofunction:: accuracy
 
@@ -17,6 +21,9 @@ Some tools to compute financial metrics.
 .. autofunction:: mdd
 
 .. autofunction:: sharpe
+
+Rolling metrics
+===============
 
 .. autofunction:: roll_calmar
 
