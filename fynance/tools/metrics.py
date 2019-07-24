@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-07-24 17:01:34
+# @Last modified time: 2019-07-24 18:25:17
 
 """ Metric functons used in financial analysis. """
 
@@ -83,7 +83,9 @@ def accuracy(y_true, y_pred, sign=True):
 
 
 def calmar(series, period=252):
-    """ Compute the compouned annual return over the Maximum DrawDown.
+    """ Compute the Calmar Ratio [1]_.
+
+    It is the compouned annual return over the Maximum DrawDown.
 
     Parameters
     ----------
@@ -96,6 +98,10 @@ def calmar(series, period=252):
     -------
     np.float64
         Value of Calmar ratio.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Calmar_ratio
 
     Examples
     --------
@@ -120,11 +126,9 @@ def diversified_ratio(series, w=None, std_method='std'):
 
     Diversification ratio, denoted D, is defined as the ratio of the
     portfolio's weighted average volatility to its overll volatility,
-    developed by Choueifaty and Coignard [1]_.
+    developed by Choueifaty and Coignard [2]_.
 
-    .. math::
-
-        D(P) = \frac{P' \Sigma}{\sqrt{P'VP}}
+    .. math:: D(P) = \frac{P' \Sigma}{\sqrt{P'VP}}
 
     With :math:`\Sigma` vector of asset volatilities, :math:`P` vector of
     weights of asset of portfolio, and :math:`V` matrix of variance-covariance
@@ -147,7 +151,7 @@ def diversified_ratio(series, w=None, std_method='std'):
 
     References
     ----------
-    .. [1] tobam.fr/wp-content/uploads/2014/12/TOBAM-JoPM-Maximum-Div-2008.pdf
+    .. [2] tobam.fr/wp-content/uploads/2014/12/TOBAM-JoPM-Maximum-Div-2008.pdf
 
     """
     T, N = series.shape
@@ -167,7 +171,7 @@ def drawdown(series):
     """ Measures the drawdown of `series`.
 
     Function to compute measure of the decline from a historical peak in some
-    variable [1]_ (typically the cumulative profit or total open equity of a
+    variable [3]_ (typically the cumulative profit or total open equity of a
     financial trading strategy).
 
     Parameters
@@ -182,7 +186,7 @@ def drawdown(series):
 
     References
     ----------
-    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
+    .. [3] https://en.wikipedia.org/wiki/Drawdown_(economics)
 
     Examples
     --------
@@ -203,7 +207,7 @@ def drawdown(series):
 def mad(series):
     """ Compute the Mean Absolute Deviation.
 
-    Compute the mean of the absolute value of the distance to the mean. _[1]
+    Compute the mean of the absolute value of the distance to the mean [4]_.
 
     Parameters
     ----------
@@ -217,7 +221,7 @@ def mad(series):
 
     References
     ----------
-    .. [1] https://en.wikipedia.org/wiki/Average_absolute_deviation
+    .. [4] https://en.wikipedia.org/wiki/Average_absolute_deviation
 
     Examples
     --------
@@ -237,7 +241,7 @@ def mdd(series):
     """ Compute the maximum drwdown.
 
     Drawdown is the measure of the decline from a historical peak in some
-    variable [2]_ (typically the cumulative profit or total open equity of a
+    variable [5]_ (typically the cumulative profit or total open equity of a
     financial trading strategy).
 
     Parameters
@@ -252,7 +256,7 @@ def mdd(series):
 
     References
     ----------
-    .. [2] https://en.wikipedia.org/wiki/Drawdown_(economics)
+    .. [5] https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
     Examples
     --------
@@ -388,7 +392,12 @@ def perf_strat(underlying, signals=None, log=False, init_value=100.,
 
 
 def sharpe(series, period=252, log=False):
-    """ Compute the total return over the volatility.
+    r""" Compute the Sharpe ratio [6]_.
+
+    It is computed as the total return over the volatility (we assume no risk
+    free asset) such that:
+
+    .. math:: \text{Sharpe ratio} = \frac{E(r)}{\sqrt{Var(r)}}
 
     Parameters
     ----------
@@ -404,6 +413,10 @@ def sharpe(series, period=252, log=False):
     -------
     np.float64
         Value of Sharpe ratio.
+
+    References
+    ----------
+    .. [6] https://en.wikipedia.org/wiki/Sharpe_ratio
 
     Examples
     --------
@@ -434,7 +447,7 @@ def sharpe(series, period=252, log=False):
 # TODO : rolling diversified ratio
 
 def roll_calmar(series, period=252.):
-    """ Compute the rolling Calmar ratio.
+    """ Compute the rolling Calmar ratio [1]_.
 
     It is the compouned annual return over the rolling Maximum DrawDown.
 
@@ -452,6 +465,10 @@ def roll_calmar(series, period=252.):
     -------
     np.ndarray[np.float64, ndim=1]
         Series of rolling Calmar ratio.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Calmar_ratio
 
     Examples
     --------
@@ -492,7 +509,7 @@ def roll_mad(series, win=0):
     """ Compute rolling Mean Absolut Deviation.
 
     Compute the moving average of the absolute value of the distance to the
-    moving average _[1].
+    moving average [4]_.
 
     Parameters
     ----------
@@ -506,7 +523,7 @@ def roll_mad(series, win=0):
 
     References
     ----------
-    .. [1] https://en.wikipedia.org/wiki/Average_absolute_deviation
+    .. [4] https://en.wikipedia.org/wiki/Average_absolute_deviation
 
     Examples
     --------
@@ -532,7 +549,7 @@ def roll_mdd(series):
     """ Compute the rolling maximum drwdown.
 
     Where drawdown is the measure of the decline from a historical peak in
-    some variable [3]_ (typically the cumulative profit or total open equity
+    some variable [5]_ (typically the cumulative profit or total open equity
     of a financial trading strategy).
 
     Parameters
@@ -550,7 +567,7 @@ def roll_mdd(series):
 
     References
     ----------
-    .. [3] https://en.wikipedia.org/wiki/Drawdown_(economics)
+    .. [5] https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 
     Examples
     --------
@@ -569,7 +586,7 @@ def roll_mdd(series):
 
 
 def roll_sharpe(series, period=252, win=0, cap=True):
-    """ Compute rolling sharpe ratio.
+    """ Compute rolling sharpe ratio [6]_.
 
     It is the rolling compouned annual returns divided by rolling annual
     volatility.
@@ -591,6 +608,10 @@ def roll_sharpe(series, period=252, win=0, cap=True):
     -------
     np.ndarray[np.float64, ndim=1]
         Serires of rolling Sharpe ratio.
+
+    References
+    ----------
+    .. [6] https://en.wikipedia.org/wiki/Sharpe_ratio
 
     Examples
     --------
