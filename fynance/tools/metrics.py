@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-07-24 16:52:59
+# @Last modified time: 2019-07-24 17:01:34
 
 """ Metric functons used in financial analysis. """
 
@@ -15,8 +15,8 @@ import numpy as np
 
 # Internal packages
 from fynance.tools.metrics_cy import calmar_cy, drawdown_cy, mdd_cy, sharpe_cy
-from fynance.tools.metrics_cy import log_sharpe_cy, roll_mdd_cy
-from fynance.tools.momentums_cy import smstd_cy, sma_cy
+from fynance.tools.metrics_cy import log_sharpe_cy, roll_mdd_cy, roll_mad_cy
+from fynance.tools.momentums_cy import smstd_cy
 
 # TODO:
 # - Append window size on rolling calmar
@@ -486,6 +486,46 @@ def roll_calmar(series, period=252.):
     roll_cal[not_null] = annual_return[not_null] / roll_maxdd[not_null]
 
     return roll_cal
+
+
+def roll_mad(series, win=0):
+    """ Compute rolling Mean Absolut Deviation.
+
+    Compute the moving average of the absolute value of the distance to the
+    moving average _[1].
+
+    Parameters
+    ----------
+    series : np.ndarray[np.float64, ndim=1]
+        Time series (price, performance or index).
+
+    Returns
+    -------
+    np.ndarray[np.float64, ndim=1]
+        Series of mean absolute deviation.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Average_absolute_deviation
+
+    Examples
+    --------
+    >>> series = np.array([70., 100., 90., 110., 150., 80.])
+    >>> roll_mad(series)
+    array([ 0.        , 15.        , 11.11111111, 12.5       , 20.8       ,
+           20.        ])
+
+    See Also
+    --------
+    mad
+
+    """
+    series = np.asarray(series, dtype=np.float64).flatten()
+
+    if win < 2:
+        win = series.size
+
+    return roll_mad_cy(series, win=int(win))
 
 
 def roll_mdd(series):
