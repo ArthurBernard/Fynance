@@ -1,11 +1,20 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
+# coding: utf-8
+# @Author: ArthurBernard
+# @Email: arthur.bernard.92@gmail.com
+# @Date: 2019-07-09 10:49:19
+# @Last modified by: ArthurBernard
+# @Last modified time: 2019-07-24 17:02:21
 
-import numpy as np
-cimport numpy as np
+# Built-in packages
 from libc.math cimport sqrt
 
-from fynance.tools.momentums_cy import smstd_cy
+# External packages
+import numpy as np
+cimport numpy as np
+
+# Local packages
+from fynance.tools.momentums_cy import smstd_cy, sma_cy
 
 # TODO list:
 # - Append window size on rolling MDD
@@ -13,32 +22,33 @@ from fynance.tools.momentums_cy import smstd_cy
 
 __all__ = [
     'sharpe_cy', 'roll_sharpe_cy', 'log_sharpe_cy', 'mdd_cy', 'calmar_cy', 
-    'roll_mdd_cy', 'drawdown_cy',
+    'roll_mad_cy', 'roll_mdd_cy', 'drawdown_cy',
 ]
 
 
-#=============================================================================#
+# =========================================================================== #
 #                                   Metrics                                   #
-#=============================================================================#
+# =========================================================================== #
 
 
 cpdef np.ndarray[np.float64_t, ndim=1] drawdown_cy(
         np.ndarray[np.float64_t, ndim=1] series
     ):
-    """
-    Function to compute measure of the decline from a historical peak in some 
-    variable [1]_ (typically the cumulative profit or total open equity of a 
-    financial trading strategy). 
+    """ Compute drawdown of a series.
     
+    Measure of the decline from a historical peak in some variable [1]_
+    (typically the cumulative profit or total open equity of a financial
+    trading strategy). 
+
     Parameters
     ----------
-    :series: np.ndarray[np.float64, ndim=1]
+    series : np.ndarray[np.float64, ndim=1]
         Time series (price, performance or index).
 
     Returns
     -------
-    :out: np.ndarray[np.float64, ndim=1]
-        DrawDown.
+    np.ndarray[np.float64, ndim=1]
+        Series of DrawDown.
 
     References
     ----------
@@ -54,20 +64,21 @@ cpdef np.ndarray[np.float64_t, ndim=1] drawdown_cy(
 
 
 cpdef np.float64_t mdd_cy(np.ndarray[np.float64_t, ndim=1] series):
-    """
+    """ Compute the maximum drawdown.
+
     Function to compute the maximum drwdown where drawdown is the measure of 
     the decline from a historical peak in some variable [1]_ (typically the 
     cumulative profit or total open equity of a financial trading strategy). 
     
     Parameters
     ----------
-    :series: np.ndarray[np.float64, ndim=1]
+    series : np.ndarray[np.float64, ndim=1]
         Time series (price, performance or index).
 
     Returns
     -------
-    :out: np.float64
-        Maximum DrawDown.
+    np.float64
+        Value of Maximum DrawDown.
 
     References
     ----------
@@ -86,21 +97,22 @@ cpdef np.float64_t calmar_cy(
         np.ndarray[np.float64_t, ndim=1] series, 
         np.float64_t period=252.
     ):
-    """
+    """ Compute Calmar ratio.
+
     Function to compute the compouned annual return over the Maximum DrawDown, 
     known as the Calmar ratio.
     
     Parameters
     ----------
-    :series: np.ndarray[np.float64, ndim=1]
+    series : np.ndarray[np.float64, ndim=1]
         Time series (price, performance or index).
-    :period: int (default 252)
+    period : int (default 252)
         Number of period per year.
 
     Returns
     -------
-    :out: np.float64
-        Calmar ratio.
+    np.float64
+        Value of Calmar ratio.
 
     """
     cdef np.float64_t ret, annual_return, max_dd, T = series.size
@@ -123,7 +135,8 @@ cpdef np.float64_t sharpe_cy(
         np.ndarray[np.float64_t, ndim=1] series, 
         np.float64_t period=252.
     ):
-    """ 
+    """ Compute Sharpe ratio.
+
     Function to compute the total return over the volatility, known as the 
     Sharpe ratio.
     
@@ -136,7 +149,8 @@ cpdef np.float64_t sharpe_cy(
 
     Returns
     -------
-    Float, it's the Sharpe ratio.
+    np.float64
+        Value of Sharpe ratio.
 
     """
     if series[0] == 0.:
@@ -150,6 +164,7 @@ cpdef np.float64_t sharpe_cy(
     # Compute compouned annual returns
     cdef np.ndarray[np.float64_t, ndim=1] ret_vect = series[1:] / series[:-1] - 1.
     cdef np.float64_t annual_return 
+    # TODO : `np.sign(series[-1] / series[0])` why i did this ? To fix
     annual_return = np.sign(series[-1] / series[0]) * np.float_power(
         np.abs(series[-1] / series[0]), <double>period / T, dtype=np.float64) - 1.
     
@@ -166,7 +181,8 @@ cpdef np.float64_t log_sharpe_cy(
         np.ndarray[np.float64_t, ndim=1] series, 
         np.float64_t period=252.
     ):
-    """ 
+    """ Compute Sharpe ratio.
+
     Function to compute the total return over the volatility, known as the 
     Sharpe ratio.
     
@@ -179,7 +195,8 @@ cpdef np.float64_t log_sharpe_cy(
 
     Returns
     -------
-    Float, it's the Sharpe ratio.
+    np.float64
+        Value of Sharpe ratio.
 
     """
     
@@ -198,31 +215,69 @@ cpdef np.float64_t log_sharpe_cy(
     return annual_return / vol
 
 
-#=============================================================================#
+# =========================================================================== #
 #                               Rolling metrics                               #
-#=============================================================================#
+# =========================================================================== #
+
+
+cpdef np.ndarray[np.float64_t, ndim=1] roll_mad_cy(
+        np.ndarray[np.float64_t, ndim=1] series,
+        int win=0
+    ):
+    """ Compute rolling Mean Absolut Deviation.
+
+    Compute the moving average of the absolute value of the distance to the
+    moving average _[1].
+
+    Parameters
+    ----------
+    series : np.ndarray[np.float64, ndim=1]
+        Time series (price, performance or index).
+
+    Returns
+    -------
+    np.ndarray[np.float64, ndim=1]
+        Series of mean absolute deviation.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Average_absolute_deviation
+
+    """
+    cdef int t, T = series.size
+    cdef np.ndarray[np.float64_t, ndim=1] ma = sma_cy(series, lags=win)
+    cdef np.ndarray[np.float64_t, ndim=1] mad = np.zeros([T], dtype=np.float64)
+    
+    for t in range(T):
+        mad[t] = np.sum(
+            np.abs(series[max(t-win+1, 0): t+1] - ma[t], dtype=np.float64),
+            dtype=np.float64
+            )  / <double>min(t + 1, win)
+
+    return mad
 
 
 cpdef np.ndarray[np.float64_t, ndim=1] roll_mdd_cy(
         np.ndarray[np.float64_t, ndim=1] series,
         int win=0
     ):
-    """
+    """ Compute rolling maximum drawdown.
+
     Function to compute the maximum drwdown where drawdown is the measure of 
     the decline from a historical peak in some variable [1]_ (typically the 
     cumulative profit or total open equity of a financial trading strategy). 
     
     Parameters
     ----------
-    :series: np.ndarray[np.float64, ndim=1]
+    series : np.ndarray[np.float64, ndim=1]
         Time series (price, performance or index).
-    :win: int (default 0)
+    win : int (default 0)
         Size of the rolling window. If less of two, 
         rolling Max DrawDown is compute on all the past.
 
     Returns
     -------
-    :out: np.ndarray[np.float64, ndim=1]
+    np.ndarray[np.float64, ndim=1]
         Series of rolling Maximum DrawDown.
 
     References
@@ -236,6 +291,7 @@ cpdef np.ndarray[np.float64_t, ndim=1] roll_mdd_cy(
     drawdowns = drawdown_cy(series)
     
     if win <= 2:
+
         return np.maximum.accumulate(drawdowns, dtype=np.float64)
 
 
@@ -256,4 +312,5 @@ cpdef np.ndarray[np.float64_t, ndim=1] roll_sharpe_cy(
             roll_s[t] = sharpe_cy(series[:t + 1], period=period)
         else:
             roll_s[t] = sharpe_cy(series[t - window: t + 1], period=period)
+
     return roll_s
