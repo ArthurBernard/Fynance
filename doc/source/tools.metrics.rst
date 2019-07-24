@@ -12,10 +12,14 @@ Some tools to compute financial metrics.
 
 .. autofunction:: drawdown
 
+.. autofunction:: mad
+
 .. autofunction:: mdd
 
 .. autofunction:: sharpe
 
-.. autofunction:: roll_sharpe
-
 .. autofunction:: roll_calmar
+
+.. autofunction:: roll_mad
+
+.. autofunction:: roll_sharpe
