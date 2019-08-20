@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:33
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-08-20 14:26:44
+# @Last modified time: 2019-08-20 14:46:31
 
 """ Indicators functions. """
 
@@ -14,77 +14,13 @@
 import numpy as np
 
 # Local packages
-from fynance.tools.momentums import *
+from fynance.tools.momentums import sma, ema, wma, smstd, emstd, wmstd
 from fynance.tools.metrics import roll_mad
 
 __all__ = [
-    'z_score', 'bollinger_band', 'cci', 'hma', 'macd_hist', 'macd_line',
+    'bollinger_band', 'cci', 'hma', 'macd_hist', 'macd_line',
     'rsi', 'signal_line',
 ]
-
-# =========================================================================== #
-#                                    Tools                                    #
-# =========================================================================== #
-
-
-def z_score(series, kind_ma='sma', **kwargs):
-    r""" Compute rolling/moving vector of Z-score.
-
-    Notes
-    -----
-    Compute for each observation the z-score function for a specific moving
-    average function such that:
-
-    .. math:: z = \frac{seres - \mu_t}{\sigma_t}
-
-    Where :math:`\mu_t` is the moving average and :math:`\sigma_t` is the
-    moving standard deviation.
-
-    Parameters
-    ----------
-    series : np.ndarray[np.float64, ndim=1]
-        Series of index, prices or returns.
-    kind_ma : {'ema', 'sma', 'wma'}, optional
-        Kind of moving average, default is 'sma'.
-    kwargs
-        Any parameters for the moving average function.
-
-    Returns
-    -------
-    np.ndarray[np.float64, ndim=1]
-        Z-score at each period.
-
-    Examples
-    --------
-    >>> series = np.array([70, 100, 80, 120, 160, 80])
-    >>> z_score(series, kind_ma='ema')
-    array([ 0.        ,  3.83753384,  1.04129457,  3.27008748,  3.23259291,
-           -0.00963602])
-    >>> z_score(series, lags=3)
-    array([ 0.        ,  1.        , -0.26726124,  1.22474487,  1.22474487,
-           -1.22474487])
-
-    See Also
-    --------
-    rsi, bollinger_band, hma, macd_hist
-
-    """
-    if kind_ma.lower() == 'wma':
-        ma_f = wma
-        std_f = wmstd
-    elif kind_ma.lower() == 'sma':
-        ma_f = sma
-        std_f = smstd
-    else:
-        ma_f = ema
-        std_f = emstd
-
-    m = ma_f(series, **kwargs)
-    s = std_f(series, **kwargs)
-    s[s == 0.] = 1.
-    z = (series - m) / s
-
-    return z
 
 
 # =========================================================================== #
@@ -116,9 +52,12 @@ def bollinger_band(series, lags=21, n_std=2, kind_ma='sma'):
     Examples
     --------
     >>> series = np.array([60, 100, 80, 120, 160, 80])
-    >>> bollinger_band(series, lags=3)
-    (array([ 60.,  80.,  80., 100., 120., 120.]), array([ 0.        , 40.        , 32.65986324, 32.65986324, 65.31972647,
-           65.31972647]))
+    >>> mean_vect, std_vect = bollinger_band(series, lags=3)
+    >>> mean_vect
+    array([ 60.,  80.,  80., 100., 120., 120.])
+    >>> std_vect
+    array([ 0.        , 40.        , 32.65986324, 32.65986324, 65.31972647,
+           65.31972647])
 
     See Also
     --------
@@ -138,8 +77,7 @@ def bollinger_band(series, lags=21, n_std=2, kind_ma='sma'):
         std = wmstd(series, lags=lags)
 
     else:
-        ma = ema(series, lags=lags)
-        std = smstd(series, lags=lags)
+        raise ValueError('Unknown kind_ma: {}'.format(kind_ma))
 
     return ma, n_std * std
 
@@ -247,8 +185,11 @@ def hma(series, lags=21, kind_ma='wma'):
     elif kind_ma.lower() == 'sma':
         f = sma
 
-    else:
+    elif kind_ma.lower() == 'wma':
         f = wma
+
+    else:
+        raise ValueError('Unknown kind_ma: {}'.format(kind_ma))
 
     wma1 = f(series, lags=int(lags / 2))
     wma2 = f(series, lags=lags)
@@ -338,8 +279,11 @@ def macd_line(series, fast_ma=12, slow_ma=26, kind_ma='ema'):
     elif kind_ma.lower() == 'sma':
         f = sma
 
-    else:
+    elif kind_ma.lower() == 'ema':
         f = ema
+
+    else:
+        raise ValueError('Unknown kind_ma: {}'.format(kind_ma))
 
     fast = f(series, lags=fast_ma)
     slow = f(series, lags=slow_ma)
@@ -396,7 +340,7 @@ def rsi(series, kind_ma='ema', lags=21, alpha=None):
     U[delta > 0] = delta[delta > 0]
     D[delta < 0] = - delta[delta < 0]
 
-    if kind_ma.lower() == 'ma' or kind_ma.lower() == 'sma':
+    if kind_ma.lower() == 'sma':
         ma_U = sma(U, lags=lags)
         ma_D = sma(D, lags=lags)
 
@@ -409,10 +353,7 @@ def rsi(series, kind_ma='ema', lags=21, alpha=None):
         ma_D = wma(D, lags=lags)
 
     else:
-        print('Kind moving average is miss specified, \
-            exponential moving average is selected by default.')
-        ma_U = ema(U, lags=lags, alpha=alpha)
-        ma_D = ema(D, lags=lags, alpha=alpha)
+        raise ValueError('Unknown kind_ma: {}'.format(kind_ma))
 
     RSI = np.zeros([T])
     RSI[1:] = 100 * ma_U / (ma_U + ma_D + 1e-8)
@@ -461,8 +402,11 @@ def signal_line(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
     elif kind_ma.lower() == 'sma':
         f = sma
 
-    else:
+    elif kind_ma.lower() == 'ema':
         f = ema
+
+    else:
+        raise ValueError('Unknown kind_ma: {}'.format(kind_ma))
 
     sig_lin = f(macd_lin, lags=lags)
 
