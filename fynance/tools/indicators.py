@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:33
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-08-20 14:46:31
+# @Last modified time: 2019-08-20 15:22:39
 
 """ Indicators functions. """
 
@@ -39,8 +39,11 @@ def bollinger_band(series, lags=21, n_std=2, kind_ma='sma'):
         Number of lags for ma, default is 21.
     n_std : float (default 1)
         Number of standard deviation, default is 1.
-    kind_ma : str {'ema', 'sma', 'wma'}, optional
-        Kind of moving average, default is 'ema'.
+    kind_ma : {'ema', 'sma', 'wma'}
+        Kind of moving average/standard deviation, default is 'sma'.
+        - Exponential moving average if 'ema'.
+        - Simple moving average if 'sma'.
+        - Weighted moving average if 'wma'.
 
     Returns
     -------
@@ -159,8 +162,11 @@ def hma(series, lags=21, kind_ma='wma'):
         Series of prices or returns.
     lags : int, optional
         Number of lags for ma, default is 21.
-    kind_ma : str {'ema', 'sma', 'wma'}, optional
-        Kind of moving average, default is 'ema'.
+    kind_ma : {'ema', 'sma', 'wma'}
+        Kind of moving average, default is 'wma'.
+        - Exponential moving average if 'ema'.
+        - Simple moving average if 'sma'.
+        - Weighted moving average if 'wma'.
 
     Returns
     -------
@@ -211,8 +217,11 @@ def macd_hist(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
         Number of lags for short ma, default is 12.
     slow_ma : int, optional
         Number of lags for long ma, default is 26.
-    kind_ma : str {'ema', 'sma', 'wma'}, optional
+    kind_ma : {'ema', 'sma', 'wma'}
         Kind of moving average, default is 'ema'.
+        - Exponential moving average if 'ema'.
+        - Simple moving average if 'sma'.
+        - Weighted moving average if 'wma'.
 
     Returns
     -------
@@ -253,8 +262,11 @@ def macd_line(series, fast_ma=12, slow_ma=26, kind_ma='ema'):
         Number of lags for short ma, default is 12.
     slow_ma : int, optional
         Number of lags for long ma, default is 26.
-    kind_ma : str {'ema', 'sma', 'wma'}, optional
+    kind_ma : {'ema', 'sma', 'wma'}
         Kind of moving average, default is 'ema'.
+        - Exponential moving average if 'ema'.
+        - Simple moving average if 'sma'.
+        - Weighted moving average if 'wma'.
 
     Returns
     -------
@@ -307,8 +319,11 @@ def rsi(series, kind_ma='ema', lags=21, alpha=None):
     ----------
     series : np.ndarray[dtype=np.float64, ndim=1]
         Index series.
-    kind_ma : str {'ema', 'sma', 'wma'}, optional
+    kind_ma : {'ema', 'sma', 'wma'}
         Kind of moving average, default is 'ema'.
+        - Exponential moving average if 'ema'.
+        - Simple moving average if 'sma'.
+        - Weighted moving average if 'wma'.
     lags : int, optional
         Number of lagged period, default is 21.
     alpha : float, optional
@@ -374,8 +389,11 @@ def signal_line(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
         Number of lags for short ma, default is 12.
     slow_ma : int, optional
         Number of lags for long ma, default is 26.
-    kind_ma : str {'ema', 'sma', 'wma'}, optional
+    kind_ma : {'ema', 'sma', 'wma'}
         Kind of moving average, default is 'ema'.
+        - Exponential moving average if 'ema'.
+        - Simple moving average if 'sma'.
+        - Weighted moving average if 'wma'.
 
     Returns
     -------
