@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-08-20 15:25:34
+# @Last modified time: 2019-08-20 16:15:33
 
 """ Metric functons used in financial analysis. """
 
@@ -28,9 +28,10 @@ from fynance.tools.momentums import sma, ema, wma, smstd, emstd, wmstd
 
 
 __all__ = [
-    'accuracy', 'calmar', 'diversified_ratio', 'drawdown', 'mad', 'mdd',
-    'roll_calmar', 'roll_mad', 'roll_mdd', 'roll_sharpe', 'roll_z_score',
-    'sharpe', 'perf_index', 'perf_returns', 'z_score',
+    'accuracy', 'annual_return', 'annual_volatility', 'calmar',
+    'diversified_ratio', 'drawdown', 'mad', 'mdd', 'roll_calmar', 'roll_mad',
+    'roll_mdd', 'roll_sharpe', 'roll_z_score', 'sharpe', 'perf_index',
+    'perf_returns', 'z_score',
 ]
 
 
@@ -82,6 +83,75 @@ def accuracy(y_true, y_pred, sign=True):
     W = np.sum(y_true != y_pred)
 
     return R / (R + W)
+
+
+def annual_return(series, period=252):
+    """ Compute compouned annual return.
+
+    Parameters
+    ----------
+    series : np.ndarray[np.float64, ndim=1]
+        Time series (price, performance or index).
+    period : int, optional
+        Number of period per year, default is 252 (trading days).
+
+    Returns
+    -------
+    np.float64
+        Value of compouned annual return.
+
+    Examples
+    --------
+    Assume series of monthly prices:
+
+    >>> series = np.array([100, 110, 80, 120, 160, 108])
+    >>> print(round(annual_return(series, period=12), 4))
+    0.1664
+
+    See Also
+    --------
+    mdd, drawdown, sharpe, annual_volatility
+
+    """
+    T = series.size
+    ret = series[-1] / series[0]
+
+    return np.sign(ret) * np.float_power(
+        np.abs(ret),
+        period / T,
+        dtype=np.float64
+    ) - 1.
+
+
+def annual_volatility(series, period=252):
+    """ Compute compouned annual volatility.
+
+    Parameters
+    ----------
+    series : np.ndarray[np.float64, ndim=1]
+        Time series (price, performance or index).
+    period : int, optional
+        Number of period per year, default is 252 (trading days).
+
+    Returns
+    -------
+    np.float64
+        Value of compouned annual volatility.
+
+    Examples
+    --------
+    Assume series of monthly prices:
+
+    >>> series = np.array([100, 110, 105, 110, 120, 108])
+    >>> print(round(annual_volatility(series, period=12), 6))
+    0.272172
+
+    See Also
+    --------
+    mdd, drawdown, sharpe, annual_return
+
+    """
+    return np.sqrt(period) * np.std(series[1:] / series[:-1] - 1.)
 
 
 def calmar(series, period=252):
