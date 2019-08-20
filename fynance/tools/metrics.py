@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-07-24 18:25:17
+# @Last modified time: 2019-08-20 15:25:34
 
 """ Metric functons used in financial analysis. """
 
@@ -17,6 +17,7 @@ import numpy as np
 from fynance.tools.metrics_cy import calmar_cy, drawdown_cy, mdd_cy, sharpe_cy
 from fynance.tools.metrics_cy import log_sharpe_cy, roll_mdd_cy, roll_mad_cy
 from fynance.tools.momentums_cy import smstd_cy
+from fynance.tools.momentums import sma, ema, wma, smstd, emstd, wmstd
 
 # TODO:
 # - Append window size on rolling calmar
@@ -28,7 +29,8 @@ from fynance.tools.momentums_cy import smstd_cy
 
 __all__ = [
     'accuracy', 'calmar', 'diversified_ratio', 'drawdown', 'mad', 'mdd',
-    'roll_calmar', 'roll_mad', 'roll_mdd', 'roll_sharpe', 'sharpe',
+    'roll_calmar', 'roll_mad', 'roll_mdd', 'roll_sharpe', 'roll_z_score',
+    'sharpe', 'perf_index', 'perf_returns', 'z_score',
 ]
 
 
@@ -85,6 +87,8 @@ def accuracy(y_true, y_pred, sign=True):
 def calmar(series, period=252):
     """ Compute the Calmar Ratio [1]_.
 
+    Notes
+    -----
     It is the compouned annual return over the Maximum DrawDown.
 
     Parameters
@@ -124,6 +128,8 @@ def calmar(series, period=252):
 def diversified_ratio(series, w=None, std_method='std'):
     r""" Compute diversification ratio of a portfolio.
 
+    Notes
+    -----
     Diversification ratio, denoted D, is defined as the ratio of the
     portfolio's weighted average volatility to its overll volatility,
     developed by Choueifaty and Coignard [2]_.
@@ -274,14 +280,14 @@ def mdd(series):
     return mdd_cy(series)
 
 
-def perf_index(series, init_value=100.):
+def perf_index(series, base=100.):
     """ Compute performance of prices or index values along time axis.
 
     Parameters
     ----------
     series : np.ndarray[ndim=1, dtype=np.float64]
         Time-series of prices or index values.
-    init_value : float, optional
+    base : float, optional
         Initial value for measure the performance, default is 100.
 
     Returns
@@ -296,14 +302,14 @@ def perf_index(series, init_value=100.):
     Examples
     --------
     >>> series = np.array([10., 12., 15., 14., 16., 18., 16.])
-    >>> perf_index(series, init_value=100.)
+    >>> perf_index(series, base=100.)
     array([100., 120., 150., 140., 160., 180., 160.])
 
     """
-    return init_value * series / series[0]
+    return base * series / series[0]
 
 
-def perf_returns(returns, log=False, init_value=100.):
+def perf_returns(returns, log=False, base=100.):
     """ Compute performance of returns along time axis.
 
     Parameters
@@ -312,7 +318,7 @@ def perf_returns(returns, log=False, init_value=100.):
         Time-series of returns.
     log : bool, optional
         Considers returns as log-returns if True. Default is False.
-    init_value : float, optional
+    base : float, optional
         Initial value for measure the performance, default is 100.
 
     Returns
@@ -327,20 +333,20 @@ def perf_returns(returns, log=False, init_value=100.):
     Examples
     --------
     >>> returns = np.array([0., 20., 30., -10., 20., 20., -20.])
-    >>> perf_returns(returns, init_value=100., log=False)
+    >>> perf_returns(returns, base=100., log=False)
     array([100., 120., 150., 140., 160., 180., 160.])
 
     """
-    series = np.cumsum(returns) + init_value
+    series = np.cumsum(returns) + base
 
     if log:
         series = np.exp(series)
 
-    return perf_index(series, init_value=init_value)
+    return perf_index(series, base=base)
 
 
 # TODO : finish perf strat metric (add reinvest option)
-def perf_strat(underlying, signals=None, log=False, init_value=100.,
+def perf_strat(underlying, signals=None, log=False, base=100.,
                reinvest=False):
     """ Compute the performance of a strategy.
 
@@ -354,7 +360,7 @@ def perf_strat(underlying, signals=None, log=False, init_value=100.,
         Time-series of signals, if `None` considering a long position.
     log : bool, optional
         Considers underlying series as log values if True. Default is False.
-    init_value : float, optional
+    base : float, optional
         Initial value for measure the performance, default is 100.
     reinvest : bool, optional
         Reinvest profit/loss if true.
@@ -372,15 +378,15 @@ def perf_strat(underlying, signals=None, log=False, init_value=100.,
     --------
     >>> underlying = np.array([10., 12., 15., 14., 16., 18., 16.])
     >>> signals = np.array([1., 1., 1., 0., 1., 1., -1.])
-    >>> perf_strat(underlying, signals, init_value=100.)
+    >>> perf_strat(underlying, signals, base=100.)
     array([100., 120., 150., 150., 170., 190., 210.])
 
-    # >>> perf_strat(underlying, signals, init_value=100., reinvest=True)
+    # >>> perf_strat(underlying, signals, base=100., reinvest=True)
     # array([100., 120., ])
 
     """
     returns = np.zeros(underlying.shape)
-    underlying *= init_value / underlying[0]
+    underlying *= base / underlying[0]
     returns[1:] = underlying[1:] - underlying[:-1]
 
     if signals is None:
@@ -388,14 +394,16 @@ def perf_strat(underlying, signals=None, log=False, init_value=100.,
 
     series = returns * signals
 
-    return perf_returns(series, log=log, init_value=init_value)
+    return perf_returns(series, log=log, base=base)
 
 
 def sharpe(series, period=252, log=False):
     r""" Compute the Sharpe ratio [6]_.
 
-    It is computed as the total return over the volatility (we assume no risk
-    free asset) such that:
+    Notes
+    -----
+    It is computed as the total return over the volatility (we assume no
+    risk-free rate) such that:
 
     .. math:: \text{Sharpe ratio} = \frac{E(r)}{\sqrt{Var(r)}}
 
@@ -437,6 +445,72 @@ def sharpe(series, period=252, log=False):
         return log_sharpe_cy(series, period=float(period))
 
     return sharpe_cy(series, period=float(period))
+
+
+def z_score(series, kind_ma='sma', **kwargs):
+    r""" Compute Z-score function.
+
+    Notes
+    -----
+    Compute the z-score function for a specific average and standard deviation
+    function such that:
+
+    .. math:: z = \frac{series_t - \mu_t}{\sigma_t}
+
+    Where :math:`\mu_t` is the average and :math:`\sigma_t` is the standard
+    deviation.
+
+    Parameters
+    ----------
+    series : np.ndarray[np.float64, ndim=1]
+        Series of index, prices or returns.
+    kind_ma : {'ema', 'sma', 'wma'}
+        Kind of moving average/standard deviation, default is 'sma'.
+        - Exponential moving average if 'ema'.
+        - Simple moving average if 'sma'.
+        - Weighted moving average if 'wma'.
+    **kwargs
+        Any parameters for the moving average function.
+
+    Returns
+    -------
+    float
+        Value of Z-score.
+
+    Examples
+    --------
+    >>> series = np.array([70, 100, 80, 120, 160, 80])
+    >>> z_score(series, kind_ma='ema')
+    -0.009636022213064485
+    >>> z_score(series, lags=3)
+    -1.224744871391589
+
+    See Also
+    --------
+    roll_z_score, mdd, calmar, drawdown, sharpe
+
+    """
+    if kind_ma.lower() == 'wma':
+        ma_f = wma
+        std_f = wmstd
+
+    elif kind_ma.lower() == 'sma':
+        ma_f = sma
+        std_f = smstd
+
+    elif kind_ma.lower() == 'ema':
+        ma_f = ema
+        std_f = emstd
+
+    else:
+        raise ValueError('Unknown kind_ma: {}'.format(kind_ma))
+
+    m = ma_f(series, **kwargs)
+    s = std_f(series, **kwargs)
+    s[s == 0.] = 1.
+    z = (series - m) / s
+
+    return z[-1]
 
 
 # =========================================================================== #
@@ -665,6 +739,74 @@ def roll_sharpe(series, period=252, win=0, cap=True):
         roll_shar[:win][xtrem_val] = 0.
 
     return roll_shar
+
+
+def roll_z_score(series, kind_ma='sma', **kwargs):
+    r""" Compute vector of rolling/moving Z-score function.
+
+    Notes
+    -----
+    Compute for each observation the z-score function for a specific moving
+    average function such that:
+
+    .. math:: z = \frac{seres - \mu_t}{\sigma_t}
+
+    Where :math:`\mu_t` is the moving average and :math:`\sigma_t` is the
+    moving standard deviation.
+
+    Parameters
+    ----------
+    series : np.ndarray[np.float64, ndim=1]
+        Series of index, prices or returns.
+    kind_ma : {'ema', 'sma', 'wma'}
+        Kind of moving average/standard deviation, default is 'sma'.
+        - Exponential moving average if 'ema'.
+        - Simple moving average if 'sma'.
+        - Weighted moving average if 'wma'.
+    **kwargs
+        Any parameters for the moving average function.
+
+    Returns
+    -------
+    np.ndarray[np.float64, ndim=1]
+        Vector of Z-score at each period.
+
+    Examples
+    --------
+    >>> series = np.array([70, 100, 80, 120, 160, 80])
+    >>> roll_z_score(series, kind_ma='ema')
+    array([ 0.        ,  3.83753384,  1.04129457,  3.27008748,  3.23259291,
+           -0.00963602])
+    >>> roll_z_score(series, lags=3)
+    array([ 0.        ,  1.        , -0.26726124,  1.22474487,  1.22474487,
+           -1.22474487])
+
+    See Also
+    --------
+    z_score, roll_mdd, roll_calmar, roll_mad, roll_sharpe
+
+    """
+    if kind_ma.lower() == 'wma':
+        ma_f = wma
+        std_f = wmstd
+
+    elif kind_ma.lower() == 'sma':
+        ma_f = sma
+        std_f = smstd
+
+    elif kind_ma.lower() == 'ema':
+        ma_f = ema
+        std_f = emstd
+
+    else:
+        raise ValueError('Unknown kind_ma: {}'.format(kind_ma))
+
+    m = ma_f(series, **kwargs)
+    s = std_f(series, **kwargs)
+    s[s == 0.] = 1.
+    z = (series - m) / s
+
+    return z
 
 
 if __name__ == '__main__':
