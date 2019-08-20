@@ -4,7 +4,9 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:33
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-07-24 18:00:23
+# @Last modified time: 2019-08-20 14:26:44
+
+""" Indicators functions. """
 
 # Built-in packages
 
@@ -25,9 +27,13 @@ __all__ = [
 # =========================================================================== #
 
 
-def z_score(series, kind_ma='ema', **kwargs):
-    r""" Compute a Z-score function for a specific moving average function such
-    that:
+def z_score(series, kind_ma='sma', **kwargs):
+    r""" Compute rolling/moving vector of Z-score.
+
+    Notes
+    -----
+    Compute for each observation the z-score function for a specific moving
+    average function such that:
 
     .. math:: z = \frac{seres - \mu_t}{\sigma_t}
 
@@ -38,9 +44,9 @@ def z_score(series, kind_ma='ema', **kwargs):
     ----------
     series : np.ndarray[np.float64, ndim=1]
         Series of index, prices or returns.
-    kind_ma : str {'ema', 'sma', 'wma'}, optional
-        Kind of moving average, default is 'ema'.
-    kwargs : dict, optional
+    kind_ma : {'ema', 'sma', 'wma'}, optional
+        Kind of moving average, default is 'sma'.
+    kwargs
         Any parameters for the moving average function.
 
     Returns
@@ -51,10 +57,10 @@ def z_score(series, kind_ma='ema', **kwargs):
     Examples
     --------
     >>> series = np.array([70, 100, 80, 120, 160, 80])
-    >>> z_score(series)
+    >>> z_score(series, kind_ma='ema')
     array([ 0.        ,  3.83753384,  1.04129457,  3.27008748,  3.23259291,
            -0.00963602])
-    >>> z_score(series, kind_ma='sma', lags=3)
+    >>> z_score(series, lags=3)
     array([ 0.        ,  1.        , -0.26726124,  1.22474487,  1.22474487,
            -1.22474487])
 
@@ -141,6 +147,8 @@ def bollinger_band(series, lags=21, n_std=2, kind_ma='sma'):
 def cci(series, high=None, low=None, lags=20):
     r""" Compute Commodity Channel Index _[1].
 
+    Notes
+    -----
     CCI is an oscillator introduced by Donald Lamber in 1980. It is calculated
     as the difference between the typical price of a commodity and its simple
     moving average, divided by the moving mean absolute deviation of the
@@ -201,8 +209,10 @@ def cci(series, high=None, low=None, lags=20):
 
 
 def hma(series, lags=21, kind_ma='wma'):
-    r""" Indicator Hull moving average following:
+    r""" Compute Hull Moving Average.
 
+    Notes
+    -----
     .. math:: hma = wma(2 \times wma(x, \frac{k}{2}) - wma(x, k), \sqrt{k})
 
     Parameters
@@ -292,7 +302,7 @@ def macd_hist(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
 
 
 def macd_line(series, fast_ma=12, slow_ma=26, kind_ma='ema'):
-    """ Indicator Moving Average Convergence Divergence Line
+    """ Compute Moving Average Convergence Divergence Line.
 
     Parameters
     ----------
@@ -341,6 +351,8 @@ def macd_line(series, fast_ma=12, slow_ma=26, kind_ma='ema'):
 def rsi(series, kind_ma='ema', lags=21, alpha=None):
     r""" Compute Relative Strenght Index.
 
+    Notes
+    -----
     It is the average gain of upward periods (noted `U`) divided by the average
     loss of downward (noted `D`) periods during the specified time frame, such
     that :
