@@ -1,11 +1,12 @@
+************************
 Tools to backtest module
-========================
+************************
 Some tools to plot strategy's performances, rolling sharpe or drawdowns and to display some metrics and statistics.
 
 .. autosummary::
 
    fynance.backtest.display_perf
-   fynance.backtest.backtest.set_text_stats
+   fynance.backtest.set_text_stats
 
 .. autofunction:: fynance.backtest.display_perf
 
