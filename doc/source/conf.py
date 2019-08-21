@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-08-21 07:05:30
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-08-21 07:40:01
+# @Last modified time: 2019-08-21 07:45:29
 
 """ Configuration file of documentation. """
 
@@ -65,7 +65,7 @@ author = 'Arthur Bernard'
 version = "1.0.4"
 release = "1.0.4"
 
-templates_path = ['doc/source/_templates']
+templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
 pygments_style = 'sphinx'  # Style of code source
