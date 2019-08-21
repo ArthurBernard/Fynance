@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-08-21 07:05:30
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-08-21 07:20:31
+# @Last modified time: 2019-08-21 07:33:36
 
 """ Configuration file of documentation. """
 
@@ -49,49 +49,14 @@ sys.path.append(os.path.abspath('../..'))
 sys.path.append(os.path.abspath('../sphinxext'))
 
 extensions = [
-    # 'sphinx.ext.autodoc',
-    # 'numpydoc',
-    # 'sphinx.ext.intersphinx',
-    # 'sphinx.ext.coverage',
-    # 'sphinx.ext.doctest',
-    # 'sphinx.ext.autosummary',
-    # 'sphinx.ext.graphviz',
-    # 'sphinx.ext.ifconfig',
-    # 'matplotlib.sphinxext.plot_directive',
-    # 'IPython.sphinxext.ipython_console_highlighting',
-    # 'IPython.sphinxext.ipython_directive',
-    #
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinx.ext.intersphinx',
     'numpydoc',
-    # 'scipyoptdoc',
-    # 'doi_role',
     'matplotlib.sphinxext.plot_directive',
-    #
-    # 'sphinx.ext.autodoc',
-    # 'sphinx.ext.napoleon',
-    # 'sphinx.ext.intersphinx',
-    # 'sphinx.ext.coverage',
-    # 'sphinx.ext.autosummary',
-    #
-    # 'numpydoc',
 ]
-
-# Napoleon settings
-# napoleon_google_docstring = False
-# napoleon_numpy_docstring = True
-# napoleon_include_init_with_doc = True
-# napoleon_include_private_with_doc = False
-# napoleon_include_special_with_doc = True
-# napoleon_use_admonition_for_examples = False
-# napoleon_use_admonition_for_notes = False
-# napoleon_use_admonition_for_references = False
-# napoleon_use_ivar = False
-# napoleon_use_param = False
-# napoleon_use_rtype = False
 
 project = 'fynance'
 copyright = '2018-2019, Arthur Bernard'
@@ -100,7 +65,7 @@ author = 'Arthur Bernard'
 version = "1.0.4"
 release = "1.0.4"
 
-templates_path = ['_templates']
+templates_path = ['doc/source/_templates']
 source_suffix = '.rst'
 master_doc = 'index'
 pygments_style = 'sphinx'  # Style of code source
