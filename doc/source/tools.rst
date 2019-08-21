@@ -1,3 +1,4 @@
+=======================
 Financial tools package
 =======================
 Several financial tools as metrics, indicators, etc.
