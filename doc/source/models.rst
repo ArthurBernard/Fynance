@@ -1,3 +1,4 @@
+========================
 Financial models package
 ========================
 Several financial models (deep learning, econometric, statistic etc.).

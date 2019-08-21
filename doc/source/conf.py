@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-08-21 07:05:30
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-08-21 07:45:29
+# @Last modified time: 2019-08-21 08:12:49
 
 """ Configuration file of documentation. """
 
@@ -101,7 +101,7 @@ html_theme_option = {
         ),
     ]
 }
-html_sidebars = {'index': ['searchbox.html']}  # , 'indexsidebar.html'
+html_sidebars = {'index': ['searchbox.html', 'indexsidebar.html']}
 html_static_path = ['_static']
 html_context = {
     "display_github": True,  # Integrate GitHub
