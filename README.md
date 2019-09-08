@@ -1,5 +1,6 @@
 # Fynance - Machine learning tools for financial analysis [In Progress]
 
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/fynance)
 [![PyPI](https://img.shields.io/pypi/v/fynance.svg)](https://pypi.org/project/fynance/)
 [![Status](https://img.shields.io/pypi/status/fynance.svg?colorB=blue)](https://pypi.org/project/fynance/)
 [![Build Status](https://travis-ci.org/ArthurBernard/Fynance.svg?branch=master)](https://travis-ci.org/ArthurBernard/Fynance)
