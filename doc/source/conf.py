@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-08-21 07:05:30
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-08-21 08:12:49
+# @Last modified time: 2019-09-11 10:10:30
 
 """ Configuration file of documentation. """
 
@@ -62,8 +62,8 @@ project = 'fynance'
 copyright = '2018-2019, Arthur Bernard'
 author = 'Arthur Bernard'
 
-version = "1.0.4"
-release = "1.0.4"
+version = "1.0.5"
+release = "1.0.5"
 
 templates_path = ['_templates']
 source_suffix = '.rst'
