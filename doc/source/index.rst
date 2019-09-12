@@ -7,7 +7,8 @@ This is the documentation of `fynance`, a **python/cython project** that include
    :maxdepth: 2
    :caption: Contents:
 
-   neural_networks
+   algorithms
    backtest
-   tools
    models
+   neural_networks
+   tools
