@@ -7,8 +7,8 @@ Some algorithms of portfolio allocation.
 .. autosummary::
 
    fynance.algorithms.allocation.HRP
-   fynance.algorithms.allocation.MDP
+   fynance.algorithms.allocation.MVP
 
 .. autofunction:: HRP
 
-.. autofunction:: MDP
+.. autofunction:: MVP
