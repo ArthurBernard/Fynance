@@ -1,5 +1,5 @@
-Portfolio allocation algorithm module
-=====================================
+Portfolio allocation module
+===========================
 Some algorithms of portfolio allocation.
 
 .. currentmodule:: fynance.algorithms.allocation

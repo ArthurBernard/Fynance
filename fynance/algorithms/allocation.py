@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-09-12 14:52:08
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-16 10:30:24
+# @Last modified time: 2019-09-16 10:44:47
 
 """ Algorithms of portfolio allocation. """
 
@@ -224,15 +224,15 @@ def IVP(X, normalize=False):
     .. math::
         w_i = \frac{1}{\sigma_k^2} (\sum_{i} \frac{1}{\sigma_i^2})^{-1}
 
-    With math:`\sigma_i^2` is the variance of asset i.
+    With :math:`\sigma_i^2` is the variance of asset i.
 
     Parameters
     ----------
     X : array_like
         Each column is a price or return's asset series.
     normalize : bool, optional
-        If True normalize the weights such that math:`\sum_{i=1}^{N} w_i = 1`
-        and math:`0 \leq w_i \leq 1`.
+        If True normalize the weights such that :math:`\sum_{i=1}^{N} w_i = 1`
+        and :math:`0 \leq w_i \leq 1`.
 
     Returns
     -------
@@ -265,14 +265,14 @@ def MVP(X, normalize=True):
 
     Notes
     -----
-    The vector of weights noted math:`w` that minimize the portfolio variance
+    The vector of weights noted :math:`w` that minimize the portfolio variance
     [2]_ is define as below:
 
     .. math::
         w = \frac{\Omega^{-1} e}{e' \Omega^{-1} e}
         \text{ with } \sum_{i=1}^{N} w_i = 1
 
-    Where math:`\Omega` is the asset's variance-covariance matrix and math:`e`
+    Where :math:`\Omega` is the asset's variance-covariance matrix and :math:`e`
     is a vector of ones.
 
     Parameters
@@ -280,8 +280,8 @@ def MVP(X, normalize=True):
     X : array_like
         Each column is a time-series of price or return's asset.
     normalize : boolean, optional
-        If True normalize the weigths such that math:`0 \leq w_i \leq 1` and
-        math:`\sum_{i=1}^{N} w_i = 1`, math:`\forall i`.
+        If True normalize the weigths such that :math:`0 \leq w_i \leq 1` and
+        :math:`\sum_{i=1}^{N} w_i = 1`, :math:`\forall i`.
 
     Returns
     -------
