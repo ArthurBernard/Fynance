@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-09-12 14:52:08
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-13 17:17:51
+# @Last modified time: 2019-09-16 10:30:24
 
 """ Algorithms of portfolio allocation. """
 
@@ -164,15 +164,17 @@ def _get_IVP(mat_cov):
     return ivp
 
 
-def HRP(data, method='single', metric='euclidean'):
+def HRP(X, method='single', metric='euclidean'):
     """ Get weights of the Hierarchical Risk Parity allocation.
 
+    Notes
+    -----
     Hierarchical Risk Parity algorithm is developed by Marco Lopez de Prado
     [1]_. First step is clustering and second step is allocating weights.
 
     Parameters
     ----------
-    data : array_like
+    X : array_like
         Each column is a price or return's asset series. Some errors will
         happen if one or more series are constant.
     method, metric: str
@@ -189,12 +191,12 @@ def HRP(data, method='single', metric='euclidean'):
     .. [1] https://ssrn.com/abstract=2708678
 
     """
-    if not isinstance(data, pd.DataFrame):
-        data = pd.DataFrame(data)
+    if not isinstance(X, pd.DataFrame):
+        X = pd.DataFrame(X)
 
     # Compute covariance and correlation matrix
-    mat_cov = data.cov()
-    mat_corr = data.corr()  # .fillna(0)
+    mat_cov = X.cov()
+    mat_corr = X.corr()  # .fillna(0)
     # Compute distance matrix
     mat_dist = _corr_dist(mat_corr).fillna(0)
     mat_dist_corr = squareform(mat_dist)
@@ -212,9 +214,11 @@ def HRP(data, method='single', metric='euclidean'):
 # =========================================================================== #
 
 
-def IVP(data, normalize=False):
+def IVP(X, normalize=False):
     r""" Get weights of the Inverse Variance Portfolio allocation.
 
+    Notes
+    -----
     Weights are computed by the inverse of the asset's variance [3]_ such that:
 
     .. math::
@@ -224,7 +228,7 @@ def IVP(data, normalize=False):
 
     Parameters
     ----------
-    data : array_like
+    X : array_like
         Each column is a price or return's asset series.
     normalize : bool, optional
         If True normalize the weights such that math:`\sum_{i=1}^{N} w_i = 1`
@@ -240,7 +244,7 @@ def IVP(data, normalize=False):
     .. [3] https://en.wikipedia.org/wiki/Inverse-variance_weighting
 
     """
-    mat_cov = np.cov(data, rowvar=False)
+    mat_cov = np.cov(X, rowvar=False)
     w = _get_IVP(mat_cov)
 
     if normalize:
@@ -256,11 +260,13 @@ def IVP(data, normalize=False):
 # =========================================================================== #
 
 
-def MVP(data, normalize=True):
-    r""" Get weights of the Minimum Variance Portfolio [2]_ allocation.
+def MVP(X, normalize=True):
+    r""" Get weights of the Minimum Variance Portfolio allocation.
 
+    Notes
+    -----
     The vector of weights noted math:`w` that minimize the portfolio variance
-    is define as below:
+    [2]_ is define as below:
 
     .. math::
         w = \frac{\Omega^{-1} e}{e' \Omega^{-1} e}
@@ -271,7 +277,7 @@ def MVP(data, normalize=True):
 
     Parameters
     ----------
-    data : array_like
+    X : array_like
         Each column is a time-series of price or return's asset.
     normalize : boolean, optional
         If True normalize the weigths such that math:`0 \leq w_i \leq 1` and
@@ -291,7 +297,7 @@ def MVP(data, normalize=True):
     HRP
 
     """
-    mat_cov = np.cov(data, rowvar=False)
+    mat_cov = np.cov(X, rowvar=False)
     # Inverse variance matrix
     try:
         iv = np.linalg.inv(mat_cov)
@@ -315,12 +321,12 @@ def MVP(data, normalize=True):
 # =========================================================================== #
 
 
-def MDP(data, w0=None, up_bound=1., low_bound=0.):
+def MDP(X, w0=None, up_bound=1., low_bound=0.):
     """ Get weights of Maximum Diversified Portfolio allocation.
 
     Parameters
     ----------
-    data : array_like
+    X : array_like
         Each column is a series of price or return's asset.
     w0 : array_like, optional
         Initial weights to maximize.
@@ -337,11 +343,11 @@ def MDP(data, w0=None, up_bound=1., low_bound=0.):
     .. [2] tobam.fr/wp-content/uploads/2014/12/TOBAM-JoPM-Maximum-Div-2008.pdf
 
     """
-    T, N = data.shape
+    T, N = X.shape
 
     # Set function to minimze
     def f_max_divers_weights(w):
-        return - diversified_ratio(data, w=w).flatten()
+        return - diversified_ratio(X, w=w).flatten()
 
     # Set inital weights
     if w0 is None:
@@ -366,35 +372,44 @@ def MDP(data, w0=None, up_bound=1., low_bound=0.):
 # =========================================================================== #
 
 
-def _perf_alloc(data, w, drift=True):
+def _perf_alloc(X, w, drift=True):
     if w.ndim == 1 and not isinstance(w, pd.Series):
         w = w.reshape([w.size, 1])
 
     if drift:
-        return (data / data[0, :]) @ w
+        return (X / X[0, :]) @ w
 
-    perf = np.zeros(data.shape)
-    perf[1:] = (data[1:] / data[:-1] - 1)
+    perf = np.zeros(X.shape)
+    perf[1:] = (X[1:] / X[:-1] - 1)
 
     return np.cumprod(perf @ w + 1)
 
 
-def rolling_allocation(f, data, n=252, s=63, ret=True, drift=True, **kwargs):
-    """ Roll an algorithm of allocation.
+def rolling_allocation(f, X, n=252, s=63, ret=True, drift=True, **kwargs):
+    r""" Roll an algorithm of allocation.
+
+    Notes
+    -----
+    Weights are computed on the past data from ``t - n`` to ``t`` and are
+    applied to backtest on data from ``t`` to ``t + s``.
+
+    .. math::
+        \forall t \in [n, T], w_{t:t+s} = f(X_{t-n:t})
 
     Parameters
     ----------
     f : callable
-        Allocation algorithm that take as parameters a subarray of ``data``
+        Allocation algorithm that take as parameters a subarray of ``X``
         and ``**kwargs``, and return a vector (as ``np.ndarray``) of weights.
-    data : array_like
-        Each columns is a series of prices, indexes or performances.
+    X : array_like
+        Data matrix, each columns is a series of prices, indexes or
+        performances, each row is a observation at time ``t``.
     n, s : int
         Respectively the number of observations to compute weights and the
         number of observations to roll. Default is ``n=252`` and ``s=63``.
     ret : bool, optional
-        If True (default) pass to ``f`` the returns of ``data``. Otherwise pass
-        ``data`` to ``f``.
+        If True (default) pass to ``f`` the returns of ``X``. Otherwise pass
+        ``X`` to ``f``.
     drift : bool, optional
         If False performance of the portfolio is computed as if we rebalance
         the weights of asset at each timeframe. Otherwise we let to drift the
@@ -410,30 +425,29 @@ def rolling_allocation(f, data, n=252, s=63, ret=True, drift=True, **kwargs):
         Weights of the portfolio allocated following ``f`` algorithm.
 
     """
-    data = pd.DataFrame(data)
-    idx = data.index
-    w_mat = pd.DataFrame(index=idx, columns=data.columns)
+    X = pd.DataFrame(X)
+    idx = X.index
+    w_mat = pd.DataFrame(index=idx, columns=X.columns)
     portfolio = pd.Series(100., index=idx, name='portfolio')
-    T = idx.size
 
     if ret:
-        data_ = data.pct_change()
+        X_ = X.pct_change()
 
     else:
-        data_ = data
+        X_ = X
 
     roll = _RollingMechanism(idx, n=n, s=s)
 
     for slice_n, slice_s in roll():
-        # Select data
-        sub_data = data_.loc[slice_n].copy()
-        sub_data = sub_data.dropna(axis=1, how='all').fillna(method='bfill')
-        assets = sub_data.columns
+        # Select X
+        sub_X = X_.loc[slice_n].copy()
+        sub_X = sub_X.dropna(axis=1, how='all').fillna(method='bfill')
+        assets = sub_X.columns
         # Compute weights
-        w = f(sub_data.values, **kwargs)
+        w = f(sub_X.values, **kwargs)
         w_mat.loc[roll.d, assets] = w.flatten()
         # Compute portfolio performance
-        perf = _perf_alloc(data.loc[slice_s, assets].values, w=w, drift=drift)
+        perf = _perf_alloc(X.loc[slice_s, assets].values, w=w, drift=drift)
         portfolio.loc[slice_s] = portfolio.loc[roll.d] * perf.flatten()
 
     w_mat = w_mat.fillna(method='ffill').fillna(0.)

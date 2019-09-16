@@ -4,12 +4,11 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-09-13 10:27:51
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-13 15:26:51
+# @Last modified time: 2019-09-16 09:59:29
 
 # Built-in packages
 
 # Third party packages
-import pandas as pd
 
 # Local packages
 
