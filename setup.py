@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-19 19:54:59
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-11 09:56:05
+# @Last modified time: 2019-09-16 10:31:45
 
 """ Setup script. """
 
@@ -40,7 +40,7 @@ CLASSIFIERS = [
 
 MAJOR = 1
 MINOR = 0
-PATCH = 5
+PATCH = 6
 VERSION = '{}.{}.{}'.format(MAJOR, MINOR, PATCH)
 
 DESCRIPTION = 'Python and Cython scripts of machine learning, econometrics '
