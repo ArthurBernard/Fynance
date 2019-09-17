@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-09-12 14:52:08
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-16 10:44:47
+# @Last modified time: 2019-09-17 15:10:48
 
 """ Algorithms of portfolio allocation. """
 
@@ -194,9 +194,11 @@ def HRP(X, method='single', metric='euclidean'):
     if not isinstance(X, pd.DataFrame):
         X = pd.DataFrame(X)
 
+    idx = X.columns
+
     # Compute covariance and correlation matrix
     mat_cov = X.cov()
-    mat_corr = X.corr()  # .fillna(0)
+    mat_corr = X.corr().fillna(0)
     # Compute distance matrix
     mat_dist = _corr_dist(mat_corr).fillna(0)
     mat_dist_corr = squareform(mat_dist)
@@ -206,7 +208,7 @@ def HRP(X, method='single', metric='euclidean'):
     sortIx = mat_corr.index[sortIx].tolist()
     weights = _get_rec_bisec(mat_cov, sortIx)
 
-    return weights.to_numpy(copy=True).reshape([weights.size, 1])
+    return weights.loc[idx].to_numpy(copy=True).reshape([weights.size, 1])
 
 
 # =========================================================================== #
@@ -249,8 +251,9 @@ def IVP(X, normalize=False):
 
     if normalize:
         w = w - np.min(w)
+        w = w / np.sum(w)
 
-        return w / np.sum(w)
+        return w.reshape([mat_cov.shape[0], 1])
 
     return w.reshape([mat_cov.shape[0], 1])
 
@@ -272,8 +275,8 @@ def MVP(X, normalize=True):
         w = \frac{\Omega^{-1} e}{e' \Omega^{-1} e}
         \text{ with } \sum_{i=1}^{N} w_i = 1
 
-    Where :math:`\Omega` is the asset's variance-covariance matrix and :math:`e`
-    is a vector of ones.
+    Where :math:`\Omega` is the asset's variance-covariance matrix and
+    :math:`e` is a vector of ones.
 
     Parameters
     ----------
