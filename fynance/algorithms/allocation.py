@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-09-12 14:52:08
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-17 15:10:48
+# @Last modified time: 2019-09-20 12:24:48
 
 """ Algorithms of portfolio allocation. """
 
@@ -23,7 +23,77 @@ from .rolling import _RollingMechanism
 
 # TODO : cython
 
-__all__ = ['HRP', 'IVP', 'MDP', 'MVP', 'rolling_allocation']
+__all__ = ['ERC', 'HRP', 'IVP', 'MDP', 'MVP', 'MVP_uc', 'rolling_allocation']
+
+
+# =========================================================================== #
+#                         Equal Risk Contribution                             #
+# =========================================================================== #
+
+
+def ERC(X, w0=None, up_bound=1., low_bound=0.):
+    r""" Get weights of Equal Risk Contribution portfolio allocation.
+
+    Notes
+    -----
+    Weights of Equal Risk Contribution, as described by S. Maillard, T. Roncalli
+    and J. Teiletche [1]_, verify the following problem:
+
+    .. math::
+        w = \text{arg min } f(w)
+        u.c. w'e = 1 \text { and } 0 \leq w_i \leq 1
+
+        \text{With } f(w) = N \sum_{i=1}^{N}w_i^2 (\Omega w)_i^2 - \sum_{i,j=1}^{N} w_i w_j (\Omega w)_i (\Omega w)_j
+
+    Where :math:`\Omega` is the variance-covariance matrix of `X` and :math:`N`
+    the number of assets.
+
+    Parameters
+    ----------
+    X : array_like
+        Each column is a series of price or return's asset.
+    w0 : array_like, optional
+        Initial weights to maximize.
+    up_bound, low_bound : float, optional
+        Respectively maximum and minimum values of weights, such that
+        :math:`low_bound \leq w_i \leq up_bound \forall i`. Default is 0 and 1.
+
+    Returns
+    -------
+    array_like
+        Weights that minimize the Equal Risk Contribution portfolio.
+
+    References
+    ----------
+    .. [1] http://thierry-roncalli.com/download/erc-slides.pdf
+
+    """
+    T, N = X.shape
+    SIGMA = np.cov(X, rowvar=False)
+    up_bound = max(up_bound, 1 / N)
+
+    def f_ERC(w):
+        w = w.reshape([N, 1])
+        arg = N * np.sum(w ** 2 * (SIGMA @ w) ** 2)
+
+        return arg - np.sum(w * (SIGMA @ w) * np.sum(w * (SIGMA @ w)))
+
+    # Set inital weights
+    if w0 is None:
+        w0 = np.ones([N]) / N
+
+    const_sum = LinearConstraint(np.ones([1, N]), [1], [1])
+    const_ind = Bounds(low_bound * np.ones([N]), up_bound * np.ones([N]))
+    result = minimize(
+        f_ERC,
+        w0,
+        method='SLSQP',
+        constraints=[const_sum],
+        bounds=const_ind
+    )
+
+    return result.x.reshape([N, 1])
+
 
 # =========================================================================== #
 #                     HRP developed by Marcos Lopez de Prado                  #
@@ -164,13 +234,13 @@ def _get_IVP(mat_cov):
     return ivp
 
 
-def HRP(X, method='single', metric='euclidean'):
+def HRP(X, method='single', metric='euclidean', low_bound=0., up_bound=1.0):
     """ Get weights of the Hierarchical Risk Parity allocation.
 
     Notes
     -----
     Hierarchical Risk Parity algorithm is developed by Marco Lopez de Prado
-    [1]_. First step is clustering and second step is allocating weights.
+    [2]_. First step is clustering and second step is allocating weights.
 
     Parameters
     ----------
@@ -188,27 +258,31 @@ def HRP(X, method='single', metric='euclidean'):
 
     References
     ----------
-    .. [1] https://ssrn.com/abstract=2708678
+    .. [2] https://ssrn.com/abstract=2708678
 
     """
     if not isinstance(X, pd.DataFrame):
         X = pd.DataFrame(X)
 
     idx = X.columns
+    up_bound = max(up_bound, 1 / X.shape[1])
+    low_bound = min(low_bound, 1 / X.shape[1])
 
     # Compute covariance and correlation matrix
     mat_cov = X.cov()
     mat_corr = X.corr().fillna(0)
     # Compute distance matrix
+    # print(mat_corr)
     mat_dist = _corr_dist(mat_corr).fillna(0)
     mat_dist_corr = squareform(mat_dist)
     link = sch.linkage(mat_dist_corr, method=method, metric=metric)
     # Sort linked matrix
     sortIx = _get_quasi_diag(link)
     sortIx = mat_corr.index[sortIx].tolist()
-    weights = _get_rec_bisec(mat_cov, sortIx)
+    w = _get_rec_bisec(mat_cov, sortIx)
+    w = w.loc[idx].to_numpy(copy=True).reshape([w.size, 1])
 
-    return weights.loc[idx].to_numpy(copy=True).reshape([weights.size, 1])
+    return _normalize(w, up_bound=up_bound, low_bound=low_bound)  # (up_bound - low_bound) * w + low_bound
 
 
 # =========================================================================== #
@@ -216,12 +290,12 @@ def HRP(X, method='single', metric='euclidean'):
 # =========================================================================== #
 
 
-def IVP(X, normalize=False):
+def IVP(X, normalize=False, low_bound=0., up_bound=1.0):
     r""" Get weights of the Inverse Variance Portfolio allocation.
 
     Notes
     -----
-    Weights are computed by the inverse of the asset's variance [3]_ such that:
+    w are computed by the inverse of the asset's variance [3]_ such that:
 
     .. math::
         w_i = \frac{1}{\sigma_k^2} (\sum_{i} \frac{1}{\sigma_i^2})^{-1}
@@ -248,12 +322,16 @@ def IVP(X, normalize=False):
     """
     mat_cov = np.cov(X, rowvar=False)
     w = _get_IVP(mat_cov)
+    up_bound = max(up_bound, 1 / X.shape[1])
+    low_bound = min(low_bound, 1 / X.shape[1])
 
     if normalize:
         w = w - np.min(w)
         w = w / np.sum(w)
 
-        return w.reshape([mat_cov.shape[0], 1])
+    #    return w.reshape([mat_cov.shape[0], 1])
+    w = _normalize(w, up_bound=up_bound, low_bound=low_bound)
+    # w = w * (up_bound - low_bound) + low_bound
 
     return w.reshape([mat_cov.shape[0], 1])
 
@@ -269,7 +347,7 @@ def MVP(X, normalize=True):
     Notes
     -----
     The vector of weights noted :math:`w` that minimize the portfolio variance
-    [2]_ is define as below:
+    [4]_ is define as below:
 
     .. math::
         w = \frac{\Omega^{-1} e}{e' \Omega^{-1} e}
@@ -293,7 +371,7 @@ def MVP(X, normalize=True):
 
     References
     ----------
-    .. [2] https://breakingdownfinance.com/finance-topics/modern-portfolio-theory/minimum-variance-portfolio/
+    .. [4] https://breakingdownfinance.com/finance-topics/modern-portfolio-theory/minimum-variance-portfolio/
 
     See Also
     --------
@@ -306,7 +384,11 @@ def MVP(X, normalize=True):
         iv = np.linalg.inv(mat_cov)
 
     except np.linalg.LinAlgError:
-        iv = np.linalg.pinv(mat_cov)
+        try:
+            iv = np.linalg.pinv(mat_cov)
+        except np.linalg.LinAlgError:
+            display(mat_cov)
+            raise np.linalg.LinAlgError
 
     e = np.ones([iv.shape[0], 1])
     w = (iv @ e) / (e.T @ iv @ e)
@@ -319,13 +401,19 @@ def MVP(X, normalize=True):
     return w
 
 
-# =========================================================================== #
-#    Maximum Diversification Portfolio developed by Choueifaty and Coignard   #
-# =========================================================================== #
+def MVP_uc(X, w0=None, up_bound=1., low_bound=0.):
+    r""" Get weights of the Minimum Variance Portfolio under constraints.
 
+    Notes
+    -----
+    Weights of Minimum Variance Portfolio verify the following problem:
 
-def MDP(X, w0=None, up_bound=1., low_bound=0.):
-    """ Get weights of Maximum Diversified Portfolio allocation.
+    .. math::
+        w = \text{arg min } w' \Omega w
+        u.c. w'e = 1 \text { and } 0 \leq w_i \leq 1
+
+    Where :math:`\Omega` is the variance-covariance matrix of `X` and :math:`e`
+    a vector of ones.
 
     Parameters
     ----------
@@ -334,19 +422,86 @@ def MDP(X, w0=None, up_bound=1., low_bound=0.):
     w0 : array_like, optional
         Initial weights to maximize.
     up_bound, low_bound : float, optional
-        Respectively maximum and minimum values of weights.
+        Respectively maximum and minimum values of weights, such that
+        :math:`low_bound \leq w_i \leq up_bound \forall i`. Default is 0 and 1.
+
+    Returns
+    -------
+    array_like
+        Weights that minimize the variance of the portfolio.
+
+    """
+    mat_cov = np.cov(X, rowvar=False)
+    N = X.shape[1]
+    up_bound = max(up_bound, 1 / N)
+
+    def f_MVP(w):
+        w = w.reshape([N, 1])
+        return w.T @ mat_cov @ w
+
+    # Set inital weights
+    if w0 is None:
+        w0 = np.ones([N]) / N
+
+    # Set constraints and minimze
+    const_sum = LinearConstraint(np.ones([1, N]), [1], [1])
+    const_ind = Bounds(low_bound * np.ones([N]), up_bound * np.ones([N]))
+    result = minimize(
+        f_MVP,
+        w0,
+        method='SLSQP',
+        constraints=[const_sum],
+        bounds=const_ind
+    )
+
+    return result.x.reshape([N, 1])
+
+
+# =========================================================================== #
+#    Maximum Diversification Portfolio developed by Choueifaty and Coignard   #
+# =========================================================================== #
+
+
+def MDP(X, w0=None, up_bound=1., low_bound=0.):
+    r""" Get weights of Maximum Diversified Portfolio allocation.
+
+    Notes
+    -----
+    Weights of Maximum Diversification Portfolio, as described by Y. Choueifaty
+    and Y. Coignard [5]_, verify the following problem:
+
+    .. math::
+        w = \text{arg max } D(w)
+        u.c. w'e = 1 \text { and } 0 \leq w_i \leq 1
+
+    Where :math:`D(w)` is the diversified ratio of portfolio weighted by `w`.
+
+    Parameters
+    ----------
+    X : array_like
+        Each column is a series of price or return's asset.
+    w0 : array_like, optional
+        Initial weights to maximize.
+    up_bound, low_bound : float, optional
+        Respectively maximum and minimum values of weights, such that
+        :math:`low_bound \leq w_i \leq up_bound \forall i`. Default is 0 and 1.
 
     Returns
     -------
     array_like
         Weights that maximize the diversified ratio of the portfolio.
 
+    See Also
+    --------
+    diversified_ratio
+
     References
     ----------
-    .. [2] tobam.fr/wp-content/uploads/2014/12/TOBAM-JoPM-Maximum-Div-2008.pdf
+    .. [5] tobam.fr/wp-content/uploads/2014/12/TOBAM-JoPM-Maximum-Div-2008.pdf
 
     """
     T, N = X.shape
+    up_bound = max(up_bound, 1 / N)
 
     # Set function to minimze
     def f_max_divers_weights(w):
@@ -375,21 +530,8 @@ def MDP(X, w0=None, up_bound=1., low_bound=0.):
 # =========================================================================== #
 
 
-def _perf_alloc(X, w, drift=True):
-    if w.ndim == 1 and not isinstance(w, pd.Series):
-        w = w.reshape([w.size, 1])
-
-    if drift:
-        return (X / X[0, :]) @ w
-
-    perf = np.zeros(X.shape)
-    perf[1:] = (X[1:] / X[:-1] - 1)
-
-    return np.cumprod(perf @ w + 1)
-
-
 def rolling_allocation(f, X, n=252, s=63, ret=True, drift=True, **kwargs):
-    r""" Roll an algorithm of allocation.
+    r""" Roll an algorithm of portfolio allocation.
 
     Notes
     -----
@@ -428,7 +570,7 @@ def rolling_allocation(f, X, n=252, s=63, ret=True, drift=True, **kwargs):
         Weights of the portfolio allocated following ``f`` algorithm.
 
     """
-    X = pd.DataFrame(X)
+    X = pd.DataFrame(X).fillna(method='ffill')
     idx = X.index
     w_mat = pd.DataFrame(index=idx, columns=X.columns)
     portfolio = pd.Series(100., index=idx, name='portfolio')
@@ -441,18 +583,72 @@ def rolling_allocation(f, X, n=252, s=63, ret=True, drift=True, **kwargs):
 
     roll = _RollingMechanism(idx, n=n, s=s)
 
+    def process(series):
+        # True if less than 50% of obs. are constant
+        return series.value_counts(dropna=False).max() < 0.5 * n
+
     for slice_n, slice_s in roll():
         # Select X
         sub_X = X_.loc[slice_n].copy()
-        sub_X = sub_X.dropna(axis=1, how='all').fillna(method='bfill')
-        assets = sub_X.columns
+        assets = list(X.columns[sub_X.apply(process)])
+        sub_X = sub_X.fillna(method='bfill')
         # Compute weights
-        w = f(sub_X.values, **kwargs)
+        if len(assets) == 1:
+            w = np.array([[1.]])
+
+        else:
+            w = f(sub_X.loc[:, assets].values, **kwargs)
+
         w_mat.loc[roll.d, assets] = w.flatten()
+        w_mat.loc[roll.d, :] = w_mat.loc[roll.d, :].fillna(0.)
         # Compute portfolio performance
-        perf = _perf_alloc(X.loc[slice_s, assets].values, w=w, drift=drift)
+        perf = _perf_alloc(
+            X.loc[slice_s, assets].fillna(method='bfill').values,
+            w=w,
+            drift=drift
+        )
         portfolio.loc[slice_s] = portfolio.loc[roll.d] * perf.flatten()
 
     w_mat = w_mat.fillna(method='ffill').fillna(0.)
 
     return portfolio, w_mat
+
+
+# =========================================================================== #
+#                                   Tools                                     #
+# =========================================================================== #
+
+
+def _perf_alloc(X, w, drift=True):
+    # Compute portfolio performance following specified weights
+    if w.ndim == 1 and not isinstance(w, pd.Series):
+        w = w.reshape([w.size, 1])
+
+    if drift:
+        return (X / X[0, :]) @ w
+
+    perf = np.zeros(X.shape)
+    perf[1:] = (X[1:] / X[:-1] - 1)
+
+    return np.cumprod(perf @ w + 1)
+
+
+def _normalize(w, low_bound=0., up_bound=1., sum_w=1., max_iter=1000):
+    # Iterative algorithm to set bounds
+    if up_bound < sum_w / w.size or low_bound > sum_w / w.size:
+
+        raise ValueError('Low or up bound exceeded sum weight constraint.')
+
+    j = 0
+    while (min(w) < low_bound or max(w) > up_bound) and j < max_iter:
+        for i in range(w.size):
+            w[i] = min(w[i], up_bound)
+            w[i] = max(w[i], low_bound)
+
+        w = sum_w * (w / sum(w))
+        j += 1
+
+    if j >= max_iter:
+        print('Iterative normalize algorithm exceeded max iterations')
+
+    return w
