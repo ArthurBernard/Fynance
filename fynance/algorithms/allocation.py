@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-09-12 14:52:08
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-20 12:24:48
+# @Last modified time: 2019-09-20 12:40:01
 
 """ Algorithms of portfolio allocation. """
 
@@ -36,14 +36,15 @@ def ERC(X, w0=None, up_bound=1., low_bound=0.):
 
     Notes
     -----
-    Weights of Equal Risk Contribution, as described by S. Maillard, T. Roncalli
-    and J. Teiletche [1]_, verify the following problem:
+    Weights of Equal Risk Contribution, as described by S. Maillard, T.
+    Roncalli and J. Teiletche [1]_, verify the following problem:
 
     .. math::
-        w = \text{arg min } f(w)
-        u.c. w'e = 1 \text { and } 0 \leq w_i \leq 1
+        w = \text{arg min } f(w) \\
+        u.c. w'e = 1 \text { and } 0 \leq w_i \leq 1 \\
 
-        \text{With } f(w) = N \sum_{i=1}^{N}w_i^2 (\Omega w)_i^2 - \sum_{i,j=1}^{N} w_i w_j (\Omega w)_i (\Omega w)_j
+        \text{With } f(w) = N \sum_{i=1}^{N}w_i^2 (\Omega w)_i^2
+        - \sum_{i,j=1}^{N} w_i w_j (\Omega w)_i (\Omega w)_j
 
     Where :math:`\Omega` is the variance-covariance matrix of `X` and :math:`N`
     the number of assets.
@@ -282,7 +283,7 @@ def HRP(X, method='single', metric='euclidean', low_bound=0., up_bound=1.0):
     w = _get_rec_bisec(mat_cov, sortIx)
     w = w.loc[idx].to_numpy(copy=True).reshape([w.size, 1])
 
-    return _normalize(w, up_bound=up_bound, low_bound=low_bound)  # (up_bound - low_bound) * w + low_bound
+    return _normalize(w, up_bound=up_bound, low_bound=low_bound)
 
 
 # =========================================================================== #
@@ -308,7 +309,7 @@ def IVP(X, normalize=False, low_bound=0., up_bound=1.0):
         Each column is a price or return's asset series.
     normalize : bool, optional
         If True normalize the weights such that :math:`\sum_{i=1}^{N} w_i = 1`
-        and :math:`0 \leq w_i \leq 1`.
+        and :math:`0 \leq w_i \leq 1`. Default is False.
 
     Returns
     -------
@@ -341,7 +342,7 @@ def IVP(X, normalize=False, low_bound=0., up_bound=1.0):
 # =========================================================================== #
 
 
-def MVP(X, normalize=True):
+def MVP(X, normalize=False):
     r""" Get weights of the Minimum Variance Portfolio allocation.
 
     Notes
@@ -350,8 +351,8 @@ def MVP(X, normalize=True):
     [4]_ is define as below:
 
     .. math::
-        w = \frac{\Omega^{-1} e}{e' \Omega^{-1} e}
-        \text{ with } \sum_{i=1}^{N} w_i = 1
+        w = \frac{\Omega^{-1} e}{e' \Omega^{-1} e} \\
+        \text{With } \sum_{i=1}^{N} w_i = 1
 
     Where :math:`\Omega` is the asset's variance-covariance matrix and
     :math:`e` is a vector of ones.
@@ -362,7 +363,7 @@ def MVP(X, normalize=True):
         Each column is a time-series of price or return's asset.
     normalize : boolean, optional
         If True normalize the weigths such that :math:`0 \leq w_i \leq 1` and
-        :math:`\sum_{i=1}^{N} w_i = 1`, :math:`\forall i`.
+        :math:`\sum_{i=1}^{N} w_i = 1`, :math:`\forall i`. Default is False.
 
     Returns
     -------
@@ -409,7 +410,7 @@ def MVP_uc(X, w0=None, up_bound=1., low_bound=0.):
     Weights of Minimum Variance Portfolio verify the following problem:
 
     .. math::
-        w = \text{arg min } w' \Omega w
+        w = \text{arg min } w' \Omega w \\
         u.c. w'e = 1 \text { and } 0 \leq w_i \leq 1
 
     Where :math:`\Omega` is the variance-covariance matrix of `X` and :math:`e`
@@ -471,7 +472,7 @@ def MDP(X, w0=None, up_bound=1., low_bound=0.):
     and Y. Coignard [5]_, verify the following problem:
 
     .. math::
-        w = \text{arg max } D(w)
+        w = \text{arg max } D(w) \\
         u.c. w'e = 1 \text { and } 0 \leq w_i \leq 1
 
     Where :math:`D(w)` is the diversified ratio of portfolio weighted by `w`.
