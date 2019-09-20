@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-09-12 14:52:08
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-20 13:17:52
+# @Last modified time: 2019-09-20 17:29:59
 
 """ Algorithms of portfolio allocation. """
 
@@ -41,10 +41,9 @@ def ERC(X, w0=None, up_bound=1., low_bound=0.):
 
     .. math::
         w = \text{arg min } f(w) \\
-        u.c. \left{\begin{array}{l}
-        w'e = 1 \\
-        0 \leq w_i \leq 1 \\
-        \end{array}\right
+        u.c. \begin{cases}w'e = 1 \\
+                          0 \leq w_i \leq 1 \\
+             \end{cases}
 
     With:
 
@@ -362,9 +361,8 @@ def MVP(X, normalize=False):
     The vector of weights noted :math:`w` that minimize the portfolio variance
     [4]_ is define as below:
 
-    .. math::
-        w = \frac{\Omega^{-1} e}{e' \Omega^{-1} e} \\
-        \text{With } \sum_{i=1}^{N} w_i = 1
+    .. math:: w = \frac{\Omega^{-1} e}{e' \Omega^{-1} e} \\
+    .. math:: \text{With } \sum_{i=1}^{N} w_i = 1
 
     Where :math:`\Omega` is the asset's variance-covariance matrix and
     :math:`e` is a vector of ones.
@@ -423,10 +421,9 @@ def MVP_uc(X, w0=None, up_bound=1., low_bound=0.):
 
     .. math::
         w = \text{arg min } w' \Omega w \\
-        u.c. \left{\begin{array}{l}
-        w'e = 1 \\
-        0 \leq w_i \leq 1 \\
-        \end{array}\right
+        u.c. \begin{cases}w'e = 1 \\
+                          0 \leq w_i \leq 1 \\
+             \end{cases}
 
     Where :math:`\Omega` is the variance-covariance matrix of `X` and :math:`e`
     a vector of ones.
@@ -487,11 +484,11 @@ def MDP(X, w0=None, up_bound=1., low_bound=0.):
     and Y. Coignard [5]_, verify the following problem:
 
     .. math::
+
         w = \text{arg max } D(w) \\
-        u.c. \left{\begin{array}{l}
-        w'e = 1 \\
-        0 \leq w_i \leq 1 \\
-        \end{array}\right
+        u.c. \begin{cases}w'e = 1 \\
+                          0 \leq w_i \leq 1 \\
+             \end{cases}
 
     Where :math:`D(w)` is the diversified ratio of portfolio weighted by `w`.
 
