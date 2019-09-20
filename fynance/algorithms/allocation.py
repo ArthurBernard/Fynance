@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-09-12 14:52:08
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-20 12:40:01
+# @Last modified time: 2019-09-20 13:17:52
 
 """ Algorithms of portfolio allocation. """
 
@@ -41,9 +41,15 @@ def ERC(X, w0=None, up_bound=1., low_bound=0.):
 
     .. math::
         w = \text{arg min } f(w) \\
-        u.c. w'e = 1 \text { and } 0 \leq w_i \leq 1 \\
+        u.c. \left{\begin{array}{l}
+        w'e = 1 \\
+        0 \leq w_i \leq 1 \\
+        \end{array}\right
 
-        \text{With } f(w) = N \sum_{i=1}^{N}w_i^2 (\Omega w)_i^2
+    With:
+
+    .. math::
+        f(w) = N \sum_{i=1}^{N}w_i^2 (\Omega w)_i^2
         - \sum_{i,j=1}^{N} w_i w_j (\Omega w)_i (\Omega w)_j
 
     Where :math:`\Omega` is the variance-covariance matrix of `X` and :math:`N`
@@ -56,8 +62,8 @@ def ERC(X, w0=None, up_bound=1., low_bound=0.):
     w0 : array_like, optional
         Initial weights to maximize.
     up_bound, low_bound : float, optional
-        Respectively maximum and minimum values of weights, such that
-        :math:`low_bound \leq w_i \leq up_bound \forall i`. Default is 0 and 1.
+        Respectively maximum and minimum values of weights, such that low_bound
+        :math:`\leq w_i \leq` up_bound :math`\forall i`. Default is 0 and 1.
 
     Returns
     -------
@@ -236,7 +242,7 @@ def _get_IVP(mat_cov):
 
 
 def HRP(X, method='single', metric='euclidean', low_bound=0., up_bound=1.0):
-    """ Get weights of the Hierarchical Risk Parity allocation.
+    r""" Get weights of the Hierarchical Risk Parity allocation.
 
     Notes
     -----
@@ -251,6 +257,9 @@ def HRP(X, method='single', metric='euclidean', low_bound=0., up_bound=1.0):
     method, metric: str
         Parameters for linkage algorithm, default ``method='single'`` and
         ``metric='euclidean'``.
+    low_bound, up_bound : float
+        Respectively minimum and maximum value of weights, such that low_bound
+        :math:`\leq w_i \leq` up_bound :math`\forall i`. Default is 0 and 1.
 
     Returns
     -------
@@ -310,6 +319,9 @@ def IVP(X, normalize=False, low_bound=0., up_bound=1.0):
     normalize : bool, optional
         If True normalize the weights such that :math:`\sum_{i=1}^{N} w_i = 1`
         and :math:`0 \leq w_i \leq 1`. Default is False.
+    low_bound, up_bound : float, optional
+        Respectively minimum and maximum values of weights, such that low_bound
+        :math:`\leq w_i \leq` up_bound :math`\forall i`. Default is 0 and 1.
 
     Returns
     -------
@@ -411,7 +423,10 @@ def MVP_uc(X, w0=None, up_bound=1., low_bound=0.):
 
     .. math::
         w = \text{arg min } w' \Omega w \\
-        u.c. w'e = 1 \text { and } 0 \leq w_i \leq 1
+        u.c. \left{\begin{array}{l}
+        w'e = 1 \\
+        0 \leq w_i \leq 1 \\
+        \end{array}\right
 
     Where :math:`\Omega` is the variance-covariance matrix of `X` and :math:`e`
     a vector of ones.
@@ -423,8 +438,8 @@ def MVP_uc(X, w0=None, up_bound=1., low_bound=0.):
     w0 : array_like, optional
         Initial weights to maximize.
     up_bound, low_bound : float, optional
-        Respectively maximum and minimum values of weights, such that
-        :math:`low_bound \leq w_i \leq up_bound \forall i`. Default is 0 and 1.
+        Respectively maximum and minimum values of weights, such that low_bound
+        :math:`\leq w_i \leq` up_bound :math`\forall i`. Default is 0 and 1.
 
     Returns
     -------
@@ -473,7 +488,10 @@ def MDP(X, w0=None, up_bound=1., low_bound=0.):
 
     .. math::
         w = \text{arg max } D(w) \\
-        u.c. w'e = 1 \text { and } 0 \leq w_i \leq 1
+        u.c. \left{\begin{array}{l}
+        w'e = 1 \\
+        0 \leq w_i \leq 1 \\
+        \end{array}\right
 
     Where :math:`D(w)` is the diversified ratio of portfolio weighted by `w`.
 
@@ -484,8 +502,8 @@ def MDP(X, w0=None, up_bound=1., low_bound=0.):
     w0 : array_like, optional
         Initial weights to maximize.
     up_bound, low_bound : float, optional
-        Respectively maximum and minimum values of weights, such that
-        :math:`low_bound \leq w_i \leq up_bound \forall i`. Default is 0 and 1.
+        Respectively maximum and minimum values of weights, such that low_bound
+        :math:`\leq w_i \leq` up_bound :math`\forall i`. Default is 0 and 1.
 
     Returns
     -------
