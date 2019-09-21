@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-05-06 20:16:31
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-06-28 16:58:07
+# @Last modified time: 2019-09-12 08:56:41
 
 """ Basis of neural networks models. """
 
@@ -37,17 +37,14 @@ class BaseNeuralNet(torch.nn.Module):
 
     Methods
     -------
-    set_optimizer(criterion, optimizer, **kwargs)
-        Set optimizer object with specified criterion (loss function) and
-        any optional parameters.
-    train_on(X, y)
-        Trains the neural network on `X` as inputs and `y` as ouputs.
-    predict(X)
-        Predicts the outputs of neural network model for `X` as inputs.
+    set_optimizer
+    train_on
+    predict
+    set_data
 
     See Also
     --------
-    MultiLayerPerceptron
+    MultiLayerPerceptron, RollingBasis
 
     """
 
@@ -67,12 +64,12 @@ class BaseNeuralNet(torch.nn.Module):
             A loss function.
         optimizer : torch.optim
             An optimizer algorithm.
-        kwargs : dict
-            Keyword arguments of optimizer, cf pytorch documentation [1]_.
+        **kwargs
+            Keyword arguments of `optimizer`, cf PyTorch documentation [1]_.
 
         Returns
         -------
-        NeuralNetwork
+        BaseNeuralNet
             Self object model.
 
         References
@@ -178,6 +175,17 @@ class MultiLayerPerceptron(BaseNeuralNet):
     Refered as vanilla neural network model, with `n` hidden layers s.t
     n :math:`\geq` 1, with each one a specified number of neurons.
 
+    Parameters
+    ----------
+    X, y : array-like
+        Respectively inputs and outputs data.
+    layers : list of int
+        List of number of neurons in each hidden layer.
+    activation : torch.nn.Module
+        Activation function of layers.
+    drop : float, optional
+        Probability of an element to be zeroed.
+
     Attributes
     ----------
     criterion : torch.nn.modules.loss
@@ -193,37 +201,19 @@ class MultiLayerPerceptron(BaseNeuralNet):
 
     Methods
     -------
-    set_optimizer(criterion, optimizer, **kwargs)
-        Set optimizer object with specified criterion (loss function) and
-        any optional parameters.
-    train_on(X, y)
-        Trains the neural network on `X` as inputs and `y` as ouputs.
-    predict(X)
-        Predicts the outputs of neural network model for `X` as inputs.
-    set_data(X, y)
-        Set respectively input and ouputs data tensor.
+    set_optimizer
+    train_on
+    predict
+    set_data
 
     See Also
     --------
-    BaseNeuralNet
+    BaseNeuralNet, RollMultiLayerPerceptron
 
     """
 
     def __init__(self, X, y, layers=[], activation=None, drop=None):
-        """ Initialize.
-
-        Parameters
-        ----------
-        X, y : array-like
-            Respectively inputs and outputs data.
-        layers : list of int
-            List of number of neurons in each hidden layer.
-        activation : torch.nn.Module
-            Activation function of layers.
-        drop : float, optional
-            Probability of an element to be zeroed.
-
-        """
+        """ Initialize object. """
         BaseNeuralNet.__init__(self)
 
         self.set_data(X, y)
@@ -243,12 +233,14 @@ class MultiLayerPerceptron(BaseNeuralNet):
         # Set activation functions
         if activation is not None:
             self.activation = activation()
+
         else:
             self.activation = lambda x: x
 
         # Set dropout parameters
         if drop is not None:
             self.drop = torch.nn.Dropout(p=drop)
+
         else:
             self.drop = lambda x: x
 
@@ -262,7 +254,7 @@ class MultiLayerPerceptron(BaseNeuralNet):
         return x
 
 
-def type_convert(dtype):
+def _type_convert(dtype):
     if dtype is np.float64 or dtype is np.float or dtype is np.double:
         return torch.float64
 
