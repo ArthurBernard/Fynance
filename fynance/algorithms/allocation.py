@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-09-12 14:52:08
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-20 17:29:59
+# @Last modified time: 2019-09-21 00:56:57
 
 """ Algorithms of portfolio allocation. """
 
@@ -62,7 +62,7 @@ def ERC(X, w0=None, up_bound=1., low_bound=0.):
         Initial weights to maximize.
     up_bound, low_bound : float, optional
         Respectively maximum and minimum values of weights, such that low_bound
-        :math:`\leq w_i \leq` up_bound :math`\forall i`. Default is 0 and 1.
+        :math:`\leq w_i \leq` up_bound :math:`\forall i`. Default is 0 and 1.
 
     Returns
     -------
@@ -258,7 +258,7 @@ def HRP(X, method='single', metric='euclidean', low_bound=0., up_bound=1.0):
         ``metric='euclidean'``.
     low_bound, up_bound : float
         Respectively minimum and maximum value of weights, such that low_bound
-        :math:`\leq w_i \leq` up_bound :math`\forall i`. Default is 0 and 1.
+        :math:`\leq w_i \leq` up_bound :math:`\forall i`. Default is 0 and 1.
 
     Returns
     -------
@@ -320,7 +320,7 @@ def IVP(X, normalize=False, low_bound=0., up_bound=1.0):
         and :math:`0 \leq w_i \leq 1`. Default is False.
     low_bound, up_bound : float, optional
         Respectively minimum and maximum values of weights, such that low_bound
-        :math:`\leq w_i \leq` up_bound :math`\forall i`. Default is 0 and 1.
+        :math:`\leq w_i \leq` up_bound :math:`\forall i`. Default is 0 and 1.
 
     Returns
     -------
@@ -436,7 +436,7 @@ def MVP_uc(X, w0=None, up_bound=1., low_bound=0.):
         Initial weights to maximize.
     up_bound, low_bound : float, optional
         Respectively maximum and minimum values of weights, such that low_bound
-        :math:`\leq w_i \leq` up_bound :math`\forall i`. Default is 0 and 1.
+        :math:`\leq w_i \leq` up_bound :math:`\forall i`. Default is 0 and 1.
 
     Returns
     -------
@@ -500,7 +500,7 @@ def MDP(X, w0=None, up_bound=1., low_bound=0.):
         Initial weights to maximize.
     up_bound, low_bound : float, optional
         Respectively maximum and minimum values of weights, such that low_bound
-        :math:`\leq w_i \leq` up_bound :math`\forall i`. Default is 0 and 1.
+        :math:`\leq w_i \leq` up_bound :math:`\forall i`. Default is 0 and 1.
 
     Returns
     -------
