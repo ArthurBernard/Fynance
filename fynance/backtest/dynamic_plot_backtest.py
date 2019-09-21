@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-03-05 19:17:04
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-05-24 12:47:17
+# @Last modified time: 2019-09-21 19:56:53
 
 """ Module with some function plot backtest. """
 
@@ -108,7 +108,7 @@ class DynaPlotBackTest(PlotBackTest):
 
         # display
         self.ax.legend(**kwargs)
-        # self.f.canvas.draw()
+        # self.fig.canvas.draw()
 
         return self
 
