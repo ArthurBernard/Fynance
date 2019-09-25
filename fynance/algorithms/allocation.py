@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-09-12 14:52:08
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-21 00:56:57
+# @Last modified time: 2019-09-25 14:11:18
 
 """ Algorithms of portfolio allocation. """
 
@@ -349,7 +349,7 @@ def IVP(X, normalize=False, low_bound=0., up_bound=1.0):
 
 
 # =========================================================================== #
-#                         Maximum Variance Portfolio                          #
+#                         Minimum Variance Portfolio                          #
 # =========================================================================== #
 
 
