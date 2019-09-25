@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 # coding: utf-8
+# @Author: ArthurBernard
+# @Email: arthur.bernard.92@gmail.com
+# @Date: 2019-04-23 19:15:05
+# @Last modified by: ArthurBernard
+# @Last modified time: 2019-09-25 14:14:47
 
 # Built-in packages
 
-# External packages
-import xgboost as xgb
+# Third party packages
+# import xgboost as xgb
 
-# Internal packages
+# Local packages
 
 
 __all__ = ['XGB', 'XGBData']
@@ -36,11 +41,13 @@ class XGB:
         # TODO : to remove
         train = self.data[:-n]
         estim = self.data[: s]
-        bst = xgb.train(params, train)
-        return bst.predict(estim)
+        # bst = xgb.train(params, train)
+        # return bst.predict(estim)
 
 
-class XGBData(xgb.DMatrix):
+class XGBData:  # (xgb.DMatrix):
+    """ Set data for XGBoost models. """
+
     def __getitem__(self, key):
         """ Slice the DMatrix and return a new DMatrix that only contains `key`.
 
@@ -66,3 +73,16 @@ class XGBData(xgb.DMatrix):
             stop += self.num_row() + 1
 
         return self.slice(list(range(start, stop, step)))
+
+
+def train_xgb(params, dtrain, bst=None, **kwargs):
+    """ Train a XGBoost model """
+    if bst is None:
+        pass
+
+        # return xgb.train(params, dtrain, **kwargs)
+
+    else:
+        pass
+
+        # return xgb.train(params, dtrain, xgb_model=bst, **kwargs)

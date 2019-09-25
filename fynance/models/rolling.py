@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-04-23 19:15:17
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-21 19:57:43
+# @Last modified time: 2019-09-25 14:12:03
 
 """ Basis of rolling models.
 
@@ -24,7 +24,7 @@ from matplotlib import pyplot as plt
 import torch
 
 # Local packages
-from fynance.models.xgb import XGBData
+# from fynance.models.xgb import XGBData
 from fynance.models.neural_network import MultiLayerPerceptron
 from fynance.backtest.dynamic_plot_backtest import DynaPlotBackTest
 
@@ -169,7 +169,7 @@ class _RollingBasis:
         # Set eval and test periods
         return slice(self.t - self.r, self.t), slice(self.t, self.t + self.s)
 
-    def run(self, backtest_plot=True, backtest_kpi=True):
+    def run(self, backtest_plot=True, backtest_kpi=True, figsize=(9, 6)):
         """ Run neural network model.
 
         Parameters
@@ -183,7 +183,7 @@ class _RollingBasis:
         perf_eval = 100. * np.ones(self.y.shape)
         perf_test = 100. * np.ones(self.y.shape)
         # Set dynamic plot object
-        f, (ax_1, ax_2) = plt.subplots(2, 1, figsize=(16, 16))
+        f, (ax_1, ax_2) = plt.subplots(2, 1, figsize=figsize)
         plt.ion()
         ax_loss = DynaPlotBackTest(
             f, ax_1, title='Model loss', ylabel='Loss', xlabel='Epochs',
@@ -292,7 +292,7 @@ class RollingXGB(_RollingBasis):
 
         """
         _RollingBasis.__init__(self, X, y)
-        self.data = XGBData(X, label=y, **kwargs)
+        # self.data = XGBData(X, label=y, **kwargs)
         self.bst = None
 
     def _train(self):
