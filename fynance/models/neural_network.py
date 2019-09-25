@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-05-06 20:16:31
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-12 08:56:41
+# @Last modified time: 2019-09-25 22:09:09
 
 """ Basis of neural networks models. """
 
@@ -212,11 +212,12 @@ class MultiLayerPerceptron(BaseNeuralNet):
 
     """
 
-    def __init__(self, X, y, layers=[], activation=None, drop=None):
+    def __init__(self, X, y, layers=[], activation=None, drop=None,
+                 x_type=None, y_type=None):
         """ Initialize object. """
         BaseNeuralNet.__init__(self)
 
-        self.set_data(X, y)
+        self.set_data(X, y, x_type=x_type, y_type=y_type)
         layers_list = []
 
         # Set input layer
