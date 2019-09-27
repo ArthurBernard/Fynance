@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-19 19:54:59
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-16 10:31:45
+# @Last modified time: 2019-09-27 14:03:28
 
 """ Setup script. """
 
@@ -40,7 +40,7 @@ CLASSIFIERS = [
 
 MAJOR = 1
 MINOR = 0
-PATCH = 6
+PATCH = 8
 VERSION = '{}.{}.{}'.format(MAJOR, MINOR, PATCH)
 
 DESCRIPTION = 'Python and Cython scripts of machine learning, econometrics '
@@ -59,24 +59,30 @@ if USE_CYTHON or USE_CYTHON == 'auto':
     try:
         from Cython.Build import cythonize
         from Cython.Distutils import build_ext
+
         ext = '.pyx'
         print('Using cython.')
         USE_CYTHON = True
+
     except ImportError:
         if not USE_CYTHON == 'auto':
             print("If USE_CYTHON is set to True, Cython is required to",
-                "compile fynance. Please install Cython or don't set",
-                "USE_CYTHON to True.")
+                  "compile fynance. Please install Cython or don't set",
+                  "USE_CYTHON to True.")
+
             raise ImportError
+
         else:
             print('Not using cython.')
             ext = '.c'
             USE_CYTHON = False
+
 else:
     ext = '.c'
 
 if 'build_ext' in sys.argv[1:] or USE_CYTHON or USE_CYTHON == 'auto':
     cmdclass = {'build_ext': build_ext}
+
 else:
     cmdclass = {}
 
@@ -105,6 +111,7 @@ extensions = [
 
 if USE_CYTHON or USE_CYTHON == 'auto':
     ext_modules = cythonize(extensions, annotate=True)
+
 else:
     ext_modules = extensions
 
