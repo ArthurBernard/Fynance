@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-05-06 20:16:31
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-25 22:09:09
+# @Last modified time: 2019-09-26 17:10:55
 
 """ Basis of neural networks models. """
 
@@ -213,27 +213,31 @@ class MultiLayerPerceptron(BaseNeuralNet):
     """
 
     def __init__(self, X, y, layers=[], activation=None, drop=None,
-                 x_type=None, y_type=None):
+                 x_type=None, y_type=None, bias=True, activation_kwargs={}):
         """ Initialize object. """
         BaseNeuralNet.__init__(self)
 
-        self.set_data(X, y, x_type=x_type, y_type=y_type)
+        self.set_data(X=X, y=y, x_type=x_type, y_type=y_type)
         layers_list = []
 
         # Set input layer
         input_size = self.N
         for output_size in layers:
             # Set hidden layers
-            layers_list += [torch.nn.Linear(input_size, output_size)]
+            layers_list += [torch.nn.Linear(
+                input_size,
+                output_size,
+                bias=bias
+            )]
             input_size = output_size
 
         # Set output layer
-        layers_list += [torch.nn.Linear(input_size, self.M)]
+        layers_list += [torch.nn.Linear(input_size, self.M, bias=bias)]
         self.layers = torch.nn.ModuleList(layers_list)
 
         # Set activation functions
         if activation is not None:
-            self.activation = activation()
+            self.activation = activation(**activation_kwargs)
 
         else:
             self.activation = lambda x: x

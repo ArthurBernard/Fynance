@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-04-23 19:15:17
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-25 14:12:03
+# @Last modified time: 2019-09-27 14:00:38
 
 """ Basis of rolling models.
 
@@ -310,10 +310,14 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
 
     """
 
-    def __init__(self, X, y, layers=[], activation=None, drop=None, **kwargs):
+    def __init__(self, X, y, layers=[], activation=None, drop=None, bias=True,
+                 x_type=None, y_type=None, activation_kwargs={}, **kwargs):
+        """ Initialize rolling multi-layer perceptron model. """
         _RollingBasis.__init__(self, X, y, **kwargs)
-        MultiLayerPerceptron.__init__(self, X, y, layers=layers,
-                                      activation=activation, drop=drop)
+        MultiLayerPerceptron.__init__(self, X, y, layers=layers, bias=bias,
+                                      activation=activation, drop=drop,
+                                      x_type=x_type, y_type=y_type,
+                                      activation_kwargs=activation_kwargs)
 
     def set_roll_period(self, train_period, test_period, start=0, end=None,
                         roll_period=None, eval_period=None, batch_size=64,
@@ -346,13 +350,14 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
 
         """
         return _RollingBasis.__call__(
-            self, train_period, test_period, start=start, end=end,
-            roll_period=roll_period, eval_period=eval_period,
-            batch_size=batch_size, epochs=epochs
+            self, train_period=train_period, test_period=test_period,
+            start=start, end=end, roll_period=roll_period,
+            eval_period=eval_period, batch_size=batch_size, epochs=epochs
         )
 
     def _train(self, X, y):
-        return self.train_on(X, y)
+        return self.train_on(X=X, y=y)
 
     def sub_predict(self, X):
-        return self.predict(X)
+        """ Predict. """
+        return self.predict(X=X)
