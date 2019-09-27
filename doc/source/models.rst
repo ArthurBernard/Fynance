@@ -7,3 +7,4 @@ Several financial models (deep learning, econometric, statistic etc.).
     
     models.econometric_models
     models.neural_network
+    models.rolling
