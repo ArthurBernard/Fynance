@@ -4,9 +4,12 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:13
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-06-12 16:09:32
+# @Last modified time: 2019-09-11 09:57:53
+
+""" Statical momentum functions. """
 
 # Built-in packages
+import warnings
 
 # External packages
 import numpy as np
@@ -22,13 +25,35 @@ __all__ = [
 #        - Momentums of order 4
 #        - Momentums of order k
 
+
+def _momentum_process(series, lags):
+    shape = series.shape
+    # Check lags
+    if shape[0] < lags:
+        lags = shape[0]
+        warnings.warn('Lags parameters is greater than size of series.')
+
+    if not isinstance(lags, int):
+        lags = int(lags)
+
+    # Check type of series
+    if not isinstance(series.dtype, np.float64):
+        series = series.astype(np.float64)
+
+    # Check shape of series
+    if len(shape) > 1:
+        series = series.flatten()
+
+    return series, lags
+
+
 # =========================================================================== #
 #                               Moving Averages                               #
 # =========================================================================== #
 
 
 def sma(series, lags=21):
-    r""" Simple moving average along k lags.
+    r""" Compute simple moving average along k lags.
 
     .. math:: sma_t = \frac{1}{k} \sum^{k-1}_{i=0} series_{t-i}
 
@@ -55,7 +80,10 @@ def sma(series, lags=21):
     wma, ema
 
     """
-    return sma_cy(series.flatten().astype(np.float64), lags=int(lags))
+    series, lags = _momentum_process(series, lags=lags)
+
+    return sma_cy(series, lags=lags)
+    # return sma_cy(series.flatten().astype(np.float64), lags=int(lags))
 
 
 def wma(series, lags=21):
@@ -88,7 +116,10 @@ def wma(series, lags=21):
     sma, ema
 
     """
-    return wma_cy(series.flatten().astype(np.float64), lags=int(lags))
+    series, lags = _momentum_process(series, lags=lags)
+
+    return wma_cy(series, lags=lags)
+    # return wma_cy(series.flatten().astype(np.float64), lags=int(lags))
 
 
 def ema(series, alpha=0.94, lags=None):
@@ -131,7 +162,10 @@ def ema(series, alpha=0.94, lags=None):
     if lags is not None:
         alpha = 1 - 2 / (1 + lags)
 
-    return ema_cy(series.flatten().astype(np.float64), alpha=float(alpha))
+    series, _ = _momentum_process(series, lags=series.size)
+
+    return ema_cy(series, alpha=float(alpha))
+    # return ema_cy(series.flatten().astype(np.float64), alpha=float(alpha))
 
 
 # =========================================================================== #
@@ -140,7 +174,7 @@ def ema(series, alpha=0.94, lags=None):
 
 
 def smstd(series, lags=21):
-    r""" Simple moving standard deviation along k lags.
+    r""" Compute simple moving standard deviation along k lags.
 
     .. math::
         smstd_t = \sqrt{\frac{1}{k} \sum^{k-1}_{i=0} (p_{t-i} - sma_t)^2}
