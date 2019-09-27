@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:33
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-08-20 15:22:39
+# @Last modified time: 2019-08-21 09:15:06
 
 """ Indicators functions. """
 
@@ -86,7 +86,7 @@ def bollinger_band(series, lags=21, n_std=2, kind_ma='sma'):
 
 
 def cci(series, high=None, low=None, lags=20):
-    r""" Compute Commodity Channel Index _[1].
+    r""" Compute Commodity Channel Index [1]_.
 
     Notes
     -----
