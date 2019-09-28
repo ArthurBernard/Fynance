@@ -1,9 +1,21 @@
-============================
-Financial algorithms package
-============================
+----------------------------------------------------------
+ Financial algorithms package (:mod:`fynance.algorithms`) 
+----------------------------------------------------------
+
+.. automodule:: fynance.algorithms
+   :no-members:
+   :no-inherited-members:
+   :no-special-members:
 
 Several financial algorithms (portfolio allocation, etc.).
 
-.. toctree::
+.. autosummary::
+   :toctree: generated/
 
-   algorithms.allocation
+   ERC
+   HRP
+   IVP
+   MDP
+   MVP
+   MVP_uc
+   rolling_allocation

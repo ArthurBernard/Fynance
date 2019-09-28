@@ -1,6 +1,12 @@
-=======================
-Financial tools package
-=======================
+------------------------------------------------
+ Financial tools package (:mod:`fynance.tools`) 
+------------------------------------------------
+
+.. automodule:: fynance.tools
+   :no-members:
+   :no-inherited-members:
+   :no-special-members:
+
 Several financial tools as metrics, indicators, etc.
 
 Some precisions on parameters in following modules:
@@ -15,9 +21,3 @@ Some precisions on parameters in following modules:
 - `slow_ma` and `fast_ma` means the size of windows for respectively long and short moving averages.
 
 - `period` means the number of period per year of data, e.g in daily data `period = 252` trading days per year or `period = 365` days per year, it depends of data.
-
-.. toctree::
-    
-    tools.indicators
-    tools.metrics
-    tools.momentums

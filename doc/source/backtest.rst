@@ -1,8 +1,11 @@
-BackTest package
-================
+--------------------------------------------
+ BackTest package (:mod:`fynance.backtest`) 
+--------------------------------------------
+
 Different tools to backtest or analyze financial strategies or models.
 
-.. toctree::
-    
-   backtest.tools
-   backtest.plot_object
+.. automodule:: fynance.backtest
+   :no-members:
+   :no-inherited-members:
+   :no-special-members:
+

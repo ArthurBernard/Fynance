@@ -1,10 +1,10 @@
-========================
-Financial models package
-========================
-Several financial models (deep learning, econometric, statistic etc.).
+--------------------------------------------------
+ Financial models package (:mod:`fynance.models`) 
+--------------------------------------------------
 
-.. toctree::
-    
-    models.econometric_models
-    models.neural_network
-    models.rolling
+.. automodule:: fynance.models
+   :no-members:
+   :no-inherited-members:
+   :no-special-members:
+
+Several financial models (deep learning, econometric, statistic etc.).
