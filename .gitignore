@@ -1,5 +1,6 @@
 # Files to ignore
 setup.cfg
+_how_to_make_dist.txt
 
 # Extensions to ignore
 *.so
