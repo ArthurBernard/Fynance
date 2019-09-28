@@ -4,14 +4,18 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-09-12 17:54:50
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-12 17:59:01
+# @Last modified time: 2019-09-28 13:39:14
 
-"""
+""" Module with some algorithms.
 
-Some financial algorithms.
+.. currentmodule:: fynance.algorithms
 
-.. automodule:: fynance.algorithms
-   :members:
+.. toctree::
+   :maxdepth: 1
+   :caption: Contents:
+
+   algorithms.allocation
+
 
 """
 

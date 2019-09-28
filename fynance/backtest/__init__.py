@@ -5,8 +5,14 @@
 
 Some tools to backtest strategies
 
-.. automodule:: fynance.backtest
-   :members:
+.. currentmodule:: fynance.backtest
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Contents:
+
+   backtest.tools
+   backtest.plot_object
 
 """
 

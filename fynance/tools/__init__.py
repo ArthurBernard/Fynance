@@ -1,12 +1,20 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
+# coding: utf-8
+# @Author: ArthurBernard
+# @Email: arthur.bernard.92@gmail.com
+# @Date: 2019-09-28 13:58:30
+# @Last modified by: ArthurBernard
+# @Last modified time: 2019-09-28 13:58:51
 
-"""
+""" Some financial, statistic and econometric tools.
 
-Some financial, statistic and econometric tools.
+.. currentmodule:: fynance.tools
 
-.. automodule:: fynance.tools
-   :members:
+.. toctree::
+
+    tools.indicators
+    tools.metrics
+    tools.momentums
 
 """
 from . import metrics_cy

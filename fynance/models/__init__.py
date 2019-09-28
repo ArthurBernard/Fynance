@@ -4,14 +4,17 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-18 18:43:15
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-21 16:47:28
+# @Last modified time: 2019-09-28 13:54:20
 
-"""
+""" Some deep learning, econometric, statistic and/or financial models.
 
-Some deep learning, econometric, statistic and/or financial models.
+.. currentmodule:: fynance.models
 
-.. automodule:: fynance.models
-   :members:
+.. toctree::
+
+    models.econometric_models
+    models.neural_network
+    models.rolling
 
 """
 
