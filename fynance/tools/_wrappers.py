@@ -4,11 +4,12 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-10-11 10:10:43
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-11 18:01:36
+# @Last modified time: 2019-10-12 08:59:46
 
 """ Some wrappers functions. """
 
 # Built-in packages
+from functools import wraps
 
 # Third party packages
 import numpy as np
@@ -23,6 +24,7 @@ def wrap_dtype(func):
     convert to specified dtype at the end.
 
     """
+    @wraps(func)
     def check_dtype(x, *args, dtype=None, **kwargs):
         if dtype is None:
             dtype = x.dtype
