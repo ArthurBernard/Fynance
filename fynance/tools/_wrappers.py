@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-10-11 10:10:43
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-14 15:48:23
+# @Last modified time: 2019-10-14 17:15:52
 
 """ Some wrappers functions. """
 
@@ -48,7 +48,7 @@ def wrap_dtype(func):
 
 
 def wrap_axis(func):
-    """ Check the axis of the `X` array. """
+    """ Check if computation on `axis` of `X` array is available. """
     @wraps(func)
     def check_axis(X, *args, axis=0, **kwargs):
         shape = X.shape
@@ -85,7 +85,15 @@ def wrap_lags(func):
 
 
 class WrapperArray:
-    """ Object to wrap numpy arrays. """
+    """ Object to wrap numpy arrays.
+
+    This object mix several wrapper functions.
+
+    Parameters
+    ----------
+    *args : {'dtype', 'axis', 'lags'}
+
+    """
 
     handler = {
         'dtype': wrap_dtype,
@@ -93,13 +101,24 @@ class WrapperArray:
         'lags': wrap_lags,
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args):
         """ Initialize wrapper functions. """
         self.wrappers = {key: self.handler[key] for key in args}
-        self.kwargs = kwargs
 
     def __call__(self, func):
-        """ Wrap `func`. """
+        """ Wrap `func`.
+
+        Parameters
+        ----------
+        func : function
+            Function to wrap.
+
+        Returns
+        -------
+        function
+            Wrapped function.
+
+        """
         @wraps(func)
         def wrap(X, *args, **kwargs):
             wrap_func = None
