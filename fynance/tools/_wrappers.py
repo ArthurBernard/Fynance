@@ -4,17 +4,28 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-10-11 10:10:43
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-14 14:55:19
+# @Last modified time: 2019-10-14 15:48:23
 
 """ Some wrappers functions. """
 
 # Built-in packages
 from functools import wraps
+from warnings import warn
 
 # Third party packages
 import numpy as np
 
 # Local packages
+
+
+def _check_dtype(X, dtype):
+    if dtype is None:
+        dtype = X.dtype
+
+    if X.dtype != np.float64:
+        X = X.astype(np.float64)
+
+    return X, dtype
 
 
 def wrap_dtype(func):
@@ -26,11 +37,7 @@ def wrap_dtype(func):
     """
     @wraps(func)
     def check_dtype(X, *args, dtype=None, **kwargs):
-        if dtype is None:
-            dtype = X.dtype
-
-        if X.dtype != np.float64:
-            X = X.astype(np.float64)
+        X, dtype = _check_dtype(X, dtype)
 
         if dtype != np.float64:
             return func(X, *args, dtype=dtype, **kwargs).astype(dtype)
@@ -46,7 +53,7 @@ def wrap_axis(func):
     def check_axis(X, *args, axis=0, **kwargs):
         shape = X.shape
 
-        if len(X.shape) >= axis:
+        if len(X.shape) <= axis:
 
             raise np.AxisError(axis, len(X.shape))
 
@@ -59,3 +66,50 @@ def wrap_axis(func):
     return check_axis
 
 
+def wrap_lags(func):
+    """ Check the lag of the `X` array. """
+    @wraps(func)
+    def check_lags(X, k, *args, axis=0, **kwargs):
+        if k <= 0:
+            raise ValueError('{} lag is not available value.'.format(k))
+
+        if X.shape[axis] < k:
+            k = X.shape[axis]
+            warn('{} lags is greater than size {} of series on axis {}'.format(
+                k, X.shape[axis], axis
+            ))
+
+        return func(X, k, *args, axis=axis, **kwargs)
+
+    return check_lags
+
+
+class WrapperArray:
+    """ Object to wrap numpy arrays. """
+
+    handler = {
+        'dtype': wrap_dtype,
+        'axis': wrap_axis,
+        'lags': wrap_lags,
+    }
+
+    def __init__(self, *args, **kwargs):
+        """ Initialize wrapper functions. """
+        self.wrappers = {key: self.handler[key] for key in args}
+        self.kwargs = kwargs
+
+    def __call__(self, func):
+        """ Wrap `func`. """
+        @wraps(func)
+        def wrap(X, *args, **kwargs):
+            wrap_func = None
+            for k, w in self.wrappers.items():
+                if wrap_func is None:
+                    wrap_func = w(func)
+
+                else:
+                    wrap_func = w(wrap_func)
+
+            return wrap_func(X, *args, **kwargs)
+
+        return wrap
