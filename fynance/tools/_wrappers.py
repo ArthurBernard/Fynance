@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-10-11 10:10:43
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-14 17:15:52
+# @Last modified time: 2019-10-15 17:16:14
 
 """ Some wrappers functions. """
 
@@ -71,13 +71,13 @@ def wrap_lags(func):
     @wraps(func)
     def check_lags(X, k, *args, axis=0, **kwargs):
         if k <= 0:
-            raise ValueError('{} lag is not available value.'.format(k))
+            raise ValueError('lag {} must be greater than 0.'.format(k))
 
         if X.shape[axis] < k:
-            k = X.shape[axis]
-            warn('{} lags is greater than size {} of series on axis {}'.format(
-                k, X.shape[axis], axis
+            warn('{} lags is out of bounds for axis {} with size {}'.format(
+                k, axis, X.shape[axis]
             ))
+            k = X.shape[axis]
 
         return func(X, k, *args, axis=axis, **kwargs)
 
