@@ -4,97 +4,107 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:33
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-08-21 09:15:06
+# @Last modified time: 2019-10-16 13:09:06
 
 """ Indicators functions. """
 
 # Built-in packages
+from warnings import warn
 
 # External packages
 import numpy as np
 
 # Local packages
-from fynance.tools.momentums import sma, ema, wma, smstd, emstd, wmstd
-from fynance.tools.metrics import roll_mad
+from fynance.tools._wrappers import WrapperArray
+from fynance.tools.momentums import sma, ema, wma, smstd, emstd, wmstd, _sma
+from fynance.tools.metrics import roll_mad, mad
+from fynance.tools.metrics_cy import roll_mad_cy
 
 __all__ = [
     'bollinger_band', 'cci', 'hma', 'macd_hist', 'macd_line',
     'rsi', 'signal_line',
 ]
 
+_handler_ma = {'s': sma, 'w': wma, 'e': ema}
+_handler_mstd = {'s': smstd, 'w': wmstd, 'e': emstd}
 
 # =========================================================================== #
 #                                 Indicators                                  #
 # =========================================================================== #
 
 
-def bollinger_band(series, lags=21, n_std=2, kind_ma='sma'):
-    """ Compute the bollinger bands.
+@WrapperArray('dtype', 'axis', 'lags')
+def bollinger_band(X, k=20, n=2, kind='s', axis=0, dtype=None):
+    r""" Compute the bollinger bands for `k` lags for each `X`' series'.
+
+    Let :math:`\mu_t` the moving average and :math:`\sigma_t` is the moving
+    standard deviation of `X`.
+
+    .. math::
+        upperBand_t = \mu_t + n \times \sigma_t
+        lowerBand_t = \mu_t - n \times \sigma_t
+
 
     Parameters
     ----------
-    series : np.ndarray[dtype=np.float64, ndim=1]
-        Series.
-    lags : int, optional
-        Number of lags for ma, default is 21.
-    n_std : float (default 1)
-        Number of standard deviation, default is 1.
-    kind_ma : {'ema', 'sma', 'wma'}
-        Kind of moving average/standard deviation, default is 'sma'.
-        - Exponential moving average if 'ema'.
-        - Simple moving average if 'sma'.
-        - Weighted moving average if 'wma'.
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Elements to compute the bollinger bands. If `X` is a two-dimensional
+        array, bollinger bands are computed for each series along `axis`.
+    k : int, optional
+        Number of lags used for computation, must be positive. Default is 20.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
+    n : float, optional
+        Number of standard deviations above and below the moving average.
+        Default is 2.
+    kind : {'s', 'e', 'w'}
+        Kind of moving average/standard deviation. Default is 's'.
+        - Exponential moving average/standard deviation if 'e'.
+        - Simple moving average/standard deviation if 's'.
+        - Weighted moving average/standard deviation if 'w'.
 
     Returns
     -------
-    ma : np.ndarray[dtype=np.float64, ndim=1]
-        Moving average of series.
-    std : np.ndarray[dtype=np.float64, ndim=1]
-        `n_std` moving standard deviation of series.
+    upper_band, lower_band : np.ndarray[dtype, ndim=1 or 2]
+        Respectively upper and lower bollinger bands for each series.
 
     Examples
     --------
-    >>> series = np.array([60, 100, 80, 120, 160, 80])
-    >>> mean_vect, std_vect = bollinger_band(series, lags=3)
-    >>> mean_vect
-    array([ 60.,  80.,  80., 100., 120., 120.])
-    >>> std_vect
-    array([ 0.        , 40.        , 32.65986324, 32.65986324, 65.31972647,
-           65.31972647])
+    >>> X = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
+    >>> upper_band, lower_band = bollinger_band(X, k=3, n=2)
+    >>> upper_band
+    array([ 60.        , 120.        , 112.65986324, 132.65986324,
+           185.31972647, 185.31972647])
+    >>> lower_band
+    array([60.        , 40.        , 47.34013676, 67.34013676, 54.68027353,
+           54.68027353])
 
     See Also
     --------
     z_score, rsi, hma, macd_hist, cci
 
     """
-    if kind_ma.lower() == 'sma':
-        ma = sma(series, lags=lags)
-        std = smstd(series, lags=lags)
+    warn('Since version 1.1.0, bollinger_band returns upper and lower bands.')
+    avg = _handler_ma[kind.lower()](X, k=k)
+    std = _handler_mstd[kind.lower()](X, k=k)
 
-    elif kind_ma.lower() == 'ema':
-        ma = ema(series, lags=lags)
-        std = emstd(series, lags=lags)
-
-    elif kind_ma.lower() == 'wma':
-        ma = wma(series, lags=lags)
-        std = wmstd(series, lags=lags)
-
-    else:
-        raise ValueError('Unknown kind_ma: {}'.format(kind_ma))
-
-    return ma, n_std * std
+    return avg + n * std, avg - n * std
 
 
-def cci(series, high=None, low=None, lags=20):
-    r""" Compute Commodity Channel Index [1]_.
+@WrapperArray('dtype', 'axis')
+def cci(X, high=None, low=None, k=20, axis=0, dtype=None):
+    r""" Compute Commodity Channel Index for `k` lags for each `X`' series'.
 
     Notes
     -----
-    CCI is an oscillator introduced by Donald Lamber in 1980. It is calculated
-    as the difference between the typical price of a commodity and its simple
-    moving average, divided by the moving mean absolute deviation of the
-    typical price. The index is usually scaled by an inverse factor of 0.015 to
-    provide more readable numbers:
+    CCI is an oscillator introduced by Donald Lamber in 1980 [1]_. It is
+    calculated as the difference between the typical price of a commodity and
+    its simple moving average, divided by the moving mean absolute deviation of
+    the typical price. The index is usually scaled by an inverse factor of
+    0.015 to provide more readable numbers:
 
     .. math::
 
@@ -103,19 +113,24 @@ def cci(series, high=None, low=None, lags=20):
 
     Parameters
     ----------
-    series : np.ndarray[dtype=np.float64, ndim=1]
+    X : np.ndarray[dtype, ndim=1 or 2]
         Series of close prices.
-    high, low : np.ndarray[dtype=np.float64, ndim=1], optional
+    high, low : np.ndarray[dtype, ndim=1 or 2], optional
         Series of high and low prices, if `None` then `p_t` is computed with
-        only closed prices.
-    lags : int, optional
-        Number of lags to compute the simple moving average and the mean
-        absolute deviation.
+        only closed prices. Must have the same shape as `X`.
+    k : int, optional
+        Number of lags used to compute moving average, must be positive.
+        Default is 20.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    np.ndarray[dtype=np.float64, ndim=1]
-        Series of commodity channal index.
+    np.ndarray[dtype, ndim=1 or 2]
+        Commodity Channal Index for each series.
 
     References
     ----------
@@ -123,8 +138,8 @@ def cci(series, high=None, low=None, lags=20):
 
     Examples
     --------
-    >>> series = np.array([60, 100, 80, 120, 160, 80])
-    >>> cci(series, lags=3)
+    >>> X = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
+    >>> cci(X, k=3, dtype=np.float64)
     array([   0.        ,   66.66666667,    0.        ,  100.        ,
             100.        , -100.        ])
 
@@ -134,22 +149,22 @@ def cci(series, high=None, low=None, lags=20):
 
     """
     if high is None:
-        high = series
+        high = X
 
     if low is None:
-        low = series
+        low = X
 
     # Compute typical price
-    p = (series + high + low) / 3
+    p = (X + high + low) / 3
     # Compute moving mean absolute deviation
-    r_mad = roll_mad(p, win=lags)
+    r_mad = roll_mad(p, win=k)
     # Avoid zero division
     r_mad[r_mad == 0.] = 1.
 
-    return (p - sma(p, lags=lags)) / r_mad / 0.015
+    return (p - _sma(p, k)) / r_mad / 0.015
 
 
-def hma(series, lags=21, kind_ma='wma'):
+def hma(series, lags=21, kind='w'):
     r""" Compute Hull Moving Average.
 
     Notes
@@ -162,11 +177,11 @@ def hma(series, lags=21, kind_ma='wma'):
         Series of prices or returns.
     lags : int, optional
         Number of lags for ma, default is 21.
-    kind_ma : {'ema', 'sma', 'wma'}
-        Kind of moving average, default is 'wma'.
-        - Exponential moving average if 'ema'.
+    kind_ma : {'e', 's', 'w'}
+        Kind of moving average, default is 'w'.
+        - Exponential moving average if 'e'.
         - Simple moving average if 'sma'.
-        - Weighted moving average if 'wma'.
+        - Weighted moving average if 'w'.
 
     Returns
     -------
@@ -175,7 +190,7 @@ def hma(series, lags=21, kind_ma='wma'):
 
     Examples
     --------
-    >>> series = np.array([60, 100, 80, 120, 160, 80])
+    >>> series = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
     >>> hma(series, lags=3)
     array([ 60.        , 113.33333333,  76.66666667, 136.66666667,
            186.66666667,  46.66666667])
@@ -185,26 +200,16 @@ def hma(series, lags=21, kind_ma='wma'):
     z_score, bollinger_band, rsi, macd_hist, cci
 
     """
-    if kind_ma.lower() == 'ema':
-        f = ema
+    f = _handler_ma[kind.lower()]
 
-    elif kind_ma.lower() == 'sma':
-        f = sma
-
-    elif kind_ma.lower() == 'wma':
-        f = wma
-
-    else:
-        raise ValueError('Unknown kind_ma: {}'.format(kind_ma))
-
-    wma1 = f(series, lags=int(lags / 2))
-    wma2 = f(series, lags=lags)
-    hma = f(2 * wma1 - wma2, lags=int(np.sqrt(lags)))
+    wma1 = f(series, k=int(lags / 2))
+    wma2 = f(series, k=lags)
+    hma = f(2 * wma1 - wma2, k=int(np.sqrt(lags)))
 
     return hma
 
 
-def macd_hist(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
+def macd_hist(series, lags=9, fast_ma=12, slow_ma=26, kind='e'):
     """ Compute Moving Average Convergence Divergence Histogram.
 
     Parameters
@@ -217,11 +222,11 @@ def macd_hist(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
         Number of lags for short ma, default is 12.
     slow_ma : int, optional
         Number of lags for long ma, default is 26.
-    kind_ma : {'ema', 'sma', 'wma'}
-        Kind of moving average, default is 'ema'.
-        - Exponential moving average if 'ema'.
-        - Simple moving average if 'sma'.
-        - Weighted moving average if 'wma'.
+    kind_ma : {'e', 's', 'w'}
+        Kind of moving average, default is 'e'.
+        - Exponential moving average if 'e'.
+        - Simple moving average if 's'.
+        - Weighted moving average if 'w'.
 
     Returns
     -------
@@ -230,10 +235,10 @@ def macd_hist(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
 
     Examples
     --------
-    >>> series = np.array([60, 100, 80, 120, 160, 80])
+    >>> series = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
     >>> macd_hist(series, lags=3, fast_ma=2, slow_ma=4)
-    array([ 0.        ,  5.33333361, -0.35555539,  3.9348151 ,  6.41027212,
-           -9.47070965])
+    array([ 0.        ,  5.33333333, -0.35555556,  3.93481481,  6.4102716 ,
+           -9.47070947])
 
     See Also
     --------
@@ -241,17 +246,17 @@ def macd_hist(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
 
     """
     macd_lin = macd_line(
-        series, fast_ma=fast_ma, slow_ma=slow_ma, kind_ma=kind_ma
+        series, fast_ma=fast_ma, slow_ma=slow_ma, kind=kind
     )
     sig_lin = signal_line(
-        series, lags=lags, fast_ma=fast_ma, slow_ma=slow_ma, kind_ma=kind_ma
+        series, lags=lags, fast_ma=fast_ma, slow_ma=slow_ma, kind=kind
     )
     hist = macd_lin - sig_lin
 
     return hist
 
 
-def macd_line(series, fast_ma=12, slow_ma=26, kind_ma='ema'):
+def macd_line(series, fast_ma=12, slow_ma=26, kind='e'):
     """ Compute Moving Average Convergence Divergence Line.
 
     Parameters
@@ -262,11 +267,11 @@ def macd_line(series, fast_ma=12, slow_ma=26, kind_ma='ema'):
         Number of lags for short ma, default is 12.
     slow_ma : int, optional
         Number of lags for long ma, default is 26.
-    kind_ma : {'ema', 'sma', 'wma'}
-        Kind of moving average, default is 'ema'.
-        - Exponential moving average if 'ema'.
-        - Simple moving average if 'sma'.
-        - Weighted moving average if 'wma'.
+    kind_ma : {'e', 's', 'w'}
+        Kind of moving average, default is 'e'.
+        - Exponential moving average if 'e'.
+        - Simple moving average if 's'.
+        - Weighted moving average if 'w'.
 
     Returns
     -------
@@ -275,36 +280,26 @@ def macd_line(series, fast_ma=12, slow_ma=26, kind_ma='ema'):
 
     Examples
     --------
-    >>> series = np.array([60, 100, 80, 120, 160, 80])
+    >>> series = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
     >>> macd_line(series, fast_ma=2, slow_ma=4)
-    array([ 0.        , 10.66666722,  4.62222282, 12.84740842, 21.73313755,
-           -3.61855386])
+    array([ 0.        , 10.66666667,  4.62222222, 12.84740741, 21.7331358 ,
+           -3.61855473])
 
     See Also
     --------
     z_score, bollinger_band, hma, macd_hist, signal_line, cci
 
     """
-    if kind_ma.lower() == 'wma':
-        f = wma
+    f = _handler_ma[kind.lower()]
 
-    elif kind_ma.lower() == 'sma':
-        f = sma
-
-    elif kind_ma.lower() == 'ema':
-        f = ema
-
-    else:
-        raise ValueError('Unknown kind_ma: {}'.format(kind_ma))
-
-    fast = f(series, lags=fast_ma)
-    slow = f(series, lags=slow_ma)
+    fast = f(series, k=fast_ma)
+    slow = f(series, k=slow_ma)
     macd_lin = fast - slow
 
     return macd_lin
 
 
-def rsi(series, kind_ma='ema', lags=21, alpha=None):
+def rsi(series, kind='e', lags=21, alpha=None):
     r""" Compute Relative Strenght Index.
 
     Notes
@@ -319,11 +314,11 @@ def rsi(series, kind_ma='ema', lags=21, alpha=None):
     ----------
     series : np.ndarray[dtype=np.float64, ndim=1]
         Index series.
-    kind_ma : {'ema', 'sma', 'wma'}
-        Kind of moving average, default is 'ema'.
-        - Exponential moving average if 'ema'.
-        - Simple moving average if 'sma'.
-        - Weighted moving average if 'wma'.
+    kind_ma : {'e', 's', 'w'}
+        Kind of moving average, default is 'e'.
+        - Exponential moving average if 'e'.
+        - Simple moving average if 's'.
+        - Weighted moving average if 'w'.
     lags : int, optional
         Number of lagged period, default is 21.
     alpha : float, optional
@@ -337,7 +332,7 @@ def rsi(series, kind_ma='ema', lags=21, alpha=None):
 
     Examples
     --------
-    >>> series = np.array([60, 100, 80, 120, 160, 80])
+    >>> series = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
     >>> rsi(series, lags=3)
     array([ 0.        , 99.99999804, 69.59769254, 85.55610891, 91.72201613,
            30.00294321])
@@ -355,20 +350,10 @@ def rsi(series, kind_ma='ema', lags=21, alpha=None):
     U[delta > 0] = delta[delta > 0]
     D[delta < 0] = - delta[delta < 0]
 
-    if kind_ma.lower() == 'sma':
-        ma_U = sma(U, lags=lags)
-        ma_D = sma(D, lags=lags)
+    f = _handler_ma[kind.lower()]
 
-    elif kind_ma.lower() == 'ema':
-        ma_U = ema(U, lags=lags, alpha=alpha)
-        ma_D = ema(D, lags=lags, alpha=alpha)
-
-    elif kind_ma.lower() == 'wma':
-        ma_U = wma(U, lags=lags)
-        ma_D = wma(D, lags=lags)
-
-    else:
-        raise ValueError('Unknown kind_ma: {}'.format(kind_ma))
+    ma_U = f(U, k=lags)
+    ma_D = f(D, k=lags)
 
     RSI = np.zeros([T])
     RSI[1:] = 100 * ma_U / (ma_U + ma_D + 1e-8)
@@ -376,7 +361,7 @@ def rsi(series, kind_ma='ema', lags=21, alpha=None):
     return RSI
 
 
-def signal_line(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
+def signal_line(series, lags=9, fast_ma=12, slow_ma=26, kind='e'):
     """ Signal Line for k lags with slow and fast lenght.
 
     Parameters
@@ -389,11 +374,11 @@ def signal_line(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
         Number of lags for short ma, default is 12.
     slow_ma : int, optional
         Number of lags for long ma, default is 26.
-    kind_ma : {'ema', 'sma', 'wma'}
-        Kind of moving average, default is 'ema'.
-        - Exponential moving average if 'ema'.
-        - Simple moving average if 'sma'.
-        - Weighted moving average if 'wma'.
+    kind_ma : {'e', 's', 'w'}
+        Kind of moving average, default is 'e'.
+        - Exponential moving average if 'e'.
+        - Simple moving average if 's'.
+        - Weighted moving average if 'w'.
 
     Returns
     -------
@@ -402,10 +387,10 @@ def signal_line(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
 
     Examples
     --------
-    >>> series = np.array([60, 100, 80, 120, 160, 80])
+    >>> series = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
     >>> signal_line(series, lags=3, fast_ma=2, slow_ma=4)
-    array([ 0.        ,  5.33333361,  4.97777822,  8.91259332, 15.32286544,
-            5.85215579])
+    array([ 0.        ,  5.33333333,  4.97777778,  8.91259259, 15.3228642 ,
+            5.85215473])
 
     See Also
     --------
@@ -414,19 +399,9 @@ def signal_line(series, lags=9, fast_ma=12, slow_ma=26, kind_ma='ema'):
     """
     macd_lin = macd_line(series, fast_ma=fast_ma, slow_ma=slow_ma)
 
-    if kind_ma.lower() == 'wma':
-        f = wma
+    f = _handler_ma[kind.lower()]
 
-    elif kind_ma.lower() == 'sma':
-        f = sma
-
-    elif kind_ma.lower() == 'ema':
-        f = ema
-
-    else:
-        raise ValueError('Unknown kind_ma: {}'.format(kind_ma))
-
-    sig_lin = f(macd_lin, lags=lags)
+    sig_lin = f(macd_lin, k=lags)
 
     return sig_lin
 
