@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-08-20 16:15:33
+# @Last modified time: 2019-10-16 11:45:46
 
 """ Metric functons used in financial analysis. """
 
@@ -14,8 +14,10 @@
 import numpy as np
 
 # Internal packages
+from fynance.tools._wrappers import WrapperArray
 from fynance.tools.metrics_cy import calmar_cy, drawdown_cy, mdd_cy, sharpe_cy
-from fynance.tools.metrics_cy import log_sharpe_cy, roll_mdd_cy, roll_mad_cy
+from fynance.tools.metrics_cy import log_sharpe_cy, roll_mdd_cy, roll_mad_cy_1d
+from fynance.tools.metrics_cy import roll_mad_cy_2d
 from fynance.tools.momentums_cy import smstd_cy
 from fynance.tools.momentums import sma, ema, wma, smstd, emstd, wmstd
 
@@ -34,6 +36,8 @@ __all__ = [
     'perf_returns', 'z_score',
 ]
 
+_handler_ma = {'s': sma, 'w': wma, 'e': ema}
+_handler_mstd = {'s': smstd, 'w': wmstd, 'e': emstd}
 
 # =========================================================================== #
 #                                   Metrics                                   #
@@ -517,7 +521,7 @@ def sharpe(series, period=252, log=False):
     return sharpe_cy(series, period=float(period))
 
 
-def z_score(series, kind_ma='sma', **kwargs):
+def z_score(X, k=0, kind='s'):
     r""" Compute Z-score function.
 
     Notes
@@ -525,14 +529,14 @@ def z_score(series, kind_ma='sma', **kwargs):
     Compute the z-score function for a specific average and standard deviation
     function such that:
 
-    .. math:: z = \frac{series_t - \mu_t}{\sigma_t}
+    .. math:: z = \frac{X_t - \mu_t}{\sigma_t}
 
     Where :math:`\mu_t` is the average and :math:`\sigma_t` is the standard
     deviation.
 
     Parameters
     ----------
-    series : np.ndarray[np.float64, ndim=1]
+    X : np.ndarray[np.float64, ndim=1]
         Series of index, prices or returns.
     kind_ma : {'ema', 'sma', 'wma'}
         Kind of moving average/standard deviation, default is 'sma'.
@@ -549,36 +553,25 @@ def z_score(series, kind_ma='sma', **kwargs):
 
     Examples
     --------
-    >>> series = np.array([70, 100, 80, 120, 160, 80])
-    >>> z_score(series, kind_ma='ema')
-    -0.009636022213064485
-    >>> z_score(series, lags=3)
-    -1.224744871391589
+    >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
+    >>> z_score(X, k=3, kind='e')
+    -1.0443574118998766
+    >>> z_score(X, k=3)
+    -1.2247448713915896
 
     See Also
     --------
     roll_z_score, mdd, calmar, drawdown, sharpe
 
     """
-    if kind_ma.lower() == 'wma':
-        ma_f = wma
-        std_f = wmstd
+    if k == 0:
+        k = X.shape[0]
 
-    elif kind_ma.lower() == 'sma':
-        ma_f = sma
-        std_f = smstd
+    avg = _handler_ma[kind.lower()](X, k=k)
+    std = _handler_mstd[kind.lower()](X, k=k)
 
-    elif kind_ma.lower() == 'ema':
-        ma_f = ema
-        std_f = emstd
-
-    else:
-        raise ValueError('Unknown kind_ma: {}'.format(kind_ma))
-
-    m = ma_f(series, **kwargs)
-    s = std_f(series, **kwargs)
-    s[s == 0.] = 1.
-    z = (series - m) / s
+    std[std == 0.] = 1.
+    z = (X - avg) / std
 
     return z[-1]
 
@@ -649,7 +642,8 @@ def roll_calmar(series, period=252.):
     return roll_cal
 
 
-def roll_mad(series, win=0):
+@WrapperArray('dtype', 'axis')
+def roll_mad(X, win=0, axis=0, dtype=None):
     """ Compute rolling Mean Absolut Deviation.
 
     Compute the moving average of the absolute value of the distance to the
@@ -657,12 +651,19 @@ def roll_mad(series, win=0):
 
     Parameters
     ----------
-    series : np.ndarray[np.float64, ndim=1]
+    X : np.ndarray[dtype, ndim=1 or 2]
         Time series (price, performance or index).
+    win : int, optional
+        Window size, default is 0.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    np.ndarray[np.float64, ndim=1]
+    np.ndarray[dtype, ndim=1 or 2]
         Series of mean absolute deviation.
 
     References
@@ -671,22 +672,28 @@ def roll_mad(series, win=0):
 
     Examples
     --------
-    >>> series = np.array([70., 100., 90., 110., 150., 80.])
-    >>> roll_mad(series)
+    >>> X = np.array([70, 100, 90, 110, 150, 80])
+    >>> roll_mad(X, dtype=np.float64)
     array([ 0.        , 15.        , 11.11111111, 12.5       , 20.8       ,
            20.        ])
+    >>> X = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
+    >>> roll_mad(X, win=3, dtype=np.float64)
+    array([ 0.        , 20.        , 13.33333333, 13.33333333, 26.66666667,
+           26.66666667])
 
     See Also
     --------
     mad
 
     """
-    series = np.asarray(series, dtype=np.float64).flatten()
-
     if win < 2:
-        win = series.size
+        win = X.shape[0]
 
-    return roll_mad_cy(series, win=int(win))
+    if len(X.shape) == 2:
+
+        return np.asarray(roll_mad_cy_2d(X, int(win)))
+
+    return np.asarray(roll_mad_cy_1d(X, int(win)))
 
 
 def roll_mdd(series):
@@ -811,7 +818,7 @@ def roll_sharpe(series, period=252, win=0, cap=True):
     return roll_shar
 
 
-def roll_z_score(series, kind_ma='sma', **kwargs):
+def roll_z_score(X, k=0, kind='s'):
     r""" Compute vector of rolling/moving Z-score function.
 
     Notes
@@ -819,7 +826,7 @@ def roll_z_score(series, kind_ma='sma', **kwargs):
     Compute for each observation the z-score function for a specific moving
     average function such that:
 
-    .. math:: z = \frac{seres - \mu_t}{\sigma_t}
+    .. math:: z = \frac{X - \mu_t}{\sigma_t}
 
     Where :math:`\mu_t` is the moving average and :math:`\sigma_t` is the
     moving standard deviation.
@@ -843,11 +850,11 @@ def roll_z_score(series, kind_ma='sma', **kwargs):
 
     Examples
     --------
-    >>> series = np.array([70, 100, 80, 120, 160, 80])
-    >>> roll_z_score(series, kind_ma='ema')
-    array([ 0.        ,  3.83753384,  1.04129457,  3.27008748,  3.23259291,
-           -0.00963602])
-    >>> roll_z_score(series, lags=3)
+    >>> series = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
+    >>> roll_z_score(series, k=3, kind='e')
+    array([ 0.        ,  1.41421356, -0.32444284,  1.30806216,  1.27096675,
+           -1.04435741])
+    >>> roll_z_score(series, k=3)
     array([ 0.        ,  1.        , -0.26726124,  1.22474487,  1.22474487,
            -1.22474487])
 
@@ -856,25 +863,14 @@ def roll_z_score(series, kind_ma='sma', **kwargs):
     z_score, roll_mdd, roll_calmar, roll_mad, roll_sharpe
 
     """
-    if kind_ma.lower() == 'wma':
-        ma_f = wma
-        std_f = wmstd
+    if k == 0:
+        k = X.shape[0]
 
-    elif kind_ma.lower() == 'sma':
-        ma_f = sma
-        std_f = smstd
+    avg = _handler_ma[kind.lower()](X, k=k)
+    std = _handler_mstd[kind.lower()](X, k=k)
 
-    elif kind_ma.lower() == 'ema':
-        ma_f = ema
-        std_f = emstd
-
-    else:
-        raise ValueError('Unknown kind_ma: {}'.format(kind_ma))
-
-    m = ma_f(series, **kwargs)
-    s = std_f(series, **kwargs)
-    s[s == 0.] = 1.
-    z = (series - m) / s
+    std[std == 0.] = 1.
+    z = (X - avg) / std
 
     return z
 

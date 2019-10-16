@@ -4,17 +4,19 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-07-09 10:49:19
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-07-24 17:02:21
+# @Last modified time: 2019-10-16 11:52:30
+# cython: language_level=3
 
 # Built-in packages
 from libc.math cimport sqrt
 
 # External packages
+from cython cimport view
 import numpy as np
 cimport numpy as np
 
 # Local packages
-from fynance.tools.momentums_cy import smstd_cy, sma_cy
+from fynance.tools.momentums_cy import smstd_cy, sma_cy, sma_cy_1d, sma_cy_2d
 
 # TODO list:
 # - Append window size on rolling MDD
@@ -22,7 +24,7 @@ from fynance.tools.momentums_cy import smstd_cy, sma_cy
 
 __all__ = [
     'sharpe_cy', 'roll_sharpe_cy', 'log_sharpe_cy', 'mdd_cy', 'calmar_cy', 
-    'roll_mad_cy', 'roll_mdd_cy', 'drawdown_cy',
+    'roll_mad_cy_1d', 'roll_mad_cy_2d', 'roll_mdd_cy', 'drawdown_cy',
 ]
 
 
@@ -220,39 +222,119 @@ cpdef np.float64_t log_sharpe_cy(
 # =========================================================================== #
 
 
-cpdef np.ndarray[np.float64_t, ndim=1] roll_mad_cy(
-        np.ndarray[np.float64_t, ndim=1] series,
-        int win=0
-    ):
-    """ Compute rolling Mean Absolut Deviation.
+cpdef double [:] roll_mad_cy_1d(double [:] X, int win):
+    """ Compute rolling Mean Absolut Deviation for one-dimensional array.
 
     Compute the moving average of the absolute value of the distance to the
     moving average _[1].
 
     Parameters
     ----------
-    series : np.ndarray[np.float64, ndim=1]
-        Time series (price, performance or index).
+    X : memoryview.ndarray[ndim=1, dtype=double]
+        Time series (price, performance or index). Can be a NumPy array, C
+        array, Cython array, etc.
+    win : int
+        Window size.
 
     Returns
     -------
-    np.ndarray[np.float64, ndim=1]
-        Series of mean absolute deviation.
+    memoryview.ndarray[ndim=1, dtype=double]
+        Series of mean absolute deviation. Can be converted to a NumPy array,
+        C array, Cython array, etc.
 
     References
     ----------
     .. [1] https://en.wikipedia.org/wiki/Average_absolute_deviation
 
     """
-    cdef int t, T = series.size
-    cdef np.ndarray[np.float64_t, ndim=1] ma = sma_cy(series, lags=win)
-    cdef np.ndarray[np.float64_t, ndim=1] mad = np.zeros([T], dtype=np.float64)
-    
-    for t in range(T):
-        mad[t] = np.sum(
-            np.abs(series[max(t-win+1, 0): t+1] - ma[t], dtype=np.float64),
-            dtype=np.float64
-            )  / <double>min(t + 1, win)
+    cdef int i, t, T = X.shape[0]
+
+    var = view.array(shape=(T,), itemsize=sizeof(double), format='d')
+
+    cdef double [:] ma = sma_cy_1d(X, win)
+    cdef double [:] mad = var
+    cdef double S
+
+    t = 0
+    while t < T:
+        i = 0
+        S = <double>0.
+        if t < win:
+            while i <= t:
+                S += abs(X[i] - ma[t])
+                i += 1
+
+            mad[t] = S / <double>(t + 1)
+
+        else:
+            while i < win:
+                S += abs(X[t - i] - ma[t])
+                i += 1
+
+            mad[t] = S / <double>win
+
+        t += 1
+
+    return mad
+
+
+cpdef double [:, :] roll_mad_cy_2d(double [:, :] X, int win):
+    """ Compute rolling Mean Absolut Deviation for two-dimensional array.
+
+    Compute the moving average of the absolute value of the distance to the
+    moving average _[1].
+
+    Parameters
+    ----------
+    X : memoryview.ndarray[ndim=2, dtype=double]
+        Time series (price, performance or index). Can be a NumPy array, C
+        array, Cython array, etc.
+    win : int
+        Window size.
+
+    Returns
+    -------
+    memoryview.ndarray[ndim=2, dtype=double]
+        Series of mean absolute deviation. Can be converted to a NumPy array,
+        C array, Cython array, etc.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Average_absolute_deviation
+
+    """
+    cdef int i, T, t, N, n = 0 
+
+    T = X.shape[0]
+    N = X.shape[1]
+    var = view.array(shape=(T, N), itemsize=sizeof(double), format='d')
+
+    cdef double [:, :] ma = sma_cy_2d(X, win)
+    cdef double [:, :] mad = var
+    cdef double S
+
+    while n < N:
+        t = 0
+        while t < T:
+            i = 0
+            S = <double>0.
+            if t < win:
+                while i <= t:
+                    S += abs(X[i, n] - ma[t, n])
+                    i += 1
+
+                mad[t, n] = S / <double>(t + 1)
+
+            else:
+                while i < win:
+                    S += abs(X[t - i, n] - ma[t, n])
+                    i += 1
+
+                mad[t, n] = S / <double>win
+
+            t += 1
+
+        n += 1
 
     return mad
 
@@ -314,3 +396,45 @@ cpdef np.ndarray[np.float64_t, ndim=1] roll_sharpe_cy(
             roll_s[t] = sharpe_cy(series[t - window: t + 1], period=period)
 
     return roll_s
+
+
+# =========================================================================== #
+#                                 Old Script                                  #
+# =========================================================================== #
+
+
+cpdef np.ndarray[np.float64_t, ndim=1] roll_mad_cy(
+        np.ndarray[np.float64_t, ndim=1] series,
+        int win=0
+    ):
+    """ Compute rolling Mean Absolut Deviation.
+
+    Compute the moving average of the absolute value of the distance to the
+    moving average _[1].
+
+    Parameters
+    ----------
+    series : np.ndarray[np.float64, ndim=1]
+        Time series (price, performance or index).
+
+    Returns
+    -------
+    np.ndarray[np.float64, ndim=1]
+        Series of mean absolute deviation.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Average_absolute_deviation
+
+    """
+    cdef int t, T = series.size
+    cdef np.ndarray[np.float64_t, ndim=1] ma = np.asarray(sma_cy_1d(series, win), dtype=np.float64)
+    cdef np.ndarray[np.float64_t, ndim=1] mad = np.zeros([T], dtype=np.float64)
+    
+    for t in range(T):
+        mad[t] = np.sum(
+            np.abs(series[max(t-win+1, 0): t+1] - ma[t], dtype=np.float64),
+            dtype=np.float64
+            )  / <double>min(t + 1, win)
+
+    return mad
