@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
-# coding: utf-8 
+# coding: utf-8
+# @Author: ArthurBernard
+# @Email: arthur.bernard.92@gmail.com
+# @Date: 2019-03-01 16:51:38
+# @Last modified by: ArthurBernard
+# @Last modified time: 2019-10-15 16:39:37
 
 # Built-in packages
 
-# External packages
+# Third party packages
 import numpy as np
 import pytest
 
-# Internal packages
+# local packages
 import fynance as fy
+
 
 @pytest.fixture()
 def set_variables():
@@ -16,6 +22,7 @@ def set_variables():
     params = np.array([0.2, 0.5, -0.3, 0.6, 0.1, 0.1])
     p, q, P, Q = 1, 1, 1, 1
     return y, params, p, q, P, Q
+
 
 def test_get_parameters(set_variables):
     y, params, p, q, P, Q = set_variables
@@ -37,10 +44,11 @@ def test_get_parameters(set_variables):
     assert alpha == params[3]
     assert beta == params[4]
 
+
 def test_ARMA_GARCH(set_variables):
     y, params, p, q, P, Q = set_variables
     u_est, h_est = fy.ARMA_GARCH(
-        y, phi=params[1:2], theta=params[2:3], alpha=params[4:5], 
+        y, phi=params[1:2], theta=params[2:3], alpha=params[4:5],
         beta=params[5:6], c=params[0], omega=params[3], p=1, q=1, P=1, Q=1
     )
     u = np.zeros([y.size])
@@ -50,7 +58,9 @@ def test_ARMA_GARCH(set_variables):
     assert u[0] == u_est[0]
     assert h[0] == h_est[0]
     for t in range(1, y.size):
-        u[t] = y[t] - params[0] - y[t-1] * params[1] - u[t-1] * params[2]
-        h[t] = np.sqrt(params[3] + params[4] * u[t-1] ** 2 + params[5] * h[t-1] ** 2)
+        u[t] = y[t] - params[0] - y[t - 1] * params[1] - u[t - 1] * params[2]
+        h[t] = np.sqrt(
+            params[3] + params[4] * u[t - 1] ** 2 + params[5] * h[t - 1] ** 2
+        )
         assert u[t] == u_est[t]
         assert h[t] == h_est[t]
