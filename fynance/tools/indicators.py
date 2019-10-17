@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:33
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-17 09:06:10
+# @Last modified time: 2019-10-17 11:20:02
 
 """ Indicators functions. """
 
@@ -47,8 +47,7 @@ def bollinger_band(X, w=20, n=2, kind='s', axis=0, dtype=None):
 
     .. math::
 
-        upperBand_t = \mu_t + n \times \sigma_t
-
+        upperBand_t = \mu_t + n \times \sigma_t \\
         lowerBand_t = \mu_t - n \times \sigma_t
 
 
@@ -69,10 +68,15 @@ def bollinger_band(X, w=20, n=2, kind='s', axis=0, dtype=None):
         Number of standard deviations above and below the moving average.
         Default is 2.
     kind : {'s', 'e', 'w'}
-        Kind of moving average/standard deviation. Default is 's'.
-        - Exponential moving average/standard deviation if 'e'.
-        - Simple moving average/standard deviation if 's'.
-        - Weighted moving average/standard deviation if 'w'.
+        - If 'e' then use exponential moving average/standard deviation, see
+          :func:`~fynance.tools.momentums.ema` and
+          :func:`~fynance.tools.momentums.emstd` for details.
+        - If 's' (default) then use simple moving average/standard deviation,
+          see :func:`~fynance.tools.momentums.sma` and
+          :func:`~fynance.tools.momentums.smstd` for details.
+        - If 'w' then use weighted moving average/standard deviation, see
+          :func:`~fynance.tools.momentums.wma` and
+          :func:`~fynance.tools.momentums.wmstd` for details.
 
     Returns
     -------
@@ -96,7 +100,7 @@ def bollinger_band(X, w=20, n=2, kind='s', axis=0, dtype=None):
 
     See Also
     --------
-    z_score, rsi, hma, macd_hist, cci
+    .z_score, rsi, hma, macd_hist, cci
 
     """
     if kind == 'e':
@@ -125,8 +129,8 @@ def cci(X, high=None, low=None, w=20, axis=0, dtype=None):
 
     .. math::
 
-        cci = \frac{1}{0.015} \frac{p_t - sma^w(p_t)}{mad^w(p_t)}
-        \text{where }p_t = \frac{p_{close} + p_{high} + p_{low}}{3}
+        cci = \frac{1}{0.015} \frac{p_t - sma^w(p_t)}{mad^w(p_t)} \\
+        \text{where, }p_t = \frac{p_{close} + p_{high} + p_{low}}{3}
 
     Parameters
     ----------
@@ -206,10 +210,12 @@ def hma(X, w=21, kind='w', axis=0, dtype=None):
         Size of the main lagged window of the moving average, must be positive.
         If ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is 21.
     kind : {'e', 's', 'w'}
-        Kind of moving average, default is 'w'.
-        - If 'e' then use exponential moving average.
-        - If 's' then use simple moving average.
-        - If 'w' then use weighted moving average.
+        - If 'e' then use exponential moving average, see
+          :func:`~fynance.tools.momentums.ema` for details.
+        - If 's' then use simple moving average, see
+          :func:`~fynance.tools.momentums.sma` for details.
+        - If 'w' (default) then use weighted moving average, see
+          :func:`~fynance.tools.momentums.wma` for details.
     axis : {0, 1}, optional
         Axis along wich the computation is done. Default is 0.
     dtype : np.dtype, optional
@@ -234,7 +240,7 @@ def hma(X, w=21, kind='w', axis=0, dtype=None):
 
     See Also
     --------
-    z_score, bollinger_band, rsi, macd_hist, cci
+    .z_score, bollinger_band, rsi, macd_hist, cci
 
     """
     if kind == 'e':
@@ -250,7 +256,7 @@ def hma(X, w=21, kind='w', axis=0, dtype=None):
 
 
 @WrapperArray('dtype', 'axis')
-def macd_hist(X, w=9, fast_ma=12, slow_ma=26, kind='e', axis=0, dtype=None):
+def macd_hist(X, w=9, fast_w=12, slow_w=26, kind='e', axis=0, dtype=None):
     """ Compute Moving Average Convergence Divergence Histogram.
 
     MACD is a trading indicator used in technical analysis of stock prices,
@@ -266,17 +272,19 @@ def macd_hist(X, w=9, fast_ma=12, slow_ma=26, kind='e', axis=0, dtype=None):
     w : int, optional
         Size of the main lagged window of the moving average, must be positive.
         If ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is 9.
-    fast_ma : int, optional
+    fast_w : int, optional
         Size of the lagged window of the short moving average, must be strictly
         positive. Default is 12.
-    slow_ma : int, optional
+    slow_w : int, optional
         Size of the lagged window of the lond moving average, must be strictly
         positive. Default is 26.
     kind : {'e', 's', 'w'}
-        Kind of moving average, default is 'e'.
-        - If 'e' then use exponential moving average.
-        - If 's' then use simple moving average.
-        - If 'w' then use weighted moving average.
+        - If 'e' (default) then use exponential moving average, see
+          :func:`~fynance.tools.momentums.ema` for details.
+        - If 's' then use simple moving average, see
+          :func:`~fynance.tools.momentums.sma` for details.
+        - If 'w' then use weighted moving average, see
+          :func:`~fynance.tools.momentums.wma` for details.
     axis : {0, 1}, optional
         Axis along wich the computation is done. Default is 0.
     dtype : np.dtype, optional
@@ -295,25 +303,25 @@ def macd_hist(X, w=9, fast_ma=12, slow_ma=26, kind='e', axis=0, dtype=None):
     Examples
     --------
     >>> X = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
-    >>> macd_hist(X, w=3, fast_ma=2, slow_ma=4)
+    >>> macd_hist(X, w=3, fast_w=2, slow_w=4)
     array([ 0.        ,  5.33333333, -0.35555556,  3.93481481,  6.4102716 ,
            -9.47070947])
 
     See Also
     --------
-    z_score, bollinger_band, hma, macd_line, signal_line, cci
+    .z_score, bollinger_band, hma, macd_line, signal_line, cci
 
     """
-    if fast_ma <= 0 or slow_ma <= 0:
+    if fast_w <= 0 or slow_w <= 0:
 
         raise ValueError('lagged window of size {} and {} are not available, \
-            must be positive.'.format(fast_ma, slow_ma))
+            must be positive.'.format(fast_w, slow_w))
 
     elif kind == 'e':
         w = 1 - 2 / (1 + w)
 
-    macd_lin = _macd_line(X, fast_ma, slow_ma, kind)
-    sig_lin = _signal_line(X, w, fast_ma, slow_ma, kind)
+    macd_lin = _macd_line(X, fast_w, slow_w, kind)
+    sig_lin = _signal_line(X, w, fast_w, slow_w, kind)
 
     hist = macd_lin - sig_lin
 
@@ -321,7 +329,7 @@ def macd_hist(X, w=9, fast_ma=12, slow_ma=26, kind='e', axis=0, dtype=None):
 
 
 @WrapperArray('dtype', 'axis')
-def macd_line(X, fast_ma=12, slow_ma=26, kind='e', axis=0, dtype=None):
+def macd_line(X, fast_w=12, slow_w=26, kind='e', axis=0, dtype=None):
     """ Compute Moving Average Convergence Divergence Line.
 
     MACD is a trading indicator used in technical analysis of stock prices,
@@ -334,17 +342,19 @@ def macd_line(X, fast_ma=12, slow_ma=26, kind='e', axis=0, dtype=None):
     X : np.ndarray[dtype, ndim=1 or 2]
         Elements to compute the indicator. If `X` is a two-dimensional array,
         then an indicator is computed for each series along `axis`.
-    fast_ma : int, optional
+    fast_w : int, optional
         Size of the lagged window of the short moving average, must be strictly
         positive. Default is 12.
-    slow_ma : int, optional
+    slow_w : int, optional
         Size of the lagged window of the lond moving average, must be strictly
         positive. Default is 26.
     kind : {'e', 's', 'w'}
-        Kind of moving average, default is 'e'.
-        - If 'e' then use exponential moving average.
-        - If 's' then use simple moving average.
-        - If 'w' then use weighted moving average.
+        - If 'e' (default) then use exponential moving average, see
+          :func:`~fynance.tools.momentums.ema` for details.
+        - If 's' then use simple moving average, see
+          :func:`~fynance.tools.momentums.sma` for details.
+        - If 'w' then use weighted moving average, see
+          :func:`~fynance.tools.momentums.wma` for details.
     axis : {0, 1}, optional
         Axis along wich the computation is done. Default is 0.
     dtype : np.dtype, optional
@@ -363,32 +373,32 @@ def macd_line(X, fast_ma=12, slow_ma=26, kind='e', axis=0, dtype=None):
     Examples
     --------
     >>> X = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
-    >>> macd_line(X, fast_ma=2, slow_ma=4)
+    >>> macd_line(X, fast_w=2, slow_w=4)
     array([ 0.        , 10.66666667,  4.62222222, 12.84740741, 21.7331358 ,
            -3.61855473])
 
     See Also
     --------
-    z_score, bollinger_band, hma, macd_hist, signal_line, cci
+    .z_score, bollinger_band, hma, macd_hist, signal_line, cci
 
     """
-    if fast_ma <= 0 or slow_ma <= 0:
+    if fast_w <= 0 or slow_w <= 0:
 
         raise ValueError('lagged window of size {} and {} are not available, \
-            must be positive.'.format(fast_ma, slow_ma))
+            must be positive.'.format(fast_w, slow_w))
 
-    return _macd_line(X, fast_ma, slow_ma, kind)
+    return _macd_line(X, fast_w, slow_w, kind)
 
 
-def _macd_line(X, fast_ma, slow_ma, kind):
+def _macd_line(X, fast_w, slow_w, kind):
     if kind == 'e':
-        fast_ma = 1 - 2 / (fast_ma + 1)
-        slow_ma = 1 - 2 / (slow_ma + 1)
+        fast_w = 1 - 2 / (fast_w + 1)
+        slow_w = 1 - 2 / (slow_w + 1)
 
     f = _handler_ma[kind.lower()]
 
-    fast = f(X, fast_ma)
-    slow = f(X, slow_ma)
+    fast = f(X, fast_w)
+    slow = f(X, slow_w)
     macd_lin = fast - slow
 
     return macd_lin
@@ -422,10 +432,12 @@ def rsi(X, w=14, kind='e', axis=0, dtype=None):
         Size of the lagged window of the moving average, must be positive. If
         ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is 14.
     kind : {'e', 's', 'w'}
-        Kind of moving average, default is 'e'.
-        - If 'e' then use exponential moving average.
-        - If 's' then use simple moving average.
-        - If 'w' then use weighted moving average.
+        - If 'e' (default) then use exponential moving average, see
+          :func:`~fynance.tools.momentums.ema` for details.
+        - If 's' then use simple moving average, see
+          :func:`~fynance.tools.momentums.sma` for details.
+        - If 'w' then use weighted moving average, see
+          :func:`~fynance.tools.momentums.wma` for details.
     axis : {0, 1}, optional
         Axis along wich the computation is done. Default is 0.
     dtype : np.dtype, optional
@@ -450,7 +462,7 @@ def rsi(X, w=14, kind='e', axis=0, dtype=None):
 
     See Also
     --------
-    z_score, bollinger_band, hma, macd_hist, cci
+    .z_score, bollinger_band, hma, macd_hist, cci
 
     """
     if kind == 'e':
@@ -478,7 +490,7 @@ def rsi(X, w=14, kind='e', axis=0, dtype=None):
 
 
 @WrapperArray('dtype', 'axis', 'window')
-def signal_line(X, w=9, fast_ma=12, slow_ma=26, kind='e', axis=0, dtype=None):
+def signal_line(X, w=9, fast_w=12, slow_w=26, kind='e', axis=0, dtype=None):
     """ MACD Signal Line for window of size `w` with slow and fast lenght.
 
     MACD is a trading indicator used in technical analysis of stock prices,
@@ -494,17 +506,19 @@ def signal_line(X, w=9, fast_ma=12, slow_ma=26, kind='e', axis=0, dtype=None):
     w : int, optional
         Size of the main lagged window of the moving average, must be positive.
         If ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is 9.
-    fast_ma : int, optional
+    fast_w : int, optional
         Size of the lagged window of the short moving average, must be strictly
         positive. Default is 12.
-    slow_ma : int, optional
+    slow_w : int, optional
         Size of the lagged window of the lond moving average, must be strictly
         positive. Default is 26.
     kind : {'e', 's', 'w'}
-        Kind of moving average, default is 'e'.
-        - If 'e' then use exponential moving average.
-        - If 's' then use simple moving average.
-        - If 'w' then use weighted moving average.
+        - If 'e' (default) then use exponential moving average, see
+          :func:`~fynance.tools.momentums.ema` for details.
+        - If 's' then use simple moving average, see
+          :func:`~fynance.tools.momentums.sma` for details.
+        - If 'w' then use weighted moving average, see
+          :func:`~fynance.tools.momentums.wma` for details.
     axis : {0, 1}, optional
         Axis along wich the computation is done. Default is 0.
     dtype : np.dtype, optional
@@ -523,28 +537,28 @@ def signal_line(X, w=9, fast_ma=12, slow_ma=26, kind='e', axis=0, dtype=None):
     Examples
     --------
     >>> X = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
-    >>> signal_line(X, w=3, fast_ma=2, slow_ma=4)
+    >>> signal_line(X, w=3, fast_w=2, slow_w=4)
     array([ 0.        ,  5.33333333,  4.97777778,  8.91259259, 15.3228642 ,
             5.85215473])
 
     See Also
     --------
-    z_score, bollinger_band, hma, macd_hist, macd_line, cci
+    .z_score, bollinger_band, hma, macd_hist, macd_line, cci
 
     """
-    if fast_ma <= 0 or slow_ma <= 0:
+    if fast_w <= 0 or slow_w <= 0:
 
         raise ValueError('lagged window of size {} and {} are not available, \
-            must be positive.'.format(fast_ma, slow_ma))
+            must be positive.'.format(fast_w, slow_w))
 
     elif kind == 'e':
         w = 1 - 2 / (1 + w)
 
-    return _signal_line(X, w, fast_ma, slow_ma, kind)
+    return _signal_line(X, w, fast_w, slow_w, kind)
 
 
-def _signal_line(X, w, fast_ma, slow_ma, kind):
-    macd_lin = _macd_line(X, fast_ma, slow_ma, kind)
+def _signal_line(X, w, fast_w, slow_w, kind):
+    macd_lin = _macd_line(X, fast_w, slow_w, kind)
 
     f = _handler_ma[kind.lower()]
 
