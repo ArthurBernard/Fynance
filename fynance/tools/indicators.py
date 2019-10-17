@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:33
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-16 13:09:06
+# @Last modified time: 2019-10-17 09:06:10
 
 """ Indicators functions. """
 
@@ -16,42 +16,50 @@ import numpy as np
 
 # Local packages
 from fynance.tools._wrappers import WrapperArray
-from fynance.tools.momentums import sma, ema, wma, smstd, emstd, wmstd, _sma
-from fynance.tools.metrics import roll_mad, mad
-from fynance.tools.metrics_cy import roll_mad_cy
+from fynance.tools.momentums import _smstd, _emstd, _wmstd, _sma, _ema, _wma
+from fynance.tools.metrics import roll_mad
 
 __all__ = [
     'bollinger_band', 'cci', 'hma', 'macd_hist', 'macd_line',
     'rsi', 'signal_line',
 ]
 
-_handler_ma = {'s': sma, 'w': wma, 'e': ema}
-_handler_mstd = {'s': smstd, 'w': wmstd, 'e': emstd}
+_handler_ma = {'s': _sma, 'w': _wma, 'e': _ema}
+_handler_mstd = {'s': _smstd, 'w': _wmstd, 'e': _emstd}
 
 # =========================================================================== #
 #                                 Indicators                                  #
 # =========================================================================== #
 
 
-@WrapperArray('dtype', 'axis', 'lags')
-def bollinger_band(X, k=20, n=2, kind='s', axis=0, dtype=None):
-    r""" Compute the bollinger bands for `k` lags for each `X`' series'.
+@WrapperArray('dtype', 'axis', 'window')
+def bollinger_band(X, w=20, n=2, kind='s', axis=0, dtype=None):
+    r""" Compute the bollinger bands of size `w` for each `X`' series'.
 
+    Bollinger Bands are a type of statistical chart characterizing the prices
+    and volatility over time of a financial instrument or commodity, using a
+    formulaic method propounded by J. Bollinger in the 1980s [1]_.
+
+    Notes
+    -----
     Let :math:`\mu_t` the moving average and :math:`\sigma_t` is the moving
-    standard deviation of `X`.
+    standard deviation of size `w` for `X` at time t.
 
     .. math::
+
         upperBand_t = \mu_t + n \times \sigma_t
+
         lowerBand_t = \mu_t - n \times \sigma_t
 
 
     Parameters
     ----------
     X : np.ndarray[dtype, ndim=1 or 2]
-        Elements to compute the bollinger bands. If `X` is a two-dimensional
-        array, bollinger bands are computed for each series along `axis`.
-    k : int, optional
-        Number of lags used for computation, must be positive. Default is 20.
+        Elements to compute the indicator. If `X` is a two-dimensional array,
+        then an indicator is computed for each series along `axis`.
+    w : int, optional
+        Size of the lagged window of the moving average, must be positive. If
+        ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is 20.
     axis : {0, 1}, optional
         Axis along wich the computation is done. Default is 0.
     dtype : np.dtype, optional
@@ -71,10 +79,14 @@ def bollinger_band(X, k=20, n=2, kind='s', axis=0, dtype=None):
     upper_band, lower_band : np.ndarray[dtype, ndim=1 or 2]
         Respectively upper and lower bollinger bands for each series.
 
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Bollinger_Bands
+
     Examples
     --------
     >>> X = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
-    >>> upper_band, lower_band = bollinger_band(X, k=3, n=2)
+    >>> upper_band, lower_band = bollinger_band(X, w=3, n=2)
     >>> upper_band
     array([ 60.        , 120.        , 112.65986324, 132.65986324,
            185.31972647, 185.31972647])
@@ -87,40 +99,46 @@ def bollinger_band(X, k=20, n=2, kind='s', axis=0, dtype=None):
     z_score, rsi, hma, macd_hist, cci
 
     """
+    if kind == 'e':
+        w = 1 - 2 / (1 + w)
+
     warn('Since version 1.1.0, bollinger_band returns upper and lower bands.')
-    avg = _handler_ma[kind.lower()](X, k=k)
-    std = _handler_mstd[kind.lower()](X, k=k)
+    avg = _handler_ma[kind.lower()](X, w)
+    std = _handler_mstd[kind.lower()](X, w)
 
     return avg + n * std, avg - n * std
 
 
-@WrapperArray('dtype', 'axis')
-def cci(X, high=None, low=None, k=20, axis=0, dtype=None):
-    r""" Compute Commodity Channel Index for `k` lags for each `X`' series'.
+@WrapperArray('dtype', 'axis', 'window')
+def cci(X, high=None, low=None, w=20, axis=0, dtype=None):
+    r""" Compute Commodity Channel Index of size `w` for each `X`' series'.
+
+    CCI is an oscillator introduced by Donald Lamber in 1980 [2]_. It is
+    calculated as the difference between the typical price of a commodity and
+    its simple moving average, divided by the moving mean absolute deviation of
+    the typical price.
 
     Notes
     -----
-    CCI is an oscillator introduced by Donald Lamber in 1980 [1]_. It is
-    calculated as the difference between the typical price of a commodity and
-    its simple moving average, divided by the moving mean absolute deviation of
-    the typical price. The index is usually scaled by an inverse factor of
-    0.015 to provide more readable numbers:
+    The index is usually scaled by an inverse factor of 0.015 to provide more
+    readable numbers:
 
     .. math::
 
-        cci = \frac{1}{0.015} \frac{p_t - sma(p_t)}{mad(p_t)}
+        cci = \frac{1}{0.015} \frac{p_t - sma^w(p_t)}{mad^w(p_t)}
         \text{where }p_t = \frac{p_{close} + p_{high} + p_{low}}{3}
 
     Parameters
     ----------
     X : np.ndarray[dtype, ndim=1 or 2]
-        Series of close prices.
+        Elements to compute the indicator. If `X` is a two-dimensional array,
+        then an indicator is computed for each series along `axis`.
     high, low : np.ndarray[dtype, ndim=1 or 2], optional
         Series of high and low prices, if `None` then `p_t` is computed with
         only closed prices. Must have the same shape as `X`.
-    k : int, optional
-        Number of lags used to compute moving average, must be positive.
-        Default is 20.
+    w : int, optional
+        Size of the lagged window of the moving average, must be positive. If
+        ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is 20.
     axis : {0, 1}, optional
         Axis along wich the computation is done. Default is 0.
     dtype : np.dtype, optional
@@ -134,12 +152,12 @@ def cci(X, high=None, low=None, k=20, axis=0, dtype=None):
 
     References
     ----------
-    .. [1] https://en.wikipedia.org/wiki/Commodity_channel_index
+    .. [2] https://en.wikipedia.org/wiki/Commodity_channel_index
 
     Examples
     --------
     >>> X = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
-    >>> cci(X, k=3, dtype=np.float64)
+    >>> cci(X, w=3, dtype=np.float64)
     array([   0.        ,   66.66666667,    0.        ,  100.        ,
             100.        , -100.        ])
 
@@ -157,41 +175,60 @@ def cci(X, high=None, low=None, k=20, axis=0, dtype=None):
     # Compute typical price
     p = (X + high + low) / 3
     # Compute moving mean absolute deviation
-    r_mad = roll_mad(p, win=k)
+    r_mad = roll_mad(p, win=w)
     # Avoid zero division
     r_mad[r_mad == 0.] = 1.
 
-    return (p - _sma(p, k)) / r_mad / 0.015
+    return (p - _sma(p, w)) / r_mad / 0.015
 
 
-def hma(series, lags=21, kind='w'):
-    r""" Compute Hull Moving Average.
+@WrapperArray('dtype', 'axis', 'window')
+def hma(X, w=21, kind='w', axis=0, dtype=None):
+    r""" Compute the Hull Moving Average of size `w` for each `X`' series'.
+
+    The Hull Moving Average, developed by A. Hull [3]_, is a financial
+    indicator. It tries to reduce the lag in a moving average.
 
     Notes
     -----
-    .. math:: hma = wma(2 \times wma(x, \frac{k}{2}) - wma(x, k), \sqrt{k})
+    Let :math:`ma^w` the moving average function of lagged window size `w`.
+
+    .. math::
+
+        hma^w(X_t) = ma^{\sqrt{w}}(2 \times ma^{\frac{w}{2}}(X_t)) - ma^w(X_t))
 
     Parameters
     ----------
-    series : np.ndarray[dtype=np.float64, ndim=1]
-        Series of prices or returns.
-    lags : int, optional
-        Number of lags for ma, default is 21.
-    kind_ma : {'e', 's', 'w'}
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Elements to compute the indicator. If `X` is a two-dimensional array,
+        then an indicator is computed for each series along `axis`.
+    w : int, optional
+        Size of the main lagged window of the moving average, must be positive.
+        If ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is 21.
+    kind : {'e', 's', 'w'}
         Kind of moving average, default is 'w'.
-        - Exponential moving average if 'e'.
-        - Simple moving average if 'sma'.
-        - Weighted moving average if 'w'.
+        - If 'e' then use exponential moving average.
+        - If 's' then use simple moving average.
+        - If 'w' then use weighted moving average.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    np.ndarray[dtype=np.float64, ndim=1]
-        Hull moving average of index or returns.
+    np.ndarray[dtype, ndim=1 or 2]
+        Hull moving average of each series.
+
+    References
+    ----------
+    .. [3] https://alanhull.com/hull-moving-average
 
     Examples
     --------
-    >>> series = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
-    >>> hma(series, lags=3)
+    >>> X = np.array([60, 100, 80, 120, 160, 80])
+    >>> hma(X, w=3, dtype=np.float64)
     array([ 60.        , 113.33333333,  76.66666667, 136.66666667,
            186.66666667,  46.66666667])
 
@@ -200,43 +237,65 @@ def hma(series, lags=21, kind='w'):
     z_score, bollinger_band, rsi, macd_hist, cci
 
     """
+    if kind == 'e':
+        w = 1 - 2 / (1 + w)
+
     f = _handler_ma[kind.lower()]
 
-    wma1 = f(series, k=int(lags / 2))
-    wma2 = f(series, k=lags)
-    hma = f(2 * wma1 - wma2, k=int(np.sqrt(lags)))
+    ma1 = f(X, int(w / 2))
+    ma2 = f(X, int(w))
+    hma = f(2. * ma1 - ma2, int(np.sqrt(w)))
 
     return hma
 
 
-def macd_hist(series, lags=9, fast_ma=12, slow_ma=26, kind='e'):
+@WrapperArray('dtype', 'axis')
+def macd_hist(X, w=9, fast_ma=12, slow_ma=26, kind='e', axis=0, dtype=None):
     """ Compute Moving Average Convergence Divergence Histogram.
+
+    MACD is a trading indicator used in technical analysis of stock prices,
+    created by Gerald Appel in the late 1970s [4]_. It is designed to reveal
+    changes in the strength, direction, momentum, and duration of a trend in a
+    stock's price.
 
     Parameters
     ----------
-    series : np.ndarray[dtype=np.float64, ndim=1]
-        Series of index or returns.
-    lags : int, optional
-        Number of lags, default is 9.
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Elements to compute the indicator. If `X` is a two-dimensional array,
+        then an indicator is computed for each series along `axis`.
+    w : int, optional
+        Size of the main lagged window of the moving average, must be positive.
+        If ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is 9.
     fast_ma : int, optional
-        Number of lags for short ma, default is 12.
+        Size of the lagged window of the short moving average, must be strictly
+        positive. Default is 12.
     slow_ma : int, optional
-        Number of lags for long ma, default is 26.
-    kind_ma : {'e', 's', 'w'}
+        Size of the lagged window of the lond moving average, must be strictly
+        positive. Default is 26.
+    kind : {'e', 's', 'w'}
         Kind of moving average, default is 'e'.
-        - Exponential moving average if 'e'.
-        - Simple moving average if 's'.
-        - Weighted moving average if 'w'.
+        - If 'e' then use exponential moving average.
+        - If 's' then use simple moving average.
+        - If 'w' then use weighted moving average.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    np.ndarray[dtype=np.float64, ndim=1]
-        Moving avg convergence/divergence histogram of index or returns.
+    np.ndarray[dtype, ndim=1 or 2]
+        Moving average convergence/divergence histogram of each series.
+
+    References
+    ----------
+    .. [4] https://en.wikipedia.org/wiki/MACD
 
     Examples
     --------
-    >>> series = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
-    >>> macd_hist(series, lags=3, fast_ma=2, slow_ma=4)
+    >>> X = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
+    >>> macd_hist(X, w=3, fast_ma=2, slow_ma=4)
     array([ 0.        ,  5.33333333, -0.35555556,  3.93481481,  6.4102716 ,
            -9.47070947])
 
@@ -245,43 +304,66 @@ def macd_hist(series, lags=9, fast_ma=12, slow_ma=26, kind='e'):
     z_score, bollinger_band, hma, macd_line, signal_line, cci
 
     """
-    macd_lin = macd_line(
-        series, fast_ma=fast_ma, slow_ma=slow_ma, kind=kind
-    )
-    sig_lin = signal_line(
-        series, lags=lags, fast_ma=fast_ma, slow_ma=slow_ma, kind=kind
-    )
+    if fast_ma <= 0 or slow_ma <= 0:
+
+        raise ValueError('lagged window of size {} and {} are not available, \
+            must be positive.'.format(fast_ma, slow_ma))
+
+    elif kind == 'e':
+        w = 1 - 2 / (1 + w)
+
+    macd_lin = _macd_line(X, fast_ma, slow_ma, kind)
+    sig_lin = _signal_line(X, w, fast_ma, slow_ma, kind)
+
     hist = macd_lin - sig_lin
 
     return hist
 
 
-def macd_line(series, fast_ma=12, slow_ma=26, kind='e'):
+@WrapperArray('dtype', 'axis')
+def macd_line(X, fast_ma=12, slow_ma=26, kind='e', axis=0, dtype=None):
     """ Compute Moving Average Convergence Divergence Line.
+
+    MACD is a trading indicator used in technical analysis of stock prices,
+    created by Gerald Appel in the late 1970s [4]_. It is designed to reveal
+    changes in the strength, direction, momentum, and duration of a trend in a
+    stock's price.
 
     Parameters
     ----------
-    series : np.ndarray[dtype=np.float64, ndim=1]
-        Series of index or returns.
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Elements to compute the indicator. If `X` is a two-dimensional array,
+        then an indicator is computed for each series along `axis`.
     fast_ma : int, optional
-        Number of lags for short ma, default is 12.
+        Size of the lagged window of the short moving average, must be strictly
+        positive. Default is 12.
     slow_ma : int, optional
-        Number of lags for long ma, default is 26.
-    kind_ma : {'e', 's', 'w'}
+        Size of the lagged window of the lond moving average, must be strictly
+        positive. Default is 26.
+    kind : {'e', 's', 'w'}
         Kind of moving average, default is 'e'.
-        - Exponential moving average if 'e'.
-        - Simple moving average if 's'.
-        - Weighted moving average if 'w'.
+        - If 'e' then use exponential moving average.
+        - If 's' then use simple moving average.
+        - If 'w' then use weighted moving average.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    np.ndarray[dtype=np.float64, ndim=1]
-        Moving avg convergence/divergence line of index or returns.
+    np.ndarray[dtype, ndim=1 or 2]
+        Moving average convergence/divergence line of each series.
+
+    References
+    ----------
+    .. [4] https://en.wikipedia.org/wiki/MACD
 
     Examples
     --------
-    >>> series = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
-    >>> macd_line(series, fast_ma=2, slow_ma=4)
+    >>> X = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
+    >>> macd_line(X, fast_ma=2, slow_ma=4)
     array([ 0.        , 10.66666667,  4.62222222, 12.84740741, 21.7331358 ,
            -3.61855473])
 
@@ -290,50 +372,79 @@ def macd_line(series, fast_ma=12, slow_ma=26, kind='e'):
     z_score, bollinger_band, hma, macd_hist, signal_line, cci
 
     """
+    if fast_ma <= 0 or slow_ma <= 0:
+
+        raise ValueError('lagged window of size {} and {} are not available, \
+            must be positive.'.format(fast_ma, slow_ma))
+
+    return _macd_line(X, fast_ma, slow_ma, kind)
+
+
+def _macd_line(X, fast_ma, slow_ma, kind):
+    if kind == 'e':
+        fast_ma = 1 - 2 / (fast_ma + 1)
+        slow_ma = 1 - 2 / (slow_ma + 1)
+
     f = _handler_ma[kind.lower()]
 
-    fast = f(series, k=fast_ma)
-    slow = f(series, k=slow_ma)
+    fast = f(X, fast_ma)
+    slow = f(X, slow_ma)
     macd_lin = fast - slow
 
     return macd_lin
 
 
-def rsi(series, kind='e', lags=21, alpha=None):
+@WrapperArray('dtype', 'axis', 'window')
+def rsi(X, w=14, kind='e', axis=0, dtype=None):
     r""" Compute Relative Strenght Index.
+
+    The relative strength index, developed by J. Welles Wilder in 1978 [5]_, is
+    a technical indicator used in the analysis of financial markets. It is
+    intended to chart the current and historical strength or weakness of a
+    stock or market based on the closing prices of a recent trading period.
 
     Notes
     -----
-    It is the average gain of upward periods (noted `U`) divided by the average
-    loss of downward (noted `D`) periods during the specified time frame, such
-    that :
+    It is the average gain of upward periods (noted `ma^w(X^+_t)`) divided by
+    the average loss of downward (noted `ma^w(X^-_t)`) periods during the
+    specified time frame `w`, such that :
 
-    .. math:: RSI = 100 - \frac{100}{1 + \frac{U}{D}}
+    .. math::
+
+        RSI^w(X_t) = 100 - \frac{100}{1 + \frac{ma^w(X^+_t)}{ma^w(X^-_t)}}
 
     Parameters
     ----------
-    series : np.ndarray[dtype=np.float64, ndim=1]
-        Index series.
-    kind_ma : {'e', 's', 'w'}
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Elements to compute the indicator. If `X` is a two-dimensional array,
+        then an indicator is computed for each series along `axis`.
+    w : int, optional
+        Size of the lagged window of the moving average, must be positive. If
+        ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is 14.
+    kind : {'e', 's', 'w'}
         Kind of moving average, default is 'e'.
-        - Exponential moving average if 'e'.
-        - Simple moving average if 's'.
-        - Weighted moving average if 'w'.
-    lags : int, optional
-        Number of lagged period, default is 21.
-    alpha : float, optional
-        Coefficiant, default is 0.94 corresponding at 20 lags days (only for
-        'ema').
+        - If 'e' then use exponential moving average.
+        - If 's' then use simple moving average.
+        - If 'w' then use weighted moving average.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    np.ndarray[dtype=np.float64, ndim=1]
-        Value of RSI for each period.
+    np.ndarray[dtype, ndim=1 or 2]
+        Relative strength index for each period.
+
+    References
+    ----------
+    .. [5] https://en.wikipedia.org/wiki/Relative_strength_index
 
     Examples
     --------
-    >>> series = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
-    >>> rsi(series, lags=3)
+    >>> X = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
+    >>> rsi(X, w=3)
     array([ 0.        , 99.99999804, 69.59769254, 85.55610891, 91.72201613,
            30.00294321])
 
@@ -342,53 +453,77 @@ def rsi(series, kind='e', lags=21, alpha=None):
     z_score, bollinger_band, hma, macd_hist, cci
 
     """
-    series = series.flatten()
-    T = np.size(series)
-    U = np.zeros([T - 1])
-    D = np.zeros([T - 1])
-    delta = np.log(series[1:] / series[:-1])
+    if kind == 'e':
+        w = 1 - 2 / (1 + w)
+
+    # Compute first diff
+    delta = np.log(X[1:] / X[:-1])
+
+    # Set upward and downward arrays
+    U = np.zeros(delta.shape)
+    D = np.zeros(delta.shape)
     U[delta > 0] = delta[delta > 0]
     D[delta < 0] = - delta[delta < 0]
 
+    # Compute average
     f = _handler_ma[kind.lower()]
+    ma_U = f(U, w)
+    ma_D = f(D, w)
 
-    ma_U = f(U, k=lags)
-    ma_D = f(D, k=lags)
-
-    RSI = np.zeros([T])
+    # Compute rsi values
+    RSI = np.zeros(X.shape)
     RSI[1:] = 100 * ma_U / (ma_U + ma_D + 1e-8)
 
     return RSI
 
 
-def signal_line(series, lags=9, fast_ma=12, slow_ma=26, kind='e'):
-    """ Signal Line for k lags with slow and fast lenght.
+@WrapperArray('dtype', 'axis', 'window')
+def signal_line(X, w=9, fast_ma=12, slow_ma=26, kind='e', axis=0, dtype=None):
+    """ MACD Signal Line for window of size `w` with slow and fast lenght.
+
+    MACD is a trading indicator used in technical analysis of stock prices,
+    created by Gerald Appel in the late 1970s [4]_. It is designed to reveal
+    changes in the strength, direction, momentum, and duration of a trend in a
+    stock's price.
 
     Parameters
     ----------
-    series : np.ndarray[dtype=np.float64, ndim=1]
-        Index or returns ?
-    lags : int, optional
-        Number of lags, default is 9.
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Elements to compute the indicator. If `X` is a two-dimensional array,
+        then an indicator is computed for each series along `axis`.
+    w : int, optional
+        Size of the main lagged window of the moving average, must be positive.
+        If ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is 9.
     fast_ma : int, optional
-        Number of lags for short ma, default is 12.
+        Size of the lagged window of the short moving average, must be strictly
+        positive. Default is 12.
     slow_ma : int, optional
-        Number of lags for long ma, default is 26.
-    kind_ma : {'e', 's', 'w'}
+        Size of the lagged window of the lond moving average, must be strictly
+        positive. Default is 26.
+    kind : {'e', 's', 'w'}
         Kind of moving average, default is 'e'.
-        - Exponential moving average if 'e'.
-        - Simple moving average if 's'.
-        - Weighted moving average if 'w'.
+        - If 'e' then use exponential moving average.
+        - If 's' then use simple moving average.
+        - If 'w' then use weighted moving average.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    np.ndarray[dtype=np.float64, ndim=1]
-        Signal line of index or returns.
+    np.ndarray[dtype, ndim=1 or 2]
+        MACD signal line of each series.
+
+    References
+    ----------
+    .. [4] https://en.wikipedia.org/wiki/MACD
 
     Examples
     --------
-    >>> series = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
-    >>> signal_line(series, lags=3, fast_ma=2, slow_ma=4)
+    >>> X = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
+    >>> signal_line(X, w=3, fast_ma=2, slow_ma=4)
     array([ 0.        ,  5.33333333,  4.97777778,  8.91259259, 15.3228642 ,
             5.85215473])
 
@@ -397,11 +532,23 @@ def signal_line(series, lags=9, fast_ma=12, slow_ma=26, kind='e'):
     z_score, bollinger_band, hma, macd_hist, macd_line, cci
 
     """
-    macd_lin = macd_line(series, fast_ma=fast_ma, slow_ma=slow_ma)
+    if fast_ma <= 0 or slow_ma <= 0:
+
+        raise ValueError('lagged window of size {} and {} are not available, \
+            must be positive.'.format(fast_ma, slow_ma))
+
+    elif kind == 'e':
+        w = 1 - 2 / (1 + w)
+
+    return _signal_line(X, w, fast_ma, slow_ma, kind)
+
+
+def _signal_line(X, w, fast_ma, slow_ma, kind):
+    macd_lin = _macd_line(X, fast_ma, slow_ma, kind)
 
     f = _handler_ma[kind.lower()]
 
-    sig_lin = f(macd_lin, k=lags)
+    sig_lin = f(macd_lin, w)
 
     return sig_lin
 
