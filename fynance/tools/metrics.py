@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-17 09:07:24
+# @Last modified time: 2019-10-17 16:03:31
 
 """ Metric functons used in financial analysis. """
 
@@ -19,7 +19,7 @@ from fynance.tools.metrics_cy import calmar_cy, drawdown_cy, mdd_cy, sharpe_cy
 from fynance.tools.metrics_cy import log_sharpe_cy, roll_mdd_cy, roll_mad_cy_1d
 from fynance.tools.metrics_cy import roll_mad_cy_2d
 from fynance.tools.momentums_cy import smstd_cy
-from fynance.tools.momentums import sma, ema, wma, smstd, emstd, wmstd
+from fynance.tools.momentums import _sma, _ema, _wma, _smstd, _emstd, _wmstd
 
 # TODO:
 # - Append window size on rolling calmar
@@ -36,30 +36,39 @@ __all__ = [
     'perf_returns', 'z_score',
 ]
 
-_handler_ma = {'s': sma, 'w': wma, 'e': ema}
-_handler_mstd = {'s': smstd, 'w': wmstd, 'e': emstd}
+_handler_ma = {'s': _sma, 'w': _wma, 'e': _ema}
+_handler_mstd = {'s': _smstd, 'w': _wmstd, 'e': _emstd}
 
 # =========================================================================== #
 #                                   Metrics                                   #
 # =========================================================================== #
 
 
-def accuracy(y_true, y_pred, sign=True):
-    """ Compute the accuracy of prediction.
+@WrapperArray('axis')
+def accuracy(y_true, y_pred, sign=True, axis=0):
+    r""" Compute the accuracy of prediction.
+
+    Notes
+    -----
+    .. math::
+
+        accuracy = \frac{right}{right + wrong}
 
     Parameters
     ----------
-    y_true : np.ndarray[ndim=1, dtype=np.float64]
+    y_true : np.ndarray[ndim=1 or 2, dtype]
         Vector of true series.
-    y_pred : np.ndarray[ndim=1, dtype=np.float64]
+    y_pred : np.ndarray[ndim=1 or 2, dtype]
         Vector of predicted series.
     sign : bool, optional
-        Check sign accuracy if true, else check exact accuracy, default
-        is True.
+        - If True then check sign accuracy (default).
+        - Else check exact accuracy.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
 
     Returns
     -------
-    float
+    float or np.ndarray[ndim=1, float]
         Accuracy of prediction as float between 0 and 1.
 
     Examples
@@ -81,85 +90,151 @@ def accuracy(y_true, y_pred, sign=True):
         y_pred = np.sign(y_pred)
 
     # Check right answeres
-    R = np.sum(y_true == y_pred)
+    R = np.sum(y_true == y_pred, axis=axis)
 
     # Check wrong answeres
-    W = np.sum(y_true != y_pred)
+    W = np.sum(y_true != y_pred, axis=axis)
 
     return R / (R + W)
 
 
-def annual_return(series, period=252):
-    """ Compute compouned annual return.
+@WrapperArray('dtype', 'axis')
+def annual_return(X, period=252, axis=0, dtype=None):
+    r""" Compute compouned annual returns of each `X`' series.
+
+    The annualised return [1]_ is the process of converting returns on a whole
+    period to returns per year.
+
+    Notes
+    -----
+    Let T the number of time observations in `X`' series, the annual compouned
+    returns is computed such that:
+
+    .. math::
+
+        annualReturn = sign(\frac{X_T}{X_0}) \time
+        \frac{X_T}{X_0}^{\frac{period}{T - 1}} - 1
 
     Parameters
     ----------
-    series : np.ndarray[np.float64, ndim=1]
-        Time series (price, performance or index).
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Time-series of price, performance or index.
     period : int, optional
-        Number of period per year, default is 252 (trading days).
+        Number of period per year, default is 252 (trading days per year).
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    np.float64
-        Value of compouned annual return.
+    dtype or np.ndarray[dtype, ndim=1]
+        Values of compouned annual returns of each series.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Rate_of_return#Annualisation
 
     Examples
     --------
     Assume series of monthly prices:
 
-    >>> series = np.array([100, 110, 80, 120, 160, 108])
-    >>> print(round(annual_return(series, period=12), 4))
+    >>> X = np.array([100, 110, 80, 120, 160, 125, 108]).astype(np.float64)
+    >>> print(round(annual_return(X, period=12), 4))
     0.1664
+    >>> X = np.array([[100, 110], [80, 120], [160, 108]]).astype(np.float64)
+    >>> annual_return(X, period=12)
+    array([15.777216  , -0.10425081])
 
     See Also
     --------
     mdd, drawdown, sharpe, annual_volatility
 
     """
-    T = series.size
-    ret = series[-1] / series[0]
+    # TODO : check if X[0] != 0
+    #        check if sign(X[0]) == sign(X[-1])
+    T = X.shape[0] - 1
+    ret = X[-1] / X[0]
 
-    return np.sign(ret) * np.float_power(
-        np.abs(ret),
-        period / T,
-        dtype=np.float64
-    ) - 1.
+    sign = np.sign(ret)
+    ret = np.abs(ret)
+
+    return sign * np.float_power(ret, period / T, dtype=np.float64) - 1.
 
 
-def annual_volatility(series, period=252):
-    """ Compute compouned annual volatility.
+@WrapperArray('dtype', 'axis')
+def annual_volatility(X, period=252, log=True, axis=0, dtype=None):
+    r""" Compute the annualized volatility of each `X`' series.
+
+    In finance, volatility is the degree of variation of a trading price
+    series over time as measured by the standard deviation of logarithmic
+    returns [2]_.
+
+    Notes
+    -----
+    Let :math:`Var` the variance function of a random variable:
+
+    .. math::
+
+        annualVolatility = \sqrt{period} \times std_t(R) \\
+        \text{where, }R =
+        \begin{cases}ln(\frac{X_{1:T}}{X_{0:T-1}}) \text{ if log=True}\\
+                    \frac{X_{1:T}}{X_{0:T-1}} - 1 \text{ otherwise} \\
+        \end{cases}
 
     Parameters
     ----------
-    series : np.ndarray[np.float64, ndim=1]
-        Time series (price, performance or index).
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Time-series of price, performance or index.
     period : int, optional
-        Number of period per year, default is 252 (trading days).
+        Number of period per year, default is 252 (trading days per year).
+    log : bool, optional
+        - If True then logarithmic returns are computed.
+        - Else then returns in percentage are computed.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    np.float64
-        Value of compouned annual volatility.
+    dtype or np.ndarray([dtype, ndim=1])
+        Values of annualized volatility for each series.
+
+    References
+    ----------
+    .. [2] https://en.wikipedia.org/wiki/Volatility_(finance)
 
     Examples
     --------
     Assume series of monthly prices:
 
-    >>> series = np.array([100, 110, 105, 110, 120, 108])
-    >>> print(round(annual_volatility(series, period=12), 6))
-    0.272172
+    >>> X = np.array([100, 110, 105, 110, 120, 108]).astype(np.float64)
+    >>> print(round(annual_volatility(X, period=12, log=True), 6))
+    0.272321
+    >>> annual_volatility(X.reshape([6, 1]), period=12, log=False)
+    array([0.27217177])
 
     See Also
     --------
     mdd, drawdown, sharpe, annual_return
 
     """
-    return np.sqrt(period) * np.std(series[1:] / series[:-1] - 1.)
+    # TODO : check X != 0
+    if log:
+        R = np.log(X[1:] / X[:-1])
+
+    else:
+        R = X[1:] / X[:-1] - 1.
+
+    return np.sqrt(period) * np.std(R, axis=axis)
 
 
-def calmar(series, period=252):
-    """ Compute the Calmar Ratio [1]_.
+@WrapperArray('dtype', 'axis')
+def calmar(X, period=252, axis=0, dtype=None):
+    """ Compute the Calmar Ratio [3]_ for each `X`' series.
 
     Notes
     -----
@@ -167,46 +242,61 @@ def calmar(series, period=252):
 
     Parameters
     ----------
-    series : np.ndarray[np.float64, ndim=1]
-        Time series (price, performance or index).
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Time-series price, performance or index.
     period : int, optional
-        Number of period per year, default is 252 (trading days).
+        Number of period per year, default is 252 (trading days per year).
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    np.float64
-        Value of Calmar ratio.
+    dtype or np.ndarray([dtype, ndim=1])
+        Values of Calmar ratio for each series.
 
     References
     ----------
-    .. [1] https://en.wikipedia.org/wiki/Calmar_ratio
+    .. [3] https://en.wikipedia.org/wiki/Calmar_ratio
 
     Examples
     --------
     Assume a series of monthly prices:
 
-    >>> series = np.array([70, 100, 80, 120, 160, 80])
-    >>> calmar(series, period=12)
+    >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
+    >>> calmar(X, period=12)
     0.6122448979591835
+    >>> calmar(X.reshape([6, 1]), period=12)
+    array([0.6122449])
 
     See Also
     --------
     mdd, drawdown, sharpe, roll_calmar
 
     """
-    series = np.asarray(series, dtype=np.float64).flatten()
+    # TODO : check efficiency
+    #        calmar_cy_2d
+    if len(X.shape) == 2:
+        output = np.zeros(X.shape[1])
+        for i in range(X.shape[1]):
+            output[i] = calmar_cy(X[:, i], period=float(period))
 
-    return calmar_cy(series, period=float(period))
+        return output
+
+    return calmar_cy(X, period=float(period))
 
 
-def diversified_ratio(series, w=None, std_method='std'):
+@WrapperArray('axis')
+def diversified_ratio(X, W=None, std_method='std', axis=0):
     r""" Compute diversification ratio of a portfolio.
 
     Notes
     -----
     Diversification ratio, denoted D, is defined as the ratio of the
     portfolio's weighted average volatility to its overll volatility,
-    developed by Choueifaty and Coignard [2]_.
+    developed by Choueifaty and Coignard [4]_.
 
     .. math:: D(P) = \frac{P' \Sigma}{\sqrt{P'VP}}
 
@@ -216,13 +306,15 @@ def diversified_ratio(series, w=None, std_method='std'):
 
     Parameters
     ----------
-    series : np.array[ndim=2, dtype=np.float64] of shape (T, N)
+    X : np.ndarray[ndim=2, dtype=np.float64] of shape (T, N)
         Portfolio matrix of N assets and T time periods, each column
         correspond to one series of prices.
-    w : np.array[ndim=1 or 2, dtype=np.float64] of size N, optional
+    W : np.array[ndim=1 or 2, dtype=np.float64] of size N, optional
         Vector of weights, default is None it means it will equaly weighted.
     std_method : str, optional /!\ Not yet implemented /!\
         Method to compute variance vector and covariance matrix.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
 
     Returns
     -------
@@ -231,73 +323,96 @@ def diversified_ratio(series, w=None, std_method='std'):
 
     References
     ----------
-    .. [2] tobam.fr/wp-content/uploads/2014/12/TOBAM-JoPM-Maximum-Div-2008.pdf
+    .. [4] tobam.fr/wp-content/uploads/2014/12/TOBAM-JoPM-Maximum-Div-2008.pdf
 
     """
-    T, N = series.shape
+    # TODO : check efficiency
+    #        append examples
+    T, N = X.shape
 
-    if w is None:
-        w = np.ones([N, 1]) / N
+    if W is None:
+        W = np.ones([N, 1]) / N
     else:
-        w = w.reshape([N, 1])
+        W = W.reshape([N, 1])
 
-    sigma = np.std(series, axis=0).reshape([N, 1])
-    V = np.cov(series, rowvar=False, bias=True).reshape([N, N])
+    sigma = np.std(X, axis=0).reshape([N, 1])
+    V = np.cov(X, rowvar=False, bias=True).reshape([N, N])
 
-    return (w.T @ sigma) / np.sqrt(w.T @ V @ w)
+    return (W.T @ sigma) / np.sqrt(W.T @ V @ W)
 
 
-def drawdown(series):
-    """ Measures the drawdown of `series`.
+@WrapperArray('dtype', 'axis')
+def drawdown(X, axis=0, dtype=None):
+    """ Measures the drawdown of each `X`' series.
 
     Function to compute measure of the decline from a historical peak in some
-    variable [3]_ (typically the cumulative profit or total open equity of a
+    variable [5]_ (typically the cumulative profit or total open equity of a
     financial trading strategy).
 
     Parameters
     ----------
-    series : np.ndarray[np.float64, ndim=1]
-        Time series (price, performance or index).
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Time-series of prices, performances or index.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    np.ndarray[np.float64, ndim=1]
-        Series of DrawDown.
+    np.ndarray[dtype, ndim=1 or 2]
+        Series of draw down for each series.
 
     References
     ----------
-    .. [3] https://en.wikipedia.org/wiki/Drawdown_(economics)
+    .. [5] https://en.wikipedia.org/wiki/Drawdown_(economics)
 
     Examples
     --------
-    >>> series = np.array([70, 100, 80, 120, 160, 80])
-    >>> drawdown(series)
+    >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
+    >>> drawdown(X)
     array([0. , 0. , 0.2, 0. , 0. , 0.5])
+    >>> drawdown(X.reshape([6, 1])).T
+    array([[0. , 0. , 0.2, 0. , 0. , 0.5]])
 
     See Also
     --------
     mdd, calmar, sharpe, roll_mdd
 
     """
-    series = np.asarray(series, dtype=np.float64).flatten()
+    # TODO : check efficiency
+    #        drawdown_cy_2d
+    if len(X.shape) == 2:
+        output = np.zeros(X.shape)
+        for i in range(X.shape[1]):
+            output[:, i] = drawdown_cy(X[:, i])
 
-    return drawdown_cy(series)
+        return output
+
+    return drawdown_cy(X)
 
 
-def mad(series):
-    """ Compute the Mean Absolute Deviation.
+@WrapperArray('dtype')
+def mad(X, axis=0, dtype=None):
+    """ Compute the Mean Absolute Deviation of each `X`' series.
 
     Compute the mean of the absolute value of the distance to the mean [4]_.
 
     Parameters
     ----------
-    series : np.ndarray[np.float64, ndim=1]
-        Time series (price, performance or index).
+    X : np.ndarray[np.dtype, ndim=1 or 2]
+        Time-series of prices, performances or index.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    np.float64
-        Value of mean absolute deviation.
+    dtype or np.ndarray[dtype, ndim=1]
+        Values of mean absolute deviation of each series.
 
     References
     ----------
@@ -305,8 +420,8 @@ def mad(series):
 
     Examples
     --------
-    >>> series = np.array([70., 100., 90., 110., 150., 80.])
-    >>> mad(series)
+    >>> X = np.array([70., 100., 90., 110., 150., 80.])
+    >>> mad(X)
     20.0
 
     See Also
@@ -314,10 +429,11 @@ def mad(series):
     roll_mad
 
     """
-    return np.mean(np.abs(series - np.mean(series)))
+    # TODO : make cython function
+    return np.mean(np.abs(X - np.mean(X, axis=axis)), axis=axis)
 
 
-def mdd(series):
+def mdd(X):
     """ Compute the maximum drwdown.
 
     Drawdown is the measure of the decline from a historical peak in some
@@ -326,7 +442,7 @@ def mdd(series):
 
     Parameters
     ----------
-    series : np.ndarray[np.float64, ndim=1]
+    X : np.ndarray[np.float64, ndim=1]
         Time series (price, performance or index).
 
     Returns
@@ -340,8 +456,8 @@ def mdd(series):
 
     Examples
     --------
-    >>> series = np.array([70, 100, 80, 120, 160, 80])
-    >>> mdd(series)
+    >>> X = np.array([70, 100, 80, 120, 160, 80])
+    >>> mdd(X)
     0.5
 
     See Also
@@ -349,17 +465,17 @@ def mdd(series):
     drawdown, calmar, sharpe, roll_mdd
 
     """
-    series = np.asarray(series, dtype=np.float64).flatten()
+    X = np.asarray(X, dtype=np.float64).flatten()
 
-    return mdd_cy(series)
+    return mdd_cy(X)
 
 
-def perf_index(series, base=100.):
+def perf_index(X, base=100.):
     """ Compute performance of prices or index values along time axis.
 
     Parameters
     ----------
-    series : np.ndarray[ndim=1, dtype=np.float64]
+    X : np.ndarray[ndim=1, dtype=np.float64]
         Time-series of prices or index values.
     base : float, optional
         Initial value for measure the performance, default is 100.
@@ -375,12 +491,12 @@ def perf_index(series, base=100.):
 
     Examples
     --------
-    >>> series = np.array([10., 12., 15., 14., 16., 18., 16.])
-    >>> perf_index(series, base=100.)
+    >>> X = np.array([10., 12., 15., 14., 16., 18., 16.])
+    >>> perf_index(X, base=100.)
     array([100., 120., 150., 140., 160., 180., 160.])
 
     """
-    return base * series / series[0]
+    return base * X / X[0]
 
 
 def perf_returns(returns, log=False, base=100.):
@@ -411,12 +527,12 @@ def perf_returns(returns, log=False, base=100.):
     array([100., 120., 150., 140., 160., 180., 160.])
 
     """
-    series = np.cumsum(returns) + base
+    X = np.cumsum(returns) + base
 
     if log:
-        series = np.exp(series)
+        X = np.exp(X)
 
-    return perf_index(series, base=base)
+    return perf_index(X, base=base)
 
 
 # TODO : finish perf strat metric (add reinvest option)
@@ -466,12 +582,12 @@ def perf_strat(underlying, signals=None, log=False, base=100.,
     if signals is None:
         signals = np.ones(underlying.shape[0])
 
-    series = returns * signals
+    X = returns * signals
 
-    return perf_returns(series, log=log, base=base)
+    return perf_returns(X, log=log, base=base)
 
 
-def sharpe(series, period=252, log=False):
+def sharpe(X, period=252, log=False):
     r""" Compute the Sharpe ratio [6]_.
 
     Notes
@@ -483,7 +599,7 @@ def sharpe(series, period=252, log=False):
 
     Parameters
     ----------
-    series : numpy.ndarray(dim=1, dtype=float)
+    X : numpy.ndarray(dim=1, dtype=float)
         Prices of the index.
     period : int, optional
         Number of period per year, default is 252 (trading days).
@@ -502,10 +618,10 @@ def sharpe(series, period=252, log=False):
 
     Examples
     --------
-    Assume a series of monthly prices:
+    Assume a X of monthly prices:
 
-    >>> series = np.array([70, 100, 80, 120, 160, 80])
-    >>> sharpe(series, period=12)
+    >>> X = np.array([70, 100, 80, 120, 160, 80])
+    >>> sharpe(X, period=12)
     0.22494843872918127
 
     See Also
@@ -513,12 +629,12 @@ def sharpe(series, period=252, log=False):
     mdd, calmar, drawdown, roll_sharpe
 
     """
-    series = np.asarray(series, dtype=np.float64).flatten()
+    X = np.asarray(X, dtype=np.float64).flatten()
 
     if log:
-        return log_sharpe_cy(series, period=float(period))
+        return log_sharpe_cy(X, period=float(period))
 
-    return sharpe_cy(series, period=float(period))
+    return sharpe_cy(X, period=float(period))
 
 
 def z_score(X, w=0, kind='s'):
@@ -567,8 +683,11 @@ def z_score(X, w=0, kind='s'):
     if w == 0:
         w = X.shape[0]
 
-    avg = _handler_ma[kind.lower()](X, w=w)
-    std = _handler_mstd[kind.lower()](X, w=w)
+    if kind == 'e':
+        w = 1 - 2 / (1 + w)
+
+    avg = _handler_ma[kind.lower()](X, w)
+    std = _handler_mstd[kind.lower()](X, w)
 
     std[std == 0.] = 1.
     z = (X - avg) / std
@@ -583,14 +702,14 @@ def z_score(X, w=0, kind='s'):
 # TODO : rolling perf metric
 # TODO : rolling diversified ratio
 
-def roll_calmar(series, period=252.):
+def roll_calmar(X, period=252.):
     """ Compute the rolling Calmar ratio [1]_.
 
     It is the compouned annual return over the rolling Maximum DrawDown.
 
     Parameters
     ----------
-    series : np.ndarray[np.float64, ndim=1]
+    X : np.ndarray[np.float64, ndim=1]
         Time series (price, performance or index).
     period : int, optional
         Number of period per year, default is 252 (trading days).
@@ -611,8 +730,8 @@ def roll_calmar(series, period=252.):
     --------
     Assume a monthly series of prices:
 
-    >>> series = np.array([70, 100, 80, 120, 160, 80])
-    >>> roll_calmar(series, period=12)
+    >>> X = np.array([70, 100, 80, 120, 160, 80])
+    >>> roll_calmar(X, period=12)
     array([ 0.        ,  0.        ,  3.52977926, 20.18950437, 31.35989887,
             0.6122449 ])
 
@@ -622,17 +741,17 @@ def roll_calmar(series, period=252.):
 
     """
     # Set variables
-    series = np.asarray(series, dtype=np.float64).flatten()
-    T = series.size
+    X = np.asarray(X, dtype=np.float64).flatten()
+    T = X.size
     t = np.arange(1., T + 1., dtype=np.float64)
 
     # Compute roll Returns
-    ret = series / series[0]
+    ret = X / X[0]
     annual_return = np.sign(ret) * np.float_power(
         np.abs(ret), period / t, dtype=np.float64) - 1.
 
     # Compute roll MaxDrawDown
-    roll_maxdd = roll_mdd_cy(series)
+    roll_maxdd = roll_mdd_cy(X)
 
     # Compute roll calmar
     roll_cal = np.zeros([T])
@@ -696,7 +815,7 @@ def roll_mad(X, win=0, axis=0, dtype=None):
     return np.asarray(roll_mad_cy_1d(X, int(win)))
 
 
-def roll_mdd(series):
+def roll_mdd(X):
     """ Compute the rolling maximum drwdown.
 
     Where drawdown is the measure of the decline from a historical peak in
@@ -705,7 +824,7 @@ def roll_mdd(series):
 
     Parameters
     ----------
-    series : np.ndarray[np.float64, ndim=1]
+    X : np.ndarray[np.float64, ndim=1]
         Time series (price, performance or index).
     win : int, optional /! NOT YET WORKING /!
         Size of the rolling window. If less of two, rolling Max DrawDown is
@@ -722,8 +841,8 @@ def roll_mdd(series):
 
     Examples
     --------
-    >>> series = np.array([70, 100, 80, 120, 160, 80])
-    >>> roll_mdd(series)
+    >>> X = np.array([70, 100, 80, 120, 160, 80])
+    >>> roll_mdd(X)
     array([0. , 0. , 0.2, 0.2, 0.2, 0.5])
 
     See Also
@@ -731,12 +850,12 @@ def roll_mdd(series):
     mdd, roll_calmar, roll_sharpe, drawdown
 
     """
-    series = np.asarray(series, dtype=np.float64).flatten()
+    X = np.asarray(X, dtype=np.float64).flatten()
 
-    return roll_mdd_cy(series)
+    return roll_mdd_cy(X)
 
 
-def roll_sharpe(series, period=252, win=0, cap=True):
+def roll_sharpe(X, period=252, win=0, cap=True):
     """ Compute rolling sharpe ratio [6]_.
 
     It is the rolling compouned annual returns divided by rolling annual
@@ -744,7 +863,7 @@ def roll_sharpe(series, period=252, win=0, cap=True):
 
     Parameters
     ----------
-    series : np.ndarray[dtype=np.float64, ndim=1]
+    X : np.ndarray[dtype=np.float64, ndim=1]
         Financial series of prices or indexed values.
     period : int, optional
         Number of period in a year, default is 252 (trading days).
@@ -768,8 +887,8 @@ def roll_sharpe(series, period=252, win=0, cap=True):
     --------
     Assume a monthly series of prices:
 
-    >>> series = np.array([70, 100, 80, 120, 160, 80])
-    >>> roll_sharpe(series, period=12)
+    >>> X = np.array([70, 100, 80, 120, 160, 80])
+    >>> roll_sharpe(X, period=12)
     array([0.        , 0.        , 0.77721579, 3.99243019, 6.754557  ,
            0.24475518])
 
@@ -779,8 +898,8 @@ def roll_sharpe(series, period=252, win=0, cap=True):
 
     """
     # Setting inputs
-    series = np.asarray(series, dtype=np.float64).flatten()
-    T = series.size
+    X = np.asarray(X, dtype=np.float64).flatten()
+    T = X.size
     t = np.arange(1., T + 1., dtype=np.float64)
 
     if win < 2:
@@ -788,11 +907,11 @@ def roll_sharpe(series, period=252, win=0, cap=True):
 
     t[t > win] = win + 1.
     ret = np.zeros([T], dtype=np.float64)
-    ret[1:] = series[1:] / series[:-1] - 1.
+    ret[1:] = X[1:] / X[:-1] - 1.
 
     # Compute rolling perf
-    ma = series / series[0]
-    ma[win:] = series[win:] / series[: -win]
+    ma = X / X[0]
+    ma[win:] = X[win:] / X[: -win]
     annual_return = np.sign(ma) * np.float_power(
         np.abs(ma), period / t, dtype=np.float64) - 1.
 
@@ -833,7 +952,7 @@ def roll_z_score(X, w=0, kind='s'):
 
     Parameters
     ----------
-    series : np.ndarray[np.float64, ndim=1]
+    X : np.ndarray[np.float64, ndim=1]
         Series of index, prices or returns.
     kind_ma : {'ema', 'sma', 'wma'}
         Kind of moving average/standard deviation, default is 'sma'.
@@ -850,11 +969,11 @@ def roll_z_score(X, w=0, kind='s'):
 
     Examples
     --------
-    >>> series = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
-    >>> roll_z_score(series, w=3, kind='e')
+    >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
+    >>> roll_z_score(X, w=3, kind='e')
     array([ 0.        ,  1.41421356, -0.32444284,  1.30806216,  1.27096675,
            -1.04435741])
-    >>> roll_z_score(series, w=3)
+    >>> roll_z_score(X, w=3)
     array([ 0.        ,  1.        , -0.26726124,  1.22474487,  1.22474487,
            -1.22474487])
 
@@ -866,8 +985,11 @@ def roll_z_score(X, w=0, kind='s'):
     if w == 0:
         w = X.shape[0]
 
-    avg = _handler_ma[kind.lower()](X, w=w)
-    std = _handler_mstd[kind.lower()](X, w=w)
+    if kind == 'e':
+        w = 1 - 2 / (1 + w)
+
+    avg = _handler_ma[kind.lower()](X, w)
+    std = _handler_mstd[kind.lower()](X, w)
 
     std[std == 0.] = 1.
     z = (X - avg) / std
