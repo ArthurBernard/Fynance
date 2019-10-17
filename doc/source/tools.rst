@@ -13,7 +13,7 @@ Some precisions about parameters' notation in the following modules:
 
 - ``X`` is the time-series of returns, prices or indexed values. It can be one or two-dimensional array, if ``X`` is two-dimensional then you can precise the axis along wich make the computation. By default the compuatation is done along axis 0, i.e. each row is an observation at time t and each column is a different time-series.
 
-- ``w`` is the size of the lagged window, e.g. a simple moving average of ``X`` is noted :math:`sma^w_t(X) = \frac{1}{w} \sum^{t}_{s=t-w} X_s`.
+- ``w`` is the size of the lagged window, e.g. a simple moving average of ``X`` is noted :math:`sma^w_t(X) = \frac{1}{w} \sum^{w-i}_{i=0} X_{t-i}`.
 
 - ``kind`` means the method to compute moving average and/or standard deviation, simple ``'s'``, weighted ``'w'`` and exponential ``'e'`` are allowed.
 

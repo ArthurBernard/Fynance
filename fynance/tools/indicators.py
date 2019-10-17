@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:33
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-17 11:20:02
+# @Last modified time: 2019-10-17 14:40:30
 
 """ Indicators functions. """
 
@@ -129,8 +129,8 @@ def cci(X, high=None, low=None, w=20, axis=0, dtype=None):
 
     .. math::
 
-        cci = \frac{1}{0.015} \frac{p_t - sma^w(p_t)}{mad^w(p_t)} \\
-        \text{where, }p_t = \frac{p_{close} + p_{high} + p_{low}}{3}
+        cci = \frac{1}{0.015} \frac{p_t - sma^w_t(p)}{mad^w_t(p)} \\
+        \text{where, }p = \frac{p_{close} + p_{high} + p_{low}}{3}
 
     Parameters
     ----------
@@ -199,7 +199,8 @@ def hma(X, w=21, kind='w', axis=0, dtype=None):
 
     .. math::
 
-        hma^w(X_t) = ma^{\sqrt{w}}(2 \times ma^{\frac{w}{2}}(X_t)) - ma^w(X_t))
+        hma^w_t(X) = ma^{\sqrt{w}}_t(2 \times
+        ma^{\frac{w}{2}}_t(X)) - ma^w_t(X))
 
     Parameters
     ----------
@@ -421,7 +422,7 @@ def rsi(X, w=14, kind='e', axis=0, dtype=None):
 
     .. math::
 
-        RSI^w(X_t) = 100 - \frac{100}{1 + \frac{ma^w(X^+_t)}{ma^w(X^-_t)}}
+        RSI^w_t(X) = 100 - \frac{100}{1 + \frac{ma^w_t(X^+)}{ma^w_t(X^-)}}
 
     Parameters
     ----------

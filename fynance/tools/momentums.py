@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:13
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-16 20:35:32
+# @Last modified time: 2019-10-17 14:56:36
 
 """ Statical momentum functions. """
 
@@ -36,7 +36,7 @@ def sma(X, w=None, axis=0, dtype=None):
 
     .. math::
 
-        sma^w(X_t) = \frac{1}{w} \sum^{w-1}_{i=0} X_{t-i}
+        sma^w_t(X) = \frac{1}{w} \sum^{w-1}_{i=0} X_{t-i}
 
     Parameters
     ----------
@@ -101,7 +101,7 @@ def wma(X, w=None, axis=0, dtype=None):
 
     .. math::
 
-        wma^w(X_t) = \frac{2}{w (w-1)} \sum^{w-1}_{i=0} (w-i) \times X_{t-i}
+        wma^w_t(X) = \frac{2}{w (w-1)} \sum^{w-1}_{i=0} (w-i) \times X_{t-i}
 
     Parameters
     ----------
@@ -154,7 +154,8 @@ def ema(X, alpha=0.94, w=None, axis=0, dtype=None):
 
     .. math::
 
-        ema^{\apha}(X_t) = \alpha \times ema_{t-1} + (1-\alpha) \times X_t
+        ema^{\apha}_t(X) = \alpha \times ema^{\alpha}_{t-1} + (1-\alpha)
+        \times X_t
 
     Parameters
     ----------
@@ -229,7 +230,7 @@ def smstd(X, w=None, axis=0, dtype=None):
 
     .. math::
 
-        smstd^w(X_t) = \sqrt{\frac{1}{w} \sum^{w-1}_{i=0} (X_{t-i} - sma_t)^2}
+        smstd^w_t(X) = \sqrt{\frac{1}{w}\sum^{w-1}_{i=0} (X_{t-i} - sma^w_t)^2}
 
     Parameters
     ----------
@@ -281,9 +282,9 @@ def wmstd(X, w=None, axis=0, dtype=None):
 
     .. math::
 
-        wma_t = \frac{2}{w (w-1)} \sum^{w-1}_{i=0} (w-i) \times X_{t-i} \\
-        wmstd^w(X_t) = \sqrt{\frac{2}{w(w-1)} \sum^{w-1}_{i=0}
-        (w-i) \times (X_{t-i} - wma_t)^2}
+        wma^w_t(X) = \frac{2}{w (w-1)} \sum^{w-1}_{i=0} (w-i) \times X_{t-i} \\
+        wmstd^w_t(X) = \sqrt{\frac{2}{w(w-1)} \sum^{w-1}_{i=0}
+        (w-i) \times (X_{t-i} - wma^w_t(X))^2}
 
     Parameters
     ----------
@@ -335,8 +336,8 @@ def emstd(X, alpha=0.94, w=None, axis=0, dtype=None):
 
     .. math::
 
-        emstd^{\alpha}(X_t) = \sqrt{\alpha\times emstd_{t-1}^2+(1-\alpha)
-        \times X_t^2}
+        emstd^{\alpha}_t(X) = \sqrt{\alpha\times emstd^{\alpha}_{t-1}^2 +
+        (1-\alpha) \times X_t^2}
 
     Parameters
     ----------
