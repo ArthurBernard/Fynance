@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-10-15 16:35:14
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-15 23:34:52
+# @Last modified time: 2019-10-17 09:11:05
 
 # Built-in packages
 
@@ -51,16 +51,16 @@ def test_wma(set_variables):
 
 def test_ema(set_variables):
     x_1d, x_2d = set_variables
-    ma_1d = fy.ema(x_1d, k=4, dtype=np.float32)
-    ma_2d = fy.ema(x_2d, k=4, dtype=np.float32)
+    ma_1d = fy.ema(x_1d, w=4, dtype=np.float32)
+    ma_2d = fy.ema(x_2d, w=4, dtype=np.float32)
 
     assert ma_1d.dtype == np.float32
     assert (ma_1d == ma_2d.flatten()).all()
     assert ma_1d.shape == (6,)
     assert ma_2d.shape == (6, 1)
-    assert (fy.ema(x_1d, k=7) == fy.ema(x_1d, k=6)).any()
-    assert (fy.ema(x_1d, k=7)[1:] != fy.ema(x_1d, k=6)[1:]).all()
-    assert (fy.ema(x_2d, k=2, axis=1) == x_2d).all()
+    assert (fy.ema(x_1d, w=7) == fy.ema(x_1d, w=6)).any()
+    assert (fy.ema(x_1d, w=7)[1:] != fy.ema(x_1d, w=6)[1:]).all()
+    assert (fy.ema(x_2d, w=2, axis=1) == x_2d).all()
 
     a = 1 - 2 / (4 + 1)
     assert (ma_1d == fy.ema(x_1d, a, dtype=np.float32)).all()
@@ -97,14 +97,14 @@ def test_wmstd(set_variables):
 
 def test_emstd(set_variables):
     x_1d, x_2d = set_variables
-    ma_1d = fy.emstd(x_1d, k=4, dtype=np.float32)
-    ma_2d = fy.emstd(x_2d, k=4, dtype=np.float32)
+    ma_1d = fy.emstd(x_1d, w=4, dtype=np.float32)
+    ma_2d = fy.emstd(x_2d, w=4, dtype=np.float32)
 
     assert ma_1d.dtype == np.float32
     assert (ma_1d == ma_2d.flatten()).all()
     assert ma_1d.shape == (6,)
     assert ma_2d.shape == (6, 1)
-    assert (fy.emstd(x_2d, k=2, axis=1) == 0.).all()
+    assert (fy.emstd(x_2d, w=2, axis=1) == 0.).all()
 
     a = 1 - 2 / (4 + 1)
     assert (ma_1d == fy.emstd(x_1d, a, dtype=np.float32)).all()

@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-16 11:45:46
+# @Last modified time: 2019-10-17 09:07:24
 
 """ Metric functons used in financial analysis. """
 
@@ -521,7 +521,7 @@ def sharpe(series, period=252, log=False):
     return sharpe_cy(series, period=float(period))
 
 
-def z_score(X, k=0, kind='s'):
+def z_score(X, w=0, kind='s'):
     r""" Compute Z-score function.
 
     Notes
@@ -554,9 +554,9 @@ def z_score(X, k=0, kind='s'):
     Examples
     --------
     >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
-    >>> z_score(X, k=3, kind='e')
+    >>> z_score(X, w=3, kind='e')
     -1.0443574118998766
-    >>> z_score(X, k=3)
+    >>> z_score(X, w=3)
     -1.2247448713915896
 
     See Also
@@ -564,11 +564,11 @@ def z_score(X, k=0, kind='s'):
     roll_z_score, mdd, calmar, drawdown, sharpe
 
     """
-    if k == 0:
-        k = X.shape[0]
+    if w == 0:
+        w = X.shape[0]
 
-    avg = _handler_ma[kind.lower()](X, k=k)
-    std = _handler_mstd[kind.lower()](X, k=k)
+    avg = _handler_ma[kind.lower()](X, w=w)
+    std = _handler_mstd[kind.lower()](X, w=w)
 
     std[std == 0.] = 1.
     z = (X - avg) / std
@@ -818,7 +818,7 @@ def roll_sharpe(series, period=252, win=0, cap=True):
     return roll_shar
 
 
-def roll_z_score(X, k=0, kind='s'):
+def roll_z_score(X, w=0, kind='s'):
     r""" Compute vector of rolling/moving Z-score function.
 
     Notes
@@ -851,10 +851,10 @@ def roll_z_score(X, k=0, kind='s'):
     Examples
     --------
     >>> series = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
-    >>> roll_z_score(series, k=3, kind='e')
+    >>> roll_z_score(series, w=3, kind='e')
     array([ 0.        ,  1.41421356, -0.32444284,  1.30806216,  1.27096675,
            -1.04435741])
-    >>> roll_z_score(series, k=3)
+    >>> roll_z_score(series, w=3)
     array([ 0.        ,  1.        , -0.26726124,  1.22474487,  1.22474487,
            -1.22474487])
 
@@ -863,11 +863,11 @@ def roll_z_score(X, k=0, kind='s'):
     z_score, roll_mdd, roll_calmar, roll_mad, roll_sharpe
 
     """
-    if k == 0:
-        k = X.shape[0]
+    if w == 0:
+        w = X.shape[0]
 
-    avg = _handler_ma[kind.lower()](X, k=k)
-    std = _handler_mstd[kind.lower()](X, k=k)
+    avg = _handler_ma[kind.lower()](X, w=w)
+    std = _handler_mstd[kind.lower()](X, w=w)
 
     std[std == 0.] = 1.
     z = (X - avg) / std

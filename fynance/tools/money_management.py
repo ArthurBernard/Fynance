@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-03-15 12:23:04
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-16 13:09:56
+# @Last modified time: 2019-10-17 09:08:10
 
 """ Module with function to compute some money management coefficients. """
 
@@ -57,7 +57,7 @@ def iso_vol(series, target_vol=0.20, leverage=1., period=252, half_life=11):
     # Compute squared daily return vector
     ret2 = np.square(series[:-1] / series[1:] - 1)
     # Compute volatility vector
-    vol = np.sqrt(period * ema(ret2, k=half_life))
+    vol = np.sqrt(period * ema(ret2, w=half_life))
     vol[vol <= 0.] = 1e-8
     # Compute iso-vol coefficient
     iv[2:] = target_vol / vol[:-1]

@@ -2330,6 +2330,7 @@ static const char __pyx_k_X[] = "X";
 static const char __pyx_k_c[] = "c";
 static const char __pyx_k_d[] = "d";
 static const char __pyx_k_k[] = "k";
+static const char __pyx_k_w[] = "w";
 static const char __pyx_k_id[] = "id";
 static const char __pyx_k_np[] = "np";
 static const char __pyx_k_all[] = "__all__";
@@ -2574,21 +2575,22 @@ static PyObject *__pyx_kp_s_unable_to_allocate_shape_and_str;
 static PyObject *__pyx_kp_u_unknown_dtype_code_in_numpy_pxd;
 static PyObject *__pyx_n_s_unpack;
 static PyObject *__pyx_n_s_update;
+static PyObject *__pyx_n_s_w;
 static PyObject *__pyx_n_u_wma_cy_1d;
 static PyObject *__pyx_n_u_wma_cy_2d;
 static PyObject *__pyx_n_u_wmstd_cy_1d;
 static PyObject *__pyx_n_u_wmstd_cy_2d;
 static PyObject *__pyx_n_s_zeros;
-static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_sma_cy_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_k); /* proto */
-static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_2sma_cy_2d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_k); /* proto */
-static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_4wma_cy_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_k); /* proto */
-static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_6wma_cy_2d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_k); /* proto */
+static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_sma_cy_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_w); /* proto */
+static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_2sma_cy_2d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_w); /* proto */
+static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_4wma_cy_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_w); /* proto */
+static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_6wma_cy_2d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_w); /* proto */
 static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_8ema_cy_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, double __pyx_v_alpha); /* proto */
 static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_10ema_cy_2d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, double __pyx_v_alpha); /* proto */
-static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_12smstd_cy_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_k); /* proto */
-static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_14smstd_cy_2d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_k); /* proto */
-static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_16wmstd_cy_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_k); /* proto */
-static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_18wmstd_cy_2d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_k); /* proto */
+static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_12smstd_cy_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_w); /* proto */
+static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_14smstd_cy_2d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_w); /* proto */
+static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_16wmstd_cy_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_w); /* proto */
+static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_18wmstd_cy_2d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_w); /* proto */
 static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_20emstd_cy_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, double __pyx_v_alpha); /* proto */
 static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_22emstd_cy_2d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, double __pyx_v_alpha); /* proto */
 static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_24sma_cy(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_X, int __pyx_v_k); /* proto */
@@ -2689,13 +2691,13 @@ static PyObject *__pyx_codeobj__32;
 /* "fynance/tools/momentums_cy.pyx":31
  * 
  * 
- * cpdef double [:] sma_cy_1d(double [:] X, int k):             # <<<<<<<<<<<<<<
+ * cpdef double [:] sma_cy_1d(double [:] X, int w):             # <<<<<<<<<<<<<<
  *     """ Compute simple moving average of one-dimensional array.
  * 
  */
 
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_1sma_cy_1d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_1d(__Pyx_memviewslice __pyx_v_X, int __pyx_v_k, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_1d(__Pyx_memviewslice __pyx_v_X, int __pyx_v_w, CYTHON_UNUSED int __pyx_skip_dispatch) {
   PyObject *__pyx_v_var = NULL;
   __Pyx_memviewslice __pyx_v_ma = { 0, 0, { 0 }, { 0 }, { 0 } };
   double __pyx_v_S;
@@ -2778,7 +2780,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_1d(__Pyx
  *     cdef int t = 0
  * 
  *     while t < X.shape[0]:             # <<<<<<<<<<<<<<
- *         if t < k:
+ *         if t < w:
  *             S += X[t]
  */
   while (1) {
@@ -2788,16 +2790,16 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_1d(__Pyx
     /* "fynance/tools/momentums_cy.pyx":56
  * 
  *     while t < X.shape[0]:
- *         if t < k:             # <<<<<<<<<<<<<<
+ *         if t < w:             # <<<<<<<<<<<<<<
  *             S += X[t]
  *             ma[t] = S / <double>(t + 1)
  */
-    __pyx_t_5 = ((__pyx_v_t < __pyx_v_k) != 0);
+    __pyx_t_5 = ((__pyx_v_t < __pyx_v_w) != 0);
     if (__pyx_t_5) {
 
       /* "fynance/tools/momentums_cy.pyx":57
  *     while t < X.shape[0]:
- *         if t < k:
+ *         if t < w:
  *             S += X[t]             # <<<<<<<<<<<<<<
  *             ma[t] = S / <double>(t + 1)
  * 
@@ -2806,7 +2808,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_1d(__Pyx
       __pyx_v_S = (__pyx_v_S + (*((double *) ( /* dim=0 */ (__pyx_v_X.data + __pyx_t_6 * __pyx_v_X.strides[0]) ))));
 
       /* "fynance/tools/momentums_cy.pyx":58
- *         if t < k:
+ *         if t < w:
  *             S += X[t]
  *             ma[t] = S / <double>(t + 1)             # <<<<<<<<<<<<<<
  * 
@@ -2823,7 +2825,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_1d(__Pyx
       /* "fynance/tools/momentums_cy.pyx":56
  * 
  *     while t < X.shape[0]:
- *         if t < k:             # <<<<<<<<<<<<<<
+ *         if t < w:             # <<<<<<<<<<<<<<
  *             S += X[t]
  *             ma[t] = S / <double>(t + 1)
  */
@@ -2833,33 +2835,33 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_1d(__Pyx
     /* "fynance/tools/momentums_cy.pyx":61
  * 
  *         else:
- *             S += X[t] - X[t - k]             # <<<<<<<<<<<<<<
- *             ma[t] = S / <double>k
+ *             S += X[t] - X[t - w]             # <<<<<<<<<<<<<<
+ *             ma[t] = S / <double>w
  * 
  */
     /*else*/ {
       __pyx_t_9 = __pyx_v_t;
-      __pyx_t_10 = (__pyx_v_t - __pyx_v_k);
+      __pyx_t_10 = (__pyx_v_t - __pyx_v_w);
       __pyx_v_S = (__pyx_v_S + ((*((double *) ( /* dim=0 */ (__pyx_v_X.data + __pyx_t_9 * __pyx_v_X.strides[0]) ))) - (*((double *) ( /* dim=0 */ (__pyx_v_X.data + __pyx_t_10 * __pyx_v_X.strides[0]) )))));
 
       /* "fynance/tools/momentums_cy.pyx":62
  *         else:
- *             S += X[t] - X[t - k]
- *             ma[t] = S / <double>k             # <<<<<<<<<<<<<<
+ *             S += X[t] - X[t - w]
+ *             ma[t] = S / <double>w             # <<<<<<<<<<<<<<
  * 
  *         t += 1
  */
-      if (unlikely(((double)__pyx_v_k) == 0)) {
+      if (unlikely(((double)__pyx_v_w) == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
         __PYX_ERR(0, 62, __pyx_L1_error)
       }
       __pyx_t_11 = __pyx_v_t;
-      *((double *) ( /* dim=0 */ (__pyx_v_ma.data + __pyx_t_11 * __pyx_v_ma.strides[0]) )) = (__pyx_v_S / ((double)__pyx_v_k));
+      *((double *) ( /* dim=0 */ (__pyx_v_ma.data + __pyx_t_11 * __pyx_v_ma.strides[0]) )) = (__pyx_v_S / ((double)__pyx_v_w));
     }
     __pyx_L5:;
 
     /* "fynance/tools/momentums_cy.pyx":64
- *             ma[t] = S / <double>k
+ *             ma[t] = S / <double>w
  * 
  *         t += 1             # <<<<<<<<<<<<<<
  * 
@@ -2882,7 +2884,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_1d(__Pyx
   /* "fynance/tools/momentums_cy.pyx":31
  * 
  * 
- * cpdef double [:] sma_cy_1d(double [:] X, int k):             # <<<<<<<<<<<<<<
+ * cpdef double [:] sma_cy_1d(double [:] X, int w):             # <<<<<<<<<<<<<<
  *     """ Compute simple moving average of one-dimensional array.
  * 
  */
@@ -2910,15 +2912,15 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_1d(__Pyx
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_1sma_cy_1d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_7fynance_5tools_12momentums_cy_sma_cy_1d[] = " Compute simple moving average of one-dimensional array.\n\n    Parameters\n    ----------\n    X : memoryview.ndarray[ndim=1, dtype=double]\n        Elements to compute the function. Can be a NumPy array, C array, Cython\n        array, etc.\n    k : int\n        Number of lags used for computation, must be strictly positive.\n\n    Returns\n    -------\n    memoryview.ndarray[ndim=1, dtype=double]\n        Simple moving average. Can be converted to a NumPy array, C array,\n        Cython array, etc.\n\n    ";
+static char __pyx_doc_7fynance_5tools_12momentums_cy_sma_cy_1d[] = " Compute simple moving average of one-dimensional array.\n\n    Parameters\n    ----------\n    X : memoryview.ndarray[ndim=1, dtype=double]\n        Elements to compute the function. Can be a NumPy array, C array, Cython\n        array, etc.\n    w : int\n        Size of the window used for computation, must be strictly positive.\n\n    Returns\n    -------\n    memoryview.ndarray[ndim=1, dtype=double]\n        Simple moving average. Can be converted to a NumPy array, C array,\n        Cython array, etc.\n\n    ";
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_1sma_cy_1d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_X = { 0, 0, { 0 }, { 0 }, { 0 } };
-  int __pyx_v_k;
+  int __pyx_v_w;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("sma_cy_1d (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_X,&__pyx_n_s_k,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_X,&__pyx_n_s_w,0};
     PyObject* values[2] = {0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -2938,7 +2940,7 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_1sma_cy_1d(PyObject *__
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_k)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_w)) != 0)) kw_args--;
         else {
           __Pyx_RaiseArgtupleInvalid("sma_cy_1d", 1, 2, 2, 1); __PYX_ERR(0, 31, __pyx_L3_error)
         }
@@ -2953,7 +2955,7 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_1sma_cy_1d(PyObject *__
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
     __pyx_v_X = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_X.memview)) __PYX_ERR(0, 31, __pyx_L3_error)
-    __pyx_v_k = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_k == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 31, __pyx_L3_error)
+    __pyx_v_w = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_w == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 31, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
@@ -2963,14 +2965,14 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_1sma_cy_1d(PyObject *__
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7fynance_5tools_12momentums_cy_sma_cy_1d(__pyx_self, __pyx_v_X, __pyx_v_k);
+  __pyx_r = __pyx_pf_7fynance_5tools_12momentums_cy_sma_cy_1d(__pyx_self, __pyx_v_X, __pyx_v_w);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_sma_cy_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_k) {
+static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_sma_cy_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_w) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_memviewslice __pyx_t_1 = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -2978,7 +2980,7 @@ static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_sma_cy_1d(CYTHON_UNUSED
   __Pyx_RefNannySetupContext("sma_cy_1d", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); __PYX_ERR(0, 31, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_1d(__pyx_v_X, __pyx_v_k, 0); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 31, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_1d(__pyx_v_X, __pyx_v_w, 0); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 31, __pyx_L1_error)
   __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_t_1, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 31, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
@@ -3004,13 +3006,13 @@ static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_sma_cy_1d(CYTHON_UNUSED
 /* "fynance/tools/momentums_cy.pyx":69
  * 
  * 
- * cpdef double [:, :] sma_cy_2d(double [:, :] X, int k):             # <<<<<<<<<<<<<<
+ * cpdef double [:, :] sma_cy_2d(double [:, :] X, int w):             # <<<<<<<<<<<<<<
  *     """ Compute simple moving averages of two-dimensional array along 0 axis.
  * 
  */
 
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_3sma_cy_2d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_2d(__Pyx_memviewslice __pyx_v_X, int __pyx_v_k, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_2d(__Pyx_memviewslice __pyx_v_X, int __pyx_v_w, CYTHON_UNUSED int __pyx_skip_dispatch) {
   int __pyx_v_T;
   int __pyx_v_N;
   PyObject *__pyx_v_var = NULL;
@@ -3137,7 +3139,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_2d(__Pyx
  *         t = 0
  *         S = <double>0.             # <<<<<<<<<<<<<<
  *         while t < T:
- *             if t < k:
+ *             if t < w:
  */
     __pyx_v_S = ((double)0.);
 
@@ -3145,7 +3147,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_2d(__Pyx
  *         t = 0
  *         S = <double>0.
  *         while t < T:             # <<<<<<<<<<<<<<
- *             if t < k:
+ *             if t < w:
  *                 S += X[t, n]
  */
     while (1) {
@@ -3155,16 +3157,16 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_2d(__Pyx
       /* "fynance/tools/momentums_cy.pyx":101
  *         S = <double>0.
  *         while t < T:
- *             if t < k:             # <<<<<<<<<<<<<<
+ *             if t < w:             # <<<<<<<<<<<<<<
  *                 S += X[t, n]
  *                 ma[t, n] = S / <double>(t + 1)
  */
-      __pyx_t_6 = ((__pyx_v_t < __pyx_v_k) != 0);
+      __pyx_t_6 = ((__pyx_v_t < __pyx_v_w) != 0);
       if (__pyx_t_6) {
 
         /* "fynance/tools/momentums_cy.pyx":102
  *         while t < T:
- *             if t < k:
+ *             if t < w:
  *                 S += X[t, n]             # <<<<<<<<<<<<<<
  *                 ma[t, n] = S / <double>(t + 1)
  * 
@@ -3174,7 +3176,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_2d(__Pyx
         __pyx_v_S = (__pyx_v_S + (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_X.data + __pyx_t_7 * __pyx_v_X.strides[0]) ) + __pyx_t_8 * __pyx_v_X.strides[1]) ))));
 
         /* "fynance/tools/momentums_cy.pyx":103
- *             if t < k:
+ *             if t < w:
  *                 S += X[t, n]
  *                 ma[t, n] = S / <double>(t + 1)             # <<<<<<<<<<<<<<
  * 
@@ -3192,7 +3194,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_2d(__Pyx
         /* "fynance/tools/momentums_cy.pyx":101
  *         S = <double>0.
  *         while t < T:
- *             if t < k:             # <<<<<<<<<<<<<<
+ *             if t < w:             # <<<<<<<<<<<<<<
  *                 S += X[t, n]
  *                 ma[t, n] = S / <double>(t + 1)
  */
@@ -3202,36 +3204,36 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_2d(__Pyx
       /* "fynance/tools/momentums_cy.pyx":106
  * 
  *             else:
- *                 S += X[t, n] - X[t - k, n]             # <<<<<<<<<<<<<<
- *                 ma[t, n] = S / <double>k
+ *                 S += X[t, n] - X[t - w, n]             # <<<<<<<<<<<<<<
+ *                 ma[t, n] = S / <double>w
  * 
  */
       /*else*/ {
         __pyx_t_12 = __pyx_v_t;
         __pyx_t_13 = __pyx_v_n;
-        __pyx_t_14 = (__pyx_v_t - __pyx_v_k);
+        __pyx_t_14 = (__pyx_v_t - __pyx_v_w);
         __pyx_t_15 = __pyx_v_n;
         __pyx_v_S = (__pyx_v_S + ((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_X.data + __pyx_t_12 * __pyx_v_X.strides[0]) ) + __pyx_t_13 * __pyx_v_X.strides[1]) ))) - (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_X.data + __pyx_t_14 * __pyx_v_X.strides[0]) ) + __pyx_t_15 * __pyx_v_X.strides[1]) )))));
 
         /* "fynance/tools/momentums_cy.pyx":107
  *             else:
- *                 S += X[t, n] - X[t - k, n]
- *                 ma[t, n] = S / <double>k             # <<<<<<<<<<<<<<
+ *                 S += X[t, n] - X[t - w, n]
+ *                 ma[t, n] = S / <double>w             # <<<<<<<<<<<<<<
  * 
  *             t += 1
  */
-        if (unlikely(((double)__pyx_v_k) == 0)) {
+        if (unlikely(((double)__pyx_v_w) == 0)) {
           PyErr_SetString(PyExc_ZeroDivisionError, "float division");
           __PYX_ERR(0, 107, __pyx_L1_error)
         }
         __pyx_t_16 = __pyx_v_t;
         __pyx_t_17 = __pyx_v_n;
-        *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_ma.data + __pyx_t_16 * __pyx_v_ma.strides[0]) ) + __pyx_t_17 * __pyx_v_ma.strides[1]) )) = (__pyx_v_S / ((double)__pyx_v_k));
+        *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_ma.data + __pyx_t_16 * __pyx_v_ma.strides[0]) ) + __pyx_t_17 * __pyx_v_ma.strides[1]) )) = (__pyx_v_S / ((double)__pyx_v_w));
       }
       __pyx_L7:;
 
       /* "fynance/tools/momentums_cy.pyx":109
- *                 ma[t, n] = S / <double>k
+ *                 ma[t, n] = S / <double>w
  * 
  *             t += 1             # <<<<<<<<<<<<<<
  * 
@@ -3264,7 +3266,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_2d(__Pyx
   /* "fynance/tools/momentums_cy.pyx":69
  * 
  * 
- * cpdef double [:, :] sma_cy_2d(double [:, :] X, int k):             # <<<<<<<<<<<<<<
+ * cpdef double [:, :] sma_cy_2d(double [:, :] X, int w):             # <<<<<<<<<<<<<<
  *     """ Compute simple moving averages of two-dimensional array along 0 axis.
  * 
  */
@@ -3293,15 +3295,15 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_2d(__Pyx
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_3sma_cy_2d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_7fynance_5tools_12momentums_cy_2sma_cy_2d[] = " Compute simple moving averages of two-dimensional array along 0 axis.\n\n    Parameters\n    ----------\n    X : memoryview.ndarray[ndim=2, dtype=double]\n        Elements to compute the function. Can be a NumPy array, C array, Cython\n        array, etc.\n    k : int\n        Number of lags used for computation, must be strictly positive.\n\n    Returns\n    -------\n    memoryview.ndarray[ndim=2, dtype=double]\n        Simple moving average. Can be converted to a NumPy array, C array,\n        Cython array, etc.\n\n    ";
+static char __pyx_doc_7fynance_5tools_12momentums_cy_2sma_cy_2d[] = " Compute simple moving averages of two-dimensional array along 0 axis.\n\n    Parameters\n    ----------\n    X : memoryview.ndarray[ndim=2, dtype=double]\n        Elements to compute the function. Can be a NumPy array, C array, Cython\n        array, etc.\n    w : int\n        Size of the window used for computation, must be strictly positive.\n\n    Returns\n    -------\n    memoryview.ndarray[ndim=2, dtype=double]\n        Simple moving average. Can be converted to a NumPy array, C array,\n        Cython array, etc.\n\n    ";
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_3sma_cy_2d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_X = { 0, 0, { 0 }, { 0 }, { 0 } };
-  int __pyx_v_k;
+  int __pyx_v_w;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("sma_cy_2d (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_X,&__pyx_n_s_k,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_X,&__pyx_n_s_w,0};
     PyObject* values[2] = {0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -3321,7 +3323,7 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_3sma_cy_2d(PyObject *__
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_k)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_w)) != 0)) kw_args--;
         else {
           __Pyx_RaiseArgtupleInvalid("sma_cy_2d", 1, 2, 2, 1); __PYX_ERR(0, 69, __pyx_L3_error)
         }
@@ -3336,7 +3338,7 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_3sma_cy_2d(PyObject *__
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
     __pyx_v_X = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_X.memview)) __PYX_ERR(0, 69, __pyx_L3_error)
-    __pyx_v_k = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_k == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 69, __pyx_L3_error)
+    __pyx_v_w = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_w == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 69, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
@@ -3346,14 +3348,14 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_3sma_cy_2d(PyObject *__
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7fynance_5tools_12momentums_cy_2sma_cy_2d(__pyx_self, __pyx_v_X, __pyx_v_k);
+  __pyx_r = __pyx_pf_7fynance_5tools_12momentums_cy_2sma_cy_2d(__pyx_self, __pyx_v_X, __pyx_v_w);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_2sma_cy_2d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_k) {
+static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_2sma_cy_2d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_w) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_memviewslice __pyx_t_1 = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -3361,7 +3363,7 @@ static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_2sma_cy_2d(CYTHON_UNUSE
   __Pyx_RefNannySetupContext("sma_cy_2d", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); __PYX_ERR(0, 69, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_2d(__pyx_v_X, __pyx_v_k, 0); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 69, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_7fynance_5tools_12momentums_cy_sma_cy_2d(__pyx_v_X, __pyx_v_w, 0); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 69, __pyx_L1_error)
   __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_t_1, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
@@ -3387,13 +3389,13 @@ static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_2sma_cy_2d(CYTHON_UNUSE
 /* "fynance/tools/momentums_cy.pyx":116
  * 
  * 
- * cpdef double [:] wma_cy_1d(double [:] X, int k):             # <<<<<<<<<<<<<<
+ * cpdef double [:] wma_cy_1d(double [:] X, int w):             # <<<<<<<<<<<<<<
  *     """ Compute weighted moving average of one-dimensional array.
  * 
  */
 
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_5wma_cy_1d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_1d(__Pyx_memviewslice __pyx_v_X, int __pyx_v_k, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_1d(__Pyx_memviewslice __pyx_v_X, int __pyx_v_w, CYTHON_UNUSED int __pyx_skip_dispatch) {
   int __pyx_v_T;
   int __pyx_v_i;
   int __pyx_v_t;
@@ -3488,7 +3490,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_1d(__Pyx
  *     while t < T:
  *         i = 0             # <<<<<<<<<<<<<<
  *         S = <double>0.
- *         if t < k:
+ *         if t < w:
  */
     __pyx_v_i = 0;
 
@@ -3496,7 +3498,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_1d(__Pyx
  *     while t < T:
  *         i = 0
  *         S = <double>0.             # <<<<<<<<<<<<<<
- *         if t < k:
+ *         if t < w:
  *             m = <double>(t + 1)
  */
     __pyx_v_S = ((double)0.);
@@ -3504,16 +3506,16 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_1d(__Pyx
     /* "fynance/tools/momentums_cy.pyx":145
  *         i = 0
  *         S = <double>0.
- *         if t < k:             # <<<<<<<<<<<<<<
+ *         if t < w:             # <<<<<<<<<<<<<<
  *             m = <double>(t + 1)
  *             m = m * (m + <double>1) / <double>2
  */
-    __pyx_t_5 = ((__pyx_v_t < __pyx_v_k) != 0);
+    __pyx_t_5 = ((__pyx_v_t < __pyx_v_w) != 0);
     if (__pyx_t_5) {
 
       /* "fynance/tools/momentums_cy.pyx":146
  *         S = <double>0.
- *         if t < k:
+ *         if t < w:
  *             m = <double>(t + 1)             # <<<<<<<<<<<<<<
  *             m = m * (m + <double>1) / <double>2
  *             while i <= t:
@@ -3521,7 +3523,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_1d(__Pyx
       __pyx_v_m = ((double)(__pyx_v_t + 1));
 
       /* "fynance/tools/momentums_cy.pyx":147
- *         if t < k:
+ *         if t < w:
  *             m = <double>(t + 1)
  *             m = m * (m + <double>1) / <double>2             # <<<<<<<<<<<<<<
  *             while i <= t:
@@ -3563,7 +3565,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_1d(__Pyx
       /* "fynance/tools/momentums_cy.pyx":145
  *         i = 0
  *         S = <double>0.
- *         if t < k:             # <<<<<<<<<<<<<<
+ *         if t < w:             # <<<<<<<<<<<<<<
  *             m = <double>(t + 1)
  *             m = m * (m + <double>1) / <double>2
  */
@@ -3573,28 +3575,28 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_1d(__Pyx
     /* "fynance/tools/momentums_cy.pyx":153
  * 
  *         else:
- *             while i < k:             # <<<<<<<<<<<<<<
- *                 S += <double>(k - i) * X[t - i]
+ *             while i < w:             # <<<<<<<<<<<<<<
+ *                 S += <double>(w - i) * X[t - i]
  *                 i += 1
  */
     /*else*/ {
       while (1) {
-        __pyx_t_5 = ((__pyx_v_i < __pyx_v_k) != 0);
+        __pyx_t_5 = ((__pyx_v_i < __pyx_v_w) != 0);
         if (!__pyx_t_5) break;
 
         /* "fynance/tools/momentums_cy.pyx":154
  *         else:
- *             while i < k:
- *                 S += <double>(k - i) * X[t - i]             # <<<<<<<<<<<<<<
+ *             while i < w:
+ *                 S += <double>(w - i) * X[t - i]             # <<<<<<<<<<<<<<
  *                 i += 1
  * 
  */
         __pyx_t_7 = (__pyx_v_t - __pyx_v_i);
-        __pyx_v_S = (__pyx_v_S + (((double)(__pyx_v_k - __pyx_v_i)) * (*((double *) ( /* dim=0 */ (__pyx_v_X.data + __pyx_t_7 * __pyx_v_X.strides[0]) )))));
+        __pyx_v_S = (__pyx_v_S + (((double)(__pyx_v_w - __pyx_v_i)) * (*((double *) ( /* dim=0 */ (__pyx_v_X.data + __pyx_t_7 * __pyx_v_X.strides[0]) )))));
 
         /* "fynance/tools/momentums_cy.pyx":155
- *             while i < k:
- *                 S += <double>(k - i) * X[t - i]
+ *             while i < w:
+ *                 S += <double>(w - i) * X[t - i]
  *                 i += 1             # <<<<<<<<<<<<<<
  * 
  *         ma[t] = S / m
@@ -3642,7 +3644,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_1d(__Pyx
   /* "fynance/tools/momentums_cy.pyx":116
  * 
  * 
- * cpdef double [:] wma_cy_1d(double [:] X, int k):             # <<<<<<<<<<<<<<
+ * cpdef double [:] wma_cy_1d(double [:] X, int w):             # <<<<<<<<<<<<<<
  *     """ Compute weighted moving average of one-dimensional array.
  * 
  */
@@ -3670,15 +3672,15 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_1d(__Pyx
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_5wma_cy_1d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_7fynance_5tools_12momentums_cy_4wma_cy_1d[] = " Compute weighted moving average of one-dimensional array.\n\n    Parameters\n    ----------\n    X : memoryview.ndarray[ndim=1, dtype=double]\n        Elements to compute the function. Can be a NumPy array, C array, Cython\n        array, etc.\n    k : int\n        Number of lags used for computation, must be strictly positive.\n\n    Returns\n    -------\n    memoryview.ndarray[ndim=1, dtype=double]\n        Weighted moving average. Can be converted to a NumPy array, C array,\n        Cython array, etc.\n\n    ";
+static char __pyx_doc_7fynance_5tools_12momentums_cy_4wma_cy_1d[] = " Compute weighted moving average of one-dimensional array.\n\n    Parameters\n    ----------\n    X : memoryview.ndarray[ndim=1, dtype=double]\n        Elements to compute the function. Can be a NumPy array, C array, Cython\n        array, etc.\n    w : int\n        Size of the window used for computation, must be strictly positive.\n\n    Returns\n    -------\n    memoryview.ndarray[ndim=1, dtype=double]\n        Weighted moving average. Can be converted to a NumPy array, C array,\n        Cython array, etc.\n\n    ";
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_5wma_cy_1d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_X = { 0, 0, { 0 }, { 0 }, { 0 } };
-  int __pyx_v_k;
+  int __pyx_v_w;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("wma_cy_1d (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_X,&__pyx_n_s_k,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_X,&__pyx_n_s_w,0};
     PyObject* values[2] = {0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -3698,7 +3700,7 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_5wma_cy_1d(PyObject *__
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_k)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_w)) != 0)) kw_args--;
         else {
           __Pyx_RaiseArgtupleInvalid("wma_cy_1d", 1, 2, 2, 1); __PYX_ERR(0, 116, __pyx_L3_error)
         }
@@ -3713,7 +3715,7 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_5wma_cy_1d(PyObject *__
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
     __pyx_v_X = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_X.memview)) __PYX_ERR(0, 116, __pyx_L3_error)
-    __pyx_v_k = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_k == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 116, __pyx_L3_error)
+    __pyx_v_w = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_w == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 116, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
@@ -3723,14 +3725,14 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_5wma_cy_1d(PyObject *__
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7fynance_5tools_12momentums_cy_4wma_cy_1d(__pyx_self, __pyx_v_X, __pyx_v_k);
+  __pyx_r = __pyx_pf_7fynance_5tools_12momentums_cy_4wma_cy_1d(__pyx_self, __pyx_v_X, __pyx_v_w);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_4wma_cy_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_k) {
+static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_4wma_cy_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_w) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_memviewslice __pyx_t_1 = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -3738,7 +3740,7 @@ static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_4wma_cy_1d(CYTHON_UNUSE
   __Pyx_RefNannySetupContext("wma_cy_1d", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); __PYX_ERR(0, 116, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_1d(__pyx_v_X, __pyx_v_k, 0); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 116, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_1d(__pyx_v_X, __pyx_v_w, 0); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 116, __pyx_L1_error)
   __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_t_1, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 116, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
@@ -3764,13 +3766,13 @@ static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_4wma_cy_1d(CYTHON_UNUSE
 /* "fynance/tools/momentums_cy.pyx":163
  * 
  * 
- * cpdef double [:, :] wma_cy_2d(double [:, :] X, int k):             # <<<<<<<<<<<<<<
+ * cpdef double [:, :] wma_cy_2d(double [:, :] X, int w):             # <<<<<<<<<<<<<<
  *     """ Compute weighted moving averages of two-dimensional array along 0 axis.
  * 
  */
 
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_7wma_cy_2d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_2d(__Pyx_memviewslice __pyx_v_X, int __pyx_v_k, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_2d(__Pyx_memviewslice __pyx_v_X, int __pyx_v_w, CYTHON_UNUSED int __pyx_skip_dispatch) {
   int __pyx_v_T;
   int __pyx_v_N;
   PyObject *__pyx_v_var = NULL;
@@ -3905,7 +3907,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_2d(__Pyx
  *         while t < T:
  *             i = 0             # <<<<<<<<<<<<<<
  *             S = <double>0.
- *             if t < k:
+ *             if t < w:
  */
       __pyx_v_i = 0;
 
@@ -3913,7 +3915,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_2d(__Pyx
  *         while t < T:
  *             i = 0
  *             S = <double>0.             # <<<<<<<<<<<<<<
- *             if t < k:
+ *             if t < w:
  *                 m = <double>(t + 1)
  */
       __pyx_v_S = ((double)0.);
@@ -3921,16 +3923,16 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_2d(__Pyx
       /* "fynance/tools/momentums_cy.pyx":196
  *             i = 0
  *             S = <double>0.
- *             if t < k:             # <<<<<<<<<<<<<<
+ *             if t < w:             # <<<<<<<<<<<<<<
  *                 m = <double>(t + 1)
  *                 m = m * (m + <double>1) / <double>2
  */
-      __pyx_t_6 = ((__pyx_v_t < __pyx_v_k) != 0);
+      __pyx_t_6 = ((__pyx_v_t < __pyx_v_w) != 0);
       if (__pyx_t_6) {
 
         /* "fynance/tools/momentums_cy.pyx":197
  *             S = <double>0.
- *             if t < k:
+ *             if t < w:
  *                 m = <double>(t + 1)             # <<<<<<<<<<<<<<
  *                 m = m * (m + <double>1) / <double>2
  *                 while i <= t:
@@ -3938,7 +3940,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_2d(__Pyx
         __pyx_v_m = ((double)(__pyx_v_t + 1));
 
         /* "fynance/tools/momentums_cy.pyx":198
- *             if t < k:
+ *             if t < w:
  *                 m = <double>(t + 1)
  *                 m = m * (m + <double>1) / <double>2             # <<<<<<<<<<<<<<
  *                 while i <= t:
@@ -3981,7 +3983,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_2d(__Pyx
         /* "fynance/tools/momentums_cy.pyx":196
  *             i = 0
  *             S = <double>0.
- *             if t < k:             # <<<<<<<<<<<<<<
+ *             if t < w:             # <<<<<<<<<<<<<<
  *                 m = <double>(t + 1)
  *                 m = m * (m + <double>1) / <double>2
  */
@@ -3991,29 +3993,29 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_2d(__Pyx
       /* "fynance/tools/momentums_cy.pyx":204
  * 
  *             else:
- *                 while i < k:             # <<<<<<<<<<<<<<
- *                     S += <double>(k - i) * X[t - i, n]
+ *                 while i < w:             # <<<<<<<<<<<<<<
+ *                     S += <double>(w - i) * X[t - i, n]
  *                     i += 1
  */
       /*else*/ {
         while (1) {
-          __pyx_t_6 = ((__pyx_v_i < __pyx_v_k) != 0);
+          __pyx_t_6 = ((__pyx_v_i < __pyx_v_w) != 0);
           if (!__pyx_t_6) break;
 
           /* "fynance/tools/momentums_cy.pyx":205
  *             else:
- *                 while i < k:
- *                     S += <double>(k - i) * X[t - i, n]             # <<<<<<<<<<<<<<
+ *                 while i < w:
+ *                     S += <double>(w - i) * X[t - i, n]             # <<<<<<<<<<<<<<
  *                     i += 1
  * 
  */
           __pyx_t_9 = (__pyx_v_t - __pyx_v_i);
           __pyx_t_10 = __pyx_v_n;
-          __pyx_v_S = (__pyx_v_S + (((double)(__pyx_v_k - __pyx_v_i)) * (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_X.data + __pyx_t_9 * __pyx_v_X.strides[0]) ) + __pyx_t_10 * __pyx_v_X.strides[1]) )))));
+          __pyx_v_S = (__pyx_v_S + (((double)(__pyx_v_w - __pyx_v_i)) * (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_X.data + __pyx_t_9 * __pyx_v_X.strides[0]) ) + __pyx_t_10 * __pyx_v_X.strides[1]) )))));
 
           /* "fynance/tools/momentums_cy.pyx":206
- *                 while i < k:
- *                     S += <double>(k - i) * X[t - i, n]
+ *                 while i < w:
+ *                     S += <double>(w - i) * X[t - i, n]
  *                     i += 1             # <<<<<<<<<<<<<<
  * 
  *             ma[t, n] = S / m
@@ -4072,7 +4074,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_2d(__Pyx
   /* "fynance/tools/momentums_cy.pyx":163
  * 
  * 
- * cpdef double [:, :] wma_cy_2d(double [:, :] X, int k):             # <<<<<<<<<<<<<<
+ * cpdef double [:, :] wma_cy_2d(double [:, :] X, int w):             # <<<<<<<<<<<<<<
  *     """ Compute weighted moving averages of two-dimensional array along 0 axis.
  * 
  */
@@ -4101,15 +4103,15 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_2d(__Pyx
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_7wma_cy_2d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_7fynance_5tools_12momentums_cy_6wma_cy_2d[] = " Compute weighted moving averages of two-dimensional array along 0 axis.\n\n    Parameters\n    ----------\n    X : memoryview.ndarray[ndim=2, dtype=double]\n        Elements to compute the function. Can be a NumPy array, C array, Cython\n        array, etc.\n    k : int\n        Number of lags used for computation, must be strictly positive.\n\n    Returns\n    -------\n    memoryview.ndarray[ndim=2, dtype=double]\n        Weighted moving average. Can be converted to a NumPy array, C array,\n        Cython array, etc.\n\n    ";
+static char __pyx_doc_7fynance_5tools_12momentums_cy_6wma_cy_2d[] = " Compute weighted moving averages of two-dimensional array along 0 axis.\n\n    Parameters\n    ----------\n    X : memoryview.ndarray[ndim=2, dtype=double]\n        Elements to compute the function. Can be a NumPy array, C array, Cython\n        array, etc.\n    w : int\n        Size of the window used for computation, must be strictly positive.\n\n    Returns\n    -------\n    memoryview.ndarray[ndim=2, dtype=double]\n        Weighted moving average. Can be converted to a NumPy array, C array,\n        Cython array, etc.\n\n    ";
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_7wma_cy_2d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_X = { 0, 0, { 0 }, { 0 }, { 0 } };
-  int __pyx_v_k;
+  int __pyx_v_w;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("wma_cy_2d (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_X,&__pyx_n_s_k,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_X,&__pyx_n_s_w,0};
     PyObject* values[2] = {0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -4129,7 +4131,7 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_7wma_cy_2d(PyObject *__
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_k)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_w)) != 0)) kw_args--;
         else {
           __Pyx_RaiseArgtupleInvalid("wma_cy_2d", 1, 2, 2, 1); __PYX_ERR(0, 163, __pyx_L3_error)
         }
@@ -4144,7 +4146,7 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_7wma_cy_2d(PyObject *__
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
     __pyx_v_X = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_X.memview)) __PYX_ERR(0, 163, __pyx_L3_error)
-    __pyx_v_k = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_k == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 163, __pyx_L3_error)
+    __pyx_v_w = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_w == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 163, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
@@ -4154,14 +4156,14 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_7wma_cy_2d(PyObject *__
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7fynance_5tools_12momentums_cy_6wma_cy_2d(__pyx_self, __pyx_v_X, __pyx_v_k);
+  __pyx_r = __pyx_pf_7fynance_5tools_12momentums_cy_6wma_cy_2d(__pyx_self, __pyx_v_X, __pyx_v_w);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_6wma_cy_2d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_k) {
+static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_6wma_cy_2d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_w) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_memviewslice __pyx_t_1 = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -4169,7 +4171,7 @@ static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_6wma_cy_2d(CYTHON_UNUSE
   __Pyx_RefNannySetupContext("wma_cy_2d", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); __PYX_ERR(0, 163, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_2d(__pyx_v_X, __pyx_v_k, 0); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 163, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_7fynance_5tools_12momentums_cy_wma_cy_2d(__pyx_v_X, __pyx_v_w, 0); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 163, __pyx_L1_error)
   __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_t_1, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
@@ -4781,13 +4783,13 @@ static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_10ema_cy_2d(CYTHON_UNUS
 /* "fynance/tools/momentums_cy.pyx":293
  * 
  * 
- * cpdef double [:] smstd_cy_1d(double [:] X, int k):             # <<<<<<<<<<<<<<
+ * cpdef double [:] smstd_cy_1d(double [:] X, int w):             # <<<<<<<<<<<<<<
  *     """ Compute simple moving standard deviation of one-dimensional array.
  * 
  */
 
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_13smstd_cy_1d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_1d(__Pyx_memviewslice __pyx_v_X, int __pyx_v_k, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_1d(__Pyx_memviewslice __pyx_v_X, int __pyx_v_w, CYTHON_UNUSED int __pyx_skip_dispatch) {
   int __pyx_v_T;
   int __pyx_v_t;
   PyObject *__pyx_v_var = NULL;
@@ -4895,7 +4897,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_1d(__P
  *     S2 = <double>0
  * 
  *     while t < T:             # <<<<<<<<<<<<<<
- *         if t < k:
+ *         if t < w:
  *             S += X[t]
  */
   while (1) {
@@ -4905,16 +4907,16 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_1d(__P
     /* "fynance/tools/momentums_cy.pyx":322
  * 
  *     while t < T:
- *         if t < k:             # <<<<<<<<<<<<<<
+ *         if t < w:             # <<<<<<<<<<<<<<
  *             S += X[t]
  *             S2 += X[t] ** <double>2
  */
-    __pyx_t_5 = ((__pyx_v_t < __pyx_v_k) != 0);
+    __pyx_t_5 = ((__pyx_v_t < __pyx_v_w) != 0);
     if (__pyx_t_5) {
 
       /* "fynance/tools/momentums_cy.pyx":323
  *     while t < T:
- *         if t < k:
+ *         if t < w:
  *             S += X[t]             # <<<<<<<<<<<<<<
  *             S2 += X[t] ** <double>2
  *             m = S / <double>(t + 1)
@@ -4923,7 +4925,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_1d(__P
       __pyx_v_S = (__pyx_v_S + (*((double *) ( /* dim=0 */ (__pyx_v_X.data + __pyx_t_6 * __pyx_v_X.strides[0]) ))));
 
       /* "fynance/tools/momentums_cy.pyx":324
- *         if t < k:
+ *         if t < w:
  *             S += X[t]
  *             S2 += X[t] ** <double>2             # <<<<<<<<<<<<<<
  *             m = S / <double>(t + 1)
@@ -4973,7 +4975,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_1d(__P
       /* "fynance/tools/momentums_cy.pyx":322
  * 
  *     while t < T:
- *         if t < k:             # <<<<<<<<<<<<<<
+ *         if t < w:             # <<<<<<<<<<<<<<
  *             S += X[t]
  *             S2 += X[t] ** <double>2
  */
@@ -4983,55 +4985,55 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_1d(__P
     /* "fynance/tools/momentums_cy.pyx":330
  * 
  *         else:
- *             S += X[t] - X[t - k]             # <<<<<<<<<<<<<<
- *             S2 += X[t] ** <double>2 - X[t - k] ** <double>2
- *             m = S / <double>k
+ *             S += X[t] - X[t - w]             # <<<<<<<<<<<<<<
+ *             S2 += X[t] ** <double>2 - X[t - w] ** <double>2
+ *             m = S / <double>w
  */
     /*else*/ {
       __pyx_t_10 = __pyx_v_t;
-      __pyx_t_11 = (__pyx_v_t - __pyx_v_k);
+      __pyx_t_11 = (__pyx_v_t - __pyx_v_w);
       __pyx_v_S = (__pyx_v_S + ((*((double *) ( /* dim=0 */ (__pyx_v_X.data + __pyx_t_10 * __pyx_v_X.strides[0]) ))) - (*((double *) ( /* dim=0 */ (__pyx_v_X.data + __pyx_t_11 * __pyx_v_X.strides[0]) )))));
 
       /* "fynance/tools/momentums_cy.pyx":331
  *         else:
- *             S += X[t] - X[t - k]
- *             S2 += X[t] ** <double>2 - X[t - k] ** <double>2             # <<<<<<<<<<<<<<
- *             m = S / <double>k
- *             m2 = S2 / <double>k
+ *             S += X[t] - X[t - w]
+ *             S2 += X[t] ** <double>2 - X[t - w] ** <double>2             # <<<<<<<<<<<<<<
+ *             m = S / <double>w
+ *             m2 = S2 / <double>w
  */
       __pyx_t_12 = __pyx_v_t;
-      __pyx_t_13 = (__pyx_v_t - __pyx_v_k);
+      __pyx_t_13 = (__pyx_v_t - __pyx_v_w);
       __pyx_v_S2 = (__pyx_v_S2 + (pow((*((double *) ( /* dim=0 */ (__pyx_v_X.data + __pyx_t_12 * __pyx_v_X.strides[0]) ))), ((double)2)) - pow((*((double *) ( /* dim=0 */ (__pyx_v_X.data + __pyx_t_13 * __pyx_v_X.strides[0]) ))), ((double)2))));
 
       /* "fynance/tools/momentums_cy.pyx":332
- *             S += X[t] - X[t - k]
- *             S2 += X[t] ** <double>2 - X[t - k] ** <double>2
- *             m = S / <double>k             # <<<<<<<<<<<<<<
- *             m2 = S2 / <double>k
+ *             S += X[t] - X[t - w]
+ *             S2 += X[t] ** <double>2 - X[t - w] ** <double>2
+ *             m = S / <double>w             # <<<<<<<<<<<<<<
+ *             m2 = S2 / <double>w
  *             sd[t] = sqrt(m2 - m ** <double>2)
  */
-      if (unlikely(((double)__pyx_v_k) == 0)) {
+      if (unlikely(((double)__pyx_v_w) == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
         __PYX_ERR(0, 332, __pyx_L1_error)
       }
-      __pyx_v_m = (__pyx_v_S / ((double)__pyx_v_k));
+      __pyx_v_m = (__pyx_v_S / ((double)__pyx_v_w));
 
       /* "fynance/tools/momentums_cy.pyx":333
- *             S2 += X[t] ** <double>2 - X[t - k] ** <double>2
- *             m = S / <double>k
- *             m2 = S2 / <double>k             # <<<<<<<<<<<<<<
+ *             S2 += X[t] ** <double>2 - X[t - w] ** <double>2
+ *             m = S / <double>w
+ *             m2 = S2 / <double>w             # <<<<<<<<<<<<<<
  *             sd[t] = sqrt(m2 - m ** <double>2)
  * 
  */
-      if (unlikely(((double)__pyx_v_k) == 0)) {
+      if (unlikely(((double)__pyx_v_w) == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
         __PYX_ERR(0, 333, __pyx_L1_error)
       }
-      __pyx_v_m2 = (__pyx_v_S2 / ((double)__pyx_v_k));
+      __pyx_v_m2 = (__pyx_v_S2 / ((double)__pyx_v_w));
 
       /* "fynance/tools/momentums_cy.pyx":334
- *             m = S / <double>k
- *             m2 = S2 / <double>k
+ *             m = S / <double>w
+ *             m2 = S2 / <double>w
  *             sd[t] = sqrt(m2 - m ** <double>2)             # <<<<<<<<<<<<<<
  * 
  *         t += 1
@@ -5065,7 +5067,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_1d(__P
   /* "fynance/tools/momentums_cy.pyx":293
  * 
  * 
- * cpdef double [:] smstd_cy_1d(double [:] X, int k):             # <<<<<<<<<<<<<<
+ * cpdef double [:] smstd_cy_1d(double [:] X, int w):             # <<<<<<<<<<<<<<
  *     """ Compute simple moving standard deviation of one-dimensional array.
  * 
  */
@@ -5093,15 +5095,15 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_1d(__P
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_13smstd_cy_1d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_7fynance_5tools_12momentums_cy_12smstd_cy_1d[] = " Compute simple moving standard deviation of one-dimensional array.\n\n    Parameters\n    ----------\n    X : memoryview.ndarray[ndim=1, dtype=double]\n        Elements to compute the function. Can be a NumPy array, C array, Cython\n        array, etc.\n    k : int\n        Number of lags used for computation, must be strictly positive.\n\n    Returns\n    -------\n    memoryview.ndarray[ndim=1, dtype=double]\n        Simple moving standard deviation. Can be converted to a NumPy array, C\n        array, Cython array, etc.\n\n    ";
+static char __pyx_doc_7fynance_5tools_12momentums_cy_12smstd_cy_1d[] = " Compute simple moving standard deviation of one-dimensional array.\n\n    Parameters\n    ----------\n    X : memoryview.ndarray[ndim=1, dtype=double]\n        Elements to compute the function. Can be a NumPy array, C array, Cython\n        array, etc.\n    w : int\n        Size of the window used for computation, must be strictly positive.\n\n    Returns\n    -------\n    memoryview.ndarray[ndim=1, dtype=double]\n        Simple moving standard deviation. Can be converted to a NumPy array, C\n        array, Cython array, etc.\n\n    ";
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_13smstd_cy_1d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_X = { 0, 0, { 0 }, { 0 }, { 0 } };
-  int __pyx_v_k;
+  int __pyx_v_w;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("smstd_cy_1d (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_X,&__pyx_n_s_k,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_X,&__pyx_n_s_w,0};
     PyObject* values[2] = {0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -5121,7 +5123,7 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_13smstd_cy_1d(PyObject 
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_k)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_w)) != 0)) kw_args--;
         else {
           __Pyx_RaiseArgtupleInvalid("smstd_cy_1d", 1, 2, 2, 1); __PYX_ERR(0, 293, __pyx_L3_error)
         }
@@ -5136,7 +5138,7 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_13smstd_cy_1d(PyObject 
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
     __pyx_v_X = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_X.memview)) __PYX_ERR(0, 293, __pyx_L3_error)
-    __pyx_v_k = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_k == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 293, __pyx_L3_error)
+    __pyx_v_w = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_w == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 293, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
@@ -5146,14 +5148,14 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_13smstd_cy_1d(PyObject 
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7fynance_5tools_12momentums_cy_12smstd_cy_1d(__pyx_self, __pyx_v_X, __pyx_v_k);
+  __pyx_r = __pyx_pf_7fynance_5tools_12momentums_cy_12smstd_cy_1d(__pyx_self, __pyx_v_X, __pyx_v_w);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_12smstd_cy_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_k) {
+static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_12smstd_cy_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_w) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_memviewslice __pyx_t_1 = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -5161,7 +5163,7 @@ static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_12smstd_cy_1d(CYTHON_UN
   __Pyx_RefNannySetupContext("smstd_cy_1d", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); __PYX_ERR(0, 293, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_1d(__pyx_v_X, __pyx_v_k, 0); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 293, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_1d(__pyx_v_X, __pyx_v_w, 0); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 293, __pyx_L1_error)
   __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_t_1, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 293, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
@@ -5187,13 +5189,13 @@ static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_12smstd_cy_1d(CYTHON_UN
 /* "fynance/tools/momentums_cy.pyx":341
  * 
  * 
- * cpdef double [:, :] smstd_cy_2d(double [:, :] X, int k):             # <<<<<<<<<<<<<<
+ * cpdef double [:, :] smstd_cy_2d(double [:, :] X, int w):             # <<<<<<<<<<<<<<
  *     """ Compute simple moving standard deviations of two-dimensional array
  *     along 0 axis.
  */
 
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_15smstd_cy_2d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_2d(__Pyx_memviewslice __pyx_v_X, int __pyx_v_k, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_2d(__Pyx_memviewslice __pyx_v_X, int __pyx_v_w, CYTHON_UNUSED int __pyx_skip_dispatch) {
   int __pyx_v_T;
   int __pyx_v_t;
   int __pyx_v_N;
@@ -5338,7 +5340,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_2d(__P
  *         S = <double>0
  *         S2 = <double>0             # <<<<<<<<<<<<<<
  *         while t < T:
- *             if t < k:
+ *             if t < w:
  */
     __pyx_v_S2 = ((double)0);
 
@@ -5346,7 +5348,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_2d(__P
  *         S = <double>0
  *         S2 = <double>0
  *         while t < T:             # <<<<<<<<<<<<<<
- *             if t < k:
+ *             if t < w:
  *                 S += X[t, n]
  */
     while (1) {
@@ -5356,16 +5358,16 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_2d(__P
       /* "fynance/tools/momentums_cy.pyx":374
  *         S2 = <double>0
  *         while t < T:
- *             if t < k:             # <<<<<<<<<<<<<<
+ *             if t < w:             # <<<<<<<<<<<<<<
  *                 S += X[t, n]
  *                 S2 += X[t, n] ** <double>2
  */
-      __pyx_t_6 = ((__pyx_v_t < __pyx_v_k) != 0);
+      __pyx_t_6 = ((__pyx_v_t < __pyx_v_w) != 0);
       if (__pyx_t_6) {
 
         /* "fynance/tools/momentums_cy.pyx":375
  *         while t < T:
- *             if t < k:
+ *             if t < w:
  *                 S += X[t, n]             # <<<<<<<<<<<<<<
  *                 S2 += X[t, n] ** <double>2
  *                 m = S / <double>(t + 1)
@@ -5375,7 +5377,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_2d(__P
         __pyx_v_S = (__pyx_v_S + (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_X.data + __pyx_t_7 * __pyx_v_X.strides[0]) ) + __pyx_t_8 * __pyx_v_X.strides[1]) ))));
 
         /* "fynance/tools/momentums_cy.pyx":376
- *             if t < k:
+ *             if t < w:
  *                 S += X[t, n]
  *                 S2 += X[t, n] ** <double>2             # <<<<<<<<<<<<<<
  *                 m = S / <double>(t + 1)
@@ -5427,7 +5429,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_2d(__P
         /* "fynance/tools/momentums_cy.pyx":374
  *         S2 = <double>0
  *         while t < T:
- *             if t < k:             # <<<<<<<<<<<<<<
+ *             if t < w:             # <<<<<<<<<<<<<<
  *                 S += X[t, n]
  *                 S2 += X[t, n] ** <double>2
  */
@@ -5437,59 +5439,59 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_2d(__P
       /* "fynance/tools/momentums_cy.pyx":382
  * 
  *             else:
- *                 S += X[t, n] - X[t - k, n]             # <<<<<<<<<<<<<<
- *                 S2 += X[t, n] ** <double>2 - X[t - k, n] ** <double>2
- *                 m = S / <double>k
+ *                 S += X[t, n] - X[t - w, n]             # <<<<<<<<<<<<<<
+ *                 S2 += X[t, n] ** <double>2 - X[t - w, n] ** <double>2
+ *                 m = S / <double>w
  */
       /*else*/ {
         __pyx_t_14 = __pyx_v_t;
         __pyx_t_15 = __pyx_v_n;
-        __pyx_t_16 = (__pyx_v_t - __pyx_v_k);
+        __pyx_t_16 = (__pyx_v_t - __pyx_v_w);
         __pyx_t_17 = __pyx_v_n;
         __pyx_v_S = (__pyx_v_S + ((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_X.data + __pyx_t_14 * __pyx_v_X.strides[0]) ) + __pyx_t_15 * __pyx_v_X.strides[1]) ))) - (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_X.data + __pyx_t_16 * __pyx_v_X.strides[0]) ) + __pyx_t_17 * __pyx_v_X.strides[1]) )))));
 
         /* "fynance/tools/momentums_cy.pyx":383
  *             else:
- *                 S += X[t, n] - X[t - k, n]
- *                 S2 += X[t, n] ** <double>2 - X[t - k, n] ** <double>2             # <<<<<<<<<<<<<<
- *                 m = S / <double>k
- *                 m2 = S2 / <double>k
+ *                 S += X[t, n] - X[t - w, n]
+ *                 S2 += X[t, n] ** <double>2 - X[t - w, n] ** <double>2             # <<<<<<<<<<<<<<
+ *                 m = S / <double>w
+ *                 m2 = S2 / <double>w
  */
         __pyx_t_18 = __pyx_v_t;
         __pyx_t_19 = __pyx_v_n;
-        __pyx_t_20 = (__pyx_v_t - __pyx_v_k);
+        __pyx_t_20 = (__pyx_v_t - __pyx_v_w);
         __pyx_t_21 = __pyx_v_n;
         __pyx_v_S2 = (__pyx_v_S2 + (pow((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_X.data + __pyx_t_18 * __pyx_v_X.strides[0]) ) + __pyx_t_19 * __pyx_v_X.strides[1]) ))), ((double)2)) - pow((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_X.data + __pyx_t_20 * __pyx_v_X.strides[0]) ) + __pyx_t_21 * __pyx_v_X.strides[1]) ))), ((double)2))));
 
         /* "fynance/tools/momentums_cy.pyx":384
- *                 S += X[t, n] - X[t - k, n]
- *                 S2 += X[t, n] ** <double>2 - X[t - k, n] ** <double>2
- *                 m = S / <double>k             # <<<<<<<<<<<<<<
- *                 m2 = S2 / <double>k
+ *                 S += X[t, n] - X[t - w, n]
+ *                 S2 += X[t, n] ** <double>2 - X[t - w, n] ** <double>2
+ *                 m = S / <double>w             # <<<<<<<<<<<<<<
+ *                 m2 = S2 / <double>w
  *                 sd[t, n] = sqrt(m2 - m ** <double>2)
  */
-        if (unlikely(((double)__pyx_v_k) == 0)) {
+        if (unlikely(((double)__pyx_v_w) == 0)) {
           PyErr_SetString(PyExc_ZeroDivisionError, "float division");
           __PYX_ERR(0, 384, __pyx_L1_error)
         }
-        __pyx_v_m = (__pyx_v_S / ((double)__pyx_v_k));
+        __pyx_v_m = (__pyx_v_S / ((double)__pyx_v_w));
 
         /* "fynance/tools/momentums_cy.pyx":385
- *                 S2 += X[t, n] ** <double>2 - X[t - k, n] ** <double>2
- *                 m = S / <double>k
- *                 m2 = S2 / <double>k             # <<<<<<<<<<<<<<
+ *                 S2 += X[t, n] ** <double>2 - X[t - w, n] ** <double>2
+ *                 m = S / <double>w
+ *                 m2 = S2 / <double>w             # <<<<<<<<<<<<<<
  *                 sd[t, n] = sqrt(m2 - m ** <double>2)
  * 
  */
-        if (unlikely(((double)__pyx_v_k) == 0)) {
+        if (unlikely(((double)__pyx_v_w) == 0)) {
           PyErr_SetString(PyExc_ZeroDivisionError, "float division");
           __PYX_ERR(0, 385, __pyx_L1_error)
         }
-        __pyx_v_m2 = (__pyx_v_S2 / ((double)__pyx_v_k));
+        __pyx_v_m2 = (__pyx_v_S2 / ((double)__pyx_v_w));
 
         /* "fynance/tools/momentums_cy.pyx":386
- *                 m = S / <double>k
- *                 m2 = S2 / <double>k
+ *                 m = S / <double>w
+ *                 m2 = S2 / <double>w
  *                 sd[t, n] = sqrt(m2 - m ** <double>2)             # <<<<<<<<<<<<<<
  * 
  *             t += 1
@@ -5534,7 +5536,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_2d(__P
   /* "fynance/tools/momentums_cy.pyx":341
  * 
  * 
- * cpdef double [:, :] smstd_cy_2d(double [:, :] X, int k):             # <<<<<<<<<<<<<<
+ * cpdef double [:, :] smstd_cy_2d(double [:, :] X, int w):             # <<<<<<<<<<<<<<
  *     """ Compute simple moving standard deviations of two-dimensional array
  *     along 0 axis.
  */
@@ -5563,15 +5565,15 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_2d(__P
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_15smstd_cy_2d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_7fynance_5tools_12momentums_cy_14smstd_cy_2d[] = " Compute simple moving standard deviations of two-dimensional array\n    along 0 axis.\n\n    Parameters\n    ----------\n    X : memoryview.ndarray[ndim=2, dtype=double]\n        Elements to compute the function. Can be a NumPy array, C array, Cython\n        array, etc.\n    k : int\n        Number of lags used for computation, must be strictly positive.\n\n    Returns\n    -------\n    memoryview.ndarray[ndim=2, dtype=double]\n        Simple moving standard deviation. Can be converted to a NumPy array, C\n        array, Cython array, etc.\n\n    ";
+static char __pyx_doc_7fynance_5tools_12momentums_cy_14smstd_cy_2d[] = " Compute simple moving standard deviations of two-dimensional array\n    along 0 axis.\n\n    Parameters\n    ----------\n    X : memoryview.ndarray[ndim=2, dtype=double]\n        Elements to compute the function. Can be a NumPy array, C array, Cython\n        array, etc.\n    w : int\n        Size of the window used for computation, must be strictly positive.\n\n    Returns\n    -------\n    memoryview.ndarray[ndim=2, dtype=double]\n        Simple moving standard deviation. Can be converted to a NumPy array, C\n        array, Cython array, etc.\n\n    ";
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_15smstd_cy_2d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_X = { 0, 0, { 0 }, { 0 }, { 0 } };
-  int __pyx_v_k;
+  int __pyx_v_w;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("smstd_cy_2d (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_X,&__pyx_n_s_k,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_X,&__pyx_n_s_w,0};
     PyObject* values[2] = {0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -5591,7 +5593,7 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_15smstd_cy_2d(PyObject 
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_k)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_w)) != 0)) kw_args--;
         else {
           __Pyx_RaiseArgtupleInvalid("smstd_cy_2d", 1, 2, 2, 1); __PYX_ERR(0, 341, __pyx_L3_error)
         }
@@ -5606,7 +5608,7 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_15smstd_cy_2d(PyObject 
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
     __pyx_v_X = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_X.memview)) __PYX_ERR(0, 341, __pyx_L3_error)
-    __pyx_v_k = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_k == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 341, __pyx_L3_error)
+    __pyx_v_w = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_w == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 341, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
@@ -5616,14 +5618,14 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_15smstd_cy_2d(PyObject 
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7fynance_5tools_12momentums_cy_14smstd_cy_2d(__pyx_self, __pyx_v_X, __pyx_v_k);
+  __pyx_r = __pyx_pf_7fynance_5tools_12momentums_cy_14smstd_cy_2d(__pyx_self, __pyx_v_X, __pyx_v_w);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_14smstd_cy_2d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_k) {
+static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_14smstd_cy_2d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_w) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_memviewslice __pyx_t_1 = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -5631,7 +5633,7 @@ static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_14smstd_cy_2d(CYTHON_UN
   __Pyx_RefNannySetupContext("smstd_cy_2d", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); __PYX_ERR(0, 341, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_2d(__pyx_v_X, __pyx_v_k, 0); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 341, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_7fynance_5tools_12momentums_cy_smstd_cy_2d(__pyx_v_X, __pyx_v_w, 0); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 341, __pyx_L1_error)
   __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_t_1, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 341, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
@@ -5657,13 +5659,13 @@ static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_14smstd_cy_2d(CYTHON_UN
 /* "fynance/tools/momentums_cy.pyx":395
  * 
  * 
- * cpdef double [:] wmstd_cy_1d(double [:] X, int k):             # <<<<<<<<<<<<<<
+ * cpdef double [:] wmstd_cy_1d(double [:] X, int w):             # <<<<<<<<<<<<<<
  *     """ Compute weighted moving standard deviation of one-dimensional array.
  * 
  */
 
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_17wmstd_cy_1d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_1d(__Pyx_memviewslice __pyx_v_X, int __pyx_v_k, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_1d(__Pyx_memviewslice __pyx_v_X, int __pyx_v_w, CYTHON_UNUSED int __pyx_skip_dispatch) {
   int __pyx_v_T;
   int __pyx_v_i;
   int __pyx_v_t;
@@ -5770,7 +5772,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_1d(__P
  *         i = 0
  *         S = <double>0.             # <<<<<<<<<<<<<<
  *         S2 = <double>0.
- *         if t < k:
+ *         if t < w:
  */
     __pyx_v_S = ((double)0.);
 
@@ -5778,7 +5780,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_1d(__P
  *         i = 0
  *         S = <double>0.
  *         S2 = <double>0.             # <<<<<<<<<<<<<<
- *         if t < k:
+ *         if t < w:
  *             m = <double>(t + 1)
  */
     __pyx_v_S2 = ((double)0.);
@@ -5786,16 +5788,16 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_1d(__P
     /* "fynance/tools/momentums_cy.pyx":425
  *         S = <double>0.
  *         S2 = <double>0.
- *         if t < k:             # <<<<<<<<<<<<<<
+ *         if t < w:             # <<<<<<<<<<<<<<
  *             m = <double>(t + 1)
  *             m = m * (m + <double>1) / <double>2
  */
-    __pyx_t_5 = ((__pyx_v_t < __pyx_v_k) != 0);
+    __pyx_t_5 = ((__pyx_v_t < __pyx_v_w) != 0);
     if (__pyx_t_5) {
 
       /* "fynance/tools/momentums_cy.pyx":426
  *         S2 = <double>0.
- *         if t < k:
+ *         if t < w:
  *             m = <double>(t + 1)             # <<<<<<<<<<<<<<
  *             m = m * (m + <double>1) / <double>2
  *             while i <= t:
@@ -5803,7 +5805,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_1d(__P
       __pyx_v_m = ((double)(__pyx_v_t + 1));
 
       /* "fynance/tools/momentums_cy.pyx":427
- *         if t < k:
+ *         if t < w:
  *             m = <double>(t + 1)
  *             m = m * (m + <double>1) / <double>2             # <<<<<<<<<<<<<<
  *             while i <= t:
@@ -5855,7 +5857,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_1d(__P
       /* "fynance/tools/momentums_cy.pyx":425
  *         S = <double>0.
  *         S2 = <double>0.
- *         if t < k:             # <<<<<<<<<<<<<<
+ *         if t < w:             # <<<<<<<<<<<<<<
  *             m = <double>(t + 1)
  *             m = m * (m + <double>1) / <double>2
  */
@@ -5865,38 +5867,38 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_1d(__P
     /* "fynance/tools/momentums_cy.pyx":434
  * 
  *         else:
- *             while i < k:             # <<<<<<<<<<<<<<
- *                 S += <double>(k - i) * X[t - i]
- *                 S2 += <double>(k - i) * X[t - i] ** <double>2
+ *             while i < w:             # <<<<<<<<<<<<<<
+ *                 S += <double>(w - i) * X[t - i]
+ *                 S2 += <double>(w - i) * X[t - i] ** <double>2
  */
     /*else*/ {
       while (1) {
-        __pyx_t_5 = ((__pyx_v_i < __pyx_v_k) != 0);
+        __pyx_t_5 = ((__pyx_v_i < __pyx_v_w) != 0);
         if (!__pyx_t_5) break;
 
         /* "fynance/tools/momentums_cy.pyx":435
  *         else:
- *             while i < k:
- *                 S += <double>(k - i) * X[t - i]             # <<<<<<<<<<<<<<
- *                 S2 += <double>(k - i) * X[t - i] ** <double>2
+ *             while i < w:
+ *                 S += <double>(w - i) * X[t - i]             # <<<<<<<<<<<<<<
+ *                 S2 += <double>(w - i) * X[t - i] ** <double>2
  *                 i += 1
  */
         __pyx_t_8 = (__pyx_v_t - __pyx_v_i);
-        __pyx_v_S = (__pyx_v_S + (((double)(__pyx_v_k - __pyx_v_i)) * (*((double *) ( /* dim=0 */ (__pyx_v_X.data + __pyx_t_8 * __pyx_v_X.strides[0]) )))));
+        __pyx_v_S = (__pyx_v_S + (((double)(__pyx_v_w - __pyx_v_i)) * (*((double *) ( /* dim=0 */ (__pyx_v_X.data + __pyx_t_8 * __pyx_v_X.strides[0]) )))));
 
         /* "fynance/tools/momentums_cy.pyx":436
- *             while i < k:
- *                 S += <double>(k - i) * X[t - i]
- *                 S2 += <double>(k - i) * X[t - i] ** <double>2             # <<<<<<<<<<<<<<
+ *             while i < w:
+ *                 S += <double>(w - i) * X[t - i]
+ *                 S2 += <double>(w - i) * X[t - i] ** <double>2             # <<<<<<<<<<<<<<
  *                 i += 1
  * 
  */
         __pyx_t_9 = (__pyx_v_t - __pyx_v_i);
-        __pyx_v_S2 = (__pyx_v_S2 + (((double)(__pyx_v_k - __pyx_v_i)) * pow((*((double *) ( /* dim=0 */ (__pyx_v_X.data + __pyx_t_9 * __pyx_v_X.strides[0]) ))), ((double)2))));
+        __pyx_v_S2 = (__pyx_v_S2 + (((double)(__pyx_v_w - __pyx_v_i)) * pow((*((double *) ( /* dim=0 */ (__pyx_v_X.data + __pyx_t_9 * __pyx_v_X.strides[0]) ))), ((double)2))));
 
         /* "fynance/tools/momentums_cy.pyx":437
- *                 S += <double>(k - i) * X[t - i]
- *                 S2 += <double>(k - i) * X[t - i] ** <double>2
+ *                 S += <double>(w - i) * X[t - i]
+ *                 S2 += <double>(w - i) * X[t - i] ** <double>2
  *                 i += 1             # <<<<<<<<<<<<<<
  * 
  *         sd[t] = sqrt(S2 / m - (S / m) ** <double>2)
@@ -5948,7 +5950,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_1d(__P
   /* "fynance/tools/momentums_cy.pyx":395
  * 
  * 
- * cpdef double [:] wmstd_cy_1d(double [:] X, int k):             # <<<<<<<<<<<<<<
+ * cpdef double [:] wmstd_cy_1d(double [:] X, int w):             # <<<<<<<<<<<<<<
  *     """ Compute weighted moving standard deviation of one-dimensional array.
  * 
  */
@@ -5976,15 +5978,15 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_1d(__P
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_17wmstd_cy_1d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_7fynance_5tools_12momentums_cy_16wmstd_cy_1d[] = " Compute weighted moving standard deviation of one-dimensional array.\n\n    Parameters\n    ----------\n    X : memoryview.ndarray[ndim=1, dtype=double]\n        Elements to compute the function. Can be a NumPy array, C array, Cython\n        array, etc.\n    k : int\n        Number of lags used for computation, must be strictly positive.\n\n    Returns\n    -------\n    memoryview.ndarray[ndim=1, dtype=double]\n        Weighted moving standard deviation. Can be converted to a NumPy array,\n        C array, Cython array, etc.\n\n    ";
+static char __pyx_doc_7fynance_5tools_12momentums_cy_16wmstd_cy_1d[] = " Compute weighted moving standard deviation of one-dimensional array.\n\n    Parameters\n    ----------\n    X : memoryview.ndarray[ndim=1, dtype=double]\n        Elements to compute the function. Can be a NumPy array, C array, Cython\n        array, etc.\n    w : int\n        Size of the window used for computation, must be strictly positive.\n\n    Returns\n    -------\n    memoryview.ndarray[ndim=1, dtype=double]\n        Weighted moving standard deviation. Can be converted to a NumPy array,\n        C array, Cython array, etc.\n\n    ";
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_17wmstd_cy_1d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_X = { 0, 0, { 0 }, { 0 }, { 0 } };
-  int __pyx_v_k;
+  int __pyx_v_w;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("wmstd_cy_1d (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_X,&__pyx_n_s_k,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_X,&__pyx_n_s_w,0};
     PyObject* values[2] = {0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -6004,7 +6006,7 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_17wmstd_cy_1d(PyObject 
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_k)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_w)) != 0)) kw_args--;
         else {
           __Pyx_RaiseArgtupleInvalid("wmstd_cy_1d", 1, 2, 2, 1); __PYX_ERR(0, 395, __pyx_L3_error)
         }
@@ -6019,7 +6021,7 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_17wmstd_cy_1d(PyObject 
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
     __pyx_v_X = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_X.memview)) __PYX_ERR(0, 395, __pyx_L3_error)
-    __pyx_v_k = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_k == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 395, __pyx_L3_error)
+    __pyx_v_w = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_w == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 395, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
@@ -6029,14 +6031,14 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_17wmstd_cy_1d(PyObject 
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7fynance_5tools_12momentums_cy_16wmstd_cy_1d(__pyx_self, __pyx_v_X, __pyx_v_k);
+  __pyx_r = __pyx_pf_7fynance_5tools_12momentums_cy_16wmstd_cy_1d(__pyx_self, __pyx_v_X, __pyx_v_w);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_16wmstd_cy_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_k) {
+static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_16wmstd_cy_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_w) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_memviewslice __pyx_t_1 = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -6044,7 +6046,7 @@ static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_16wmstd_cy_1d(CYTHON_UN
   __Pyx_RefNannySetupContext("wmstd_cy_1d", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); __PYX_ERR(0, 395, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_1d(__pyx_v_X, __pyx_v_k, 0); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 395, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_1d(__pyx_v_X, __pyx_v_w, 0); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 395, __pyx_L1_error)
   __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_t_1, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 395, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
@@ -6070,13 +6072,13 @@ static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_16wmstd_cy_1d(CYTHON_UN
 /* "fynance/tools/momentums_cy.pyx":445
  * 
  * 
- * cpdef double [:, :] wmstd_cy_2d(double [:, :] X, int k):             # <<<<<<<<<<<<<<
+ * cpdef double [:, :] wmstd_cy_2d(double [:, :] X, int w):             # <<<<<<<<<<<<<<
  *     """ Compute weighted moving standard deviation of two-dimensional array
  *     along 0 axis.
  */
 
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_19wmstd_cy_2d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_2d(__Pyx_memviewslice __pyx_v_X, int __pyx_v_k, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_2d(__Pyx_memviewslice __pyx_v_X, int __pyx_v_w, CYTHON_UNUSED int __pyx_skip_dispatch) {
   int __pyx_v_i;
   int __pyx_v_T;
   int __pyx_v_t;
@@ -6225,7 +6227,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_2d(__P
  *             i = 0
  *             S = <double>0.             # <<<<<<<<<<<<<<
  *             S2 = <double>0.
- *             if t < k:
+ *             if t < w:
  */
       __pyx_v_S = ((double)0.);
 
@@ -6233,7 +6235,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_2d(__P
  *             i = 0
  *             S = <double>0.
  *             S2 = <double>0.             # <<<<<<<<<<<<<<
- *             if t < k:
+ *             if t < w:
  *                 m = <double>(t + 1)
  */
       __pyx_v_S2 = ((double)0.);
@@ -6241,16 +6243,16 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_2d(__P
       /* "fynance/tools/momentums_cy.pyx":479
  *             S = <double>0.
  *             S2 = <double>0.
- *             if t < k:             # <<<<<<<<<<<<<<
+ *             if t < w:             # <<<<<<<<<<<<<<
  *                 m = <double>(t + 1)
  *                 m = m * (m + <double>1) / <double>2
  */
-      __pyx_t_6 = ((__pyx_v_t < __pyx_v_k) != 0);
+      __pyx_t_6 = ((__pyx_v_t < __pyx_v_w) != 0);
       if (__pyx_t_6) {
 
         /* "fynance/tools/momentums_cy.pyx":480
  *             S2 = <double>0.
- *             if t < k:
+ *             if t < w:
  *                 m = <double>(t + 1)             # <<<<<<<<<<<<<<
  *                 m = m * (m + <double>1) / <double>2
  *                 while i <= t:
@@ -6258,7 +6260,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_2d(__P
         __pyx_v_m = ((double)(__pyx_v_t + 1));
 
         /* "fynance/tools/momentums_cy.pyx":481
- *             if t < k:
+ *             if t < w:
  *                 m = <double>(t + 1)
  *                 m = m * (m + <double>1) / <double>2             # <<<<<<<<<<<<<<
  *                 while i <= t:
@@ -6312,7 +6314,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_2d(__P
         /* "fynance/tools/momentums_cy.pyx":479
  *             S = <double>0.
  *             S2 = <double>0.
- *             if t < k:             # <<<<<<<<<<<<<<
+ *             if t < w:             # <<<<<<<<<<<<<<
  *                 m = <double>(t + 1)
  *                 m = m * (m + <double>1) / <double>2
  */
@@ -6322,40 +6324,40 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_2d(__P
       /* "fynance/tools/momentums_cy.pyx":488
  * 
  *             else:
- *                 while i < k:             # <<<<<<<<<<<<<<
- *                     S += <double>(k - i) * X[t - i, n]
- *                     S2 += <double>(k - i) * X[t - i, n] ** <double>2
+ *                 while i < w:             # <<<<<<<<<<<<<<
+ *                     S += <double>(w - i) * X[t - i, n]
+ *                     S2 += <double>(w - i) * X[t - i, n] ** <double>2
  */
       /*else*/ {
         while (1) {
-          __pyx_t_6 = ((__pyx_v_i < __pyx_v_k) != 0);
+          __pyx_t_6 = ((__pyx_v_i < __pyx_v_w) != 0);
           if (!__pyx_t_6) break;
 
           /* "fynance/tools/momentums_cy.pyx":489
  *             else:
- *                 while i < k:
- *                     S += <double>(k - i) * X[t - i, n]             # <<<<<<<<<<<<<<
- *                     S2 += <double>(k - i) * X[t - i, n] ** <double>2
+ *                 while i < w:
+ *                     S += <double>(w - i) * X[t - i, n]             # <<<<<<<<<<<<<<
+ *                     S2 += <double>(w - i) * X[t - i, n] ** <double>2
  *                     i += 1
  */
           __pyx_t_11 = (__pyx_v_t - __pyx_v_i);
           __pyx_t_12 = __pyx_v_n;
-          __pyx_v_S = (__pyx_v_S + (((double)(__pyx_v_k - __pyx_v_i)) * (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_X.data + __pyx_t_11 * __pyx_v_X.strides[0]) ) + __pyx_t_12 * __pyx_v_X.strides[1]) )))));
+          __pyx_v_S = (__pyx_v_S + (((double)(__pyx_v_w - __pyx_v_i)) * (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_X.data + __pyx_t_11 * __pyx_v_X.strides[0]) ) + __pyx_t_12 * __pyx_v_X.strides[1]) )))));
 
           /* "fynance/tools/momentums_cy.pyx":490
- *                 while i < k:
- *                     S += <double>(k - i) * X[t - i, n]
- *                     S2 += <double>(k - i) * X[t - i, n] ** <double>2             # <<<<<<<<<<<<<<
+ *                 while i < w:
+ *                     S += <double>(w - i) * X[t - i, n]
+ *                     S2 += <double>(w - i) * X[t - i, n] ** <double>2             # <<<<<<<<<<<<<<
  *                     i += 1
  * 
  */
           __pyx_t_13 = (__pyx_v_t - __pyx_v_i);
           __pyx_t_14 = __pyx_v_n;
-          __pyx_v_S2 = (__pyx_v_S2 + (((double)(__pyx_v_k - __pyx_v_i)) * pow((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_X.data + __pyx_t_13 * __pyx_v_X.strides[0]) ) + __pyx_t_14 * __pyx_v_X.strides[1]) ))), ((double)2))));
+          __pyx_v_S2 = (__pyx_v_S2 + (((double)(__pyx_v_w - __pyx_v_i)) * pow((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_X.data + __pyx_t_13 * __pyx_v_X.strides[0]) ) + __pyx_t_14 * __pyx_v_X.strides[1]) ))), ((double)2))));
 
           /* "fynance/tools/momentums_cy.pyx":491
- *                     S += <double>(k - i) * X[t - i, n]
- *                     S2 += <double>(k - i) * X[t - i, n] ** <double>2
+ *                     S += <double>(w - i) * X[t - i, n]
+ *                     S2 += <double>(w - i) * X[t - i, n] ** <double>2
  *                     i += 1             # <<<<<<<<<<<<<<
  * 
  *             sd[t, n] = sqrt(S2 / m - (S / m) ** <double>2)
@@ -6418,7 +6420,7 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_2d(__P
   /* "fynance/tools/momentums_cy.pyx":445
  * 
  * 
- * cpdef double [:, :] wmstd_cy_2d(double [:, :] X, int k):             # <<<<<<<<<<<<<<
+ * cpdef double [:, :] wmstd_cy_2d(double [:, :] X, int w):             # <<<<<<<<<<<<<<
  *     """ Compute weighted moving standard deviation of two-dimensional array
  *     along 0 axis.
  */
@@ -6447,15 +6449,15 @@ static __Pyx_memviewslice __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_2d(__P
 
 /* Python wrapper */
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_19wmstd_cy_2d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_7fynance_5tools_12momentums_cy_18wmstd_cy_2d[] = " Compute weighted moving standard deviation of two-dimensional array\n    along 0 axis.\n\n    Parameters\n    ----------\n    X : memoryview.ndarray[ndim=2, dtype=double]\n        Elements to compute the function. Can be a NumPy array, C array, Cython\n        array, etc.\n    k : int\n        Number of lags used for computation, must be strictly positive.\n\n    Returns\n    -------\n    memoryview.ndarray[ndim=2, dtype=double]\n        Weighted moving standard deviation. Can be converted to a NumPy array,\n        C array, Cython array, etc.\n\n    ";
+static char __pyx_doc_7fynance_5tools_12momentums_cy_18wmstd_cy_2d[] = " Compute weighted moving standard deviation of two-dimensional array\n    along 0 axis.\n\n    Parameters\n    ----------\n    X : memoryview.ndarray[ndim=2, dtype=double]\n        Elements to compute the function. Can be a NumPy array, C array, Cython\n        array, etc.\n    w : int\n        Size of the window used for computation, must be strictly positive.\n\n    Returns\n    -------\n    memoryview.ndarray[ndim=2, dtype=double]\n        Weighted moving standard deviation. Can be converted to a NumPy array,\n        C array, Cython array, etc.\n\n    ";
 static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_19wmstd_cy_2d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_X = { 0, 0, { 0 }, { 0 }, { 0 } };
-  int __pyx_v_k;
+  int __pyx_v_w;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("wmstd_cy_2d (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_X,&__pyx_n_s_k,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_X,&__pyx_n_s_w,0};
     PyObject* values[2] = {0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -6475,7 +6477,7 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_19wmstd_cy_2d(PyObject 
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_k)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_w)) != 0)) kw_args--;
         else {
           __Pyx_RaiseArgtupleInvalid("wmstd_cy_2d", 1, 2, 2, 1); __PYX_ERR(0, 445, __pyx_L3_error)
         }
@@ -6490,7 +6492,7 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_19wmstd_cy_2d(PyObject 
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
     __pyx_v_X = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_X.memview)) __PYX_ERR(0, 445, __pyx_L3_error)
-    __pyx_v_k = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_k == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 445, __pyx_L3_error)
+    __pyx_v_w = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_w == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 445, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
@@ -6500,14 +6502,14 @@ static PyObject *__pyx_pw_7fynance_5tools_12momentums_cy_19wmstd_cy_2d(PyObject 
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7fynance_5tools_12momentums_cy_18wmstd_cy_2d(__pyx_self, __pyx_v_X, __pyx_v_k);
+  __pyx_r = __pyx_pf_7fynance_5tools_12momentums_cy_18wmstd_cy_2d(__pyx_self, __pyx_v_X, __pyx_v_w);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_18wmstd_cy_2d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_k) {
+static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_18wmstd_cy_2d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_X, int __pyx_v_w) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_memviewslice __pyx_t_1 = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -6515,7 +6517,7 @@ static PyObject *__pyx_pf_7fynance_5tools_12momentums_cy_18wmstd_cy_2d(CYTHON_UN
   __Pyx_RefNannySetupContext("wmstd_cy_2d", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_X.memview)) { __Pyx_RaiseUnboundLocalError("X"); __PYX_ERR(0, 445, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_2d(__pyx_v_X, __pyx_v_k, 0); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 445, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_7fynance_5tools_12momentums_cy_wmstd_cy_2d(__pyx_v_X, __pyx_v_w, 0); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 445, __pyx_L1_error)
   __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_t_1, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 445, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
@@ -26394,6 +26396,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u_unknown_dtype_code_in_numpy_pxd, __pyx_k_unknown_dtype_code_in_numpy_pxd, sizeof(__pyx_k_unknown_dtype_code_in_numpy_pxd), 0, 1, 0, 0},
   {&__pyx_n_s_unpack, __pyx_k_unpack, sizeof(__pyx_k_unpack), 0, 0, 1, 1},
   {&__pyx_n_s_update, __pyx_k_update, sizeof(__pyx_k_update), 0, 0, 1, 1},
+  {&__pyx_n_s_w, __pyx_k_w, sizeof(__pyx_k_w), 0, 0, 1, 1},
   {&__pyx_n_u_wma_cy_1d, __pyx_k_wma_cy_1d, sizeof(__pyx_k_wma_cy_1d), 0, 1, 0, 1},
   {&__pyx_n_u_wma_cy_2d, __pyx_k_wma_cy_2d, sizeof(__pyx_k_wma_cy_2d), 0, 1, 0, 1},
   {&__pyx_n_u_wmstd_cy_1d, __pyx_k_wmstd_cy_1d, sizeof(__pyx_k_wmstd_cy_1d), 0, 1, 0, 1},

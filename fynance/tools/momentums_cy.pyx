@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-07-24 15:11:52
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-16 08:52:06
+# @Last modified time: 2019-10-16 18:42:06
 # cython: language_level=3, wraparound=False, boundscheck=False
 
 # Built-in packages
@@ -28,7 +28,7 @@ __all__ = [
 # =========================================================================== #
 
 
-cpdef double [:] sma_cy_1d(double [:] X, int k):
+cpdef double [:] sma_cy_1d(double [:] X, int w):
     """ Compute simple moving average of one-dimensional array.
 
     Parameters
@@ -36,8 +36,8 @@ cpdef double [:] sma_cy_1d(double [:] X, int k):
     X : memoryview.ndarray[ndim=1, dtype=double]
         Elements to compute the function. Can be a NumPy array, C array, Cython
         array, etc.
-    k : int
-        Number of lags used for computation, must be strictly positive.
+    w : int
+        Size of the window used for computation, must be strictly positive.
 
     Returns
     -------
@@ -53,20 +53,20 @@ cpdef double [:] sma_cy_1d(double [:] X, int k):
     cdef int t = 0
 
     while t < X.shape[0]:
-        if t < k:
+        if t < w:
             S += X[t]
             ma[t] = S / <double>(t + 1)
 
         else:
-            S += X[t] - X[t - k]
-            ma[t] = S / <double>k
+            S += X[t] - X[t - w]
+            ma[t] = S / <double>w
 
         t += 1
     
     return ma
 
 
-cpdef double [:, :] sma_cy_2d(double [:, :] X, int k):
+cpdef double [:, :] sma_cy_2d(double [:, :] X, int w):
     """ Compute simple moving averages of two-dimensional array along 0 axis.
 
     Parameters
@@ -74,8 +74,8 @@ cpdef double [:, :] sma_cy_2d(double [:, :] X, int k):
     X : memoryview.ndarray[ndim=2, dtype=double]
         Elements to compute the function. Can be a NumPy array, C array, Cython
         array, etc.
-    k : int
-        Number of lags used for computation, must be strictly positive.
+    w : int
+        Size of the window used for computation, must be strictly positive.
 
     Returns
     -------
@@ -98,13 +98,13 @@ cpdef double [:, :] sma_cy_2d(double [:, :] X, int k):
         t = 0
         S = <double>0.
         while t < T:
-            if t < k:
+            if t < w:
                 S += X[t, n]
                 ma[t, n] = S / <double>(t + 1)
 
             else:
-                S += X[t, n] - X[t - k, n]
-                ma[t, n] = S / <double>k
+                S += X[t, n] - X[t - w, n]
+                ma[t, n] = S / <double>w
 
             t += 1
 
@@ -113,7 +113,7 @@ cpdef double [:, :] sma_cy_2d(double [:, :] X, int k):
     return ma
 
 
-cpdef double [:] wma_cy_1d(double [:] X, int k):
+cpdef double [:] wma_cy_1d(double [:] X, int w):
     """ Compute weighted moving average of one-dimensional array.
 
     Parameters
@@ -121,8 +121,8 @@ cpdef double [:] wma_cy_1d(double [:] X, int k):
     X : memoryview.ndarray[ndim=1, dtype=double]
         Elements to compute the function. Can be a NumPy array, C array, Cython
         array, etc.
-    k : int
-        Number of lags used for computation, must be strictly positive.
+    w : int
+        Size of the window used for computation, must be strictly positive.
 
     Returns
     -------
@@ -142,7 +142,7 @@ cpdef double [:] wma_cy_1d(double [:] X, int k):
     while t < T:
         i = 0
         S = <double>0.
-        if t < k:
+        if t < w:
             m = <double>(t + 1)
             m = m * (m + <double>1) / <double>2
             while i <= t:
@@ -150,8 +150,8 @@ cpdef double [:] wma_cy_1d(double [:] X, int k):
                 i += 1
 
         else:
-            while i < k:
-                S += <double>(k - i) * X[t - i]
+            while i < w:
+                S += <double>(w - i) * X[t - i]
                 i += 1
 
         ma[t] = S / m
@@ -160,7 +160,7 @@ cpdef double [:] wma_cy_1d(double [:] X, int k):
     return ma
 
 
-cpdef double [:, :] wma_cy_2d(double [:, :] X, int k):
+cpdef double [:, :] wma_cy_2d(double [:, :] X, int w):
     """ Compute weighted moving averages of two-dimensional array along 0 axis.
 
     Parameters
@@ -168,8 +168,8 @@ cpdef double [:, :] wma_cy_2d(double [:, :] X, int k):
     X : memoryview.ndarray[ndim=2, dtype=double]
         Elements to compute the function. Can be a NumPy array, C array, Cython
         array, etc.
-    k : int
-        Number of lags used for computation, must be strictly positive.
+    w : int
+        Size of the window used for computation, must be strictly positive.
 
     Returns
     -------
@@ -193,7 +193,7 @@ cpdef double [:, :] wma_cy_2d(double [:, :] X, int k):
         while t < T:
             i = 0
             S = <double>0.
-            if t < k:
+            if t < w:
                 m = <double>(t + 1)
                 m = m * (m + <double>1) / <double>2
                 while i <= t:
@@ -201,8 +201,8 @@ cpdef double [:, :] wma_cy_2d(double [:, :] X, int k):
                     i += 1
 
             else:
-                while i < k:
-                    S += <double>(k - i) * X[t - i, n]
+                while i < w:
+                    S += <double>(w - i) * X[t - i, n]
                     i += 1
 
             ma[t, n] = S / m
@@ -290,7 +290,7 @@ cpdef double [:, :] ema_cy_2d(double [:, :] X, double alpha):
 # =========================================================================== #
 
 
-cpdef double [:] smstd_cy_1d(double [:] X, int k):
+cpdef double [:] smstd_cy_1d(double [:] X, int w):
     """ Compute simple moving standard deviation of one-dimensional array.
 
     Parameters
@@ -298,8 +298,8 @@ cpdef double [:] smstd_cy_1d(double [:] X, int k):
     X : memoryview.ndarray[ndim=1, dtype=double]
         Elements to compute the function. Can be a NumPy array, C array, Cython
         array, etc.
-    k : int
-        Number of lags used for computation, must be strictly positive.
+    w : int
+        Size of the window used for computation, must be strictly positive.
 
     Returns
     -------
@@ -319,7 +319,7 @@ cpdef double [:] smstd_cy_1d(double [:] X, int k):
     S2 = <double>0
 
     while t < T:
-        if t < k:
+        if t < w:
             S += X[t]
             S2 += X[t] ** <double>2
             m = S / <double>(t + 1)
@@ -327,10 +327,10 @@ cpdef double [:] smstd_cy_1d(double [:] X, int k):
             sd[t] = sqrt(m2 - m ** <double>2)
 
         else:
-            S += X[t] - X[t - k]
-            S2 += X[t] ** <double>2 - X[t - k] ** <double>2
-            m = S / <double>k
-            m2 = S2 / <double>k
+            S += X[t] - X[t - w]
+            S2 += X[t] ** <double>2 - X[t - w] ** <double>2
+            m = S / <double>w
+            m2 = S2 / <double>w
             sd[t] = sqrt(m2 - m ** <double>2)
 
         t += 1
@@ -338,7 +338,7 @@ cpdef double [:] smstd_cy_1d(double [:] X, int k):
     return sd
 
 
-cpdef double [:, :] smstd_cy_2d(double [:, :] X, int k):
+cpdef double [:, :] smstd_cy_2d(double [:, :] X, int w):
     """ Compute simple moving standard deviations of two-dimensional array
     along 0 axis.
 
@@ -347,8 +347,8 @@ cpdef double [:, :] smstd_cy_2d(double [:, :] X, int k):
     X : memoryview.ndarray[ndim=2, dtype=double]
         Elements to compute the function. Can be a NumPy array, C array, Cython
         array, etc.
-    k : int
-        Number of lags used for computation, must be strictly positive.
+    w : int
+        Size of the window used for computation, must be strictly positive.
 
     Returns
     -------
@@ -371,7 +371,7 @@ cpdef double [:, :] smstd_cy_2d(double [:, :] X, int k):
         S = <double>0
         S2 = <double>0
         while t < T:
-            if t < k:
+            if t < w:
                 S += X[t, n]
                 S2 += X[t, n] ** <double>2
                 m = S / <double>(t + 1)
@@ -379,10 +379,10 @@ cpdef double [:, :] smstd_cy_2d(double [:, :] X, int k):
                 sd[t, n] = sqrt(m2 - m ** <double>2)
 
             else:
-                S += X[t, n] - X[t - k, n]
-                S2 += X[t, n] ** <double>2 - X[t - k, n] ** <double>2
-                m = S / <double>k
-                m2 = S2 / <double>k
+                S += X[t, n] - X[t - w, n]
+                S2 += X[t, n] ** <double>2 - X[t - w, n] ** <double>2
+                m = S / <double>w
+                m2 = S2 / <double>w
                 sd[t, n] = sqrt(m2 - m ** <double>2)
 
             t += 1
@@ -392,7 +392,7 @@ cpdef double [:, :] smstd_cy_2d(double [:, :] X, int k):
     return sd
 
 
-cpdef double [:] wmstd_cy_1d(double [:] X, int k):
+cpdef double [:] wmstd_cy_1d(double [:] X, int w):
     """ Compute weighted moving standard deviation of one-dimensional array.
 
     Parameters
@@ -400,8 +400,8 @@ cpdef double [:] wmstd_cy_1d(double [:] X, int k):
     X : memoryview.ndarray[ndim=1, dtype=double]
         Elements to compute the function. Can be a NumPy array, C array, Cython
         array, etc.
-    k : int
-        Number of lags used for computation, must be strictly positive.
+    w : int
+        Size of the window used for computation, must be strictly positive.
 
     Returns
     -------
@@ -422,7 +422,7 @@ cpdef double [:] wmstd_cy_1d(double [:] X, int k):
         i = 0
         S = <double>0.
         S2 = <double>0.
-        if t < k:
+        if t < w:
             m = <double>(t + 1)
             m = m * (m + <double>1) / <double>2
             while i <= t:
@@ -431,9 +431,9 @@ cpdef double [:] wmstd_cy_1d(double [:] X, int k):
                 i += 1
 
         else:
-            while i < k:
-                S += <double>(k - i) * X[t - i]
-                S2 += <double>(k - i) * X[t - i] ** <double>2
+            while i < w:
+                S += <double>(w - i) * X[t - i]
+                S2 += <double>(w - i) * X[t - i] ** <double>2
                 i += 1
 
         sd[t] = sqrt(S2 / m - (S / m) ** <double>2)
@@ -442,7 +442,7 @@ cpdef double [:] wmstd_cy_1d(double [:] X, int k):
     return sd
 
 
-cpdef double [:, :] wmstd_cy_2d(double [:, :] X, int k):
+cpdef double [:, :] wmstd_cy_2d(double [:, :] X, int w):
     """ Compute weighted moving standard deviation of two-dimensional array
     along 0 axis.
 
@@ -451,8 +451,8 @@ cpdef double [:, :] wmstd_cy_2d(double [:, :] X, int k):
     X : memoryview.ndarray[ndim=2, dtype=double]
         Elements to compute the function. Can be a NumPy array, C array, Cython
         array, etc.
-    k : int
-        Number of lags used for computation, must be strictly positive.
+    w : int
+        Size of the window used for computation, must be strictly positive.
 
     Returns
     -------
@@ -476,7 +476,7 @@ cpdef double [:, :] wmstd_cy_2d(double [:, :] X, int k):
             i = 0
             S = <double>0.
             S2 = <double>0.
-            if t < k:
+            if t < w:
                 m = <double>(t + 1)
                 m = m * (m + <double>1) / <double>2
                 while i <= t:
@@ -485,9 +485,9 @@ cpdef double [:, :] wmstd_cy_2d(double [:, :] X, int k):
                     i += 1
 
             else:
-                while i < k:
-                    S += <double>(k - i) * X[t - i, n]
-                    S2 += <double>(k - i) * X[t - i, n] ** <double>2
+                while i < w:
+                    S += <double>(w - i) * X[t - i, n]
+                    S2 += <double>(w - i) * X[t - i, n] ** <double>2
                     i += 1
 
             sd[t, n] = sqrt(S2 / m - (S / m) ** <double>2)
