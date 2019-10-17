@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-10-11 10:10:43
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-16 23:19:04
+# @Last modified time: 2019-10-17 09:13:18
 
 """ Some wrappers functions. """
 
@@ -67,6 +67,7 @@ def wrap_axis(func):
 
 
 def wrap_lags(func):
+    # Not clean, may lead to undesirable behavior
     """ Check the max available lag for `X` array. """
     @wraps(func)
     def check_lags(X, k, *args, axis=0, **kwargs):
@@ -87,7 +88,7 @@ def wrap_lags(func):
 def wrap_window(func):
     """ Check if the lagged window `w` is available for `X` array. """
     @wraps(func)
-    def check_window(X, *args, w=None, axis=0, **kwargs):
+    def check_window(X, w=None, axis=0, **kwargs):
         if w < 0:
             raise ValueError('lagged window of size {} is not available, \
                 must be positive.'.format(w))
@@ -102,12 +103,13 @@ def wrap_window(func):
             ))
             w = X.shape[axis]
 
-        return func(X, *args, w=int(w), axis=axis, **kwargs)
+        return func(X, w=int(w), axis=axis, **kwargs)
 
     return check_window
 
 
 def wrap_expo(func):
+    # Not clean, may lead to undesirable behavior
     """ Check if parameters is allowed by the `kind` of moving avg/std. """
     @wraps(func)
     def check_expo(X, *args, w=None, kind=None, **kwargs):
