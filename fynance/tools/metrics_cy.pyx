@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-07-09 10:49:19
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-18 11:08:12
+# @Last modified time: 2019-10-18 11:51:00
 # cython: language_level=3
 
 # Built-in packages
@@ -34,7 +34,7 @@ __all__ = [
 # =========================================================================== #
 
 
-cpdef double [:] drawdown_cy_1d(double [:] X):
+cpdef double [:] drawdown_cy_1d(double [:] X, int raw):
     """ Compute drawdown of a one-dimensional array.
     
     Measure of the decline from a historical peak in some variable [1]_
@@ -46,6 +46,9 @@ cpdef double [:] drawdown_cy_1d(double [:] X):
     X : memoryview.ndarray[ndim=1, dtype=double]
         Elements to compute the function. Can be a NumPy array, C array, Cython
         array, etc.
+    raw : {0, 1}
+        If 1 compute the raw drawdown, otherwise compute drawdown in
+        percentage.
 
     Returns
     -------
@@ -70,13 +73,18 @@ cpdef double [:] drawdown_cy_1d(double [:] X):
     # Compute DrawDown
     while t < T:
         S = max(S, X[t])
-        dd[t] = one - X[t] / S
+        if raw != 0:
+            dd[t] = S - X[t]
+
+        else:
+            dd[t] = one - X[t] / S
+
         t += 1
     
     return dd
 
 
-cpdef double [:, :] drawdown_cy_2d(double [:, :] X):
+cpdef double [:, :] drawdown_cy_2d(double [:, :] X, int raw):
     """ Compute drawdown of a two-dimensional array.
 
     Measure of the decline from a historical peak in some variable [1]_
@@ -88,6 +96,9 @@ cpdef double [:, :] drawdown_cy_2d(double [:, :] X):
     X : memoryview.ndarray[ndim=2, dtype=double]
         Elements to compute the function. Can be a NumPy array, C array, Cython
         array, etc.
+    raw : {0, 1}
+        If 1 compute the raw drawdown, otherwise compute drawdown in
+        percentage.
 
     Returns
     -------
@@ -116,7 +127,12 @@ cpdef double [:, :] drawdown_cy_2d(double [:, :] X):
         S = X[0, n]
         while t < T:
             S = max(S, X[t, n])
-            dd[t, n] = one - X[t, n] / S
+            if raw != 0:
+                dd[t, n] = S - X[t, n]
+
+            else:
+                dd[t, n] = one - X[t, n] / S
+
             t += 1
 
         n += 1
