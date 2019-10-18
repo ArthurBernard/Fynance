@@ -4,20 +4,22 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-17 16:03:31
+# @Last modified time: 2019-10-18 11:51:12
 
 """ Metric functons used in financial analysis. """
 
 # Built-in packages
+from warnings import warn
 
 # External packages
 import numpy as np
 
 # Internal packages
 from fynance.tools._wrappers import WrapperArray
-from fynance.tools.metrics_cy import calmar_cy, drawdown_cy, mdd_cy, sharpe_cy
+from fynance.tools.metrics_cy import calmar_cy, mdd_cy, sharpe_cy
 from fynance.tools.metrics_cy import log_sharpe_cy, roll_mdd_cy, roll_mad_cy_1d
-from fynance.tools.metrics_cy import roll_mad_cy_2d
+from fynance.tools.metrics_cy import roll_mad_cy_2d, drawdown_cy_1d
+from fynance.tools.metrics_cy import drawdown_cy_2d
 from fynance.tools.momentums_cy import smstd_cy
 from fynance.tools.momentums import _sma, _ema, _wma, _smstd, _emstd, _wmstd
 
@@ -342,17 +344,30 @@ def diversified_ratio(X, W=None, std_method='std', axis=0):
 
 
 @WrapperArray('dtype', 'axis')
-def drawdown(X, axis=0, dtype=None):
-    """ Measures the drawdown of each `X`' series.
+def drawdown(X, raw=False, axis=0, dtype=None):
+    r""" Measures the drawdown of each `X`' series.
 
     Function to compute measure of the decline from a historical peak in some
     variable [5]_ (typically the cumulative profit or total open equity of a
     financial trading strategy).
 
+    Notes
+    -----
+    Let DD the drawdown vector:
+
+    .. math::
+
+        DD_t = \begin{cases}max(X_t) - X_t \text{ if raw=True} \\
+                            1 - \frac{X_t}{max(X_t)} \text{ otherwise} \\
+        \end{cases}
+
     Parameters
     ----------
     X : np.ndarray[dtype, ndim=1 or 2]
-        Time-series of prices, performances or index.
+        Time-series of prices, performances or index. Must be positive values.
+    raw : bool, optional
+        - If True then compute the raw drawdown.
+        - Else (default) compute the drawdown in percentage.
     axis : {0, 1}, optional
         Axis along wich the computation is done. Default is 0.
     dtype : np.dtype, optional
@@ -362,7 +377,7 @@ def drawdown(X, axis=0, dtype=None):
     Returns
     -------
     np.ndarray[dtype, ndim=1 or 2]
-        Series of draw down for each series.
+        Series of drawdown for each series.
 
     References
     ----------
@@ -375,22 +390,25 @@ def drawdown(X, axis=0, dtype=None):
     array([0. , 0. , 0.2, 0. , 0. , 0.5])
     >>> drawdown(X.reshape([6, 1])).T
     array([[0. , 0. , 0.2, 0. , 0. , 0.5]])
+    >>> drawdown(X, raw=True)
+    array([ 0.,  0., 20.,  0.,  0., 80.])
 
     See Also
     --------
     mdd, calmar, sharpe, roll_mdd
 
     """
-    # TODO : check efficiency
-    #        drawdown_cy_2d
+    if (X[0] == 0).any() and not raw:
+
+        warn('Cannot compute drawdown in percentage without initial values \
+            X[0] strictly positive.')
+        raw = True
+
     if len(X.shape) == 2:
-        output = np.zeros(X.shape)
-        for i in range(X.shape[1]):
-            output[:, i] = drawdown_cy(X[:, i])
 
-        return output
+        return np.asarray(drawdown_cy_2d(X, int(raw)))
 
-    return drawdown_cy(X)
+    return np.asarray(drawdown_cy_1d(X, int(raw)))
 
 
 @WrapperArray('dtype')
@@ -434,7 +452,7 @@ def mad(X, axis=0, dtype=None):
 
 
 def mdd(X):
-    """ Compute the maximum drwdown.
+    """ Compute the maximum drawdown.
 
     Drawdown is the measure of the decline from a historical peak in some
     variable [5]_ (typically the cumulative profit or total open equity of a
