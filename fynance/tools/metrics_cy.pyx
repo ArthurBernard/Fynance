@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-07-09 10:49:19
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-16 11:52:30
+# @Last modified time: 2019-10-18 11:08:12
 # cython: language_level=3
 
 # Built-in packages
@@ -24,7 +24,8 @@ from fynance.tools.momentums_cy import smstd_cy, sma_cy, sma_cy_1d, sma_cy_2d
 
 __all__ = [
     'sharpe_cy', 'roll_sharpe_cy', 'log_sharpe_cy', 'mdd_cy', 'calmar_cy', 
-    'roll_mad_cy_1d', 'roll_mad_cy_2d', 'roll_mdd_cy', 'drawdown_cy',
+    'roll_mad_cy_1d', 'roll_mad_cy_2d', 'roll_mdd_cy', 'drawdown_cy_1d',
+    'drawdown_cy_2d',
 ]
 
 
@@ -33,10 +34,8 @@ __all__ = [
 # =========================================================================== #
 
 
-cpdef np.ndarray[np.float64_t, ndim=1] drawdown_cy(
-        np.ndarray[np.float64_t, ndim=1] series
-    ):
-    """ Compute drawdown of a series.
+cpdef double [:] drawdown_cy_1d(double [:] X):
+    """ Compute drawdown of a one-dimensional array.
     
     Measure of the decline from a historical peak in some variable [1]_
     (typically the cumulative profit or total open equity of a financial
@@ -44,25 +43,85 @@ cpdef np.ndarray[np.float64_t, ndim=1] drawdown_cy(
 
     Parameters
     ----------
-    series : np.ndarray[np.float64, ndim=1]
-        Time series (price, performance or index).
+    X : memoryview.ndarray[ndim=1, dtype=double]
+        Elements to compute the function. Can be a NumPy array, C array, Cython
+        array, etc.
 
     Returns
     -------
-    np.ndarray[np.float64, ndim=1]
-        Series of DrawDown.
+    memoryview.ndarray[ndim=1, dtype=double]
+        Series of DrawDown. Can be converted to a NumPy array, C array,
+        Cython array, etc.
 
     References
     ----------
     .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
 
     """
-    cdef np.ndarray[np.float64_t, ndim=1] maximums
-    
+    cdef int T = X.shape[0]
+
+    var = view.array(shape=(T,), itemsize=sizeof(double), format='d')
+
+    cdef double [:] dd = var
+    cdef double one = <double>1
+    cdef double S = X[0]
+    cdef int t = 0
+
     # Compute DrawDown
-    maximums = np.maximum.accumulate(series, dtype=np.float64)
+    while t < T:
+        S = max(S, X[t])
+        dd[t] = one - X[t] / S
+        t += 1
     
-    return 1. - series / maximums
+    return dd
+
+
+cpdef double [:, :] drawdown_cy_2d(double [:, :] X):
+    """ Compute drawdown of a two-dimensional array.
+
+    Measure of the decline from a historical peak in some variable [1]_
+    (typically the cumulative profit or total open equity of a financial
+    trading strategy). 
+
+    Parameters
+    ----------
+    X : memoryview.ndarray[ndim=2, dtype=double]
+        Elements to compute the function. Can be a NumPy array, C array, Cython
+        array, etc.
+
+    Returns
+    -------
+    memoryview.ndarray[ndim=2, dtype=double]
+        Series of DrawDown. Can be converted to a NumPy array, C array,
+        Cython array, etc.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
+
+    """
+    cdef int T = X.shape[0]
+    cdef int N = X.shape[1]
+
+    var = view.array(shape=(T, N), itemsize=sizeof(double), format='d')
+
+    cdef double [:, :] dd = var
+    cdef double one = <double>1
+    cdef double S
+    cdef int t = 0
+    cdef int n = 0
+
+    # Compute DrawDown
+    while n < N:
+        S = X[0, n]
+        while t < T:
+            S = max(S, X[t, n])
+            dd[t, n] = one - X[t, n] / S
+            t += 1
+
+        n += 1
+    
+    return dd
 
 
 cpdef np.float64_t mdd_cy(np.ndarray[np.float64_t, ndim=1] series):
@@ -438,3 +497,35 @@ cpdef np.ndarray[np.float64_t, ndim=1] roll_mad_cy(
             )  / <double>min(t + 1, win)
 
     return mad
+
+
+cpdef np.ndarray[np.float64_t, ndim=1] drawdown_cy(
+        np.ndarray[np.float64_t, ndim=1] series
+    ):
+    """ Compute drawdown of a series.
+    
+    Measure of the decline from a historical peak in some variable [1]_
+    (typically the cumulative profit or total open equity of a financial
+    trading strategy). 
+
+    Parameters
+    ----------
+    series : np.ndarray[np.float64, ndim=1]
+        Time series (price, performance or index).
+
+    Returns
+    -------
+    np.ndarray[np.float64, ndim=1]
+        Series of DrawDown.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
+
+    """
+    cdef np.ndarray[np.float64_t, ndim=1] maximums
+    
+    # Compute DrawDown
+    maximums = np.maximum.accumulate(series, dtype=np.float64)
+    
+    return 1. - series / maximums
