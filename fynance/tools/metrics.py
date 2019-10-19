@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-18 11:51:12
+# @Last modified time: 2019-10-19 11:44:40
 
 """ Metric functons used in financial analysis. """
 
@@ -154,18 +154,29 @@ def annual_return(X, period=252, axis=0, dtype=None):
     mdd, drawdown, sharpe, annual_volatility
 
     """
-    # TODO : check if X[0] != 0
-    #        check if sign(X[0]) == sign(X[-1])
-    T = X.shape[0] - 1
+    return _annual_return(X, period=period)
+
+
+def _annual_return(X, period):
+    if (X[0] == 0).any():
+
+        raise ValueError('initial value X[0] cannot be null.')
+
     ret = X[-1] / X[0]
 
-    sign = np.sign(ret)
+    if (ret < 0).any():
+
+        raise ValueError('initial value X[0] and final value X[T] must \
+            be of the same sign.')
+
+    T = X.shape[0] - 1
     ret = np.abs(ret)
+    sign = np.sign(X[0])
 
     return sign * np.float_power(ret, period / T, dtype=np.float64) - 1.
 
 
-@WrapperArray('dtype', 'axis')
+@WrapperArray('dtype', 'axis', 'null')
 def annual_volatility(X, period=252, log=True, axis=0, dtype=None):
     r""" Compute the annualized volatility of each `X`' series.
 
@@ -179,7 +190,7 @@ def annual_volatility(X, period=252, log=True, axis=0, dtype=None):
 
     .. math::
 
-        annualVolatility = \sqrt{period} \times std_t(R) \\
+        annualVolatility = \sqrt{period \times Var_t(R)} \\
         \text{where, }R =
         \begin{cases}ln(\frac{X_{1:T}}{X_{0:T-1}}) \text{ if log=True}\\
                     \frac{X_{1:T}}{X_{0:T-1}} - 1 \text{ otherwise} \\
@@ -224,7 +235,6 @@ def annual_volatility(X, period=252, log=True, axis=0, dtype=None):
     mdd, drawdown, sharpe, annual_return
 
     """
-    # TODO : check X != 0
     if log:
         R = np.log(X[1:] / X[:-1])
 
@@ -235,17 +245,34 @@ def annual_volatility(X, period=252, log=True, axis=0, dtype=None):
 
 
 @WrapperArray('dtype', 'axis')
-def calmar(X, period=252, axis=0, dtype=None):
-    """ Compute the Calmar Ratio [3]_ for each `X`' series.
+def calmar(X, raw=False, period=252, axis=0, dtype=None):
+    r""" Compute the Calmar Ratio [3]_ for each `X`' series.
 
     Notes
     -----
-    It is the compouned annual return over the Maximum DrawDown.
+    It is the compouned annual return
+    (:func:`~fynance.tools.metrics.annual_return`) over the maximum drawdown
+    (:func:`~fynance.tools.metrics.mdd`). Let :math:`T` the number of time
+    observations, DD the vector of drawdown:
+
+    .. math::
+
+        calmarRatio = \frac{annualReturn}{MaxDD} \\
+        annualReturn = sign(\frac{X_T}{X_0}) \time
+        \frac{X_T}{X_0}^{\frac{period}{T - 1}} - 1 \\
+        maxDD = max(DD) \\
+        \text{where, } DD_t =
+        \begin{cases}max(X_{0:t}) - X_t \text{ if raw=True} \\
+                     1 - \frac{X_t}{max(X_{0:t})} \text{ otherwise} \\
+        \end{cases}
 
     Parameters
     ----------
     X : np.ndarray[dtype, ndim=1 or 2]
         Time-series price, performance or index.
+    raw : bool, optional
+        - If True then compute the raw drawdown.
+        - Else (default) compute the drawdown in percentage.
     period : int, optional
         Number of period per year, default is 252 (trading days per year).
     axis : {0, 1}, optional
@@ -267,10 +294,10 @@ def calmar(X, period=252, axis=0, dtype=None):
     --------
     Assume a series of monthly prices:
 
-    >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
+    >>> X = np.array([70, 100, 80, 120, 160, 105, 80]).astype(np.float64)
     >>> calmar(X, period=12)
     0.6122448979591835
-    >>> calmar(X.reshape([6, 1]), period=12)
+    >>> calmar(X.reshape([7, 1]), period=12)
     array([0.6122449])
 
     See Also
@@ -278,16 +305,8 @@ def calmar(X, period=252, axis=0, dtype=None):
     mdd, drawdown, sharpe, roll_calmar
 
     """
-    # TODO : check efficiency
-    #        calmar_cy_2d
-    if len(X.shape) == 2:
-        output = np.zeros(X.shape[1])
-        for i in range(X.shape[1]):
-            output[i] = calmar_cy(X[:, i], period=float(period))
-
-        return output
-
-    return calmar_cy(X, period=float(period))
+    # TODO: check if cython function is necessary
+    return _annual_return(X, period) / _drawdown(X, raw).max(axis=axis)
 
 
 @WrapperArray('axis')
@@ -357,8 +376,8 @@ def drawdown(X, raw=False, axis=0, dtype=None):
 
     .. math::
 
-        DD_t = \begin{cases}max(X_t) - X_t \text{ if raw=True} \\
-                            1 - \frac{X_t}{max(X_t)} \text{ otherwise} \\
+        DD_t = \begin{cases}max(X_{0:t}) - X_t \text{ if raw=True} \\
+                            1 - \frac{X_t}{max(X_{0:t})} \text{ otherwise} \\
         \end{cases}
 
     Parameters
@@ -398,6 +417,10 @@ def drawdown(X, raw=False, axis=0, dtype=None):
     mdd, calmar, sharpe, roll_mdd
 
     """
+    return _drawdown(X, raw)
+
+
+def _drawdown(X, raw):
     if (X[0] == 0).any() and not raw:
 
         warn('Cannot compute drawdown in percentage without initial values \
@@ -415,7 +438,7 @@ def drawdown(X, raw=False, axis=0, dtype=None):
 def mad(X, axis=0, dtype=None):
     """ Compute the Mean Absolute Deviation of each `X`' series.
 
-    Compute the mean of the absolute value of the distance to the mean [4]_.
+    Compute the mean of the absolute value of the distance to the mean [6]_.
 
     Parameters
     ----------
@@ -434,7 +457,7 @@ def mad(X, axis=0, dtype=None):
 
     References
     ----------
-    .. [4] https://en.wikipedia.org/wiki/Average_absolute_deviation
+    .. [6] https://en.wikipedia.org/wiki/Average_absolute_deviation
 
     Examples
     --------
@@ -447,45 +470,66 @@ def mad(X, axis=0, dtype=None):
     roll_mad
 
     """
-    # TODO : make cython function
+    # TODO : make cython function or not ?
     return np.mean(np.abs(X - np.mean(X, axis=axis)), axis=axis)
 
 
-def mdd(X):
-    """ Compute the maximum drawdown.
+@WrapperArray('dtype', 'axis')
+def mdd(X, raw=False, axis=0, dtype=None):
+    r""" Compute the maximum drawdown for each `X`' series.
 
-    Drawdown is the measure of the decline from a historical peak in some
-    variable [5]_ (typically the cumulative profit or total open equity of a
-    financial trading strategy).
+    Drawdown (:func:~`fynance.tools.metrics.drawdown`) is the measure of the
+    decline from a historical peak in some variable [5]_ (typically the
+    cumulative profit or total open equity of a financial trading strategy).
+
+    Notes
+    -----
+    Let DD the drawdown vector:
+
+    .. math::
+
+        maxDD = max(DD) \\
+        \text{where, } DD_t =
+        \begin{cases}max(X_{0:t}) - X_t \text{ if raw=True} \\
+                     1 - \frac{X_t}{max(X_{0:t})} \text{ otherwise} \\
+        \end{cases}
 
     Parameters
     ----------
-    X : np.ndarray[np.float64, ndim=1]
-        Time series (price, performance or index).
+    X : np.ndarray[np.dtype, ndim=1 or 2]
+        Time-series of prices, performances or index.
+    raw : bool, optional
+        - If True then compute the raw drawdown.
+        - Else (default) compute the drawdown in percentage.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    np.float64
-        Value of Maximum DrawDown.
+    dtype or np.ndarray[dtype, ndim=1]
+        Value of Maximum DrawDown for each series.
 
     References
     ----------
-    .. [5] https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
+    .. [5] https://en.wikipedia.org/wiki/Drawdown_(economics)
 
     Examples
     --------
-    >>> X = np.array([70, 100, 80, 120, 160, 80])
+    >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
     >>> mdd(X)
     0.5
+    >>> mdd(X.reshape([6, 1]))
+    array([0.5])
 
     See Also
     --------
     drawdown, calmar, sharpe, roll_mdd
 
     """
-    X = np.asarray(X, dtype=np.float64).flatten()
-
-    return mdd_cy(X)
+    return _drawdown(X, raw).max(axis=axis)
 
 
 def perf_index(X, base=100.):
@@ -605,8 +649,9 @@ def perf_strat(underlying, signals=None, log=False, base=100.,
     return perf_returns(X, log=log, base=base)
 
 
-def sharpe(X, period=252, log=False):
-    r""" Compute the Sharpe ratio [6]_.
+@WrapperArray('dtype', 'axis')
+def sharpe(X, period=252, log=False, axis=0, dtype=None):
+    r""" Compute the Sharpe ratio [7]_ for each `X`' series.
 
     Notes
     -----
@@ -617,46 +662,60 @@ def sharpe(X, period=252, log=False):
 
     Parameters
     ----------
-    X : numpy.ndarray(dim=1, dtype=float)
-        Prices of the index.
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Time-series of prices, performances or index.
     period : int, optional
         Number of period per year, default is 252 (trading days).
     log : bool, optional
         If true compute sharpe with the formula for log-returns, default
         is False.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    np.float64
-        Value of Sharpe ratio.
+    dtype or np.ndarray[dtype, ndim=1]
+        Value of Sharpe ratio for each series.
 
     References
     ----------
-    .. [6] https://en.wikipedia.org/wiki/Sharpe_ratio
+    .. [7] https://en.wikipedia.org/wiki/Sharpe_ratio
 
     Examples
     --------
-    Assume a X of monthly prices:
+    Assume a series X of monthly prices:
 
-    >>> X = np.array([70, 100, 80, 120, 160, 80])
+    >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
     >>> sharpe(X, period=12)
     0.22494843872918127
+    >>> sharpe(X.reshape([6, 1]), period=12)
+    array([0.22494844])
 
     See Also
     --------
     mdd, calmar, drawdown, roll_sharpe
 
     """
-    X = np.asarray(X, dtype=np.float64).flatten()
+    # TODO : check efficiency of cython function
+    #        append risk free rate
+    sharpe_func = log_sharpe_cy if log else sharpe_cy
 
-    if log:
-        return log_sharpe_cy(X, period=float(period))
+    if len(X.shape) == 2:
+        output = np.zeros(X.shape[1])
+        for i in range(X.shape[1]):
+            output[i] = sharpe_func(X[:, i], float(period))
 
-    return sharpe_cy(X, period=float(period))
+        return output
+
+    return sharpe_func(X, float(period))
 
 
-def z_score(X, w=0, kind='s'):
-    r""" Compute Z-score function.
+@WrapperArray('dtype', 'axis', 'window')
+def z_score(X, w=0, kind='s', axis=0, dtype=None):
+    r""" Compute the Z-score of each `X`' series.
 
     Notes
     -----
@@ -670,20 +729,28 @@ def z_score(X, w=0, kind='s'):
 
     Parameters
     ----------
-    X : np.ndarray[np.float64, ndim=1]
+    X : np.ndarray[dtype, ndim=1 or 2]
         Series of index, prices or returns.
-    kind_ma : {'ema', 'sma', 'wma'}
-        Kind of moving average/standard deviation, default is 'sma'.
-        - Exponential moving average if 'ema'.
-        - Simple moving average if 'sma'.
-        - Weighted moving average if 'wma'.
-    **kwargs
-        Any parameters for the moving average function.
+    w : int, optional
+        Size of the lagged window of the moving averages, must be positive. If
+        ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is None.
+    kind : {'e', 's', 'w'}
+        - If 'e' then use exponential moving average, see
+          :func:`~fynance.tools.momentums.ema` for details.
+        - If 's' (default) then use simple moving average, see
+          :func:`~fynance.tools.momentums.sma` for details.
+        - If 'w' then use weighted moving average, see
+          :func:`~fynance.tools.momentums.wma` for details.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    float
-        Value of Z-score.
+    dtype or np.ndarray[dtype, ndim=1]
+        Value of Z-score for each series.
 
     Examples
     --------
@@ -692,15 +759,14 @@ def z_score(X, w=0, kind='s'):
     -1.0443574118998766
     >>> z_score(X, w=3)
     -1.2247448713915896
+    >>> z_score(X.reshape([6, 1]), w=3)
+    array([-1.22474487])
 
     See Also
     --------
     roll_z_score, mdd, calmar, drawdown, sharpe
 
     """
-    if w == 0:
-        w = X.shape[0]
-
     if kind == 'e':
         w = 1 - 2 / (1 + w)
 
