@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-10-11 10:10:43
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-17 09:13:18
+# @Last modified time: 2019-10-19 09:53:29
 
 """ Some wrappers functions. """
 
@@ -121,6 +121,17 @@ def wrap_expo(func):
     return check_expo
 
 
+def wrap_null(func):
+    """ Check if there is any null value and raise an exception. """
+    @wraps(func)
+    def check_null(X, *args, **kwargs):
+        if (X == 0).any():
+            raise ValueError('null value in X is not allowed.')
+
+        return func(X, *args, **kwargs)
+    return check_null
+
+
 class WrapperArray:
     """ Object to wrap numpy arrays.
 
@@ -138,6 +149,7 @@ class WrapperArray:
         'lags': wrap_lags,
         'window': wrap_window,
         'expo': wrap_expo,
+        'null': wrap_null,
     }
 
     def __init__(self, *args):
