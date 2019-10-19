@@ -8,6 +8,8 @@ Some tools to compute financial metrics.
 .. autosummary::
 
    fynance.tools.metrics.accuracy
+   fynance.tools.metrics.annual_return
+   fynance.tools.metrics.annual_volatility
    fynance.tools.metrics.calmar
    fynance.tools.metrics.diversified_ratio
    fynance.tools.metrics.drawdown
@@ -28,6 +30,10 @@ Scalar functions
 The following functions return a scalar.
 
 .. autofunction:: accuracy
+
+.. autofunction:: annual_return
+
+.. autofunction:: annual_volatility
 
 .. autofunction:: calmar
 
