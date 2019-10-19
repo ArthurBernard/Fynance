@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-07-09 10:49:19
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-18 11:51:00
+# @Last modified time: 2019-10-19 11:35:31
 # cython: language_level=3
 
 # Built-in packages
@@ -138,74 +138,6 @@ cpdef double [:, :] drawdown_cy_2d(double [:, :] X, int raw):
         n += 1
     
     return dd
-
-
-cpdef np.float64_t mdd_cy(np.ndarray[np.float64_t, ndim=1] series):
-    """ Compute the maximum drawdown.
-
-    Function to compute the maximum drwdown where drawdown is the measure of 
-    the decline from a historical peak in some variable [1]_ (typically the 
-    cumulative profit or total open equity of a financial trading strategy). 
-    
-    Parameters
-    ----------
-    series : np.ndarray[np.float64, ndim=1]
-        Time series (price, performance or index).
-
-    Returns
-    -------
-    np.float64
-        Value of Maximum DrawDown.
-
-    References
-    ----------
-    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
-    
-    """
-    cdef np.ndarray[np.float64_t, ndim=1] drawdowns
-    
-    # Compute DrawDown
-    drawdowns = drawdown_cy(series)
-
-    return max(drawdowns)
-
-
-cpdef np.float64_t calmar_cy(
-        np.ndarray[np.float64_t, ndim=1] series, 
-        np.float64_t period=252.
-    ):
-    """ Compute Calmar ratio.
-
-    Function to compute the compouned annual return over the Maximum DrawDown, 
-    known as the Calmar ratio.
-    
-    Parameters
-    ----------
-    series : np.ndarray[np.float64, ndim=1]
-        Time series (price, performance or index).
-    period : int (default 252)
-        Number of period per year.
-
-    Returns
-    -------
-    np.float64
-        Value of Calmar ratio.
-
-    """
-    cdef np.float64_t ret, annual_return, max_dd, T = series.size
-    
-    # Compute compouned annual returns
-    ret = series[-1] / series[0]
-    annual_return = np.sign(ret) * np.float_power(
-        np.abs(ret), period / T, dtype=np.float64) - 1.
-    
-    # Compute MaxDrawDown
-    max_dd = mdd_cy(series)
-
-    if max_dd == 0.:
-        return 0.
-
-    return annual_return / max_dd
 
 
 cpdef np.float64_t sharpe_cy(
@@ -545,3 +477,71 @@ cpdef np.ndarray[np.float64_t, ndim=1] drawdown_cy(
     maximums = np.maximum.accumulate(series, dtype=np.float64)
     
     return 1. - series / maximums
+
+
+cpdef np.float64_t mdd_cy(np.ndarray[np.float64_t, ndim=1] series):
+    """ Compute the maximum drawdown.
+
+    Function to compute the maximum drwdown where drawdown is the measure of 
+    the decline from a historical peak in some variable [1]_ (typically the 
+    cumulative profit or total open equity of a financial trading strategy). 
+    
+    Parameters
+    ----------
+    series : np.ndarray[np.float64, ndim=1]
+        Time series (price, performance or index).
+
+    Returns
+    -------
+    np.float64
+        Value of Maximum DrawDown.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
+    
+    """
+    cdef np.ndarray[np.float64_t, ndim=1] drawdowns
+    
+    # Compute DrawDown
+    drawdowns = drawdown_cy(series)
+
+    return max(drawdowns)
+
+
+cpdef np.float64_t calmar_cy(
+        np.ndarray[np.float64_t, ndim=1] series, 
+        np.float64_t period=252.
+    ):
+    """ Compute Calmar ratio.
+
+    Function to compute the compouned annual return over the Maximum DrawDown, 
+    known as the Calmar ratio.
+    
+    Parameters
+    ----------
+    series : np.ndarray[np.float64, ndim=1]
+        Time series (price, performance or index).
+    period : int (default 252)
+        Number of period per year.
+
+    Returns
+    -------
+    np.float64
+        Value of Calmar ratio.
+
+    """
+    cdef np.float64_t ret, annual_return, max_dd, T = series.size
+    
+    # Compute compouned annual returns
+    ret = series[-1] / series[0]
+    annual_return = np.sign(ret) * np.float_power(
+        np.abs(ret), period / T, dtype=np.float64) - 1.
+    
+    # Compute MaxDrawDown
+    max_dd = mdd_cy(series)
+
+    if max_dd == 0.:
+        return 0.
+
+    return annual_return / max_dd
