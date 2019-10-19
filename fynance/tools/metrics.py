@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-19 11:44:40
+# @Last modified time: 2019-10-19 12:06:26
 
 """ Metric functons used in financial analysis. """
 
@@ -114,8 +114,7 @@ def annual_return(X, period=252, axis=0, dtype=None):
 
     .. math::
 
-        annualReturn = sign(\frac{X_T}{X_0}) \time
-        \frac{X_T}{X_0}^{\frac{period}{T - 1}} - 1
+        annualReturn = \frac{X_T}{X_0}^{\frac{period}{T - 1}} - 1
 
     Parameters
     ----------
@@ -192,8 +191,8 @@ def annual_volatility(X, period=252, log=True, axis=0, dtype=None):
 
         annualVolatility = \sqrt{period \times Var_t(R)} \\
         \text{where, }R =
-        \begin{cases}ln(\frac{X_{1:T}}{X_{0:T-1}}) \text{ if log=True}\\
-                    \frac{X_{1:T}}{X_{0:T-1}} - 1 \text{ otherwise} \\
+        \begin{cases}ln(\frac{X_{1:T}}{X_{0:T-1}}) \text{, if log=True}\\
+                    \frac{X_{1:T}}{X_{0:T-1}} - 1 \text{, otherwise} \\
         \end{cases}
 
     Parameters
@@ -258,12 +257,11 @@ def calmar(X, raw=False, period=252, axis=0, dtype=None):
     .. math::
 
         calmarRatio = \frac{annualReturn}{MaxDD} \\
-        annualReturn = sign(\frac{X_T}{X_0}) \time
-        \frac{X_T}{X_0}^{\frac{period}{T - 1}} - 1 \\
+        annualReturn = \frac{X_T}{X_0}^{\frac{period}{T - 1}} - 1 \\
         maxDD = max(DD) \\
         \text{where, } DD_t =
-        \begin{cases}max(X_{0:t}) - X_t \text{ if raw=True} \\
-                     1 - \frac{X_t}{max(X_{0:t})} \text{ otherwise} \\
+        \begin{cases}max(X_{0:t}) - X_t \text{, if raw=True} \\
+                     1 - \frac{X_t}{max(X_{0:t})} \text{, otherwise} \\
         \end{cases}
 
     Parameters
@@ -376,8 +374,8 @@ def drawdown(X, raw=False, axis=0, dtype=None):
 
     .. math::
 
-        DD_t = \begin{cases}max(X_{0:t}) - X_t \text{ if raw=True} \\
-                            1 - \frac{X_t}{max(X_{0:t})} \text{ otherwise} \\
+        DD_t = \begin{cases}max(X_{0:t}) - X_t \text{, if raw=True} \\
+                            1 - \frac{X_t}{max(X_{0:t})} \text{, otherwise} \\
         \end{cases}
 
     Parameters
@@ -490,8 +488,8 @@ def mdd(X, raw=False, axis=0, dtype=None):
 
         maxDD = max(DD) \\
         \text{where, } DD_t =
-        \begin{cases}max(X_{0:t}) - X_t \text{ if raw=True} \\
-                     1 - \frac{X_t}{max(X_{0:t})} \text{ otherwise} \\
+        \begin{cases}max(X_{0:t}) - X_t \text{, if raw=True} \\
+                     1 - \frac{X_t}{max(X_{0:t})} \text{, otherwise} \\
         \end{cases}
 
     Parameters
@@ -787,7 +785,7 @@ def z_score(X, w=0, kind='s', axis=0, dtype=None):
 # TODO : rolling diversified ratio
 
 def roll_calmar(X, period=252.):
-    """ Compute the rolling Calmar ratio [1]_.
+    """ Compute the rolling Calmar ratio [3]_.
 
     It is the compouned annual return over the rolling Maximum DrawDown.
 
@@ -808,7 +806,7 @@ def roll_calmar(X, period=252.):
 
     References
     ----------
-    .. [1] https://en.wikipedia.org/wiki/Calmar_ratio
+    .. [3] https://en.wikipedia.org/wiki/Calmar_ratio
 
     Examples
     --------
@@ -850,7 +848,7 @@ def roll_mad(X, win=0, axis=0, dtype=None):
     """ Compute rolling Mean Absolut Deviation.
 
     Compute the moving average of the absolute value of the distance to the
-    moving average [4]_.
+    moving average [6]_.
 
     Parameters
     ----------
@@ -871,7 +869,7 @@ def roll_mad(X, win=0, axis=0, dtype=None):
 
     References
     ----------
-    .. [4] https://en.wikipedia.org/wiki/Average_absolute_deviation
+    .. [6] https://en.wikipedia.org/wiki/Average_absolute_deviation
 
     Examples
     --------
@@ -940,7 +938,7 @@ def roll_mdd(X):
 
 
 def roll_sharpe(X, period=252, win=0, cap=True):
-    """ Compute rolling sharpe ratio [6]_.
+    """ Compute rolling sharpe ratio [7]_.
 
     It is the rolling compouned annual returns divided by rolling annual
     volatility.
@@ -965,7 +963,7 @@ def roll_sharpe(X, period=252, win=0, cap=True):
 
     References
     ----------
-    .. [6] https://en.wikipedia.org/wiki/Sharpe_ratio
+    .. [7] https://en.wikipedia.org/wiki/Sharpe_ratio
 
     Examples
     --------
