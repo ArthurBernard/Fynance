@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-19 12:06:26
+# @Last modified time: 2019-10-21 16:49:56
 
 """ Metric functons used in financial analysis. """
 
@@ -114,7 +114,7 @@ def annual_return(X, period=252, axis=0, dtype=None):
 
     .. math::
 
-        annualReturn = \frac{X_T}{X_0}^{\frac{period}{T - 1}} - 1
+        annualReturn = \frac{X_T}{X_1}^{\frac{period}{T}} - 1
 
     Parameters
     ----------
@@ -141,12 +141,12 @@ def annual_return(X, period=252, axis=0, dtype=None):
     --------
     Assume series of monthly prices:
 
-    >>> X = np.array([100, 110, 80, 120, 160, 125, 108]).astype(np.float64)
+    >>> X = np.array([100, 110, 80, 120, 160, 108]).astype(np.float64)
     >>> print(round(annual_return(X, period=12), 4))
     0.1664
     >>> X = np.array([[100, 110], [80, 120], [160, 108]]).astype(np.float64)
     >>> annual_return(X, period=12)
-    array([15.777216  , -0.10425081])
+    array([ 5.5536    , -0.07076773])
 
     See Also
     --------
@@ -165,10 +165,10 @@ def _annual_return(X, period):
 
     if (ret < 0).any():
 
-        raise ValueError('initial value X[0] and final value X[T] must \
+        raise ValueError('initial value X[0] and final value X[-1] must \
             be of the same sign.')
 
-    T = X.shape[0] - 1
+    T = X.shape[0]
     ret = np.abs(ret)
     sign = np.sign(X[0])
 
@@ -191,8 +191,8 @@ def annual_volatility(X, period=252, log=True, axis=0, dtype=None):
 
         annualVolatility = \sqrt{period \times Var_t(R)} \\
         \text{where, }R =
-        \begin{cases}ln(\frac{X_{1:T}}{X_{0:T-1}}) \text{, if log=True}\\
-                    \frac{X_{1:T}}{X_{0:T-1}} - 1 \text{, otherwise} \\
+        \begin{cases}ln(\frac{X_{2:T}}{X_{1:T-1}}) \text{, if log=True}\\
+                    \frac{X_{2:T}}{X_{1:T-1}} - 1 \text{, otherwise} \\
         \end{cases}
 
     Parameters
@@ -257,11 +257,11 @@ def calmar(X, raw=False, period=252, axis=0, dtype=None):
     .. math::
 
         calmarRatio = \frac{annualReturn}{MaxDD} \\
-        annualReturn = \frac{X_T}{X_0}^{\frac{period}{T - 1}} - 1 \\
+        annualReturn = \frac{X_T}{X_1}^{\frac{period}{T}} - 1 \\
         maxDD = max(DD) \\
         \text{where, } DD_t =
-        \begin{cases}max(X_{0:t}) - X_t \text{, if raw=True} \\
-                     1 - \frac{X_t}{max(X_{0:t})} \text{, otherwise} \\
+        \begin{cases}max(X_{1:t}) - X_t \text{, if raw=True} \\
+                     1 - \frac{X_t}{max(X_{1:t})} \text{, otherwise} \\
         \end{cases}
 
     Parameters
@@ -292,10 +292,10 @@ def calmar(X, raw=False, period=252, axis=0, dtype=None):
     --------
     Assume a series of monthly prices:
 
-    >>> X = np.array([70, 100, 80, 120, 160, 105, 80]).astype(np.float64)
+    >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
     >>> calmar(X, period=12)
     0.6122448979591835
-    >>> calmar(X.reshape([7, 1]), period=12)
+    >>> calmar(X.reshape([6, 1]), period=12)
     array([0.6122449])
 
     See Also
@@ -374,8 +374,8 @@ def drawdown(X, raw=False, axis=0, dtype=None):
 
     .. math::
 
-        DD_t = \begin{cases}max(X_{0:t}) - X_t \text{, if raw=True} \\
-                            1 - \frac{X_t}{max(X_{0:t})} \text{, otherwise} \\
+        DD_t = \begin{cases}max(X_{1:t}) - X_t \text{, if raw=True} \\
+                            1 - \frac{X_t}{max(X_{1:t})} \text{, otherwise} \\
         \end{cases}
 
     Parameters
@@ -488,8 +488,8 @@ def mdd(X, raw=False, axis=0, dtype=None):
 
         maxDD = max(DD) \\
         \text{where, } DD_t =
-        \begin{cases}max(X_{0:t}) - X_t \text{, if raw=True} \\
-                     1 - \frac{X_t}{max(X_{0:t})} \text{, otherwise} \\
+        \begin{cases}max(X_{1:t}) - X_t \text{, if raw=True} \\
+                     1 - \frac{X_t}{max(X_{1:t})} \text{, otherwise} \\
         \end{cases}
 
     Parameters
@@ -783,6 +783,7 @@ def z_score(X, w=0, kind='s', axis=0, dtype=None):
 
 # TODO : rolling perf metric
 # TODO : rolling diversified ratio
+
 
 def roll_calmar(X, period=252.):
     """ Compute the rolling Calmar ratio [3]_.
