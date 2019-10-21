@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-21 16:49:56
+# @Last modified time: 2019-10-21 16:57:31
 
 """ Metric functons used in financial analysis. """
 
@@ -114,7 +114,7 @@ def annual_return(X, period=252, axis=0, dtype=None):
 
     .. math::
 
-        annualReturn = \frac{X_T}{X_1}^{\frac{period}{T}} - 1
+        annualReturn = \frac{X_T}{X_1}^{\frac{period}{T - 1}} - 1
 
     Parameters
     ----------
@@ -141,12 +141,12 @@ def annual_return(X, period=252, axis=0, dtype=None):
     --------
     Assume series of monthly prices:
 
-    >>> X = np.array([100, 110, 80, 120, 160, 108]).astype(np.float64)
+    >>> X = np.array([100, 110, 80, 120, 160, 105, 108]).astype(np.float64)
     >>> print(round(annual_return(X, period=12), 4))
     0.1664
     >>> X = np.array([[100, 110], [80, 120], [160, 108]]).astype(np.float64)
     >>> annual_return(X, period=12)
-    array([ 5.5536    , -0.07076773])
+    array([15.777216  , -0.10425081])
 
     See Also
     --------
@@ -172,7 +172,7 @@ def _annual_return(X, period):
     ret = np.abs(ret)
     sign = np.sign(X[0])
 
-    return sign * np.float_power(ret, period / T, dtype=np.float64) - 1.
+    return sign * np.float_power(ret, period / (T - 1), dtype=np.float64) - 1.
 
 
 @WrapperArray('dtype', 'axis', 'null')
@@ -257,7 +257,7 @@ def calmar(X, raw=False, period=252, axis=0, dtype=None):
     .. math::
 
         calmarRatio = \frac{annualReturn}{MaxDD} \\
-        annualReturn = \frac{X_T}{X_1}^{\frac{period}{T}} - 1 \\
+        annualReturn = \frac{X_T}{X_1}^{\frac{period}{T - 1}} - 1 \\
         maxDD = max(DD) \\
         \text{where, } DD_t =
         \begin{cases}max(X_{1:t}) - X_t \text{, if raw=True} \\
@@ -292,10 +292,10 @@ def calmar(X, raw=False, period=252, axis=0, dtype=None):
     --------
     Assume a series of monthly prices:
 
-    >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
+    >>> X = np.array([70, 100, 80, 120, 160, 105, 80]).astype(np.float64)
     >>> calmar(X, period=12)
     0.6122448979591835
-    >>> calmar(X.reshape([6, 1]), period=12)
+    >>> calmar(X.reshape([7, 1]), period=12)
     array([0.6122449])
 
     See Also
