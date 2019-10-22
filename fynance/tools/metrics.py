@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-21 16:57:31
+# @Last modified time: 2019-10-22 23:39:55
 
 """ Metric functons used in financial analysis. """
 
@@ -16,7 +16,7 @@ import numpy as np
 
 # Internal packages
 from fynance.tools._wrappers import WrapperArray
-from fynance.tools.metrics_cy import calmar_cy, mdd_cy, sharpe_cy
+from fynance.tools.metrics_cy import sharpe_cy
 from fynance.tools.metrics_cy import log_sharpe_cy, roll_mdd_cy, roll_mad_cy_1d
 from fynance.tools.metrics_cy import roll_mad_cy_2d, drawdown_cy_1d
 from fynance.tools.metrics_cy import drawdown_cy_2d
@@ -169,7 +169,6 @@ def _annual_return(X, period):
             be of the same sign.')
 
     T = X.shape[0]
-    ret = np.abs(ret)
     sign = np.sign(X[0])
 
     return sign * np.float_power(ret, period / (T - 1), dtype=np.float64) - 1.
@@ -783,6 +782,173 @@ def z_score(X, w=0, kind='s', axis=0, dtype=None):
 
 # TODO : rolling perf metric
 # TODO : rolling diversified ratio
+
+
+@WrapperArray('dtype', 'axis')
+def roll_annual_return(X, period=252, axis=0, dtype=None):
+    r""" Compute rolling compouned annual returns of each `X`' series.
+
+    The annualised return [1]_ is the process of converting returns on a whole
+    period to returns per year.
+
+    Notes
+    -----
+    The rolling annual compouned returns is computed such that:
+
+    .. math::
+
+        \forall t \in [0: T],
+        annualReturn_t = \frac{X_t}{X_0}^{\frac{period}{t - 1}} - 1
+
+    Parameters
+    ----------
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Time-series of price, performance or index.
+    period : int, optional
+        Number of period per year, default is 252 (trading days per year).
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
+
+    Returns
+    -------
+    np.ndarray[dtype, ndim=1 or 2]
+        Values of rolling compouned annual returns of each series.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Rate_of_return#Annualisation
+
+    Examples
+    --------
+    Assume series of monthly prices:
+
+    >>> X = np.array([100, 110, 80, 120, 160, 105, 108]).astype(np.float64)
+    >>> roll_annual_return(X, period=12)
+    array([ 0.        ,  2.13842838, -0.737856  ,  1.0736    ,  3.096     ,
+            0.12422779,  0.1664    ])
+    >>> X = np.array([[100, 101], [80, 81], [110, 108]]).astype(np.float64)
+    >>> roll_annual_return(X, period=12, axis=1)
+    array([[ 0.        ,  0.12682503],
+           [ 0.        ,  0.16075452],
+           [ 0.        , -0.1976334 ]])
+
+    See Also
+    --------
+    mdd, drawdown, sharpe, annual_volatility
+
+    """
+    # TODO : append a rolling lagged window parameter
+    #        cython function (if it's more efficient)
+    return _roll_annual_return(X, period=period)
+
+
+def _roll_annual_return(X, period):
+    if (X[0] == 0).any():
+
+        raise ValueError('initial value X[0] cannot be null.')
+
+    cum_ret = X / X[0]
+
+    if (cum_ret < 0).any():
+
+        raise ValueError('all values of X must be of the same sign.')
+
+    T = X.shape[0]
+    arange = np.arange(1, T, dtype=np.float64)
+    sign = np.sign(X[0])
+
+    anu_ret = np.zeros(X.shape)
+    anu_ret[1:] = sign * np.float_power(cum_ret[1:], period / arange) - 1.
+
+    return anu_ret
+
+
+@WrapperArray('dtype', 'axis', 'null')
+def roll_annual_volatility(X, period=252, log=True, axis=0, dtype=None):
+    r""" Compute the annualized volatility of each `X`' series.
+
+    In finance, volatility is the degree of variation of a trading price
+    series over time as measured by the standard deviation of logarithmic
+    returns [2]_.
+
+    Notes
+    -----
+    Let :math:`Var` the variance function of a random variable:
+
+    .. math::
+
+        annualVolatility = \sqrt{period \times Var_t(R)} \\
+        \text{where, }R =
+        \begin{cases}ln(\frac{X_{1:T}}{X_{0:T-1}}) \text{, if log=True}\\
+                    \frac{X_{1:T}}{X_{0:T-1}} - 1 \text{, otherwise} \\
+        \end{cases}
+
+    Parameters
+    ----------
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Time-series of price, performance or index.
+    period : int, optional
+        Number of period per year, default is 252 (trading days per year).
+    log : bool, optional
+        - If True then logarithmic returns are computed.
+        - Else then returns in percentage are computed.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
+
+    Returns
+    -------
+    dtype or np.ndarray([dtype, ndim=1])
+        Values of annualized volatility for each series.
+
+    References
+    ----------
+    .. [2] https://en.wikipedia.org/wiki/Volatility_(finance)
+
+    Examples
+    --------
+    Assume series of monthly prices:
+
+    >>> X = np.array([100, 110, 105, 110, 120, 108]).astype(np.float64)
+    >>> roll_annual_volatility(X, period=12, log=True)
+    array([0.        , 0.        , 0.2456571 , 0.20380622, 0.1949842 ,
+           0.27232101])
+    >>> roll_annual_volatility(X.reshape([6, 1]), period=12, log=False)
+    array([[0.        ],
+           [0.        ],
+           [0.25193466],
+           [0.20836981],
+           [0.19959057],
+           [0.27217177]])
+
+    See Also
+    --------
+    mdd, drawdown, sharpe, annual_return
+
+    """
+    # TODO : append a rolling lagged window parameter
+    #        cython function
+    #        compute std with R[1: t + 1] or R[:t + 1]
+    shape = X.shape
+    T = shape[0]
+    R = np.zeros(shape)
+    anu_vol = np.zeros(shape)
+
+    if log:
+        R[1:] = np.log(X[1:] / X[:-1])
+
+    else:
+        R[1:] = X[1:] / X[:-1] - 1.
+
+    for t in range(1, T):
+        anu_vol[t] = np.std(R[1:t + 1], axis=axis)
+
+    return np.sqrt(period) * anu_vol
 
 
 def roll_calmar(X, period=252.):
