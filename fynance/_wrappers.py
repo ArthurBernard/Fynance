@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-10-11 10:10:43
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-23 14:29:40
+# @Last modified time: 2019-10-23 17:20:46
 
 """ Some wrappers functions. """
 
@@ -16,6 +16,7 @@ from warnings import warn
 import numpy as np
 
 # Local packages
+from fynance._exceptions import ArraySizeError
 
 
 def _check_dtype(X, dtype):
@@ -50,10 +51,13 @@ def wrap_dtype(func):
 def wrap_axis(func):
     """ Check if computation on `axis` of `X` array is available. """
     @wraps(func)
-    def check_axis(X, *args, axis=0, **kwargs):
+    def check_axis(X, *args, axis=0, min_size=0, **kwargs):
         shape = X.shape
+        if shape[axis] < min_size:
 
-        if len(X.shape) <= axis:
+            raise ArraySizeError(shape[axis], axis=axis, min_size=min_size)
+
+        elif len(X.shape) <= axis:
 
             raise np.AxisError(axis, len(X.shape))
 
@@ -152,9 +156,10 @@ class WrapperArray:
         'null': wrap_null,
     }
 
-    def __init__(self, *args):
+    def __init__(self, *args, **kwargs):
         """ Initialize wrapper functions. """
         self.wrappers = {key: self.handler[key] for key in args}
+        self.kw = kwargs
 
     def __call__(self, func):
         """ Wrap `func`.
@@ -173,6 +178,7 @@ class WrapperArray:
         @wraps(func)
         def wrap(X, *args, **kwargs):
             wrap_func = None
+            kwargs = {**kwargs, **self.kw}
             for k, w in self.wrappers.items():
                 if wrap_func is None:
                     wrap_func = w(func)

@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:13
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-17 14:56:36
+# @Last modified time: 2019-10-23 17:38:50
 
 """ Statical momentum functions. """
 
@@ -15,7 +15,7 @@ import numpy as np
 
 # Local packages
 from fynance.tools.momentums_cy import *
-from fynance.tools._wrappers import WrapperArray
+from fynance._wrappers import WrapperArray
 
 __all__ = [
     'sma', 'wma', 'ema', 'smstd', 'wmstd', 'emstd',

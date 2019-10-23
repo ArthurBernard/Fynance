@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:33
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-23 14:48:09
+# @Last modified time: 2019-10-23 17:39:06
 
 """ Indicators functions. """
 
@@ -15,7 +15,7 @@ from warnings import warn
 import numpy as np
 
 # Local packages
-from fynance.tools._wrappers import WrapperArray
+from fynance._wrappers import WrapperArray
 from fynance.tools.momentums import _smstd, _emstd, _wmstd, _sma, _ema, _wma
 from fynance.tools.metrics import roll_mad
 
