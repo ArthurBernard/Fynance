@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-07-09 10:49:19
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-23 14:30:27
+# @Last modified time: 2019-10-23 21:14:11
 # cython: language_level=3
 
 # Built-in packages
@@ -119,12 +119,12 @@ cpdef double [:, :] drawdown_cy_2d(double [:, :] X, int raw):
     cdef double [:, :] dd = var
     cdef double one = <double>1
     cdef double S
-    cdef int t = 0
-    cdef int n = 0
+    cdef int t, n = 0
 
     # Compute DrawDown
     while n < N:
         S = X[0, n]
+        t = 0
         while t < T:
             S = max(S, X[t, n])
             if raw != 0:
@@ -138,6 +138,19 @@ cpdef double [:, :] drawdown_cy_2d(double [:, :] X, int raw):
         n += 1
     
     return dd
+
+
+cpdef double sharpe_cy_1d(double [:] X, int p):
+   """ Compute the sharpe ratio of a one-dimensional array. """
+   cdef int T = X.shape[0]
+
+    var = view.array(shape=(T,), itemsize=sizeof(double), format='d')
+
+    cdef double [:] sharpe = var
+    cdef double S = <double>0
+    cdef int t = 0
+
+    pass
 
 
 cpdef np.float64_t sharpe_cy(
@@ -260,6 +273,10 @@ cpdef double [:] roll_drawdown_cy_1d(double [:] X, int w, int raw):
     """
     cdef int i, T = X.shape[0]
 
+    if T == w:
+
+        return drawdown_cy_1d(X, raw)
+
     var = view.array(shape=(T,), itemsize=sizeof(double), format='d')
 
     cdef double [:] dd = var
@@ -320,6 +337,11 @@ cpdef double [:, :] roll_drawdown_cy_2d(double [:, :] X, int w, int raw):
 
     """
     cdef int i, t, T = X.shape[0]
+
+    if T == w:
+
+        return drawdown_cy_2d(X, raw)
+
     cdef int n, N = X.shape[1]
 
     var = view.array(shape=(T, N), itemsize=sizeof(double), format='d')
