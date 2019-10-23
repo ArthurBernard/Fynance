@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-10-11 10:10:43
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-19 09:53:29
+# @Last modified time: 2019-10-23 14:29:40
 
 """ Some wrappers functions. """
 
@@ -89,12 +89,12 @@ def wrap_window(func):
     """ Check if the lagged window `w` is available for `X` array. """
     @wraps(func)
     def check_window(X, w=None, axis=0, **kwargs):
-        if w < 0:
+        if w == 0 or w is None:
+            w = X.shape[axis]
+
+        elif w < 0:
             raise ValueError('lagged window of size {} is not available, \
                 must be positive.'.format(w))
-
-        elif w == 0 or w is None:
-            w = X.shape[axis]
 
         elif w > X.shape[axis]:
             warn('lagged window of size {} is out of bounds for axis {} \
