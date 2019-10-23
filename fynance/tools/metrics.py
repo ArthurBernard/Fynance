@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-23 14:50:37
+# @Last modified time: 2019-10-23 21:13:04
 
 """ Metric functons used in financial analysis. """
 
@@ -15,11 +15,8 @@ from warnings import warn
 import numpy as np
 
 # Internal packages
-from fynance.tools._wrappers import WrapperArray
-from fynance.tools.metrics_cy import sharpe_cy
-from fynance.tools.metrics_cy import log_sharpe_cy, roll_mdd_cy, roll_mad_cy_1d
-from fynance.tools.metrics_cy import roll_mad_cy_2d, drawdown_cy_1d
-from fynance.tools.metrics_cy import drawdown_cy_2d, roll_drawdown_cy_1d, roll_drawdown_cy_2d
+from fynance._wrappers import WrapperArray
+from fynance.tools.metrics_cy import *
 from fynance.tools.momentums_cy import smstd_cy
 from fynance.tools.momentums import _sma, _ema, _wma, _smstd, _emstd, _wmstd
 
@@ -100,7 +97,7 @@ def accuracy(y_true, y_pred, sign=True, axis=0):
     return R / (R + W)
 
 
-@WrapperArray('dtype', 'axis')
+@WrapperArray('dtype', 'axis', min_size=2)
 def annual_return(X, period=252, axis=0, dtype=None):
     r""" Compute compouned annual returns of each `X`' series.
 
@@ -162,20 +159,20 @@ def _annual_return(X, period):
         raise ValueError('initial value X[0] cannot be null.')
 
     ret = X[-1] / X[0]
+    T = X.shape[0]
 
     if (ret < 0).any():
 
         raise ValueError('initial value X[0] and final value X[-1] must \
             be of the same sign.')
 
-    T = X.shape[0]
     sign = np.sign(X[0])
 
     return sign * np.float_power(ret, period / (T - 1), dtype=np.float64) - 1.
 
 
-@WrapperArray('dtype', 'axis', 'null')
-def annual_volatility(X, period=252, log=True, axis=0, dtype=None):
+@WrapperArray('dtype', 'axis', 'null', min_size=2)
+def annual_volatility(X, period=252, log=True, axis=0, dtype=None, dof=1):
     r""" Compute the annualized volatility of each `X`' series.
 
     In finance, volatility is the degree of variation of a trading price
@@ -239,10 +236,17 @@ def annual_volatility(X, period=252, log=True, axis=0, dtype=None):
     else:
         R = X[1:] / X[:-1] - 1.
 
-    return np.sqrt(period) * np.std(R, axis=axis)
+    if dof == 0:
+        _R = np.zeros(X.shape)
+        _R[1:] = R
+
+    else:
+        _R = R
+
+    return np.sqrt(period) * np.std(_R, axis=axis)
 
 
-@WrapperArray('dtype', 'axis')
+@WrapperArray('dtype', 'axis', min_size=2)
 def calmar(X, raw=False, period=252, axis=0, dtype=None):
     r""" Compute the Calmar Ratio [3]_ for each `X`' series.
 
@@ -468,7 +472,7 @@ def mad(X, axis=0, dtype=None):
 
     """
     # TODO : make cython function or not ?
-    return np.mean(np.abs(X - np.mean(X, axis=axis)), axis=axis)
+    return np.mean(np.abs(X.T - np.mean(X, axis=axis)).T, axis=axis)
 
 
 @WrapperArray('dtype', 'axis')
@@ -646,8 +650,8 @@ def perf_strat(underlying, signals=None, log=False, base=100.,
     return perf_returns(X, log=log, base=base)
 
 
-@WrapperArray('dtype', 'axis')
-def sharpe(X, period=252, log=False, axis=0, dtype=None):
+@WrapperArray('dtype', 'axis', 'null', min_size=2)
+def sharpe(X, period=252, log=False, axis=0, dtype=None, dof=1):
     r""" Compute the Sharpe ratio [7]_ for each `X`' series.
 
     Notes
@@ -686,7 +690,7 @@ def sharpe(X, period=252, log=False, axis=0, dtype=None):
     Assume a series X of monthly prices:
 
     >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
-    >>> sharpe(X, period=12)
+    >>> sharpe(X, period=12, dof=0)
     0.22494843872918127
     >>> sharpe(X.reshape([6, 1]), period=12)
     array([0.22494844])
@@ -696,6 +700,8 @@ def sharpe(X, period=252, log=False, axis=0, dtype=None):
     mdd, calmar, drawdown, roll_sharpe
 
     """
+    # ret = np.float_power(X[-1] / X[0], period / X.shape[0]) - 1.
+    # return ret / annual_volatility(X, period=period, log=log, dof=dof)
     # TODO : check efficiency of cython function
     #        append risk free rate
     sharpe_func = log_sharpe_cy if log else sharpe_cy
@@ -1087,9 +1093,9 @@ def _roll_drawdown(X, w, raw):
 
     if len(X.shape) == 2:
 
-        return np.asarray(roll_drawdown_cy_2d(X, int(w), int(raw)))
+        return np.asarray(roll_drawdown_cy_2d(X, w, int(raw)))
 
-    return np.asarray(roll_drawdown_cy_1d(X, int(w), int(raw)))
+    return np.asarray(roll_drawdown_cy_1d(X, w, int(raw)))
 
 
 @WrapperArray('dtype', 'axis', 'window')
