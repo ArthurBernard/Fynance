@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:33
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-17 14:40:30
+# @Last modified time: 2019-10-23 14:48:09
 
 """ Indicators functions. """
 
@@ -179,7 +179,7 @@ def cci(X, high=None, low=None, w=20, axis=0, dtype=None):
     # Compute typical price
     p = (X + high + low) / 3
     # Compute moving mean absolute deviation
-    r_mad = roll_mad(p, win=w)
+    r_mad = roll_mad(p, w=w)
     # Avoid zero division
     r_mad[r_mad == 0.] = 1.
 
