@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-07-09 10:49:19
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-23 21:14:11
+# @Last modified time: 2019-10-23 21:58:31
 # cython: language_level=3
 
 # Built-in packages
@@ -138,19 +138,6 @@ cpdef double [:, :] drawdown_cy_2d(double [:, :] X, int raw):
         n += 1
     
     return dd
-
-
-cpdef double sharpe_cy_1d(double [:] X, int p):
-   """ Compute the sharpe ratio of a one-dimensional array. """
-   cdef int T = X.shape[0]
-
-    var = view.array(shape=(T,), itemsize=sizeof(double), format='d')
-
-    cdef double [:] sharpe = var
-    cdef double S = <double>0
-    cdef int t = 0
-
-    pass
 
 
 cpdef np.float64_t sharpe_cy(
