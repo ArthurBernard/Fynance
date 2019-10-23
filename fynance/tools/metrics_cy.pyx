@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-07-09 10:49:19
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-19 11:35:31
+# @Last modified time: 2019-10-23 14:30:27
 # cython: language_level=3
 
 # Built-in packages
@@ -25,7 +25,7 @@ from fynance.tools.momentums_cy import smstd_cy, sma_cy, sma_cy_1d, sma_cy_2d
 __all__ = [
     'sharpe_cy', 'roll_sharpe_cy', 'log_sharpe_cy', 'mdd_cy', 'calmar_cy', 
     'roll_mad_cy_1d', 'roll_mad_cy_2d', 'roll_mdd_cy', 'drawdown_cy_1d',
-    'drawdown_cy_2d',
+    'drawdown_cy_2d', 'roll_drawdown_cy_1d', 'roll_drawdown_cy_2d'
 ]
 
 
@@ -227,6 +227,133 @@ cpdef np.float64_t log_sharpe_cy(
 # =========================================================================== #
 #                               Rolling metrics                               #
 # =========================================================================== #
+
+
+cpdef double [:] roll_drawdown_cy_1d(double [:] X, int w, int raw):
+    """ Compute the rolling Drawdown for one-dimensional array.
+
+    Measure of the decline from a historical peak in some variable [1]_
+    (typically the cumulative profit or total open equity of a financial
+    trading strategy).
+
+    Parameters
+    ----------
+    X : memoryview.ndarray[ndim=1, dtype=double]
+        Elements to compute the function. Can be a NumPy array, C array, Cython
+        array, etc.
+    w : int
+        Size of the lagged window.
+    raw : {0, 1}
+        If 1 compute the raw drawdown, otherwise compute drawdown in
+        percentage.
+
+    Returns
+    -------
+    memoryview.ndarray[ndim=1, dtype=double]
+        Series of DrawDown. Can be converted to a NumPy array, C array,
+        Cython array, etc.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
+
+    """
+    cdef int i, T = X.shape[0]
+
+    var = view.array(shape=(T,), itemsize=sizeof(double), format='d')
+
+    cdef double [:] dd = var
+    cdef double one = <double>1
+    cdef double S = X[0]
+    cdef int t = 0
+
+    # Compute DrawDown
+    while t < T:
+        if t < w:
+            S = max(S, X[t])
+
+        else:
+            S = X[t]
+            i = 1
+            while i < w:
+                S = max(S, X[t - i])
+                i += 1
+
+        if raw != 0:
+            dd[t] = S - X[t]
+
+        else:
+            dd[t] = one - X[t] / S
+
+        t += 1
+    
+    return dd
+
+
+cpdef double [:, :] roll_drawdown_cy_2d(double [:, :] X, int w, int raw):
+    """ Compute the rolling Drawdown for two-dimensional array.
+
+    Measure of the decline from a historical peak in some variable [1]_
+    (typically the cumulative profit or total open equity of a financial
+    trading strategy).
+
+    Parameters
+    ----------
+    X : memoryview.ndarray[ndim=2, dtype=double]
+        Elements to compute the function. Can be a NumPy array, C array, Cython
+        array, etc.
+    w : int
+        Size of the lagged window.
+    raw : {0, 1}
+        If 1 compute the raw drawdown, otherwise compute drawdown in
+        percentage.
+
+    Returns
+    -------
+    memoryview.ndarray[ndim=2, dtype=double]
+        Series of DrawDown. Can be converted to a NumPy array, C array,
+        Cython array, etc.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
+
+    """
+    cdef int i, t, T = X.shape[0]
+    cdef int n, N = X.shape[1]
+
+    var = view.array(shape=(T, N), itemsize=sizeof(double), format='d')
+
+    cdef double [:, :] dd = var
+    cdef double S, one = <double>1
+    n = 0
+
+    # Compute DrawDown
+    while n < N:
+        t = 0
+        S = X[0, n]
+        while t < T:
+            if t < w:
+                S = max(S, X[t, n])
+
+            else:
+                S = X[t, n]
+                i = 1
+                while i < w:
+                    S = max(S, X[t - i, n])
+                    i += 1
+
+            if raw != 0:
+                dd[t, n] = S - X[t, n]
+
+            else:
+                dd[t, n] = one - X[t, n] / S
+
+            t += 1
+
+        n += 1
+
+    return dd
 
 
 cpdef double [:] roll_mad_cy_1d(double [:] X, int win):

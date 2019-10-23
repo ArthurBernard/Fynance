@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-22 23:39:55
+# @Last modified time: 2019-10-23 14:50:37
 
 """ Metric functons used in financial analysis. """
 
@@ -19,7 +19,7 @@ from fynance.tools._wrappers import WrapperArray
 from fynance.tools.metrics_cy import sharpe_cy
 from fynance.tools.metrics_cy import log_sharpe_cy, roll_mdd_cy, roll_mad_cy_1d
 from fynance.tools.metrics_cy import roll_mad_cy_2d, drawdown_cy_1d
-from fynance.tools.metrics_cy import drawdown_cy_2d
+from fynance.tools.metrics_cy import drawdown_cy_2d, roll_drawdown_cy_1d, roll_drawdown_cy_2d
 from fynance.tools.momentums_cy import smstd_cy
 from fynance.tools.momentums import _sma, _ema, _wma, _smstd, _emstd, _wmstd
 
@@ -903,7 +903,7 @@ def roll_annual_volatility(X, period=252, log=True, axis=0, dtype=None):
 
     Returns
     -------
-    dtype or np.ndarray([dtype, ndim=1])
+    dtype or np.ndarray([dtype, ndim=1 or 2])
         Values of annualized volatility for each series.
 
     References
@@ -965,6 +965,11 @@ def roll_calmar(X, period=252.):
     win : int, optional /! NOT YET WORKING /!
         Size of the rolling window. If less of two, rolling calmar is
         compute on all the past. Default is 0.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
@@ -1010,9 +1015,86 @@ def roll_calmar(X, period=252.):
     return roll_cal
 
 
-@WrapperArray('dtype', 'axis')
-def roll_mad(X, win=0, axis=0, dtype=None):
-    """ Compute rolling Mean Absolut Deviation.
+@WrapperArray('dtype', 'axis', 'window')
+def roll_drawdown(X, w=None, raw=False, axis=0, dtype=None):
+    r""" Measures the rolling drawdown of each `X`' series.
+
+    Function to compute measure of the decline from a historical peak in some
+    variable [5]_ (typically the cumulative profit or total open equity of a
+    financial trading strategy).
+
+    Notes
+    -----
+    Let DD^w the drawdown vector with a lagged window of size `w`:
+
+    .. math::
+
+        DD^w_t = \begin{cases}max(X_{t - w + 1:t}) - X_t
+                              \text{, if raw=True} \\
+                              1 - \frac{X_t}{max(X_{t - w + 1:t})}
+                              \text{, otherwise} \\
+        \end{cases}
+
+    Parameters
+    ----------
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Time-series of prices, performances or index. Must be positive values.
+    w : int, optional
+        Size of the lagged window of the rolling function, must be positive. If
+        ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is None.
+    raw : bool, optional
+        - If True then compute the raw drawdown.
+        - Else (default) compute the drawdown in percentage.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
+
+    Returns
+    -------
+    np.ndarray[dtype, ndim=1 or 2]
+        Series of drawdown for each series.
+
+    References
+    ----------
+    .. [5] https://en.wikipedia.org/wiki/Drawdown_(economics)
+
+    Examples
+    --------
+    >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
+    >>> roll_drawdown(X)
+    array([0. , 0. , 0.2, 0. , 0. , 0.5])
+    >>> roll_drawdown(X.reshape([6, 1])).T
+    array([[0. , 0. , 0.2, 0. , 0. , 0.5]])
+    >>> roll_drawdown(X, raw=True)
+    array([ 0.,  0., 20.,  0.,  0., 80.])
+
+    See Also
+    --------
+    mdd, calmar, sharpe, roll_mdd
+
+    """
+    return _roll_drawdown(X, w, raw)
+
+
+def _roll_drawdown(X, w, raw):
+    if (X[0] == 0).any() and not raw:
+
+        warn('Cannot compute drawdown in percentage without initial values \
+            X[0] strictly positive.')
+        raw = True
+
+    if len(X.shape) == 2:
+
+        return np.asarray(roll_drawdown_cy_2d(X, int(w), int(raw)))
+
+    return np.asarray(roll_drawdown_cy_1d(X, int(w), int(raw)))
+
+
+@WrapperArray('dtype', 'axis', 'window')
+def roll_mad(X, w=None, axis=0, dtype=None):
+    """ Compute rolling Mean Absolut Deviation for each `X`' series.
 
     Compute the moving average of the absolute value of the distance to the
     moving average [6]_.
@@ -1021,8 +1103,9 @@ def roll_mad(X, win=0, axis=0, dtype=None):
     ----------
     X : np.ndarray[dtype, ndim=1 or 2]
         Time series (price, performance or index).
-    win : int, optional
-        Window size, default is 0.
+    w : int, optional
+        Size of the lagged window of the rolling function, must be positive. If
+        ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is None.
     axis : {0, 1}, optional
         Axis along wich the computation is done. Default is 0.
     dtype : np.dtype, optional
@@ -1045,7 +1128,7 @@ def roll_mad(X, win=0, axis=0, dtype=None):
     array([ 0.        , 15.        , 11.11111111, 12.5       , 20.8       ,
            20.        ])
     >>> X = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
-    >>> roll_mad(X, win=3, dtype=np.float64)
+    >>> roll_mad(X, w=3, dtype=np.float64)
     array([ 0.        , 20.        , 13.33333333, 13.33333333, 26.66666667,
            26.66666667])
 
@@ -1054,18 +1137,18 @@ def roll_mad(X, win=0, axis=0, dtype=None):
     mad
 
     """
-    if win < 2:
-        win = X.shape[0]
-
+    # if win < 2:
+    #    win = X.shape[0]
     if len(X.shape) == 2:
 
-        return np.asarray(roll_mad_cy_2d(X, int(win)))
+        return np.asarray(roll_mad_cy_2d(X, w))
 
-    return np.asarray(roll_mad_cy_1d(X, int(win)))
+    return np.asarray(roll_mad_cy_1d(X, w))
 
 
-def roll_mdd(X):
-    """ Compute the rolling maximum drwdown.
+@WrapperArray('dtype', 'axis', 'window')
+def roll_mdd(X, w=None, raw=False, axis=0, dtype=None):
+    """ Compute the rolling maximum drawdown for each `X`' series.
 
     Where drawdown is the measure of the decline from a historical peak in
     some variable [5]_ (typically the cumulative profit or total open equity
@@ -1073,16 +1156,21 @@ def roll_mdd(X):
 
     Parameters
     ----------
-    X : np.ndarray[np.float64, ndim=1]
+    X : np.ndarray[dtype, ndim=1 or 2]
         Time series (price, performance or index).
-    win : int, optional /! NOT YET WORKING /!
-        Size of the rolling window. If less of two, rolling Max DrawDown is
-        compute on all the past. Default is 0.
+    w : int, optional
+        Size of the lagged window of the rolling function, must be positive. If
+        ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is None.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    np.ndrray[np.float64, ndim=1]
-        Series of rolling Maximum DrawDown.
+    np.ndrray[dtype, ndim=1 or 2]
+        Series of rolling maximum drawdown for each series.
 
     References
     ----------
@@ -1091,7 +1179,7 @@ def roll_mdd(X):
     Examples
     --------
     >>> X = np.array([70, 100, 80, 120, 160, 80])
-    >>> roll_mdd(X)
+    >>> roll_mdd(X, dtype=np.float64)
     array([0. , 0. , 0.2, 0.2, 0.2, 0.5])
 
     See Also
@@ -1099,9 +1187,9 @@ def roll_mdd(X):
     mdd, roll_calmar, roll_sharpe, drawdown
 
     """
-    X = np.asarray(X, dtype=np.float64).flatten()
+    dd = _roll_drawdown(X, w, raw)
 
-    return roll_mdd_cy(X)
+    return np.maximum.accumulate(dd, axis=axis)
 
 
 def roll_sharpe(X, period=252, win=0, cap=True):
