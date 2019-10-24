@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-10-11 10:10:43
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-23 17:20:46
+# @Last modified time: 2019-10-24 19:11:46
 
 """ Some wrappers functions. """
 
@@ -92,22 +92,21 @@ def wrap_lags(func):
 def wrap_window(func):
     """ Check if the lagged window `w` is available for `X` array. """
     @wraps(func)
-    def check_window(X, w=None, axis=0, **kwargs):
+    def check_window(X, w=None, **kwargs):
         if w == 0 or w is None:
-            w = X.shape[axis]
+            w = X.shape[0]
 
         elif w < 0:
+
             raise ValueError('lagged window of size {} is not available, \
                 must be positive.'.format(w))
 
-        elif w > X.shape[axis]:
-            warn('lagged window of size {} is out of bounds for axis {} \
-                with size {}'.format(
-                w, axis, X.shape[axis]
-            ))
-            w = X.shape[axis]
+        elif w > X.shape[0]:
+            warn('lagged window of size {} is out of bounds with time axis \
+                of size {}'.format(w, X.shape[0]))
+            w = X.shape[0]
 
-        return func(X, w=int(w), axis=axis, **kwargs)
+        return func(X, w=int(w), **kwargs)
 
     return check_window
 
@@ -130,20 +129,45 @@ def wrap_null(func):
     @wraps(func)
     def check_null(X, *args, **kwargs):
         if (X == 0).any():
+
             raise ValueError('null value in X is not allowed.')
 
         return func(X, *args, **kwargs)
+
     return check_null
 
 
+def wrap_ddof(func):
+    """ Check if ddof is not greater then the number of timeframe. """
+    @wraps(func)
+    def check_ddof(X, *args, ddof=0, **kwargs):
+        if ddof >= X.shape[0]:
+            msg_prefix = 'with degree of freedom {}'.format(ddof)
+
+            raise ArraySizeError(X.shape[0], msg_prefix=msg_prefix)
+
+            raise ValueError(
+                "degree of freedom {} is greater than size {} of X".format(
+                    ddof, X.shape[0]
+                )
+            )
+
+        return func(X, *args, ddof=ddof, **kwargs)
+
+    return check_ddof
+
+
 class WrapperArray:
-    """ Object to wrap numpy arrays.
+    """ Object to wrap function that handle numpy arrays.
 
     This object mix several wrapper functions.
 
     Parameters
     ----------
-    *args : {'dtype', 'axis', 'lags'}
+    *args : {'dtype', 'axis', 'lags', 'window', 'null', 'ddof', 'keepdims'}
+        Wrapper functions.
+    **kwargs
+        Keyword arguments to pass to wrapper functions.
 
     """
 
@@ -152,8 +176,8 @@ class WrapperArray:
         'axis': wrap_axis,
         'lags': wrap_lags,
         'window': wrap_window,
-        'expo': wrap_expo,
         'null': wrap_null,
+        'ddof': wrap_ddof,
     }
 
     def __init__(self, *args, **kwargs):
@@ -179,7 +203,9 @@ class WrapperArray:
         def wrap(X, *args, **kwargs):
             wrap_func = None
             kwargs = {**kwargs, **self.kw}
+
             for k, w in self.wrappers.items():
+
                 if wrap_func is None:
                     wrap_func = w(func)
 
