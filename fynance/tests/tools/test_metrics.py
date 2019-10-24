@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-10-23 12:31:27
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-23 21:13:41
+# @Last modified time: 2019-10-24 19:30:55
 
 """ Test metric functions. """
 
@@ -47,9 +47,15 @@ def test_annual_return(set_variables):
     assert a_1d.shape == ()
     assert a_2d.shape == (1,)
 
+    # test axis wrapper
     with pytest.raises(ArraySizeError) as execinfo:
         f(x_2d, axis=1)
     execinfo.match(r'1 .* 1 .* 2')
+
+    # test ddof wrapper
+    with pytest.raises(ArraySizeError) as execinfo:
+        f(x_2d, axis=0, ddof=7)
+    execinfo.match(r'7.*6')
 
 
 def test_annual_volatility(set_variables):
@@ -173,6 +179,10 @@ def test_sharpe(set_variables):
     with pytest.raises(ArraySizeError) as execinfo:
         f(x_2d, axis=1)
     execinfo.match(r'1 .* 1 .* 2')
+
+    with pytest.raises(ArraySizeError) as execinfo:
+        f(x_2d, axis=0, ddof=7)
+    execinfo.match(r'7.*6')
 
     res = np.array([2.8867514, -0.4330127], dtype=np.float32)
     #assert (f(x_2d.reshape([3, 2]), period=3, dtype=np.float32) == res).all()
