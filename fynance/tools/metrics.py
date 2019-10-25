@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-24 19:35:07
+# @Last modified time: 2019-10-25 14:33:13
 
 """ Metric functons used in financial analysis. """
 
@@ -30,9 +30,10 @@ from fynance.tools.momentums import _sma, _ema, _wma, _smstd, _emstd, _wmstd
 
 __all__ = [
     'accuracy', 'annual_return', 'annual_volatility', 'calmar',
-    'diversified_ratio', 'drawdown', 'mad', 'mdd', 'roll_calmar', 'roll_mad',
-    'roll_mdd', 'roll_sharpe', 'roll_z_score', 'sharpe', 'perf_index',
-    'perf_returns', 'z_score',
+    'diversified_ratio', 'drawdown', 'mad', 'mdd', 'roll_annual_return',
+    'roll_annual_volatility', 'roll_calmar', 'roll_mad', 'roll_mdd',
+    'roll_sharpe', 'roll_z_score', 'sharpe', 'perf_index', 'perf_returns',
+    'z_score',
 ]
 
 _handler_ma = {'s': _sma, 'w': _wma, 'e': _ema}
@@ -159,7 +160,7 @@ def annual_return(X, period=252, axis=0, dtype=None, ddof=0):
         raise ValueError("degree of freedom {} is greater than size {} \
             of X in axis {}".format(ddof, X.shape[axis], axis))
 
-    return _annual_return(X, period=period, ddof=ddof)
+    return _annual_return(X, period, ddof)
 
 
 def _annual_return(X, period, ddof):
@@ -195,8 +196,8 @@ def annual_volatility(X, period=252, log=True, axis=0, dtype=None, ddof=0):
 
     .. math::
 
-        annualVolatility = \sqrt{period \times Var_t(R)} \\
-        \text{where, }R =
+        annualVolatility = \sqrt{period \times Var(R_{1:T})} \\
+        \text{where, }R_1 = 0 \text{ and } R_{2:T} =
         \begin{cases}ln(\frac{X_{2:T}}{X_{1:T-1}}) \text{, if log=True}\\
                     \frac{X_{2:T}}{X_{1:T-1}} - 1 \text{, otherwise} \\
         \end{cases}
@@ -234,8 +235,8 @@ def annual_volatility(X, period=252, log=True, axis=0, dtype=None, ddof=0):
     Assume series of monthly prices:
 
     >>> X = np.array([100, 110, 105, 110, 120, 108]).astype(np.float64)
-    >>> print(round(annual_volatility(X, period=12, log=True, ddof=1), 6))
-    0.27319
+    >>> annual_volatility(X, period=12, log=True, ddof=1)
+    0.2731896268610321
     >>> annual_volatility(X.reshape([6, 1]), period=12, log=False)
     array([0.24961719])
 
@@ -244,6 +245,10 @@ def annual_volatility(X, period=252, log=True, axis=0, dtype=None, ddof=0):
     mdd, drawdown, sharpe, annual_return
 
     """
+    return _annual_volatility(X, period, log, axis, ddof)
+
+
+def _annual_volatility(X, period, log, axis, ddof):
     R = np.zeros(X.shape)
 
     if log:
@@ -269,7 +274,7 @@ def calmar(X, raw=False, period=252, axis=0, dtype=None, ddof=0):
     .. math::
 
         calmarRatio = \frac{annualReturn}{MaxDD} \\
-        annualReturn = \frac{X_T}{X_1}^{\frac{period}{T - 1}} - 1 \\
+        annualReturn = \frac{X_T}{X_1}^{\frac{period}{T}} - 1 \\
         maxDD = max(DD) \\
         \text{where, } DD_t =
         \begin{cases}max(X_{1:t}) - X_t \text{, if raw=True} \\
@@ -391,6 +396,7 @@ def drawdown(X, raw=False, axis=0, dtype=None):
 
     .. math::
 
+        \forall t \in [1:T],
         DD_t = \begin{cases}max(X_{1:t}) - X_t \text{, if raw=True} \\
                             1 - \frac{X_t}{max(X_{1:t})} \text{, otherwise} \\
         \end{cases}
@@ -504,7 +510,7 @@ def mdd(X, raw=False, axis=0, dtype=None):
     .. math::
 
         maxDD = max(DD) \\
-        \text{where, } DD_t =
+        \text{where, } \forall t \in [1:T], DD_t =
         \begin{cases}max(X_{1:t}) - X_t \text{, if raw=True} \\
                      1 - \frac{X_t}{max(X_{1:t})} \text{, otherwise} \\
         \end{cases}
@@ -665,20 +671,29 @@ def perf_strat(underlying, signals=None, log=False, base=100.,
 
 
 @WrapperArray('dtype', 'axis', 'null', 'ddof', min_size=2)
-def sharpe(X, period=252, log=False, axis=0, dtype=None, ddof=0):
+def sharpe(X, rf=0, period=252, log=False, axis=0, dtype=None, ddof=0):
     r""" Compute the Sharpe ratio [7]_ for each `X`' series.
 
     Notes
     -----
-    It is computed as the total return over the volatility (we assume no
-    risk-free rate) such that:
+    It is computed as the annualized expected returns (:func:`~annual_return`)
+    minus the risk-free rate (noted :math:`rf`) over the annualized volatility
+    of returns (:func:`~annual_volatility`) such that:
 
-    .. math:: \text{Sharpe ratio} = \frac{E(r)}{\sqrt{Var(r)}}
+    .. math::
+
+        sharpeRatio = \frac{E(R) - rf}{\sqrt{period \times Var(R)}} \\
+        \text{where, }R_1 = 0 \text{ and } R_{2:T} =
+        \begin{cases}ln(\frac{X_{2:T}}{X_{1:T-1}}) \text{, if log=True}\\
+                    \frac{X_{2:T}}{X_{1:T-1}} - 1 \text{, otherwise} \\
+        \end{cases}
 
     Parameters
     ----------
     X : np.ndarray[dtype, ndim=1 or 2]
         Time-series of prices, performances or index.
+    rf : float, optional
+        Means the annualized risk-free rate, default is 0.
     period : int, optional
         Number of period per year, default is 252 (trading days).
     log : bool, optional
@@ -709,32 +724,19 @@ def sharpe(X, period=252, log=False, axis=0, dtype=None, ddof=0):
 
     >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
     >>> sharpe(X, period=12)
-    0.22494843872918127
+    0.24475518072327812
     >>> sharpe(X.reshape([6, 1]), period=12)
-    array([0.22494844])
+    array([0.24475518])
 
     See Also
     --------
     mdd, calmar, drawdown, roll_sharpe
 
     """
-    # ret = np.float_power(X[-1] / X[0], period / X.shape[0]) - 1.
-    # vol = np.sqrt(period) * np.std(X[1:] / X[:-1] - 1)
+    ret = _annual_return(X, period, ddof)
+    vol = _annual_volatility(X, period, log, axis, ddof)
 
-    # return ret / vol
-    # return ret / annual_volatility(X, period=period, log=log, dof=dof)
-    # TODO : check efficiency of cython function
-    #        append risk free rate
-    sharpe_func = log_sharpe_cy if log else sharpe_cy
-
-    if len(X.shape) == 2:
-        output = np.zeros(X.shape[1])
-        for i in range(X.shape[1]):
-            output[i] = sharpe_func(X[:, i], float(period))
-
-        return output
-
-    return sharpe_func(X, float(period))
+    return (ret - rf) / vol
 
 
 @WrapperArray('dtype', 'axis', 'window')
@@ -791,6 +793,7 @@ def z_score(X, w=0, kind='s', axis=0, dtype=None):
     roll_z_score, mdd, calmar, drawdown, sharpe
 
     """
+    # TODO : make a more efficient function
     if kind == 'e':
         w = 1 - 2 / (1 + w)
 
@@ -811,8 +814,8 @@ def z_score(X, w=0, kind='s', axis=0, dtype=None):
 # TODO : rolling diversified ratio
 
 
-@WrapperArray('dtype', 'axis')
-def roll_annual_return(X, period=252, axis=0, dtype=None):
+@WrapperArray('dtype', 'axis', 'ddof', min_size=2)
+def roll_annual_return(X, period=252, axis=0, dtype=None, ddof=0):
     r""" Compute rolling compouned annual returns of each `X`' series.
 
     The annualised return [1]_ is the process of converting returns on a whole
@@ -824,8 +827,8 @@ def roll_annual_return(X, period=252, axis=0, dtype=None):
 
     .. math::
 
-        \forall t \in [0: T],
-        annualReturn_t = \frac{X_t}{X_0}^{\frac{period}{t - 1}} - 1
+        \forall t \in [1: T],
+        annualReturn_t = \frac{X_t}{X_1}^{\frac{period}{t}} - 1
 
     Parameters
     ----------
@@ -838,6 +841,10 @@ def roll_annual_return(X, period=252, axis=0, dtype=None):
     dtype : np.dtype, optional
         The type of the output array.  If `dtype` is not given, infer the data
         type from `X` input.
+    ddof : int, optional
+        Means Delta Degrees of Freedom, the divisor used in calculations is
+        ``t - ddof``, where ``t`` represents the number of elements in time
+        axis. Default is 0.
 
     Returns
     -------
@@ -869,10 +876,10 @@ def roll_annual_return(X, period=252, axis=0, dtype=None):
     """
     # TODO : append a rolling lagged window parameter
     #        cython function (if it's more efficient)
-    return _roll_annual_return(X, period=period)
+    return _roll_annual_return(X, period, ddof)
 
 
-def _roll_annual_return(X, period):
+def _roll_annual_return(X, period, ddof):
     if (X[0] == 0).any():
 
         raise ValueError('initial value X[0] cannot be null.')
@@ -884,17 +891,18 @@ def _roll_annual_return(X, period):
         raise ValueError('all values of X must be of the same sign.')
 
     T = X.shape[0]
-    arange = np.arange(1, T, dtype=np.float64)
+    power = period / np.arange(1, T - ddof, dtype=np.float64)
     sign = np.sign(X[0])
 
     anu_ret = np.zeros(X.shape)
-    anu_ret[1:] = sign * np.float_power(cum_ret[1:], period / arange) - 1.
+    anu_ret[ddof + 1:] = sign * np.float_power(cum_ret[ddof + 1:], power) - 1.
 
     return anu_ret
 
 
 @WrapperArray('dtype', 'axis', 'null')
-def roll_annual_volatility(X, period=252, log=True, axis=0, dtype=None):
+def roll_annual_volatility(X, period=252, log=True, axis=0, dtype=None,
+                           ddof=0):
     r""" Compute the annualized volatility of each `X`' series.
 
     In finance, volatility is the degree of variation of a trading price
@@ -907,10 +915,11 @@ def roll_annual_volatility(X, period=252, log=True, axis=0, dtype=None):
 
     .. math::
 
-        annualVolatility = \sqrt{period \times Var_t(R)} \\
-        \text{where, }R =
-        \begin{cases}ln(\frac{X_{1:T}}{X_{0:T-1}}) \text{, if log=True}\\
-                    \frac{X_{1:T}}{X_{0:T-1}} - 1 \text{, otherwise} \\
+        \forall t \in [1, T],
+        annualVolatility_t = \sqrt{period \times Var(R_{1:t})} \\
+        \text{where, }R_1 = 0 \text{ and }R_{2:t} =
+        \begin{cases}ln(\frac{X_{2:t}}{X_{1:t-1}}) \text{, if log=True}\\
+                    \frac{X_{2:t}}{X_{1:t-1}} - 1 \text{, otherwise} \\
         \end{cases}
 
     Parameters
@@ -927,6 +936,10 @@ def roll_annual_volatility(X, period=252, log=True, axis=0, dtype=None):
     dtype : np.dtype, optional
         The type of the output array.  If `dtype` is not given, infer the data
         type from `X` input.
+    ddof : int, optional
+        Means Delta Degrees of Freedom, the divisor used in calculations is
+        ``t - ddof``, where ``t`` represents the number of elements in time
+        axis. Default is 0.
 
     Returns
     -------
@@ -942,16 +955,16 @@ def roll_annual_volatility(X, period=252, log=True, axis=0, dtype=None):
     Assume series of monthly prices:
 
     >>> X = np.array([100, 110, 105, 110, 120, 108]).astype(np.float64)
-    >>> roll_annual_volatility(X, period=12, log=True)
-    array([0.        , 0.        , 0.2456571 , 0.20380622, 0.1949842 ,
-           0.27232101])
+    >>> roll_annual_volatility(X, period=12, log=True, ddof=1)
+    array([0.        , 0.        , 0.25045537, 0.21110421, 0.2073765 ,
+           0.27318963])
     >>> roll_annual_volatility(X.reshape([6, 1]), period=12, log=False)
     array([[0.        ],
-           [0.        ],
-           [0.25193466],
-           [0.20836981],
-           [0.19959057],
-           [0.27217177]])
+           [0.17320508],
+           [0.21046976],
+           [0.18754434],
+           [0.19063685],
+           [0.24961719]])
 
     See Also
     --------
@@ -960,7 +973,6 @@ def roll_annual_volatility(X, period=252, log=True, axis=0, dtype=None):
     """
     # TODO : append a rolling lagged window parameter
     #        cython function
-    #        compute std with R[1: t + 1] or R[:t + 1]
     shape = X.shape
     T = shape[0]
     R = np.zeros(shape)
@@ -972,8 +984,8 @@ def roll_annual_volatility(X, period=252, log=True, axis=0, dtype=None):
     else:
         R[1:] = X[1:] / X[:-1] - 1.
 
-    for t in range(1, T):
-        anu_vol[t] = np.std(R[1:t + 1], axis=axis)
+    for t in range(ddof + 1, T):
+        anu_vol[t] = np.std(R[0:t + 1], axis=axis, ddof=ddof)
 
     return np.sqrt(period) * anu_vol
 
