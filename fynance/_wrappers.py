@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-10-11 10:10:43
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-24 19:11:46
+# @Last modified time: 2019-10-25 14:00:15
 
 """ Some wrappers functions. """
 
@@ -138,7 +138,7 @@ def wrap_null(func):
 
 
 def wrap_ddof(func):
-    """ Check if ddof is not greater then the number of timeframe. """
+    """ Check if ddof is not greater than the number of timeframe. """
     @wraps(func)
     def check_ddof(X, *args, ddof=0, **kwargs):
         if ddof >= X.shape[0]:
@@ -146,15 +146,28 @@ def wrap_ddof(func):
 
             raise ArraySizeError(X.shape[0], msg_prefix=msg_prefix)
 
-            raise ValueError(
-                "degree of freedom {} is greater than size {} of X".format(
-                    ddof, X.shape[0]
-                )
-            )
+        elif ddof < 0:
+
+            raise ValueError('ddof must be a positive value')
 
         return func(X, *args, ddof=ddof, **kwargs)
 
     return check_ddof
+
+
+def wrap_keepdims(func):
+    """ Check that output have same dimensions as input. """
+    # TODO :  check if it's working
+    @wraps(func)
+    def check_keepdims(X, *args, keepdims=False, **kwargs):
+        if keepdims:
+            out = func(X, *args, **kwargs)
+
+            return out.reshape(out.shape + (1,))
+
+        return func(X, *args, **kwargs)
+
+    return check_keepdims
 
 
 class WrapperArray:
