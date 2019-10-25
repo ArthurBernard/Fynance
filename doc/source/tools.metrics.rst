@@ -17,6 +17,8 @@ Some tools to compute financial metrics.
    fynance.tools.metrics.mdd
    fynance.tools.metrics.perf_index
    fynance.tools.metrics.perf_returns
+   fynance.tools.metrics.roll_annual_return
+   fynance.tools.metrics.roll_annual_volatility
    fynance.tools.metrics.roll_calmar
    fynance.tools.metrics.roll_mad
    fynance.tools.metrics.roll_sharpe
@@ -51,6 +53,10 @@ Vectorized functions
 ====================
 
 The following functions return a vector.
+
+.. autofunction:: roll_annual_return
+
+.. autofunction:: roll_annual_volatility
 
 .. autofunction:: drawdown
 
