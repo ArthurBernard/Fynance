@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-25 14:33:13
+# @Last modified time: 2019-10-26 15:08:49
 
 """ Metric functons used in financial analysis. """
 
@@ -682,7 +682,7 @@ def sharpe(X, rf=0, period=252, log=False, axis=0, dtype=None, ddof=0):
 
     .. math::
 
-        sharpeRatio = \frac{E(R) - rf}{\sqrt{period \times Var(R)}} \\
+        sharpeRatio = \frac{E(R) - rf}{\sqrt{period \times Var(R)}} \\ \\
         \text{where, }R_1 = 0 \text{ and } R_{2:T} =
         \begin{cases}ln(\frac{X_{2:T}}{X_{1:T-1}}) \text{, if log=True}\\
                     \frac{X_{2:T}}{X_{1:T-1}} - 1 \text{, otherwise} \\
@@ -823,11 +823,11 @@ def roll_annual_return(X, period=252, axis=0, dtype=None, ddof=0):
 
     Notes
     -----
-    The rolling annual compouned returns is computed such that:
+    The rolling annual compouned returns is computed such that :math:`\forall t
+    \in [1: T]`:
 
     .. math::
 
-        \forall t \in [1: T],
         annualReturn_t = \frac{X_t}{X_1}^{\frac{period}{t}} - 1
 
     Parameters
@@ -911,12 +911,12 @@ def roll_annual_volatility(X, period=252, log=True, axis=0, dtype=None,
 
     Notes
     -----
-    Let :math:`Var` the variance function of a random variable:
+    The rolling annualized volatility of returns is computed such that
+    :math:`\forall t \in [1, T]`:
 
     .. math::
 
-        \forall t \in [1, T],
-        annualVolatility_t = \sqrt{period \times Var(R_{1:t})} \\
+        annualVolatility_t = \sqrt{period \times Var(R_{1:t})} \\ \\
         \text{where, }R_1 = 0 \text{ and }R_{2:t} =
         \begin{cases}ln(\frac{X_{2:t}}{X_{1:t-1}}) \text{, if log=True}\\
                     \frac{X_{2:t}}{X_{1:t-1}} - 1 \text{, otherwise} \\
@@ -944,7 +944,7 @@ def roll_annual_volatility(X, period=252, log=True, axis=0, dtype=None,
     Returns
     -------
     dtype or np.ndarray([dtype, ndim=1 or 2])
-        Values of annualized volatility for each series.
+        Rolling annualized volatility for each series.
 
     References
     ----------
@@ -973,6 +973,10 @@ def roll_annual_volatility(X, period=252, log=True, axis=0, dtype=None,
     """
     # TODO : append a rolling lagged window parameter
     #        cython function
+    return _roll_annual_volatility(X, period, log, axis, ddof)
+
+
+def _roll_annual_volatility(X, period, log, axis, ddof):
     shape = X.shape
     T = shape[0]
     R = np.zeros(shape)
@@ -990,29 +994,47 @@ def roll_annual_volatility(X, period=252, log=True, axis=0, dtype=None,
     return np.sqrt(period) * anu_vol
 
 
-def roll_calmar(X, period=252.):
-    """ Compute the rolling Calmar ratio [3]_.
+@WrapperArray('dtype', 'axis', 'ddof', min_size=2)
+def roll_calmar(X, period=252., axis=0, dtype=None, ddof=0):
+    r""" Compute the rolling Calmar ratio [3]_.
 
-    It is the compouned annual return over the rolling Maximum DrawDown.
+    Notes
+    -----
+    It is the rolling compouned annual return
+    (:func:`~fynance.tools.metrics.roll_annual_return`) over the rolling
+    maximum drawdown (:func:`~fynance.tools.metrics.roll_mdd`). Let :math:`T`
+    the number of time observations, DD the vector of drawdown, :math:`\forall
+    t \in [1:T]`:
+
+    .. math::
+
+        calmarRatio_t = \frac{annualReturn_t}{MaxDD_t} \\
+        annualReturn_t = \frac{X_t}{X_1}^{\frac{period}{t}} - 1 \\
+        maxDD_t = max(DD_t) \\
+        \text{where, } DD_t =
+        \begin{cases}max(X_{1:t}) - X_t \text{, if raw=True} \\
+                     1 - \frac{X_t}{max(X_{1:t})} \text{, otherwise} \\
+        \end{cases}
 
     Parameters
     ----------
-    X : np.ndarray[np.float64, ndim=1]
-        Time series (price, performance or index).
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Time-series of price, performance or index.
     period : int, optional
-        Number of period per year, default is 252 (trading days).
-    win : int, optional /! NOT YET WORKING /!
-        Size of the rolling window. If less of two, rolling calmar is
-        compute on all the past. Default is 0.
+        Number of period per year, default is 252 (trading days per year).
     axis : {0, 1}, optional
         Axis along wich the computation is done. Default is 0.
     dtype : np.dtype, optional
         The type of the output array.  If `dtype` is not given, infer the data
         type from `X` input.
+    ddof : int, optional
+        Means Delta Degrees of Freedom, the divisor used in calculations is
+        ``t - ddof``, where ``t`` represents the number of elements in time
+        axis. Default is 0.
 
     Returns
     -------
-    np.ndarray[np.float64, ndim=1]
+    np.ndarray[dtype, ndim=1 or 2]
         Series of rolling Calmar ratio.
 
     References
@@ -1023,35 +1045,24 @@ def roll_calmar(X, period=252.):
     --------
     Assume a monthly series of prices:
 
-    >>> X = np.array([70, 100, 80, 120, 160, 80])
+    >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
     >>> roll_calmar(X, period=12)
-    array([ 0.        ,  0.        ,  3.52977926, 20.18950437, 31.35989887,
-            0.6122449 ])
+    array([ 0.        ,  0.        ,  6.14093617, 38.1820075 , 54.70845481,
+            0.75556505])
 
     See Also
     --------
     roll_mdd, roll_sharpe, calmar
 
     """
-    # Set variables
-    X = np.asarray(X, dtype=np.float64).flatten()
-    T = X.size
-    t = np.arange(1., T + 1., dtype=np.float64)
+    ret = _roll_annual_return(X, period, ddof)
+    dd = _drawdown(X, False)
+    mdd = np.maximum.accumulate(dd, axis=axis)
+    calmar = np.zeros(X.shape)
+    slice_bool = (mdd != 0)
+    calmar[slice_bool] = ret[slice_bool] / mdd[slice_bool]
 
-    # Compute roll Returns
-    ret = X / X[0]
-    annual_return = np.sign(ret) * np.float_power(
-        np.abs(ret), period / t, dtype=np.float64) - 1.
-
-    # Compute roll MaxDrawDown
-    roll_maxdd = roll_mdd_cy(X)
-
-    # Compute roll calmar
-    roll_cal = np.zeros([T])
-    not_null = roll_maxdd != 0.
-    roll_cal[not_null] = annual_return[not_null] / roll_maxdd[not_null]
-
-    return roll_cal
+    return calmar
 
 
 @WrapperArray('dtype', 'axis', 'window')
@@ -1176,8 +1187,6 @@ def roll_mad(X, w=None, axis=0, dtype=None):
     mad
 
     """
-    # if win < 2:
-    #    win = X.shape[0]
     if len(X.shape) == 2:
 
         return np.asarray(roll_mad_cy_2d(X, w))
