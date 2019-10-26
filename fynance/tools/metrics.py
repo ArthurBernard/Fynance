@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-26 15:08:49
+# @Last modified time: 2019-10-26 16:50:04
 
 """ Metric functons used in financial analysis. """
 
@@ -31,9 +31,9 @@ from fynance.tools.momentums import _sma, _ema, _wma, _smstd, _emstd, _wmstd
 __all__ = [
     'accuracy', 'annual_return', 'annual_volatility', 'calmar',
     'diversified_ratio', 'drawdown', 'mad', 'mdd', 'roll_annual_return',
-    'roll_annual_volatility', 'roll_calmar', 'roll_mad', 'roll_mdd',
-    'roll_sharpe', 'roll_z_score', 'sharpe', 'perf_index', 'perf_returns',
-    'z_score',
+    'roll_annual_volatility', 'roll_calmar', 'roll_drawdown', 'roll_mad',
+    'roll_mdd', 'roll_sharpe', 'roll_z_score', 'sharpe', 'perf_index',
+    'perf_returns', 'z_score',
 ]
 
 _handler_ma = {'s': _sma, 'w': _wma, 'e': _ema}
@@ -392,11 +392,10 @@ def drawdown(X, raw=False, axis=0, dtype=None):
 
     Notes
     -----
-    Let DD the drawdown vector:
+    Let DD the drawdown vector, :math:`\forall t \in [1:T]`:
 
     .. math::
 
-        \forall t \in [1:T],
         DD_t = \begin{cases}max(X_{1:t}) - X_t \text{, if raw=True} \\
                             1 - \frac{X_t}{max(X_{1:t})} \text{, otherwise} \\
         \end{cases}
@@ -509,8 +508,8 @@ def mdd(X, raw=False, axis=0, dtype=None):
 
     .. math::
 
-        maxDD = max(DD) \\
-        \text{where, } \forall t \in [1:T], DD_t =
+        maxDD = max(DD_{1:T}) \text{and, } \forall t \in [1:T] \\ \\
+        DD_t =
         \begin{cases}max(X_{1:t}) - X_t \text{, if raw=True} \\
                      1 - \frac{X_t}{max(X_{1:t})} \text{, otherwise} \\
         \end{cases}
@@ -1008,9 +1007,9 @@ def roll_calmar(X, period=252., axis=0, dtype=None, ddof=0):
 
     .. math::
 
-        calmarRatio_t = \frac{annualReturn_t}{MaxDD_t} \\
-        annualReturn_t = \frac{X_t}{X_1}^{\frac{period}{t}} - 1 \\
-        maxDD_t = max(DD_t) \\
+        calmarRatio_t = \frac{annualReturn_t}{MaxDD_t} \\ \\
+        \text{with, }annualReturn_t = \frac{X_t}{X_1}^{\frac{period}{t}} - 1
+        \text{ and }maxDD_t = max(DD_t) \\ \\
         \text{where, } DD_t =
         \begin{cases}max(X_{1:t}) - X_t \text{, if raw=True} \\
                      1 - \frac{X_t}{max(X_{1:t})} \text{, otherwise} \\
@@ -1240,28 +1239,52 @@ def roll_mdd(X, w=None, raw=False, axis=0, dtype=None):
     return np.maximum.accumulate(dd, axis=axis)
 
 
-def roll_sharpe(X, period=252, win=0, cap=True):
-    """ Compute rolling sharpe ratio [7]_.
+@WrapperArray('dtype', 'axis', 'ddof', min_size=2)
+def roll_sharpe(X, rf=0, period=252, win=0, cap=True, log=False, axis=0,
+                dtype=None, ddof=0):
+    r""" Compute rolling sharpe ratio [7]_.
 
-    It is the rolling compouned annual returns divided by rolling annual
-    volatility.
+    Notes
+    -----
+    It is computed as the rolling annualized expected returns
+    (:func:`~roll_annual_return`) minus the risk-free rate (noted :math:`rf`)
+    over the rolling annualized volatility of returns
+    (:func:`~roll_annual_volatility`) such that :math:`\forall t \in [1:T]`:
+
+    .. math::
+
+        sharpeRatio_t = \frac{E(R | R_{1:t}) - rf_t}{\sqrt{period \times
+        Var(R | R_{1:t})}} \\ \\
+        \text{where, }R_1 = 0 \text{ and } R_{2:T} =
+        \begin{cases}ln(\frac{X_{2:T}}{X_{1:T-1}}) \text{, if log=True}\\
+                    \frac{X_{2:T}}{X_{1:T-1}} - 1 \text{, otherwise} \\
+        \end{cases}
 
     Parameters
     ----------
-    X : np.ndarray[dtype=np.float64, ndim=1]
-        Financial series of prices or indexed values.
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Time-series of prices, performances or index.
+    rf : float or np.ndarray[dtype, ndim=1 or 2], optional
+        Means the annualized risk-free rate, default is 0. If an array is
+        passed, it must be of the same shape than ``X``.
     period : int, optional
-        Number of period in a year, default is 252 (trading days).
-    win : int, optional
-        Size of the rolling window. If less of two, rolling sharpe is
-        compute on all the past. Default is 0.
-    cap : bool, optional
-        Cap extram values (some time due to small size window), default
-        is True.
+        Number of period per year, default is 252 (trading days).
+    log : bool, optional
+        If true compute sharpe with the formula for log-returns, default
+        is False.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
+    ddof : int, optional
+        Means Delta Degrees of Freedom, the divisor used in calculations is
+        ``T - ddof``, where ``T`` represents the number of elements in time
+        axis. Default is 0.
 
     Returns
     -------
-    np.ndarray[np.float64, ndim=1]
+    np.ndarray[dtype, ndim=1 or 2]
         Serires of rolling Sharpe ratio.
 
     References
@@ -1272,84 +1295,76 @@ def roll_sharpe(X, period=252, win=0, cap=True):
     --------
     Assume a monthly series of prices:
 
-    >>> X = np.array([70, 100, 80, 120, 160, 80])
+    >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
     >>> roll_sharpe(X, period=12)
-    array([0.        , 0.        , 0.77721579, 3.99243019, 6.754557  ,
-           0.24475518])
+    array([ 0.        , 95.98127039,  1.35216177,  7.55040821, 11.78356403,
+            0.30204982])
 
     See Also
     --------
     roll_calmar, sharpe, roll_mdd
 
     """
-    # Setting inputs
-    X = np.asarray(X, dtype=np.float64).flatten()
-    T = X.size
-    t = np.arange(1., T + 1., dtype=np.float64)
+    ret = _roll_annual_return(X, period, ddof)
+    vol = _roll_annual_volatility(X, period, log, axis, ddof)
+    sharpe = np.zeros(X.shape)
+    slice_bool = (vol != 0)
 
-    if win < 2:
-        win = T
+    if isinstance(rf, float) or isinstance(rf, int):
+        _rf = rf
 
-    t[t > win] = win + 1.
-    ret = np.zeros([T], dtype=np.float64)
-    ret[1:] = X[1:] / X[:-1] - 1.
+    elif isinstance(rf, np.ndarray) and rf.shape[0] != X.shape[0]:
+        msg_pref = 'rf must be '
 
-    # Compute rolling perf
-    ma = X / X[0]
-    ma[win:] = X[win:] / X[: -win]
-    annual_return = np.sign(ma) * np.float_power(
-        np.abs(ma), period / t, dtype=np.float64) - 1.
+        raise ArraySizeError(X.shape[0], msg_prefix=msg_prefix)
 
-    # Compute rolling volatility
-    std = smstd_cy(np.asarray(ret).flatten(), lags=int(win))
-    vol = np.sqrt(period) * std
+    else:
+        _rf = rf[slice_bool]
 
-    # Compute sharpe
-    roll_shar = np.zeros([T])
-    not_null = vol != 0.
-    roll_shar[not_null] = annual_return[not_null] / vol[not_null]
+    sharpe[slice_bool] = (ret[slice_bool] - _rf) / vol[slice_bool]
 
-    # Cap extrem value
-    if cap:
-        if win == T:
-            win = T // 3
-
-        s = np.std(roll_shar[win:])
-        m = np.mean(roll_shar[win:])
-        xtrem_val = np.abs(roll_shar[:win]) > s * m
-        roll_shar[:win][xtrem_val] = 0.
-
-    return roll_shar
+    return sharpe
 
 
-def roll_z_score(X, w=0, kind='s'):
+@WrapperArray('dtype', 'axis', 'window')
+def roll_z_score(X, w=0, kind='s', axis=0, dtype=None):
     r""" Compute vector of rolling/moving Z-score function.
 
     Notes
     -----
     Compute for each observation the z-score function for a specific moving
-    average function such that:
+    average function such that :math:`\forall t \in [1:T]`:
 
-    .. math:: z = \frac{X - \mu_t}{\sigma_t}
+    .. math::
+
+        z_t = \frac{X_t - \mu_t}{\sigma_t}
 
     Where :math:`\mu_t` is the moving average and :math:`\sigma_t` is the
     moving standard deviation.
 
     Parameters
     ----------
-    X : np.ndarray[np.float64, ndim=1]
+    X : np.ndarray[dtype, ndim=1 or 2]
         Series of index, prices or returns.
-    kind_ma : {'ema', 'sma', 'wma'}
-        Kind of moving average/standard deviation, default is 'sma'.
-        - Exponential moving average if 'ema'.
-        - Simple moving average if 'sma'.
-        - Weighted moving average if 'wma'.
-    **kwargs
-        Any parameters for the moving average function.
+    w : int, optional
+        Size of the lagged window of the moving averages, must be positive. If
+        ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is None.
+    kind : {'e', 's', 'w'}
+        - If 'e' then use exponential moving average, see
+          :func:`~fynance.tools.momentums.ema` for details.
+        - If 's' (default) then use simple moving average, see
+          :func:`~fynance.tools.momentums.sma` for details.
+        - If 'w' then use weighted moving average, see
+          :func:`~fynance.tools.momentums.wma` for details.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    np.ndarray[np.float64, ndim=1]
+    np.ndarray[dtype, ndim=1 or 2]
         Vector of Z-score at each period.
 
     Examples
