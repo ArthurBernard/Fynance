@@ -17,14 +17,19 @@ Some tools to compute financial metrics.
    fynance.tools.metrics.mdd
    fynance.tools.metrics.perf_index
    fynance.tools.metrics.perf_returns
+   fynance.tools.metrics.sharpe
+   fynance.tools.metrics.z_score
+
+.. autosummary::
+
    fynance.tools.metrics.roll_annual_return
    fynance.tools.metrics.roll_annual_volatility
    fynance.tools.metrics.roll_calmar
+   fynance.tools.metrics.roll_drawdown
    fynance.tools.metrics.roll_mad
+   fynance.tools.metrics.roll_mdd
    fynance.tools.metrics.roll_sharpe
    fynance.tools.metrics.roll_z_score
-   fynance.tools.metrics.sharpe
-   fynance.tools.metrics.z_score
 
 Scalar functions
 ================
@@ -66,7 +71,11 @@ The following functions return a vector.
 
 .. autofunction:: roll_calmar
 
+..autofunction:: roll_drawdown
+
 .. autofunction:: roll_mad
+
+.. autofunction:: roll_mdd
 
 .. autofunction:: roll_sharpe
 
