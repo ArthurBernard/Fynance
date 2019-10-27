@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-26 16:50:04
+# @Last modified time: 2019-10-27 10:46:36
 
 """ Metric functons used in financial analysis. """
 
@@ -16,6 +16,7 @@ import numpy as np
 
 # Internal packages
 from fynance._wrappers import WrapperArray
+from fynance._exceptions import ArraySizeError
 from fynance.tools.metrics_cy import *
 from fynance.tools.momentums_cy import smstd_cy
 from fynance.tools.momentums import _sma, _ema, _wma, _smstd, _emstd, _wmstd
@@ -196,11 +197,11 @@ def annual_volatility(X, period=252, log=True, axis=0, dtype=None, ddof=0):
 
     .. math::
 
-        annualVolatility = \sqrt{period \times Var(R_{1:T})} \\
-        \text{where, }R_1 = 0 \text{ and } R_{2:T} =
-        \begin{cases}ln(\frac{X_{2:T}}{X_{1:T-1}}) \text{, if log=True}\\
-                    \frac{X_{2:T}}{X_{1:T-1}} - 1 \text{, otherwise} \\
-        \end{cases}
+        annualVolatility = \sqrt{period \times Var(R_{1:T})}
+
+    Where, :math:`R_1 = 0` and :math:`R_{2:T} = \begin{cases}ln(\frac{X_{2:T}}
+    {X_{1:T-1}}) \text{, if log=True} \\ \frac{X_{2:T}}{X_{1:T-1}} - 1 \text{,
+    otherwise} \\ \end{cases}`
 
     Parameters
     ----------
@@ -273,13 +274,14 @@ def calmar(X, raw=False, period=252, axis=0, dtype=None, ddof=0):
 
     .. math::
 
-        calmarRatio = \frac{annualReturn}{MaxDD} \\
-        annualReturn = \frac{X_T}{X_1}^{\frac{period}{T}} - 1 \\
-        maxDD = max(DD) \\
-        \text{where, } DD_t =
-        \begin{cases}max(X_{1:t}) - X_t \text{, if raw=True} \\
-                     1 - \frac{X_t}{max(X_{1:t})} \text{, otherwise} \\
-        \end{cases}
+        calmarRatio = \frac{annualReturn}{MDD}
+
+    With, :math:`annualReturn = \frac{X_T}{X_1}^{\frac{period}{T}} - 1` and
+    :math:`MDD = max(DD_{1:T})`.
+
+    Where, :math:`DD_t = \begin{cases}max(X_{1:t})
+    - X_t \text{, if raw=True} \\ 1 - \frac{X_t}{max(X_{1:t})} \text{,
+    otherwise} \\ \end{cases}`, :math:`\forall t \in [1:T]`.
 
     Parameters
     ----------
@@ -330,7 +332,7 @@ def calmar(X, raw=False, period=252, axis=0, dtype=None, ddof=0):
 
 @WrapperArray('axis')
 def diversified_ratio(X, W=None, std_method='std', axis=0):
-    r""" Compute diversification ratio of a portfolio.
+    """ Compute diversification ratio of a portfolio.
 
     Notes
     -----
@@ -338,9 +340,9 @@ def diversified_ratio(X, W=None, std_method='std', axis=0):
     portfolio's weighted average volatility to its overll volatility,
     developed by Choueifaty and Coignard [4]_.
 
-    .. math:: D(P) = \frac{P' \Sigma}{\sqrt{P'VP}}
+    .. math:: D(P) = \\frac{P' \\Sigma}{\\sqrt{P'VP}}
 
-    With :math:`\Sigma` vector of asset volatilities, :math:`P` vector of
+    With :math:`\\Sigma` vector of asset volatilities, :math:`P` vector of
     weights of asset of portfolio, and :math:`V` matrix of variance-covariance
     of these assets.
 
@@ -351,7 +353,7 @@ def diversified_ratio(X, W=None, std_method='std', axis=0):
         correspond to one series of prices.
     W : np.array[ndim=1 or 2, dtype=np.float64] of size N, optional
         Vector of weights, default is None it means it will equaly weighted.
-    std_method : str, optional /!\ Not yet implemented /!\
+    std_method : str, optional /!\\ Not yet implemented /!\
         Method to compute variance vector and covariance matrix.
     axis : {0, 1}, optional
         Axis along wich the computation is done. Default is 0.
@@ -363,7 +365,9 @@ def diversified_ratio(X, W=None, std_method='std', axis=0):
 
     References
     ----------
-    .. [4] tobam.fr/wp-content/uploads/2014/12/TOBAM-JoPM-Maximum-Div-2008.pdf
+    .. [4] `Choueifaty, Y., and Coignard, Y., 2008, Toward Maximum \
+    Diversification. <https://www.tobam.fr/wp-content/uploads/2014/12/\
+    TOBAM-JoPM-Maximum-Div-2008.pdf>`_
 
     """
     # TODO : check efficiency
@@ -508,11 +512,11 @@ def mdd(X, raw=False, axis=0, dtype=None):
 
     .. math::
 
-        maxDD = max(DD_{1:T}) \text{and, } \forall t \in [1:T] \\ \\
-        DD_t =
-        \begin{cases}max(X_{1:t}) - X_t \text{, if raw=True} \\
-                     1 - \frac{X_t}{max(X_{1:t})} \text{, otherwise} \\
-        \end{cases}
+        MDD = max(DD_{1:T})
+
+    Where, :math:`DD_t = \begin{cases}max(X_{1:t})
+    - X_t \text{, if raw=True} \\ 1 - \frac{X_t}{max(X_{1:t})} \text{,
+    otherwise} \\ \end{cases}`, :math:`\forall t \in [1:T]`.
 
     Parameters
     ----------
@@ -552,19 +556,25 @@ def mdd(X, raw=False, axis=0, dtype=None):
     return _drawdown(X, raw).max(axis=axis)
 
 
-def perf_index(X, base=100.):
+@WrapperArray('dtype', 'axis')
+def perf_index(X, base=100., axis=0, dtype=None):
     """ Compute performance of prices or index values along time axis.
 
     Parameters
     ----------
-    X : np.ndarray[ndim=1, dtype=np.float64]
+    X : np.ndarray[dtype, ndim=1 or 2]
         Time-series of prices or index values.
     base : float, optional
         Initial value for measure the performance, default is 100.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    np.ndarray[ndim=1, dtype=np.float64]
+    np.ndarray[dtype, ndim=1 or 2]
         Performances along time axis.
 
     See Also
@@ -581,21 +591,32 @@ def perf_index(X, base=100.):
     return base * X / X[0]
 
 
-def perf_returns(returns, log=False, base=100.):
+@WrapperArray('dtype', 'axis')
+def perf_returns(R, kind='raw', base=100., axis=0, dtype=None):
     """ Compute performance of returns along time axis.
 
     Parameters
     ----------
-    returns : np.ndarray[ndim=1, dtype=np.float64]
+    R : np.ndarray[dtype, ndim=1 or 2]
         Time-series of returns.
-    log : bool, optional
-        Considers returns as log-returns if True. Default is False.
+    kind : {'raw', 'log', 'pct'}
+        - If `'raw'` (default), then considers returns as following :math:`R_t
+          = X_t - X_{t-1}`.
+        - If `'log'`, then considers returns as following :math:`R_t =
+          log(\\frac{X_t}{X_{t-1}})`.
+        - If `'pct'`, then considers returns as following :math:`R_t =
+          \\frac{X_t - X_{t-1}}{X_{t-1}}`.
     base : float, optional
         Initial value for measure the performance, default is 100.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
-    np.ndarray[ndim=1, dtype=np.float64]
+    np.ndarray[dtype, ndim=1 or 2]
         Performances along time axis.
 
     See Also
@@ -604,38 +625,51 @@ def perf_returns(returns, log=False, base=100.):
 
     Examples
     --------
-    >>> returns = np.array([0., 20., 30., -10., 20., 20., -20.])
-    >>> perf_returns(returns, base=100., log=False)
+    >>> R = np.array([0., 20., 30., -10., 20., 20., -20.])
+    >>> perf_returns(R, base=100.)
     array([100., 120., 150., 140., 160., 180., 160.])
 
     """
-    X = np.cumsum(returns) + base
+    if kind.lower() == 'raw':
+        X = base + np.cumsum(R, axis=axis)
 
-    if log:
-        X = np.exp(X)
+    elif kind.lower() == 'log':
+        X = base * np.cumprod(np.exp(R), axis=axis)
 
-    return perf_index(X, base=base)
+    elif kind.lower() == 'pct':
+        X = base * np.cumprod(R + 1., axis=axis)
+
+    else:
+
+        raise ValueError("unkwnown kind {} of returns, only {'raw', 'log',"
+                         "'pct'} are supported".format(kind))
+
+    return perf_index(X, base=base, axis=axis, dtype=dtype)
 
 
-# TODO : finish perf strat metric (add reinvest option)
-def perf_strat(underlying, signals=None, log=False, base=100.,
-               reinvest=False):
+@WrapperArray('dtype', 'axis')
+def perf_strat(X, S=None, base=100., axis=0, dtype=None, reinvest=False):
     """ Compute the performance of a strategy.
 
     With respect to this underlying and signal series along time axis.
 
     Parameters
     ----------
-    underlying : np.ndarray[ndim=1, dtype=np.float64]
+    X : np.ndarray[dtype, ndim=1 or 2]
         Time-series of prices or index values.
-    signals : np.ndarray[ndim=1, dtype=np.float64]
-        Time-series of signals, if `None` considering a long position.
-    log : bool, optional
-        Considers underlying series as log values if True. Default is False.
+    S : np.ndarray[dtype, ndim=1 or 2]
+        Time-series of signals, if `None` considering a long only position.
+        ``S`` array must have the same shape than ``X``. Default is None.
     base : float, optional
         Initial value for measure the performance, default is 100.
     reinvest : bool, optional
-        Reinvest profit/loss if true.
+        - If True, then reinvest profit to compute the performance.
+        - Otherwise (default), compute the performance without reinvesting.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
 
     Returns
     -------
@@ -648,25 +682,30 @@ def perf_strat(underlying, signals=None, log=False, base=100.,
 
     Examples
     --------
-    >>> underlying = np.array([10., 12., 15., 14., 16., 18., 16.])
-    >>> signals = np.array([1., 1., 1., 0., 1., 1., -1.])
-    >>> perf_strat(underlying, signals, base=100.)
+    >>> X = np.array([10., 12., 15., 14., 16., 18., 16.])
+    >>> S = np.array([1., 1., 1., 0., 1., 1., -1.])
+    >>> perf_strat(X, S, base=100.)
     array([100., 120., 150., 150., 170., 190., 210.])
-
-    # >>> perf_strat(underlying, signals, base=100., reinvest=True)
-    # array([100., 120., ])
+    >>> perf_strat(X, S, base=100., reinvest=True)
+    array([100.        , 120.        , 150.        , 150.        ,
+           171.42857143, 192.85714286, 214.28571429])
 
     """
-    returns = np.zeros(underlying.shape)
-    underlying *= base / underlying[0]
-    returns[1:] = underlying[1:] - underlying[:-1]
+    if S is None:
+        S = np.ones(X)
 
-    if signals is None:
-        signals = np.ones(underlying.shape[0])
+    R = np.zeros(X.shape)
+    X = base * X / X[0]
 
-    X = returns * signals
+    if not reinvest:
+        R[1:] = X[1:] - X[:-1]
+        kind = 'raw'
 
-    return perf_returns(X, log=log, base=base)
+    elif reinvest:
+        R[1:] = X[1:] / X[:-1] - 1
+        kind = 'pct'
+
+    return perf_returns(R * S, base=base, kind=kind, axis=axis, dtype=dtype)
 
 
 @WrapperArray('dtype', 'axis', 'null', 'ddof', min_size=2)
@@ -682,10 +721,10 @@ def sharpe(X, rf=0, period=252, log=False, axis=0, dtype=None, ddof=0):
     .. math::
 
         sharpeRatio = \frac{E(R) - rf}{\sqrt{period \times Var(R)}} \\ \\
-        \text{where, }R_1 = 0 \text{ and } R_{2:T} =
-        \begin{cases}ln(\frac{X_{2:T}}{X_{1:T-1}}) \text{, if log=True}\\
-                    \frac{X_{2:T}}{X_{1:T-1}} - 1 \text{, otherwise} \\
-        \end{cases}
+
+    where, :math:`R_1 = 0` and :math:`R_{2:T} = \begin{cases}ln(\frac{X_{2:T}}
+    {X_{1:T-1}}) \text{, if log=True}\\ \frac{X_{2:T}}{X_{1:T-1}} - 1 \text{,
+    otherwise} \\ \end{cases}`
 
     Parameters
     ----------

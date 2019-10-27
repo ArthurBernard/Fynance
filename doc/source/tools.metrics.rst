@@ -17,6 +17,7 @@ Some tools to compute financial metrics.
    fynance.tools.metrics.mdd
    fynance.tools.metrics.perf_index
    fynance.tools.metrics.perf_returns
+   fynance.tools.metrics.perf_strat
    fynance.tools.metrics.sharpe
    fynance.tools.metrics.z_score
 
@@ -68,6 +69,8 @@ The following functions return a vector.
 .. autofunction:: perf_index
 
 .. autofunction:: perf_returns
+
+.. autofunction:: perf_strat
 
 .. autofunction:: roll_calmar
 
