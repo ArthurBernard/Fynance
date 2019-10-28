@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-27 10:46:36
+# @Last modified time: 2019-10-28 11:33:09
 
 """ Metric functons used in financial analysis. """
 
@@ -18,7 +18,6 @@ import numpy as np
 from fynance._wrappers import WrapperArray
 from fynance._exceptions import ArraySizeError
 from fynance.tools.metrics_cy import *
-from fynance.tools.momentums_cy import smstd_cy
 from fynance.tools.momentums import _sma, _ema, _wma, _smstd, _emstd, _wmstd
 
 # TODO:
@@ -673,7 +672,7 @@ def perf_strat(X, S=None, base=100., axis=0, dtype=None, reinvest=False):
 
     Returns
     -------
-    np.ndarray[ndim=1, dtype=np.float64]
+    np.ndarray[dtype, ndim=1 or 2]
         Performances along time axis.
 
     See Also
@@ -852,8 +851,8 @@ def z_score(X, w=0, kind='s', axis=0, dtype=None):
 # TODO : rolling diversified ratio
 
 
-@WrapperArray('dtype', 'axis', 'ddof', min_size=2)
-def roll_annual_return(X, period=252, axis=0, dtype=None, ddof=0):
+@WrapperArray('dtype', 'axis', 'window', 'ddof', min_size=2)
+def roll_annual_return(X, period=252, w=None, axis=0, dtype=None, ddof=0):
     r""" Compute rolling compouned annual returns of each `X`' series.
 
     The annualised return [1]_ is the process of converting returns on a whole
@@ -874,6 +873,9 @@ def roll_annual_return(X, period=252, axis=0, dtype=None, ddof=0):
         Time-series of price, performance or index.
     period : int, optional
         Number of period per year, default is 252 (trading days per year).
+    w : int, optional
+        Size of the lagged window of the rolling function, must be positive. If
+        ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is None.
     axis : {0, 1}, optional
         Axis along wich the computation is done. Default is 0.
     dtype : np.dtype, optional
@@ -914,15 +916,17 @@ def roll_annual_return(X, period=252, axis=0, dtype=None, ddof=0):
     """
     # TODO : append a rolling lagged window parameter
     #        cython function (if it's more efficient)
-    return _roll_annual_return(X, period, ddof)
+    return _roll_annual_return(X, period, w, ddof)
 
 
-def _roll_annual_return(X, period, ddof):
+def _roll_annual_return(X, period, w, ddof):
     if (X[0] == 0).any():
 
         raise ValueError('initial value X[0] cannot be null.')
 
-    cum_ret = X / X[0]
+    cum_ret = np.zeros(X.shape)
+    cum_ret[: w] = X[: w] / X[0]
+    cum_ret[w:] = X[w:] / X[: -w]
 
     if (cum_ret < 0).any():
 
@@ -938,9 +942,9 @@ def _roll_annual_return(X, period, ddof):
     return anu_ret
 
 
-@WrapperArray('dtype', 'axis', 'null')
-def roll_annual_volatility(X, period=252, log=True, axis=0, dtype=None,
-                           ddof=0):
+@WrapperArray('dtype', 'axis', 'null', 'window')
+def roll_annual_volatility(X, period=252, log=True, w=None, axis=0,
+                           dtype=None, ddof=0):
     r""" Compute the annualized volatility of each `X`' series.
 
     In finance, volatility is the degree of variation of a trading price
@@ -955,10 +959,10 @@ def roll_annual_volatility(X, period=252, log=True, axis=0, dtype=None,
     .. math::
 
         annualVolatility_t = \sqrt{period \times Var(R_{1:t})} \\ \\
-        \text{where, }R_1 = 0 \text{ and }R_{2:t} =
-        \begin{cases}ln(\frac{X_{2:t}}{X_{1:t-1}}) \text{, if log=True}\\
-                    \frac{X_{2:t}}{X_{1:t-1}} - 1 \text{, otherwise} \\
-        \end{cases}
+
+    Where, :math:`R_1 = 0` and :math:`R_{2:t} = \begin{cases}ln(\frac{X_{2:t}}
+    {X_{1:t-1}}) \text{, if log=True}\\ \frac{X_{2:t}}{X_{1:t-1}} - 1 \text{,
+    otherwise} \\ \end{cases}`.
 
     Parameters
     ----------
@@ -969,6 +973,9 @@ def roll_annual_volatility(X, period=252, log=True, axis=0, dtype=None,
     log : bool, optional
         - If True then logarithmic returns are computed.
         - Else then returns in percentage are computed.
+    w : int, optional
+        Size of the lagged window of the rolling function, must be positive. If
+        ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is None.
     axis : {0, 1}, optional
         Axis along wich the computation is done. Default is 0.
     dtype : np.dtype, optional
@@ -1011,10 +1018,10 @@ def roll_annual_volatility(X, period=252, log=True, axis=0, dtype=None,
     """
     # TODO : append a rolling lagged window parameter
     #        cython function
-    return _roll_annual_volatility(X, period, log, axis, ddof)
+    return _roll_annual_volatility(X, period, log, w, axis, ddof)
 
 
-def _roll_annual_volatility(X, period, log, axis, ddof):
+def _roll_annual_volatility(X, period, log, w, axis, ddof):
     shape = X.shape
     T = shape[0]
     R = np.zeros(shape)
@@ -1027,13 +1034,14 @@ def _roll_annual_volatility(X, period, log, axis, ddof):
         R[1:] = X[1:] / X[:-1] - 1.
 
     for t in range(ddof + 1, T):
-        anu_vol[t] = np.std(R[0:t + 1], axis=axis, ddof=ddof)
+        t0 = max(0, t - w)
+        anu_vol[t] = np.std(R[t0:t + 1], axis=axis, ddof=ddof)
 
     return np.sqrt(period) * anu_vol
 
 
-@WrapperArray('dtype', 'axis', 'ddof', min_size=2)
-def roll_calmar(X, period=252., axis=0, dtype=None, ddof=0):
+@WrapperArray('dtype', 'axis', 'window', 'ddof', min_size=2)
+def roll_calmar(X, period=252., w=None, axis=0, dtype=None, ddof=0):
     r""" Compute the rolling Calmar ratio [3]_.
 
     Notes
@@ -1046,13 +1054,12 @@ def roll_calmar(X, period=252., axis=0, dtype=None, ddof=0):
 
     .. math::
 
-        calmarRatio_t = \frac{annualReturn_t}{MaxDD_t} \\ \\
-        \text{with, }annualReturn_t = \frac{X_t}{X_1}^{\frac{period}{t}} - 1
-        \text{ and }maxDD_t = max(DD_t) \\ \\
-        \text{where, } DD_t =
-        \begin{cases}max(X_{1:t}) - X_t \text{, if raw=True} \\
-                     1 - \frac{X_t}{max(X_{1:t})} \text{, otherwise} \\
-        \end{cases}
+        calmarRatio_t = \frac{annualReturn_t}{MDD_t} \\ \\
+
+    With, :math:`annualReturn_t = \frac{X_t}{X_1}^{\frac{period}{t}} - 1` and
+    :math:`MDD_t = max(DD_t)` where :math:`DD_t =\begin{cases}max(X_{1:t}) -
+    X_t \text{, if raw=True} \\ 1 - \frac{X_t}{max(X_{1:t})} \text{,
+    otherwise} \\ \end{cases}`.
 
     Parameters
     ----------
@@ -1060,6 +1067,9 @@ def roll_calmar(X, period=252., axis=0, dtype=None, ddof=0):
         Time-series of price, performance or index.
     period : int, optional
         Number of period per year, default is 252 (trading days per year).
+    w : int, optional
+        Size of the lagged window of the rolling function, must be positive. If
+        ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is None.
     axis : {0, 1}, optional
         Axis along wich the computation is done. Default is 0.
     dtype : np.dtype, optional
@@ -1093,8 +1103,8 @@ def roll_calmar(X, period=252., axis=0, dtype=None, ddof=0):
     roll_mdd, roll_sharpe, calmar
 
     """
-    ret = _roll_annual_return(X, period, ddof)
-    dd = _drawdown(X, False)
+    ret = _roll_annual_return(X, period, w, ddof)
+    dd = _roll_drawdown(X, w, False)
     mdd = np.maximum.accumulate(dd, axis=axis)
     calmar = np.zeros(X.shape)
     slice_bool = (mdd != 0)
@@ -1273,14 +1283,16 @@ def roll_mdd(X, w=None, raw=False, axis=0, dtype=None):
     mdd, roll_calmar, roll_sharpe, drawdown
 
     """
-    dd = _roll_drawdown(X, w, raw)
+    if len(X.shape) == 2:
 
-    return np.maximum.accumulate(dd, axis=axis)
+        return np.asarray(roll_mdd_cy_2d(X, w, int(raw)))
+
+    return np.asarray(roll_mdd_cy_1d(X, w, int(raw)))
 
 
-@WrapperArray('dtype', 'axis', 'ddof', min_size=2)
-def roll_sharpe(X, rf=0, period=252, win=0, cap=True, log=False, axis=0,
-                dtype=None, ddof=0):
+@WrapperArray('dtype', 'axis', 'window', 'ddof', min_size=2)
+def roll_sharpe(X, rf=0, period=252, w=None, log=False, axis=0, dtype=None,
+                ddof=0):
     r""" Compute rolling sharpe ratio [7]_.
 
     Notes
@@ -1293,11 +1305,11 @@ def roll_sharpe(X, rf=0, period=252, win=0, cap=True, log=False, axis=0,
     .. math::
 
         sharpeRatio_t = \frac{E(R | R_{1:t}) - rf_t}{\sqrt{period \times
-        Var(R | R_{1:t})}} \\ \\
-        \text{where, }R_1 = 0 \text{ and } R_{2:T} =
-        \begin{cases}ln(\frac{X_{2:T}}{X_{1:T-1}}) \text{, if log=True}\\
-                    \frac{X_{2:T}}{X_{1:T-1}} - 1 \text{, otherwise} \\
-        \end{cases}
+        Var(R | R_{1:t})}}
+
+    Where, :math:`R_1 = 0` and :math:`R_{2:T} = \begin{cases}ln(\frac{X_{2:T}}
+    {X_{1:T-1}}) \text{, if log=True}\\ \frac{X_{2:T}}{X_{1:T-1}} - 1 \text{,
+    otherwise} \\ \end{cases}`.
 
     Parameters
     ----------
@@ -1308,6 +1320,9 @@ def roll_sharpe(X, rf=0, period=252, win=0, cap=True, log=False, axis=0,
         passed, it must be of the same shape than ``X``.
     period : int, optional
         Number of period per year, default is 252 (trading days).
+    w : int, optional
+        Size of the lagged window of the rolling function, must be positive. If
+        ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is None.
     log : bool, optional
         If true compute sharpe with the formula for log-returns, default
         is False.
@@ -1344,8 +1359,8 @@ def roll_sharpe(X, rf=0, period=252, win=0, cap=True, log=False, axis=0,
     roll_calmar, sharpe, roll_mdd
 
     """
-    ret = _roll_annual_return(X, period, ddof)
-    vol = _roll_annual_volatility(X, period, log, axis, ddof)
+    ret = _roll_annual_return(X, period, w, ddof)
+    vol = _roll_annual_volatility(X, period, log, w, axis, ddof)
     sharpe = np.zeros(X.shape)
     slice_bool = (vol != 0)
 
@@ -1353,7 +1368,7 @@ def roll_sharpe(X, rf=0, period=252, win=0, cap=True, log=False, axis=0,
         _rf = rf
 
     elif isinstance(rf, np.ndarray) and rf.shape[0] != X.shape[0]:
-        msg_pref = 'rf must be '
+        msg_prefix = 'rf must be '
 
         raise ArraySizeError(X.shape[0], msg_prefix=msg_prefix)
 
@@ -1366,7 +1381,7 @@ def roll_sharpe(X, rf=0, period=252, win=0, cap=True, log=False, axis=0,
 
 
 @WrapperArray('dtype', 'axis', 'window')
-def roll_z_score(X, w=0, kind='s', axis=0, dtype=None):
+def roll_z_score(X, w=None, kind='s', axis=0, dtype=None):
     r""" Compute vector of rolling/moving Z-score function.
 
     Notes
@@ -1421,9 +1436,6 @@ def roll_z_score(X, w=0, kind='s', axis=0, dtype=None):
     z_score, roll_mdd, roll_calmar, roll_mad, roll_sharpe
 
     """
-    if w == 0:
-        w = X.shape[0]
-
     if kind == 'e':
         w = 1 - 2 / (1 + w)
 
