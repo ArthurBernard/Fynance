@@ -4,8 +4,8 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-07-09 10:49:19
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-23 21:58:31
-# cython: language_level=3
+# @Last modified time: 2019-10-28 11:27:32
+# cython: language_level=3, wraparound=False, boundscheck=False
 
 # Built-in packages
 from libc.math cimport sqrt
@@ -23,9 +23,10 @@ from fynance.tools.momentums_cy import smstd_cy, sma_cy, sma_cy_1d, sma_cy_2d
 
 
 __all__ = [
-    'sharpe_cy', 'roll_sharpe_cy', 'log_sharpe_cy', 'mdd_cy', 'calmar_cy', 
-    'roll_mad_cy_1d', 'roll_mad_cy_2d', 'roll_mdd_cy', 'drawdown_cy_1d',
-    'drawdown_cy_2d', 'roll_drawdown_cy_1d', 'roll_drawdown_cy_2d'
+    'drawdown_cy_1d', 'drawdown_cy_2d', 
+    'roll_drawdown_cy_1d', 'roll_drawdown_cy_2d',
+    'roll_mad_cy_1d', 'roll_mad_cy_2d',
+    'roll_mdd_cy_1d', 'roll_mdd_cy_2d',
 ]
 
 
@@ -140,90 +141,6 @@ cpdef double [:, :] drawdown_cy_2d(double [:, :] X, int raw):
     return dd
 
 
-cpdef np.float64_t sharpe_cy(
-        np.ndarray[np.float64_t, ndim=1] series, 
-        np.float64_t period=252.
-    ):
-    """ Compute Sharpe ratio.
-
-    Function to compute the total return over the volatility, known as the 
-    Sharpe ratio.
-    
-    Parameters
-    ----------
-    series: numpy.ndarray(dim=1, dtype=float)
-        Prices of the index.
-    period: int (default: 252)
-        Number of period per year.
-
-    Returns
-    -------
-    np.float64
-        Value of Sharpe ratio.
-
-    """
-    if series[0] == 0.:
-        return 0. 
-    
-    cdef np.float64_t T = <double>len(series)
-    
-    if T == 0.:
-        return 0.
-    
-    # Compute compouned annual returns
-    cdef np.ndarray[np.float64_t, ndim=1] ret_vect = series[1:] / series[:-1] - 1.
-    cdef np.float64_t annual_return 
-    # TODO : `np.sign(series[-1] / series[0])` why i did this ? To fix
-    annual_return = np.sign(series[-1] / series[0]) * np.float_power(
-        np.abs(series[-1] / series[0]), <double>period / T, dtype=np.float64) - 1.
-    
-    # Compute annual volatility
-    cdef np.float64_t vol = sqrt(<double>period) * np.std(ret_vect, dtype=np.float64)
-    
-    if vol == 0.:
-        return 0.
-
-    return annual_return / vol
-
-
-cpdef np.float64_t log_sharpe_cy(
-        np.ndarray[np.float64_t, ndim=1] series, 
-        np.float64_t period=252.
-    ):
-    """ Compute Sharpe ratio.
-
-    Function to compute the total return over the volatility, known as the 
-    Sharpe ratio.
-    
-    Parameters
-    ----------
-    series: numpy.ndarray(dim=1, dtype=float)
-        Prices of the index.
-    period: int (default: 252)
-        Number of period per year.
-
-    Returns
-    -------
-    np.float64
-        Value of Sharpe ratio.
-
-    """
-    
-    cdef np.float64_t T = series.size 
-
-    # Compute compouned annual returns
-    cdef np.ndarray[np.float64_t, ndim=1] ret_vect = np.log(series[1:] / series[:-1], dtype=np.float64)
-    cdef np.float64_t annual_return = (<double>period / T) * np.sum(ret_vect, dtype=np.float64)
-    
-    # Compute annual volatility
-    cdef np.float64_t vol = sqrt(<double>period) * np.std(ret_vect, dtype=np.float64)
-
-    if vol == 0.:
-        return 0.
-
-    return annual_return / vol
-
-
 # =========================================================================== #
 #                               Rolling metrics                               #
 # =========================================================================== #
@@ -260,7 +177,7 @@ cpdef double [:] roll_drawdown_cy_1d(double [:] X, int w, int raw):
     """
     cdef int i, T = X.shape[0]
 
-    if T == w:
+    if w >= T:
 
         return drawdown_cy_1d(X, raw)
 
@@ -325,7 +242,7 @@ cpdef double [:, :] roll_drawdown_cy_2d(double [:, :] X, int w, int raw):
     """
     cdef int i, t, T = X.shape[0]
 
-    if T == w:
+    if w >= T:
 
         return drawdown_cy_2d(X, raw)
 
@@ -365,7 +282,7 @@ cpdef double [:, :] roll_drawdown_cy_2d(double [:, :] X, int w, int raw):
     return dd
 
 
-cpdef double [:] roll_mad_cy_1d(double [:] X, int win):
+cpdef double [:] roll_mad_cy_1d(double [:] X, int w):
     """ Compute rolling Mean Absolut Deviation for one-dimensional array.
 
     Compute the moving average of the absolute value of the distance to the
@@ -376,7 +293,7 @@ cpdef double [:] roll_mad_cy_1d(double [:] X, int win):
     X : memoryview.ndarray[ndim=1, dtype=double]
         Time series (price, performance or index). Can be a NumPy array, C
         array, Cython array, etc.
-    win : int
+    w : int
         Window size.
 
     Returns
@@ -394,7 +311,7 @@ cpdef double [:] roll_mad_cy_1d(double [:] X, int win):
 
     var = view.array(shape=(T,), itemsize=sizeof(double), format='d')
 
-    cdef double [:] ma = sma_cy_1d(X, win)
+    cdef double [:] ma = sma_cy_1d(X, w)
     cdef double [:] mad = var
     cdef double S
 
@@ -402,7 +319,7 @@ cpdef double [:] roll_mad_cy_1d(double [:] X, int win):
     while t < T:
         i = 0
         S = <double>0.
-        if t < win:
+        if t < w:
             while i <= t:
                 S += abs(X[i] - ma[t])
                 i += 1
@@ -410,18 +327,18 @@ cpdef double [:] roll_mad_cy_1d(double [:] X, int win):
             mad[t] = S / <double>(t + 1)
 
         else:
-            while i < win:
+            while i < w:
                 S += abs(X[t - i] - ma[t])
                 i += 1
 
-            mad[t] = S / <double>win
+            mad[t] = S / <double>w
 
         t += 1
 
     return mad
 
 
-cpdef double [:, :] roll_mad_cy_2d(double [:, :] X, int win):
+cpdef double [:, :] roll_mad_cy_2d(double [:, :] X, int w):
     """ Compute rolling Mean Absolut Deviation for two-dimensional array.
 
     Compute the moving average of the absolute value of the distance to the
@@ -432,7 +349,7 @@ cpdef double [:, :] roll_mad_cy_2d(double [:, :] X, int win):
     X : memoryview.ndarray[ndim=2, dtype=double]
         Time series (price, performance or index). Can be a NumPy array, C
         array, Cython array, etc.
-    win : int
+    w : int
         Window size.
 
     Returns
@@ -452,7 +369,7 @@ cpdef double [:, :] roll_mad_cy_2d(double [:, :] X, int win):
     N = X.shape[1]
     var = view.array(shape=(T, N), itemsize=sizeof(double), format='d')
 
-    cdef double [:, :] ma = sma_cy_2d(X, win)
+    cdef double [:, :] ma = sma_cy_2d(X, w)
     cdef double [:, :] mad = var
     cdef double S
 
@@ -461,7 +378,7 @@ cpdef double [:, :] roll_mad_cy_2d(double [:, :] X, int win):
         while t < T:
             i = 0
             S = <double>0.
-            if t < win:
+            if t < w:
                 while i <= t:
                     S += abs(X[i, n] - ma[t, n])
                     i += 1
@@ -469,11 +386,11 @@ cpdef double [:, :] roll_mad_cy_2d(double [:, :] X, int win):
                 mad[t, n] = S / <double>(t + 1)
 
             else:
-                while i < win:
+                while i < w:
                     S += abs(X[t - i, n] - ma[t, n])
                     i += 1
 
-                mad[t, n] = S / <double>win
+                mad[t, n] = S / <double>w
 
             t += 1
 
@@ -482,11 +399,8 @@ cpdef double [:, :] roll_mad_cy_2d(double [:, :] X, int win):
     return mad
 
 
-cpdef np.ndarray[np.float64_t, ndim=1] roll_mdd_cy(
-        np.ndarray[np.float64_t, ndim=1] series,
-        int win=0
-    ):
-    """ Compute rolling maximum drawdown.
+cpdef double [:] roll_mdd_cy_1d(double [:] X, int w, int raw):
+    """ Compute rolling maximum drawdown for one-dimensional array.
 
     Function to compute the maximum drwdown where drawdown is the measure of 
     the decline from a historical peak in some variable [1]_ (typically the 
@@ -494,56 +408,203 @@ cpdef np.ndarray[np.float64_t, ndim=1] roll_mdd_cy(
     
     Parameters
     ----------
-    series : np.ndarray[np.float64, ndim=1]
-        Time series (price, performance or index).
-    win : int (default 0)
-        Size of the rolling window. If less of two, 
-        rolling Max DrawDown is compute on all the past.
+    X : memoryview.ndarray[ndim=1, dtype=double]
+        Elements to compute the function. Can be a NumPy array, C array, Cython
+        array, etc.
+    w : int
+        Size of the lagged window.
+    raw : {0, 1}
+        If 1 compute the raw drawdown, otherwise compute drawdown in
+        percentage.
 
     Returns
     -------
-    np.ndarray[np.float64, ndim=1]
-        Series of rolling Maximum DrawDown.
+    memoryview.ndarray[ndim=1, dtype=double]
+        Series of MaxDrawDown. Can be converted to a NumPy array, C array,
+        Cython array, etc.
 
     References
     ----------
     .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
     
     """
-    cdef np.ndarray[np.float64_t, ndim=1] drawdowns
-    
-    # Compute DrawDown
-    drawdowns = drawdown_cy(series)
-    
-    if win <= 2:
+    cdef int i, T = X.shape[0]
 
-        return np.maximum.accumulate(drawdowns, dtype=np.float64)
+    var = view.array(shape=(T,), itemsize=sizeof(double), format='d')
 
+    cdef double [:] dd = roll_drawdown_cy_1d(X, w, raw)
+    cdef double [:] mdd = var
+    cdef double S
+    cdef int t = 0
 
-cpdef np.ndarray[np.float64_t, ndim=1] roll_sharpe_cy(
-        np.ndarray[np.float64_t, ndim=1] series,
-        np.float64_t period=252.,
-        int window=0
-    ):
-    """
-    Rolling sharpe
-    /! Not optimized /!
-    """
-    cdef int t, T = len(series)
-    cdef np.ndarray[np.float64_t, ndim=1] roll_s = np.zeros([T], dtype=np.float64)
-    
-    for t in range(1, T):
-        if window > t or window < 2:
-            roll_s[t] = sharpe_cy(series[:t + 1], period=period)
+    while t < T:
+        i = 1
+        S = dd[t]
+        if t < w:
+            while i < t:
+                S = max(S, dd[t - i])
+                i += 1
+
         else:
-            roll_s[t] = sharpe_cy(series[t - window: t + 1], period=period)
+            while i < w:
+                S = max(S, dd[t - i])
+                i += 1
 
-    return roll_s
+        mdd[t] = S
+        t += 1
+    
+    return mdd
+
+
+cpdef double [:, :] roll_mdd_cy_2d(double [:, :] X, int w, int raw):
+    """ Compute rolling maximum drawdown for two-dimensional array.
+
+    Function to compute the maximum drwdown where drawdown is the measure of 
+    the decline from a historical peak in some variable [1]_ (typically the 
+    cumulative profit or total open equity of a financial trading strategy). 
+    
+    Parameters
+    ----------
+    X : memoryview.ndarray[ndim=2, dtype=double]
+        Elements to compute the function. Can be a NumPy array, C array, Cython
+        array, etc.
+    w : int
+        Size of the lagged window.
+    raw : {0, 1}
+        If 1 compute the raw drawdown, otherwise compute drawdown in
+        percentage.
+
+    Returns
+    -------
+    memoryview.ndarray[ndim=2, dtype=double]
+        Series of MaxDrawDown. Can be converted to a NumPy array, C array,
+        Cython array, etc.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
+    
+    """
+    cdef int i, T = X.shape[0]
+    cdef int t, N = X.shape[1]
+
+    var = view.array(shape=(T, N), itemsize=sizeof(double), format='d')
+
+    cdef double [:, :] dd = roll_drawdown_cy_2d(X, w, raw)
+    cdef double [:, :] mdd = var
+    cdef double S
+    cdef int n = 0
+
+    while n < N:
+        t = 0
+        while t < T:
+            i = 1
+            S = dd[t, n]
+            if t < w:
+                while i < t:
+                    S = max(S, dd[t - i, n])
+                    i += 1
+
+            else:
+                while i < w:
+                    S = max(S, dd[t - i, n])
+                    i += 1
+
+            mdd[t, n] = S
+            t += 1
+
+        n += 1
+
+    return mdd
 
 
 # =========================================================================== #
-#                                 Old Script                                  #
+#                                 Old Scripts                                 #
 # =========================================================================== #
+
+
+cpdef np.float64_t sharpe_cy(
+        np.ndarray[np.float64_t, ndim=1] series, 
+        np.float64_t period=252.
+    ):
+    """ Compute Sharpe ratio.
+
+    Function to compute the total return over the volatility, known as the 
+    Sharpe ratio.
+    
+    Parameters
+    ----------
+    series: numpy.ndarray(dim=1, dtype=float)
+        Prices of the index.
+    period: int (default: 252)
+        Number of period per year.
+
+    Returns
+    -------
+    np.float64
+        Value of Sharpe ratio.
+
+    """
+    if series[0] == 0.:
+        return 0. 
+    
+    cdef np.float64_t T = <double>len(series)
+    
+    if T == 0.:
+        return 0.
+    
+    # Compute compouned annual returns
+    cdef np.ndarray[np.float64_t, ndim=1] ret_vect = series[1:] / series[:T-1] - 1.
+    cdef np.float64_t annual_return 
+    # TODO : `np.sign(series[-1] / series[0])` why i did this ? To fix
+    annual_return = np.sign(series[T-1] / series[0]) * np.float_power(
+        np.abs(series[T-1] / series[0]), <double>period / T, dtype=np.float64) - 1.
+    
+    # Compute annual volatility
+    cdef np.float64_t vol = sqrt(<double>period) * np.std(ret_vect, dtype=np.float64)
+    
+    if vol == 0.:
+        return 0.
+
+    return annual_return / vol
+
+
+cpdef np.float64_t log_sharpe_cy(
+        np.ndarray[np.float64_t, ndim=1] series, 
+        np.float64_t period=252.
+    ):
+    """ Compute Sharpe ratio.
+
+    Function to compute the total return over the volatility, known as the 
+    Sharpe ratio.
+    
+    Parameters
+    ----------
+    series: numpy.ndarray(dim=1, dtype=float)
+        Prices of the index.
+    period: int (default: 252)
+        Number of period per year.
+
+    Returns
+    -------
+    np.float64
+        Value of Sharpe ratio.
+
+    """
+    
+    cdef np.float64_t T = series.size 
+
+    # Compute compouned annual returns
+    cdef np.ndarray[np.float64_t, ndim=1] ret_vect = np.log(series[1:] / series[:T-1], dtype=np.float64)
+    cdef np.float64_t annual_return = (<double>period / T) * np.sum(ret_vect, dtype=np.float64)
+    
+    # Compute annual volatility
+    cdef np.float64_t vol = sqrt(<double>period) * np.std(ret_vect, dtype=np.float64)
+
+    if vol == 0.:
+        return 0.
+
+    return annual_return / vol
 
 
 cpdef np.ndarray[np.float64_t, ndim=1] roll_mad_cy(
@@ -670,7 +731,7 @@ cpdef np.float64_t calmar_cy(
     cdef np.float64_t ret, annual_return, max_dd, T = series.size
     
     # Compute compouned annual returns
-    ret = series[-1] / series[0]
+    ret = series[T-1] / series[0]
     annual_return = np.sign(ret) * np.float_power(
         np.abs(ret), period / T, dtype=np.float64) - 1.
     
@@ -681,3 +742,61 @@ cpdef np.float64_t calmar_cy(
         return 0.
 
     return annual_return / max_dd
+
+cpdef np.ndarray[np.float64_t, ndim=1] roll_mdd_cy(
+        np.ndarray[np.float64_t, ndim=1] series,
+        int win=0
+    ):
+    """ Compute rolling maximum drawdown.
+
+    Function to compute the maximum drwdown where drawdown is the measure of 
+    the decline from a historical peak in some variable [1]_ (typically the 
+    cumulative profit or total open equity of a financial trading strategy). 
+    
+    Parameters
+    ----------
+    series : np.ndarray[np.float64, ndim=1]
+        Time series (price, performance or index).
+    win : int (default 0)
+        Size of the rolling window. If less of two, 
+        rolling Max DrawDown is compute on all the past.
+
+    Returns
+    -------
+    np.ndarray[np.float64, ndim=1]
+        Series of rolling Maximum DrawDown.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
+    
+    """
+    cdef np.ndarray[np.float64_t, ndim=1] drawdowns
+    
+    # Compute DrawDown
+    drawdowns = drawdown_cy(series)
+    
+    if win <= 2:
+
+        return np.maximum.accumulate(drawdowns, dtype=np.float64)
+
+
+cpdef np.ndarray[np.float64_t, ndim=1] roll_sharpe_cy(
+        np.ndarray[np.float64_t, ndim=1] series,
+        np.float64_t period=252.,
+        int window=0
+    ):
+    """
+    Rolling sharpe
+    /! Not optimized /!
+    """
+    cdef int t, T = len(series)
+    cdef np.ndarray[np.float64_t, ndim=1] roll_s = np.zeros([T], dtype=np.float64)
+    
+    for t in range(1, T):
+        if window > t or window < 2:
+            roll_s[t] = sharpe_cy(series[:t + 1], period=period)
+        else:
+            roll_s[t] = sharpe_cy(series[t - window: t + 1], period=period)
+
+    return roll_s
