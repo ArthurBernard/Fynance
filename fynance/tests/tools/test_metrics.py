@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-10-23 12:31:27
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-29 12:08:33
+# @Last modified time: 2019-10-29 22:00:36
 
 """ Test metric functions. """
 
@@ -196,6 +196,15 @@ def test_roll_annual_return(set_variables):
     x_1d, x_2d = set_variables
     f = fy.annual_return
     roll_f = fy.roll_annual_return
-    a_1d = roll_f(x_1d, period=12, dtype=np.float32)
+    a_1d = roll_f(x_1d, period=12, dtype=np.float32, c=True)
+    for t in range(1, x_1d.size):
+        assert a_1d[t] == f(x_1d[: t + 1], period=12, dtype=np.float32)
+
+
+def test_roll_volatility_return(set_variables):
+    x_1d, x_2d = set_variables
+    f = fy.annual_volatility
+    roll_f = fy.roll_annual_volatility
+    a_1d = roll_f(x_1d, period=12, dtype=np.float32, c=True)
     for t in range(1, x_1d.size):
         assert a_1d[t] == f(x_1d[: t + 1], period=12, dtype=np.float32)
