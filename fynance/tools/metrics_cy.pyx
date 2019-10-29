@@ -4,11 +4,11 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-07-09 10:49:19
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-28 11:27:32
+# @Last modified time: 2019-10-29 12:30:36
 # cython: language_level=3, wraparound=False, boundscheck=False
 
 # Built-in packages
-from libc.math cimport sqrt
+from libc.math cimport sqrt, log
 
 # External packages
 from cython cimport view
@@ -16,14 +16,17 @@ import numpy as np
 cimport numpy as np
 
 # Local packages
-from fynance.tools.momentums_cy import smstd_cy, sma_cy, sma_cy_1d, sma_cy_2d
+from fynance.tools.momentums_cy import smstd_cy, sma_cy
+from fynance.tools.momentums_cy import sma_cy_1d, sma_cy_2d
 
 # TODO list:
-# - Append window size on rolling MDD
+# - roll_annual_return and roll_annual_volatility function
 
 
 __all__ = [
-    'drawdown_cy_1d', 'drawdown_cy_2d', 
+    'drawdown_cy_1d', 'drawdown_cy_2d',
+    'roll_annual_return_cy_1d', 'roll_annual_return_cy_2d',
+    'roll_annual_volatility_cy_1d',
     'roll_drawdown_cy_1d', 'roll_drawdown_cy_2d',
     'roll_mad_cy_1d', 'roll_mad_cy_2d',
     'roll_mdd_cy_1d', 'roll_mdd_cy_2d',
@@ -144,6 +147,174 @@ cpdef double [:, :] drawdown_cy_2d(double [:, :] X, int raw):
 # =========================================================================== #
 #                               Rolling metrics                               #
 # =========================================================================== #
+
+
+cpdef double [:] roll_annual_return_cy_1d(double [:] X, int p, int w, int d):
+    """ Compute the rolling annual return for an one-dimensional array.
+
+    Parameters
+    ----------
+    X : memoryview.ndarray[ndim=1, dtype=double]
+        Elements to compute the function. Can be a NumPy array, C array, Cython
+        array, etc.
+    p : int
+        Number of period per year.
+    w : int
+        Size of the lagged window.
+    d : int
+        Number degrees of freedom.
+
+    Returns
+    -------
+    memoryview.ndarray[ndim=1, dtype=double]
+        Series of annual return. Can be converted to a NumPy array, C array,
+        Cython array, etc.
+
+    """
+    cdef int t = 0, T = X.shape[0]
+
+    var = view.array(shape=(T,), itemsize=sizeof(double), format='d')
+
+    cdef double [:] ann_ret = var
+    cdef double R = <double>0, P = <double>0
+
+    while t < T:
+        if t < w:
+            R = X[t] / X[0]
+
+        else:
+            R = X[t] / X[t - w]
+
+        if t < d:
+            ann_ret[t] = <double>0
+
+        else:
+            P = <double>p / <double>(t - d + 1)
+            ann_ret[t] = R ** P - <double>1
+
+        t += 1
+
+    return ann_ret
+
+
+cpdef double [:, :] roll_annual_return_cy_2d(double [:, :] X, int p, int w, int d):
+    """ Compute the rolling annual return for an two-dimensional array.
+
+    Parameters
+    ----------
+    X : memoryview.ndarray[ndim=2, dtype=double]
+        Elements to compute the function. Can be a NumPy array, C array, Cython
+        array, etc.
+    p : int
+        Number of period per year.
+    w : int
+        Size of the lagged window.
+    d : int
+        Number degrees of freedom.
+
+    Returns
+    -------
+    memoryview.ndarray[ndim=2, dtype=double]
+        Series of annual return. Can be converted to a NumPy array, C array,
+        Cython array, etc.
+
+    """
+    cdef int t = 0, T = X.shape[0]
+    cdef int n = 0, N = X.shape[1]
+
+    var = view.array(shape=(T, N), itemsize=sizeof(double), format='d')
+
+    cdef double [:, :] ann_ret = var
+    cdef double R = <double>0, P = <double>0
+
+    while n < N:
+        t = 0
+        while t < T:
+            if t < w:
+                R = X[t, n] / X[0, n]
+
+            else:
+                R = X[t, n] / X[t - w, n]
+
+            if t < d:
+                ann_ret[t, n] = <double>0
+
+            else:
+                P = <double>p / <double>(t - d + 1)
+                ann_ret[t, n] = R ** P - <double>1
+
+            t += 1
+
+        n += 1
+
+    return ann_ret
+
+
+cpdef double [:] roll_annual_volatility_cy_1d(double [:] X, int p, int l, int w, int d):
+    """ Compute the rolling annual volatility for an one-dimensional array.
+
+    Parameters
+    ----------
+    X : memoryview.ndarray[ndim=1, dtype=double]
+        Elements to compute the function. Can be a NumPy array, C array, Cython
+        array, etc.
+    p : int
+        Number of period per year.
+    w : int
+        Size of the lagged window.
+    d : int
+        Number degrees of freedom.
+
+    Returns
+    -------
+    memoryview.ndarray[ndim=1, dtype=double]
+        Series of annual volatility. Can be converted to a NumPy array, C array,
+        Cython array, etc.
+
+    """
+    cdef int t = 1, T = X.shape[0]
+    cdef int t_w, _w
+
+    var = view.array(shape=(T,), itemsize=sizeof(double), format='d')
+
+    cdef double [:] ann_vol = var
+    cdef double [:] R = var
+    cdef double m, m2, S2, S, sub_R
+    S = <double>0
+    S2 = <double>0
+    ann_vol[0] = <double>0
+    R[0] = <double>0
+
+    while t < T:
+        if l != 0:
+            R[t] = X[t] / X[t - 1] - <double>1
+
+        else:
+            R[t] = log(X[t] / X[t - 1])
+
+        if t < w:
+            t_w = 0
+            _w = t + 1 - d
+            sub_R = <double>0
+
+        else:
+            t_w = t - w
+            _w = w - d
+            sub_R = R[t_w]
+
+        if t <= d:
+            ann_vol[t] = <double>0
+
+        else:
+            S += R[t] - sub_R
+            S2 += R[t] ** <double>2 - sub_R ** <double>2
+            m = S / <double>_w
+            m2 = S2 / <double>_w
+            ann_vol[t] = sqrt(<double>p * (m2 - m ** <double>2))
+
+        t += 1
+
+    return ann_vol
 
 
 cpdef double [:] roll_drawdown_cy_1d(double [:] X, int w, int raw):
