@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-28 11:33:09
+# @Last modified time: 2019-10-29 12:29:51
 
 """ Metric functons used in financial analysis. """
 
@@ -852,7 +852,7 @@ def z_score(X, w=0, kind='s', axis=0, dtype=None):
 
 
 @WrapperArray('dtype', 'axis', 'window', 'ddof', min_size=2)
-def roll_annual_return(X, period=252, w=None, axis=0, dtype=None, ddof=0):
+def roll_annual_return(X, period=252, w=None, axis=0, dtype=None, ddof=0, c=True):
     r""" Compute rolling compouned annual returns of each `X`' series.
 
     The annualised return [1]_ is the process of converting returns on a whole
@@ -899,23 +899,33 @@ def roll_annual_return(X, period=252, w=None, axis=0, dtype=None, ddof=0):
     --------
     Assume series of monthly prices:
 
-    >>> X = np.array([100, 110, 80, 120, 160, 105, 108]).astype(np.float64)
+    >>> X = np.array([100, 110, 80, 120, 160, 108]).astype(np.float64)
     >>> roll_annual_return(X, period=12)
-    array([ 0.        ,  2.13842838, -0.737856  ,  1.0736    ,  3.096     ,
-            0.12422779,  0.1664    ])
+    array([ 0.        ,  0.771561  , -0.5904    ,  0.728     ,  2.08949828,
+            0.1664    ])
     >>> X = np.array([[100, 101], [80, 81], [110, 108]]).astype(np.float64)
     >>> roll_annual_return(X, period=12, axis=1)
-    array([[ 0.        ,  0.12682503],
-           [ 0.        ,  0.16075452],
-           [ 0.        , -0.1976334 ]])
+    array([[ 0.        ,  0.06152015],
+           [ 0.        ,  0.07738318],
+           [ 0.        , -0.10425081]])
 
     See Also
     --------
     mdd, drawdown, sharpe, annual_volatility
 
     """
-    # TODO : append a rolling lagged window parameter
-    #        cython function (if it's more efficient)
+    if c:
+        if (X[0] == 0).any():
+
+            raise ValueError('initial value X[0] cannot be null.')
+
+        elif len(X.shape) == 2:
+
+            return np.asarray(roll_annual_return_cy_2d(X, period, w, ddof))
+
+        return np.asarray(roll_annual_return_cy_1d(X, period, w, ddof))
+
+    # TODO : cython function (if it's more efficient)
     return _roll_annual_return(X, period, w, ddof)
 
 
@@ -933,18 +943,22 @@ def _roll_annual_return(X, period, w, ddof):
         raise ValueError('all values of X must be of the same sign.')
 
     T = X.shape[0]
-    power = period / np.arange(1, T - ddof, dtype=np.float64)
+    power = period / np.arange(1, T - ddof + 1, dtype=np.float64)
+
+    if len(X.shape) == 2:
+        power = power.reshape([T, 1])
+
     sign = np.sign(X[0])
 
     anu_ret = np.zeros(X.shape)
-    anu_ret[ddof + 1:] = sign * np.float_power(cum_ret[ddof + 1:], power) - 1.
+    anu_ret[ddof:] = sign * np.float_power(cum_ret[ddof:], power) - 1.
 
     return anu_ret
 
 
 @WrapperArray('dtype', 'axis', 'null', 'window')
 def roll_annual_volatility(X, period=252, log=True, w=None, axis=0,
-                           dtype=None, ddof=0):
+                           dtype=None, ddof=0, c=False):
     r""" Compute the annualized volatility of each `X`' series.
 
     In finance, volatility is the degree of variation of a trading price
@@ -1000,7 +1014,7 @@ def roll_annual_volatility(X, period=252, log=True, w=None, axis=0,
     Assume series of monthly prices:
 
     >>> X = np.array([100, 110, 105, 110, 120, 108]).astype(np.float64)
-    >>> roll_annual_volatility(X, period=12, log=True, ddof=1)
+    >>> roll_annual_volatility(X, period=12, log=True, ddof=1, c=True)
     array([0.        , 0.        , 0.25045537, 0.21110421, 0.2073765 ,
            0.27318963])
     >>> roll_annual_volatility(X.reshape([6, 1]), period=12, log=False)
@@ -1016,8 +1030,12 @@ def roll_annual_volatility(X, period=252, log=True, w=None, axis=0,
     mdd, drawdown, sharpe, annual_return
 
     """
-    # TODO : append a rolling lagged window parameter
-    #        cython function
+    if c:
+        return np.asarray(roll_annual_volatility_cy_1d(
+            X, period, int(log), w, ddof
+        ))
+
+    # TODO : cython function
     return _roll_annual_volatility(X, period, log, w, axis, ddof)
 
 
