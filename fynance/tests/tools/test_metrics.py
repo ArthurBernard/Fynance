@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-10-23 12:31:27
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-24 19:30:55
+# @Last modified time: 2019-10-29 12:08:33
 
 """ Test metric functions. """
 
@@ -186,3 +186,16 @@ def test_sharpe(set_variables):
 
     res = np.array([2.8867514, -0.4330127], dtype=np.float32)
     #assert (f(x_2d.reshape([3, 2]), period=3, dtype=np.float32) == res).all()
+
+
+def test_zscore():
+    pass
+
+
+def test_roll_annual_return(set_variables):
+    x_1d, x_2d = set_variables
+    f = fy.annual_return
+    roll_f = fy.roll_annual_return
+    a_1d = roll_f(x_1d, period=12, dtype=np.float32)
+    for t in range(1, x_1d.size):
+        assert a_1d[t] == f(x_1d[: t + 1], period=12, dtype=np.float32)
