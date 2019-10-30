@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-29 12:29:51
+# @Last modified time: 2019-10-30 19:27:53
 
 """ Metric functons used in financial analysis. """
 
@@ -261,7 +261,7 @@ def _annual_volatility(X, period, log, axis, ddof):
 
 
 @WrapperArray('dtype', 'axis', 'ddof', min_size=2)
-def calmar(X, raw=False, period=252, axis=0, dtype=None, ddof=0):
+def calmar(X, period=252, axis=0, dtype=None, ddof=0):
     r""" Compute the Calmar Ratio [3]_ for each `X`' series.
 
     Notes
@@ -278,17 +278,13 @@ def calmar(X, raw=False, period=252, axis=0, dtype=None, ddof=0):
     With, :math:`annualReturn = \frac{X_T}{X_1}^{\frac{period}{T}} - 1` and
     :math:`MDD = max(DD_{1:T})`.
 
-    Where, :math:`DD_t = \begin{cases}max(X_{1:t})
-    - X_t \text{, if raw=True} \\ 1 - \frac{X_t}{max(X_{1:t})} \text{,
-    otherwise} \\ \end{cases}`, :math:`\forall t \in [1:T]`.
+    Where, :math:`DD_t = 1 - \frac{X_t}{max(X_{1:t})}`,
+    :math:`\forall t \in [1:T]`.
 
     Parameters
     ----------
     X : np.ndarray[dtype, ndim=1 or 2]
         Time-series price, performance or index.
-    raw : bool, optional
-        - If True then compute the raw drawdown.
-        - Else (default) compute the drawdown in percentage.
     period : int, optional
         Number of period per year, default is 252 (trading days per year).
     axis : {0, 1}, optional
@@ -316,7 +312,7 @@ def calmar(X, raw=False, period=252, axis=0, dtype=None, ddof=0):
 
     >>> X = np.array([70, 100, 80, 120, 160, 105, 80]).astype(np.float64)
     >>> calmar(X, period=12, ddof=1)
-    0.6122448979591835
+    array(0.6122449)
     >>> calmar(X.reshape([7, 1]), period=12)
     array([0.51446018])
 
@@ -325,8 +321,14 @@ def calmar(X, raw=False, period=252, axis=0, dtype=None, ddof=0):
     mdd, drawdown, sharpe, roll_calmar
 
     """
-    # TODO: check if cython function is necessary
-    return _annual_return(X, period, ddof) / _drawdown(X, raw).max(axis=axis)
+    ret = _annual_return(X, period, ddof)
+    dd = _drawdown(X, False)
+    mdd = np.max(dd, axis=axis)
+    calmar = np.zeros(ret.shape)
+    slice_bool = (mdd != 0)
+    calmar[slice_bool] = ret[slice_bool] / mdd[slice_bool]
+
+    return calmar
 
 
 @WrapperArray('axis')
@@ -821,7 +823,7 @@ def z_score(X, w=0, kind='s', axis=0, dtype=None):
     >>> z_score(X, w=3, kind='e')
     -1.0443574118998766
     >>> z_score(X, w=3)
-    -1.2247448713915896
+    -1.224744871391589
     >>> z_score(X.reshape([6, 1]), w=3)
     array([-1.22474487])
 
@@ -852,7 +854,7 @@ def z_score(X, w=0, kind='s', axis=0, dtype=None):
 
 
 @WrapperArray('dtype', 'axis', 'window', 'ddof', min_size=2)
-def roll_annual_return(X, period=252, w=None, axis=0, dtype=None, ddof=0, c=True):
+def roll_annual_return(X, period=252, w=None, axis=0, dtype=None, ddof=0):
     r""" Compute rolling compouned annual returns of each `X`' series.
 
     The annualised return [1]_ is the process of converting returns on a whole
@@ -914,51 +916,31 @@ def roll_annual_return(X, period=252, w=None, axis=0, dtype=None, ddof=0, c=True
     mdd, drawdown, sharpe, annual_volatility
 
     """
-    if c:
-        if (X[0] == 0).any():
-
-            raise ValueError('initial value X[0] cannot be null.')
-
-        elif len(X.shape) == 2:
-
-            return np.asarray(roll_annual_return_cy_2d(X, period, w, ddof))
-
-        return np.asarray(roll_annual_return_cy_1d(X, period, w, ddof))
-
-    # TODO : cython function (if it's more efficient)
     return _roll_annual_return(X, period, w, ddof)
 
 
 def _roll_annual_return(X, period, w, ddof):
-    if (X[0] == 0).any():
+    if ddof >= w:
+
+        raise ValueError(
+            'size of the lagged window (w={}) must be strictly greater than '
+            'degree of freedom (ddof={})'.format(w, ddof)
+        )
+
+    elif (X[0] == 0).any():
 
         raise ValueError('initial value X[0] cannot be null.')
 
-    cum_ret = np.zeros(X.shape)
-    cum_ret[: w] = X[: w] / X[0]
-    cum_ret[w:] = X[w:] / X[: -w]
+    elif len(X.shape) == 2:
 
-    if (cum_ret < 0).any():
+        return np.asarray(roll_annual_return_cy_2d(X, period, w, ddof))
 
-        raise ValueError('all values of X must be of the same sign.')
-
-    T = X.shape[0]
-    power = period / np.arange(1, T - ddof + 1, dtype=np.float64)
-
-    if len(X.shape) == 2:
-        power = power.reshape([T, 1])
-
-    sign = np.sign(X[0])
-
-    anu_ret = np.zeros(X.shape)
-    anu_ret[ddof:] = sign * np.float_power(cum_ret[ddof:], power) - 1.
-
-    return anu_ret
+    return np.asarray(roll_annual_return_cy_1d(X, period, w, ddof))
 
 
-@WrapperArray('dtype', 'axis', 'null', 'window')
+@WrapperArray('dtype', 'axis', 'null', 'window', 'ddof', min_size=3)
 def roll_annual_volatility(X, period=252, log=True, w=None, axis=0,
-                           dtype=None, ddof=0, c=False):
+                           dtype=None, ddof=0):
     r""" Compute the annualized volatility of each `X`' series.
 
     In finance, volatility is the degree of variation of a trading price
@@ -1014,9 +996,9 @@ def roll_annual_volatility(X, period=252, log=True, w=None, axis=0,
     Assume series of monthly prices:
 
     >>> X = np.array([100, 110, 105, 110, 120, 108]).astype(np.float64)
-    >>> roll_annual_volatility(X, period=12, log=True, ddof=1, c=True)
-    array([0.        , 0.        , 0.25045537, 0.21110421, 0.2073765 ,
-           0.27318963])
+    >>> roll_annual_volatility(X, period=12, log=False, ddof=1)
+    array([0.        , 0.24494897, 0.25777176, 0.21655755, 0.21313847,
+           0.27344193])
     >>> roll_annual_volatility(X.reshape([6, 1]), period=12, log=False)
     array([[0.        ],
            [0.17320508],
@@ -1030,32 +1012,26 @@ def roll_annual_volatility(X, period=252, log=True, w=None, axis=0,
     mdd, drawdown, sharpe, annual_return
 
     """
-    if c:
-        return np.asarray(roll_annual_volatility_cy_1d(
-            X, period, int(log), w, ddof
-        ))
-
-    # TODO : cython function
     return _roll_annual_volatility(X, period, log, w, axis, ddof)
 
 
 def _roll_annual_volatility(X, period, log, w, axis, ddof):
-    shape = X.shape
-    T = shape[0]
-    R = np.zeros(shape)
-    anu_vol = np.zeros(shape)
+    if ddof >= w:
 
-    if log:
-        R[1:] = np.log(X[1:] / X[:-1])
+        raise ValueError(
+            'size of the lagged window (w={}) must be strictly greater than '
+            'degree of freedom (ddof={})'.format(w, ddof)
+        )
 
-    else:
-        R[1:] = X[1:] / X[:-1] - 1.
+    elif len(X.shape) == 2:
 
-    for t in range(ddof + 1, T):
-        t0 = max(0, t - w)
-        anu_vol[t] = np.std(R[t0:t + 1], axis=axis, ddof=ddof)
+        return np.asarray(roll_annual_volatility_cy_2d(
+            X, period, int(log), w, ddof
+        ))
 
-    return np.sqrt(period) * anu_vol
+    return np.asarray(roll_annual_volatility_cy_1d(
+        X, period, int(log), w, ddof
+    ))
 
 
 @WrapperArray('dtype', 'axis', 'window', 'ddof', min_size=2)
@@ -1075,9 +1051,8 @@ def roll_calmar(X, period=252., w=None, axis=0, dtype=None, ddof=0):
         calmarRatio_t = \frac{annualReturn_t}{MDD_t} \\ \\
 
     With, :math:`annualReturn_t = \frac{X_t}{X_1}^{\frac{period}{t}} - 1` and
-    :math:`MDD_t = max(DD_t)` where :math:`DD_t =\begin{cases}max(X_{1:t}) -
-    X_t \text{, if raw=True} \\ 1 - \frac{X_t}{max(X_{1:t})} \text{,
-    otherwise} \\ \end{cases}`.
+    :math:`MDD_t = max(DD_t)`, where
+    :math:`DD_t = 1 - \frac{X_t}{max(X_{1:t})}`.
 
     Parameters
     ----------
@@ -1113,8 +1088,8 @@ def roll_calmar(X, period=252., w=None, axis=0, dtype=None, ddof=0):
 
     >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
     >>> roll_calmar(X, period=12)
-    array([ 0.        ,  0.        ,  6.14093617, 38.1820075 , 54.70845481,
-            0.75556505])
+    array([ 0.        ,  0.        ,  3.52977926, 20.18950437, 31.35989887,
+            0.6122449 ])
 
     See Also
     --------
@@ -1145,10 +1120,9 @@ def roll_drawdown(X, w=None, raw=False, axis=0, dtype=None):
 
     .. math::
 
-        DD^w_t = \begin{cases}max(X_{t - w + 1:t}) - X_t
-                              \text{, if raw=True} \\
-                              1 - \frac{X_t}{max(X_{t - w + 1:t})}
-                              \text{, otherwise} \\
+        DD^w_t =\begin{cases}
+        max(X_{t - w + 1:t}) - X_t \text{, if raw=True} \\
+        1 - \frac{X_t}{max(X_{t - w + 1:t})} \text{, otherwise} \\
         \end{cases}
 
     Parameters
@@ -1369,8 +1343,8 @@ def roll_sharpe(X, rf=0, period=252, w=None, log=False, axis=0, dtype=None,
 
     >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
     >>> roll_sharpe(X, period=12)
-    array([ 0.        , 95.98127039,  1.35216177,  7.55040821, 11.78356403,
-            0.30204982])
+    array([ 0.        , 10.10344078,  0.77721579,  3.99243019,  6.754557  ,
+            0.24475518])
 
     See Also
     --------
@@ -1464,6 +1438,64 @@ def roll_z_score(X, w=None, kind='s', axis=0, dtype=None):
     z = (X - avg) / std
 
     return z
+
+
+# =========================================================================== #
+#                                 old scripts                                 #
+# =========================================================================== #
+
+
+def _roll_annual_return_py(X, period, w, ddof):
+    """ Old function. """
+    if (X[0] == 0).any():
+
+        raise ValueError('initial value X[0] cannot be null.')
+
+    cum_ret = np.zeros(X.shape)
+    cum_ret[: w] = X[: w] / X[0]
+    cum_ret[w:] = X[w:] / X[: -w]
+
+    if (cum_ret < 0).any():
+
+        raise ValueError('all values of X must be of the same sign.')
+
+    T = X.shape[0]
+    power = period / np.arange(1, T - ddof + 1, dtype=np.float64)
+
+    if len(X.shape) == 2:
+        power = power.reshape([T, 1])
+
+    sign = np.sign(X[0])
+
+    anu_ret = np.zeros(X.shape)
+    anu_ret[ddof:] = sign * np.float_power(cum_ret[ddof:], power) - 1.
+
+    return anu_ret
+
+
+def _roll_annual_volatility_py(X, period, log, w, axis, ddof):
+    """ Old function. """
+    shape = X.shape
+    T = shape[0]
+    R = np.zeros(shape)
+    anu_vol = np.zeros(shape)
+
+    if log:
+        R[1:] = np.log(X[1:] / X[:-1])
+
+    else:
+        R[1:] = X[1:] / X[:-1] - 1.
+
+    for t in range(ddof + 1, T):
+        t0 = max(0, t - w)
+        anu_vol[t] = np.std(R[t0:t + 1], axis=axis, ddof=ddof)
+
+    return np.sqrt(period) * anu_vol
+
+
+# =========================================================================== #
+#                                   Tests                                     #
+# =========================================================================== #
 
 
 if __name__ == '__main__':
