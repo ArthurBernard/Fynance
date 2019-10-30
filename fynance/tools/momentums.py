@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:13
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-23 17:38:50
+# @Last modified time: 2019-10-30 13:44:16
 
 """ Statical momentum functions. """
 
@@ -84,10 +84,10 @@ def sma(X, w=None, axis=0, dtype=None):
     wma, ema, smstd
 
     """
-    return _sma(X, w, dtype=dtype, axis=axis)
+    return _sma(X, w)
 
 
-def _sma(X, w, axis=0, dtype=None):
+def _sma(X, w):
     if len(X.shape) == 2:
 
         return np.asarray(sma_cy_2d(X, w))
@@ -137,10 +137,10 @@ def wma(X, w=None, axis=0, dtype=None):
     sma, ema, wmstd
 
     """
-    return _wma(X, w, axis=axis, dtype=dtype)
+    return _wma(X, w)
 
 
-def _wma(X, w, axis=0, dtype=None):
+def _wma(X, w):
     if len(X.shape) == 2:
 
         return np.asarray(wma_cy_2d(X, w))
@@ -208,10 +208,10 @@ def ema(X, alpha=0.94, w=None, axis=0, dtype=None):
     else:
         alpha = 1 - 2 / (1 + w)
 
-    return _ema(X, alpha, axis=axis, dtype=dtype)
+    return _ema(X, alpha)
 
 
-def _ema(X, alpha, axis=0, dtype=None):
+def _ema(X, alpha):
     if len(X.shape) == 2:
 
         return np.asarray(ema_cy_2d(X, float(alpha)))
@@ -224,8 +224,8 @@ def _ema(X, alpha, axis=0, dtype=None):
 # =========================================================================== #
 
 
-@WrapperArray('dtype', 'axis', 'window')
-def smstd(X, w=None, axis=0, dtype=None):
+@WrapperArray('dtype', 'axis', 'window', 'ddof')
+def smstd(X, w=None, ddof=0, axis=0, dtype=None):
     r""" Compute simple moving standard deviation(s) for each `X`' series'.
 
     .. math::
@@ -239,6 +239,10 @@ def smstd(X, w=None, axis=0, dtype=None):
     w : int, optional
         Size of the lagged window of the moving average, must be positive. If
         ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is None.
+    ddof : int, optional
+        Means Delta Degrees of Freedom, the divisor used in calculations is
+        ``w - ddof`` (must be strictly positive), where ``w`` represents the
+        number of elements in time axis. Default is 0.
     axis : {0, 1}, optional
         Axis along wich the computation is done. Default is 0.
     dtype : np.dtype, optional
@@ -265,15 +269,22 @@ def smstd(X, w=None, axis=0, dtype=None):
     sma, wmstd, emstd
 
     """
-    return _smstd(X, w, axis=axis, dtype=dtype)
+    if ddof >= w:
+
+        raise ValueError(
+            'size of the lagged window (w={}) must be strictly greater than '
+            'degree of freedom (ddof={})'.format(w, ddof)
+        )
+
+    return _smstd(X, w, ddof=ddof)
 
 
-def _smstd(X, w, axis=0, dtype=None):
+def _smstd(X, w, ddof=0):
     if len(X.shape) == 2:
 
-        return np.asarray(smstd_cy_2d(X, w))
+        return np.asarray(smstd_cy_2d(X, w, ddof))
 
-    return np.asarray(smstd_cy_1d(X, w))
+    return np.asarray(smstd_cy_1d(X, w, ddof))
 
 
 @WrapperArray('dtype', 'axis', 'window')
@@ -319,10 +330,10 @@ def wmstd(X, w=None, axis=0, dtype=None):
     wma, smstd, emstd
 
     """
-    return _wmstd(X, w, axis=axis, dtype=dtype)
+    return _wmstd(X, w)
 
 
-def _wmstd(X, w, axis=0, dtype=None):
+def _wmstd(X, w):
     if len(X.shape) == 2:
 
         return np.asarray(wmstd_cy_2d(X, w))
@@ -395,10 +406,10 @@ def emstd(X, alpha=0.94, w=None, axis=0, dtype=None):
     else:
         alpha = 1 - 2 / (1 + w)
 
-    return _emstd(X, alpha, axis=axis, dtype=dtype)
+    return _emstd(X, alpha)
 
 
-def _emstd(X, alpha, axis=0, dtype=None):
+def _emstd(X, alpha):
     if len(X.shape) == 2:
 
         return np.asarray(emstd_cy_2d(X, float(alpha)))
@@ -407,5 +418,7 @@ def _emstd(X, alpha, axis=0, dtype=None):
 
 
 if __name__ == '__main__':
+
     import doctest
+
     doctest.testmod()
