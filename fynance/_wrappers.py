@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-10-11 10:10:43
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-25 14:00:15
+# @Last modified time: 2019-10-30 14:32:27
 
 """ Some wrappers functions. """
 
@@ -95,6 +95,11 @@ def wrap_window(func):
     def check_window(X, w=None, **kwargs):
         if w == 0 or w is None:
             w = X.shape[0]
+
+        elif 'min_size' in kwargs.keys() and w < kwargs['min_size']:
+
+            raise ValueError('lagged window of size {} is not available, \
+                must be greater than {}'.format(w, kwargs['min_size']))
 
         elif w < 0:
 
