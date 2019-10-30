@@ -4,7 +4,9 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-10-15 16:35:14
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-17 09:11:05
+# @Last modified time: 2019-10-30 13:47:52
+
+""" Test momentum functions. """
 
 # Built-in packages
 
@@ -80,6 +82,29 @@ def test_smstd(set_variables):
     assert ma_2d.shape == (6, 1)
     assert (fy.smstd(x_1d, 7) == fy.smstd(x_1d, 6)).all()
     assert (fy.smstd(x_2d, 2, axis=1) == 0.).all()
+
+    for t in range(1, 6):
+        s1 = fy.smstd(x_1d, ddof=0, w=0, dtype=np.float64)
+        s2 = np.std(x_1d[:t + 1], ddof=0)
+        assert s1[t] == pytest.approx(s2)
+        s1 = fy.smstd(x_1d, ddof=0, w=3, dtype=np.float64)
+        s2 = np.std(x_1d[max(0, t - 3 + 1): t + 1], ddof=0)
+        assert s1[t] == pytest.approx(s2)
+        if t >= 2:
+            s1 = fy.smstd(x_1d, ddof=2, w=0, dtype=np.float64)
+            s2 = np.std(x_1d[:t + 1], ddof=2)
+            assert s1[t] == pytest.approx(s2)
+            s1 = fy.smstd(x_1d, ddof=2, w=3, dtype=np.float64)
+            s2 = np.std(x_1d[max(0, t - 3 + 1): t + 1], ddof=2)
+            assert s1[t] == pytest.approx(s2)
+
+    with pytest.raises(ValueError) as execinfo:
+        fy.smstd(x_1d, ddof=2, w=2, dtype=np.float64)
+    execinfo.match(r'w=2.*ddof=2')
+
+    with pytest.raises(ValueError) as execinfo:
+        fy.smstd(x_1d, ddof=3, w=2, dtype=np.float64)
+    execinfo.match(r'w=2.*ddof=3')
 
 
 def test_wmstd(set_variables):
