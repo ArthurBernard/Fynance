@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-07-09 10:49:19
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-29 12:30:36
+# @Last modified time: 2019-10-30 15:46:59
 # cython: language_level=3, wraparound=False, boundscheck=False
 
 # Built-in packages
@@ -26,7 +26,7 @@ from fynance.tools.momentums_cy import sma_cy_1d, sma_cy_2d
 __all__ = [
     'drawdown_cy_1d', 'drawdown_cy_2d',
     'roll_annual_return_cy_1d', 'roll_annual_return_cy_2d',
-    'roll_annual_volatility_cy_1d',
+    'roll_annual_volatility_cy_1d', 'roll_annual_volatility_cy_2d',
     'roll_drawdown_cy_1d', 'roll_drawdown_cy_2d',
     'roll_mad_cy_1d', 'roll_mad_cy_2d',
     'roll_mdd_cy_1d', 'roll_mdd_cy_2d',
@@ -176,20 +176,21 @@ cpdef double [:] roll_annual_return_cy_1d(double [:] X, int p, int w, int d):
     var = view.array(shape=(T,), itemsize=sizeof(double), format='d')
 
     cdef double [:] ann_ret = var
-    cdef double R = <double>0, P = <double>0
+    cdef double R = <double>0, P = <double>1, _w = <double>1
 
     while t < T:
         if t < w:
             R = X[t] / X[0]
+            _w = <double>(t + 1 - d)
 
         else:
-            R = X[t] / X[t - w]
+            R = X[t] / X[t - w + 1]
 
         if t < d:
             ann_ret[t] = <double>0
 
         else:
-            P = <double>p / <double>(t - d + 1)
+            P = <double>p / _w
             ann_ret[t] = R ** P - <double>1
 
         t += 1
@@ -225,22 +226,23 @@ cpdef double [:, :] roll_annual_return_cy_2d(double [:, :] X, int p, int w, int 
     var = view.array(shape=(T, N), itemsize=sizeof(double), format='d')
 
     cdef double [:, :] ann_ret = var
-    cdef double R = <double>0, P = <double>0
+    cdef double R = <double>0, P = <double>1, _w = <double>1
 
     while n < N:
         t = 0
         while t < T:
             if t < w:
                 R = X[t, n] / X[0, n]
+                _w = <double>(t + 1 - d)
 
             else:
-                R = X[t, n] / X[t - w, n]
+                R = X[t, n] / X[t - w + 1, n]
 
             if t < d:
                 ann_ret[t, n] = <double>0
 
             else:
-                P = <double>p / <double>(t - d + 1)
+                P = <double>p / _w
                 ann_ret[t, n] = R ** P - <double>1
 
             t += 1
@@ -260,6 +262,8 @@ cpdef double [:] roll_annual_volatility_cy_1d(double [:] X, int p, int l, int w,
         array, etc.
     p : int
         Number of period per year.
+    l : int {0, 1}
+        If 1 then compute log-returns, otherwise compute returns in percentage.
     w : int
         Size of the lagged window.
     d : int
@@ -273,46 +277,110 @@ cpdef double [:] roll_annual_volatility_cy_1d(double [:] X, int p, int l, int w,
 
     """
     cdef int t = 1, T = X.shape[0]
-    cdef int t_w, _w
 
     var = view.array(shape=(T,), itemsize=sizeof(double), format='d')
 
     cdef double [:] ann_vol = var
     cdef double [:] R = var
-    cdef double m, m2, S2, S, sub_R
-    S = <double>0
-    S2 = <double>0
+    cdef double S = <double>0, S2 = <double>0, sub_R
+    cdef double _w = <double>1, _w_d = <double>1
     ann_vol[0] = <double>0
     R[0] = <double>0
 
     while t < T:
         if l != 0:
-            R[t] = X[t] / X[t - 1] - <double>1
-
-        else:
             R[t] = log(X[t] / X[t - 1])
 
+        else:
+            R[t] = X[t] / X[t - 1] - <double>1.
+
         if t < w:
-            t_w = 0
-            _w = t + 1 - d
+            _w = <double>(t + 1)
+            _w_d = <double>(t + 1 - d)
             sub_R = <double>0
 
-        else:
-            t_w = t - w
-            _w = w - d
-            sub_R = R[t_w]
+        elif t > w:
+            sub_R = R[t - w]
 
-        if t <= d:
+        S += R[t] - sub_R
+        S2 += R[t] * R[t] - sub_R * sub_R
+
+        if t < d:
             ann_vol[t] = <double>0
 
         else:
-            S += R[t] - sub_R
-            S2 += R[t] ** <double>2 - sub_R ** <double>2
-            m = S / <double>_w
-            m2 = S2 / <double>_w
-            ann_vol[t] = sqrt(<double>p * (m2 - m ** <double>2))
+            ann_vol[t] = sqrt(<double>p * (S2 - (S / _w) * S) / _w_d)
 
         t += 1
+
+    return ann_vol
+
+
+cpdef double [:, :] roll_annual_volatility_cy_2d(double [:, :] X, int p, int l, int w, int d):
+    """ Compute the rolling annual volatility for an two-dimensional array.
+
+    Parameters
+    ----------
+    X : memoryview.ndarray[ndim=2, dtype=double]
+        Elements to compute the function. Can be a NumPy array, C array, Cython
+        array, etc.
+    p : int
+        Number of period per year.
+    l : int {0, 1}
+        If 1 then compute log-returns, otherwise compute returns in percentage.
+    w : int
+        Size of the lagged window.
+    d : int
+        Number degrees of freedom.
+
+    Returns
+    -------
+    memoryview.ndarray[ndim=2, dtype=double]
+        Series of annual volatility. Can be converted to a NumPy array, C array,
+        Cython array, etc.
+
+    """
+    cdef int t, T = X.shape[0], n = 0, N = X.shape[1]
+
+    var = view.array(shape=(T, N), itemsize=sizeof(double), format='d')
+
+    cdef double [:, :] ann_vol = var
+    cdef double [:] R = var[:, 0]
+    cdef double S = <double>0, S2 = <double>0, sub_R
+    cdef double _w = <double>1, _w_d = <double>1
+    R[0] = <double>0
+
+    while n < N:
+        t = 1
+        ann_vol[0, n] = <double>0
+
+        while t < T:
+            if l != 0:
+                R[t] = log(X[t, n] / X[t - 1, n])
+
+            else:
+                R[t] = X[t, n] / X[t - 1, n] - <double>1.
+
+            if t < w:
+                _w = <double>(t + 1)
+                _w_d = <double>(t + 1 - d)
+                sub_R = <double>0
+
+            elif t > w:
+                sub_R = R[t - w]
+
+            S += R[t] - sub_R
+            S2 += R[t] * R[t] - sub_R * sub_R
+
+            if t < d:
+                ann_vol[t, n] = <double>0
+
+            else:
+                ann_vol[t, n] = sqrt(<double>p * (S2 - (S / _w) * S) / _w_d)
+
+            t += 1
+
+        n += 1
 
     return ann_vol
 
