@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-07-24 15:11:52
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-16 18:42:06
+# @Last modified time: 2019-10-30 13:39:03
 # cython: language_level=3, wraparound=False, boundscheck=False
 
 # Built-in packages
@@ -290,7 +290,7 @@ cpdef double [:, :] ema_cy_2d(double [:, :] X, double alpha):
 # =========================================================================== #
 
 
-cpdef double [:] smstd_cy_1d(double [:] X, int w):
+cpdef double [:] smstd_cy_1d(double [:] X, int w, int d):
     """ Compute simple moving standard deviation of one-dimensional array.
 
     Parameters
@@ -300,6 +300,8 @@ cpdef double [:] smstd_cy_1d(double [:] X, int w):
         array, etc.
     w : int
         Size of the window used for computation, must be strictly positive.
+    d : int
+        Number of degrees of freedom. Must be less than `w`.
 
     Returns
     -------
@@ -308,37 +310,38 @@ cpdef double [:] smstd_cy_1d(double [:] X, int w):
         array, Cython array, etc.
 
     """
-    cdef int T, t = 0
+    cdef int t = 0, T = X.shape[0]
 
-    T = X.shape[0]
     var = view.array(shape=(T,), itemsize=sizeof(double), format='d')
 
     cdef double [:] sd = var
-    cdef double m, m2, S2, S
-    S = <double>0
-    S2 = <double>0
+    cdef double S = <double>0, S2 = <double>0, sub_X
+    cdef double _w = <double>1, _w_d = <double>1
 
     while t < T:
         if t < w:
-            S += X[t]
-            S2 += X[t] ** <double>2
-            m = S / <double>(t + 1)
-            m2 = S2 / <double>(t + 1)
-            sd[t] = sqrt(m2 - m ** <double>2)
+            _w = <double>(t + 1)
+            _w_d = <double>(t + 1 - d)
+            sub_X = <double>0
 
         else:
-            S += X[t] - X[t - w]
-            S2 += X[t] ** <double>2 - X[t - w] ** <double>2
-            m = S / <double>w
-            m2 = S2 / <double>w
-            sd[t] = sqrt(m2 - m ** <double>2)
+            sub_X = X[t - w]
+
+        S += X[t] - sub_X
+        S2 += X[t] * X[t] - sub_X * sub_X
+        
+        if t < d:
+            sd[t] = <double>0
+
+        else:
+            sd[t] = sqrt((S2 - (S / _w) * S) / _w_d)
 
         t += 1
     
     return sd
 
 
-cpdef double [:, :] smstd_cy_2d(double [:, :] X, int w):
+cpdef double [:, :] smstd_cy_2d(double [:, :] X, int w, int d):
     """ Compute simple moving standard deviations of two-dimensional array
     along 0 axis.
 
@@ -349,6 +352,8 @@ cpdef double [:, :] smstd_cy_2d(double [:, :] X, int w):
         array, etc.
     w : int
         Size of the window used for computation, must be strictly positive.
+    d : int
+        Number of degrees of freedom. Must be less than `w`.
 
     Returns
     -------
@@ -357,33 +362,35 @@ cpdef double [:, :] smstd_cy_2d(double [:, :] X, int w):
         array, Cython array, etc.
 
     """
-    cdef int T, t, N, n = 0
+    cdef int t = 0, n = 0, T = X.shape[0], N = X.shape[1]
 
-    T = X.shape[0]
-    N = X.shape[1]
     var = view.array(shape=(T, N), itemsize=sizeof(double), format='d')
 
     cdef double [:, :] sd = var
-    cdef double m, m2, S2, S
+    cdef double S, S2, sub_X, _w = <double>1, _w_d = <double>1
 
     while n < N:
         t = 0
         S = <double>0
         S2 = <double>0
+
         while t < T:
             if t < w:
-                S += X[t, n]
-                S2 += X[t, n] ** <double>2
-                m = S / <double>(t + 1)
-                m2 = S2 / <double>(t + 1)
-                sd[t, n] = sqrt(m2 - m ** <double>2)
+                _w = <double>(t + 1)
+                _w_d = <double>(t + 1 - d)
+                sub_X = <double>0
 
             else:
-                S += X[t, n] - X[t - w, n]
-                S2 += X[t, n] ** <double>2 - X[t - w, n] ** <double>2
-                m = S / <double>w
-                m2 = S2 / <double>w
-                sd[t, n] = sqrt(m2 - m ** <double>2)
+                sub_X = X[t - w, n]
+
+            S += X[t, n] - sub_X
+            S2 += X[t, n] * X[t, n] - sub_X * sub_X
+
+            if t < d:
+                sd[t, n] = <double>0
+
+            else:
+                sd[t, n] = sqrt((S2 - (S / _w) * S) / _w_d)
 
             t += 1
 
