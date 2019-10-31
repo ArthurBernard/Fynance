@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-30 19:27:53
+# @Last modified time: 2019-10-31 15:24:54
 
 """ Metric functons used in financial analysis. """
 
@@ -1097,8 +1097,7 @@ def roll_calmar(X, period=252., w=None, axis=0, dtype=None, ddof=0):
 
     """
     ret = _roll_annual_return(X, period, w, ddof)
-    dd = _roll_drawdown(X, w, False)
-    mdd = np.maximum.accumulate(dd, axis=axis)
+    mdd = _roll_mdd(X, w, False)
     calmar = np.zeros(X.shape)
     slice_bool = (mdd != 0)
     calmar[slice_bool] = ret[slice_bool] / mdd[slice_bool]
@@ -1159,6 +1158,9 @@ def roll_drawdown(X, w=None, raw=False, axis=0, dtype=None):
     array([[0. , 0. , 0.2, 0. , 0. , 0.5]])
     >>> roll_drawdown(X, raw=True)
     array([ 0.,  0., 20.,  0.,  0., 80.])
+    >>> X = np.array([100, 80, 70, 75, 110, 80]).astype(np.float64)
+    >>> roll_drawdown(X, raw=True, w=3)
+    array([ 0., 20., 30.,  5.,  0., 30.])
 
     See Also
     --------
@@ -1269,12 +1271,21 @@ def roll_mdd(X, w=None, raw=False, axis=0, dtype=None):
     >>> X = np.array([70, 100, 80, 120, 160, 80])
     >>> roll_mdd(X, dtype=np.float64)
     array([0. , 0. , 0.2, 0.2, 0.2, 0.5])
+    >>> roll_mdd(X, w=2, dtype=np.float64)
+    array([0. , 0. , 0.2, 0.2, 0. , 0.5])
+    >>> X = np.array([100, 80, 70, 75, 110, 80]).astype(np.float64)
+    >>> roll_mdd(X, raw=True, w=3, dtype=np.float64)
+    array([ 0., 20., 30., 30., 30., 30.])
 
     See Also
     --------
     mdd, roll_calmar, roll_sharpe, drawdown
 
     """
+    return _roll_mdd(X, w, raw)
+
+
+def _roll_mdd(X, w, raw):
     if len(X.shape) == 2:
 
         return np.asarray(roll_mdd_cy_2d(X, w, int(raw)))
