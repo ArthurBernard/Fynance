@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-07-09 10:49:19
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-30 15:46:59
+# @Last modified time: 2019-10-31 17:51:56
 # cython: language_level=3, wraparound=False, boundscheck=False
 
 # Built-in packages
@@ -671,26 +671,62 @@ cpdef double [:] roll_mdd_cy_1d(double [:] X, int w, int raw):
 
     var = view.array(shape=(T,), itemsize=sizeof(double), format='d')
 
-    cdef double [:] dd = roll_drawdown_cy_1d(X, w, raw)
+    # cdef double [:] dd = roll_drawdown_cy_1d(X, w, raw)
     cdef double [:] mdd = var
     cdef double S
     cdef int t = 0
+
+    cdef double [:] dd = var
+    cdef double one = <double>1
+    cdef double S_dd = X[0]
+
+    dd[0] = <double>0
+    T = T - 1
+    if w > T:
+        w = T
 
     while t < T:
         i = 1
         S = dd[t]
         if t < w:
+            if t == w + 1:
+                while i < t:
+                    S_dd = max(S_dd, X[t - i + 1])
+                    i += 1
+
+                i = 1
+
+            else:
+                S_dd = max(S_dd, X[t + 1])
+
             while i < t:
                 S = max(S, dd[t - i])
                 i += 1
 
         else:
+            S_dd = X[t + 1]
+
             while i < w:
+                S_dd = max(S_dd, X[t - i + 1])
                 S = max(S, dd[t - i])
                 i += 1
 
+        if raw != 0:
+            dd[t + 1] = S_dd - X[t + 1]
+
+        else:
+            dd[t + 1] = one - X[t + 1] / S_dd
+
         mdd[t] = S
         t += 1
+
+    i = 1
+    S = dd[t]
+    while i < w:
+        S = max(S, dd[t - i])
+        i += 1
+
+    mdd[t] = S 
     
     return mdd
 
