@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-10-23 12:31:27
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-31 16:01:26
+# @Last modified time: 2019-11-04 16:26:21
 
 """ Test metric functions. """
 
@@ -327,14 +327,18 @@ def test_roll_mdd(set_variables):
     assert (a_1d == a_2d.flatten()).all()
     assert a_1d.shape == (6,)
     assert a_2d.shape == (6, 1)
+    assert (roll_f(
+        x_1d, dtype=np.float32, w=3
+    ) == roll_f(
+        x_2d, dtype=np.float32, w=3
+    ).flatten()).all()
 
     a_1d_w3 = roll_f(x_1d, w=3, dtype=np.float32)
-    dd_w3 = fy.roll_drawdown(x_1d, w=3, dtype=np.float32)
     a_1d_raw = roll_f(x_1d, raw=True, dtype=np.float32)
 
     for t in range(1, x_1d.size):
         assert a_1d[t] == f(x_1d[: t + 1], dtype=np.float32)
-        assert a_1d_w3[t] == np.max(dd_w3[max(0, t - 2): t + 1])
+        assert a_1d_w3[t] == f(x_1d[max(0, t - 2): t + 1], dtype=np.float32)
         if t >= 2:
             assert a_1d_raw[t] == f(x_1d[: t + 1], raw=True, dtype=np.float32)
 
