@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-31 17:57:15
+# @Last modified time: 2019-11-04 16:13:11
 
 """ Metric functons used in financial analysis. """
 
@@ -1274,19 +1274,17 @@ def roll_mdd(X, w=None, raw=False, axis=0, dtype=None):
     >>> X = np.array([70, 100, 80, 120, 160, 80])
     >>> roll_mdd(X, dtype=np.float64)
     array([0. , 0. , 0.2, 0.2, 0.2, 0.5])
+    >>> roll_mdd(X, w=3, dtype=np.float64)
+    array([0. , 0. , 0.2, 0.2, 0. , 0.5])
     >>> X = np.array([100, 80, 70, 75, 110, 80]).astype(np.float64)
     >>> roll_mdd(X, raw=True, w=3, dtype=np.float64)
-    array([ 0., 20., 30., 30., 30., 30.])
+    array([ 0., 20., 30., 10.,  0., 30.])
 
     See Also
     --------
     mdd, roll_calmar, roll_sharpe, drawdown
 
     """
-    # TODO : fix error with roll mechanism
-    # >>> roll_mdd(X, w=2, dtype=np.float64)
-    # array([0. , 0. , 0.2, 0.2, 0. , 0.5])
-
     return _roll_mdd(X, w, raw)
 
 
