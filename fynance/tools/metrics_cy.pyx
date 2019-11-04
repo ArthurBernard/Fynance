@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-07-09 10:49:19
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-31 17:51:56
+# @Last modified time: 2019-11-04 16:24:53
 # cython: language_level=3, wraparound=False, boundscheck=False
 
 # Built-in packages
@@ -670,6 +670,148 @@ cpdef double [:] roll_mdd_cy_1d(double [:] X, int w, int raw):
     cdef int i, T = X.shape[0]
 
     var = view.array(shape=(T,), itemsize=sizeof(double), format='d')
+    var2 = view.array(shape=(w,), itemsize=sizeof(double), format='d')
+
+    cdef double [:] mdd = var
+    cdef double S = <double>0
+    cdef int t = 0
+
+    cdef double [:] dd = var2
+
+    dd = drawdown_cy_1d(X[0: w], raw)
+
+    while t < w:
+        S = max(S, dd[t])
+        mdd[t] = S
+        t += 1
+
+    while t < T:
+        i = 1
+        dd = drawdown_cy_1d(X[t - w + 1: t + 1], raw)
+        S = dd[0]
+
+        while i < w:
+            S = max(S, dd[i])
+            i += 1
+
+        mdd[t] = S
+        t += 1
+
+    return mdd
+
+
+cpdef double [:, :] roll_mdd_cy_2d(double [:, :] X, int w, int raw):
+    """ Compute rolling maximum drawdown for two-dimensional array.
+
+    Function to compute the maximum drwdown where drawdown is the measure of 
+    the decline from a historical peak in some variable [1]_ (typically the 
+    cumulative profit or total open equity of a financial trading strategy). 
+    
+    Parameters
+    ----------
+    X : memoryview.ndarray[ndim=2, dtype=double]
+        Elements to compute the function. Can be a NumPy array, C array, Cython
+        array, etc.
+    w : int
+        Size of the lagged window.
+    raw : {0, 1}
+        If 1 compute the raw drawdown, otherwise compute drawdown in
+        percentage.
+
+    Returns
+    -------
+    memoryview.ndarray[ndim=2, dtype=double]
+        Series of MaxDrawDown. Can be converted to a NumPy array, C array,
+        Cython array, etc.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
+    
+    """
+    cdef int i, T = X.shape[0]
+    cdef int t, N = X.shape[1]
+
+    var = view.array(shape=(T, N), itemsize=sizeof(double), format='d')
+    
+    var2 = view.array(shape=(w, N), itemsize=sizeof(double), format='d')
+
+    cdef double [:, :] mdd = var
+    cdef double S = <double>0
+    cdef int n = 0
+
+    cdef double [:, :] dd = var2
+
+    dd = drawdown_cy_2d(X[0: w, :], raw)
+
+    while n < N:
+        t = 0
+        S = <double>0
+        while t < w:
+            S = max(S, dd[t, n])
+            mdd[t, n] = S
+            t += 1
+
+        n += 1
+
+    t = w
+
+    while t < T:
+        n = 0
+        while n < N:
+            i = 1
+            dd = drawdown_cy_2d(X[t - w + 1: t + 1, :], raw)
+            S = dd[0, n]
+
+            while i < w:
+                S = max(S, dd[i, n])
+                i += 1
+
+            mdd[t, n] = S
+            n += 1
+
+        t += 1
+
+    return mdd
+
+
+# =========================================================================== #
+#                                 Old Scripts                                 #
+# =========================================================================== #
+
+
+cpdef double [:] roll_mdd_cy_1d_bis(double [:] X, int w, int raw):
+    """ Compute rolling maximum drawdown for one-dimensional array.
+
+    Function to compute the maximum drwdown where drawdown is the measure of 
+    the decline from a historical peak in some variable [1]_ (typically the 
+    cumulative profit or total open equity of a financial trading strategy). 
+    
+    Parameters
+    ----------
+    X : memoryview.ndarray[ndim=1, dtype=double]
+        Elements to compute the function. Can be a NumPy array, C array, Cython
+        array, etc.
+    w : int
+        Size of the lagged window.
+    raw : {0, 1}
+        If 1 compute the raw drawdown, otherwise compute drawdown in
+        percentage.
+
+    Returns
+    -------
+    memoryview.ndarray[ndim=1, dtype=double]
+        Series of MaxDrawDown. Can be converted to a NumPy array, C array,
+        Cython array, etc.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Drawdown_(economics)
+    
+    """
+    cdef int i, T = X.shape[0]
+
+    var = view.array(shape=(T,), itemsize=sizeof(double), format='d')
 
     # cdef double [:] dd = roll_drawdown_cy_1d(X, w, raw)
     cdef double [:] mdd = var
@@ -731,7 +873,7 @@ cpdef double [:] roll_mdd_cy_1d(double [:] X, int w, int raw):
     return mdd
 
 
-cpdef double [:, :] roll_mdd_cy_2d(double [:, :] X, int w, int raw):
+cpdef double [:, :] roll_mdd_cy_2d_bis(double [:, :] X, int w, int raw):
     """ Compute rolling maximum drawdown for two-dimensional array.
 
     Function to compute the maximum drwdown where drawdown is the measure of 
@@ -791,11 +933,6 @@ cpdef double [:, :] roll_mdd_cy_2d(double [:, :] X, int w, int raw):
         n += 1
 
     return mdd
-
-
-# =========================================================================== #
-#                                 Old Scripts                                 #
-# =========================================================================== #
 
 
 cpdef np.float64_t sharpe_cy(
