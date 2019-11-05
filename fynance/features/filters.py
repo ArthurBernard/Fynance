@@ -4,7 +4,9 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-03-28 18:12:52
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-18 15:26:31
+# @Last modified time: 2019-11-05 20:45:41
+
+""" Some filter functions. """
 
 # Built-in packages
 
@@ -14,11 +16,15 @@ import numpy as np
 # Local packages
 
 
-__all__ = ['kalman']
+__all__ = []
+
+# TODO : to finish kalman filter
 
 
 def kalman(X, distribution='normal'):
     """ Compute the Kalman filter.
+
+    /! not yet working /!
 
     Kalman filter is computed as described in the paper by G. Welch and
     G. Bishop [1]_.
