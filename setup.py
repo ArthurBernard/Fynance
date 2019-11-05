@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-19 19:54:59
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-27 14:03:28
+# @Last modified time: 2019-11-05 17:24:48
 
 """ Setup script. """
 
@@ -39,12 +39,49 @@ CLASSIFIERS = [
 ]
 
 MAJOR = 1
-MINOR = 0
-PATCH = 8
+MINOR = 1
+PATCH = 0
+ISRELEASED = False
 VERSION = '{}.{}.{}'.format(MAJOR, MINOR, PATCH)
 
+
+def get_version_info():
+    FULLVERSION = VERSION
+    GIT_REVISION = ""
+
+    if not ISRELEASED:
+        FULLVERSION += '.dev' + GIT_REVISION[:7]
+
+    return FULLVERSION, GIT_REVISION
+
+
+def write_version_py(filename='fynance/version.py'):
+    cnt = """
+# THIS FILE IS GENERATED FROM FYNANCE SETUP.PY
+short_version = '%(version)s'
+version = '%(version)s'
+full_version = '%(full_version)s'
+git_revision = '%(git_revision)s'
+release = %(isrelease)s
+if not release:
+    version = full_version
+"""
+    FULLVERSION, GIT_REVISION = get_version_info()
+
+    a = open(filename, 'w')
+    try:
+        a.write(cnt % {'version': VERSION,
+                       'full_version': FULLVERSION,
+                       'git_revision': GIT_REVISION,
+                       'isrelease': str(ISRELEASED)})
+    finally:
+        a.close()
+
+
+write_version_py()
+
 DESCRIPTION = 'Python and Cython scripts of machine learning, econometrics '
-DESCRIPTION += 'and statistical tools for financial analysis [In progress]'
+DESCRIPTION += 'and statistical features for financial analysis [In progress]'
 
 build_requires = [
     'Cython>=0.29.0',
@@ -93,13 +130,13 @@ extensions = [
         include_dirs=[numpy.get_include(), '.']
     ),
     Extension(
-        'fynance.tools.metrics_cy',
-        ['fynance/tools/metrics_cy' + ext],
+        'fynance.features.metrics_cy',
+        ['fynance/features/metrics_cy' + ext],
         include_dirs=[numpy.get_include(), '.']
     ),
     Extension(
-        'fynance.tools.momentums_cy',
-        ['fynance/tools/momentums_cy' + ext],
+        'fynance.features.momentums_cy',
+        ['fynance/features/momentums_cy' + ext],
         include_dirs=[numpy.get_include(), '.']
     ),
     Extension(
@@ -115,7 +152,7 @@ if USE_CYTHON or USE_CYTHON == 'auto':
 else:
     ext_modules = extensions
 
-with open('README.rst') as f:
+with open('README.rst', 'r') as f:
     long_description = f.read()
 
 setup(
@@ -126,6 +163,10 @@ setup(
     license='MIT',
     url='https://github.com/ArthurBernard/Fynance',
     download_url='https://pypi.org/project/fynance/',
+    project_urls={
+        'Documentation': 'https://fynance.readthedocs.io/',
+        'Source Code': 'https://github.com/ArthurBernard/Fynance/'
+    },
     author=['Arthur Bernard'],
     author_email='arthur.bernard.92@gmail.com',
     packages=find_packages(),  # ['fynance'],
