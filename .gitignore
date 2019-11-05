@@ -1,6 +1,7 @@
 # Files to ignore
 setup.cfg
 _how_to_make_dist.txt
+fynance/version.py
 
 # Extensions to ignore
 *.so
