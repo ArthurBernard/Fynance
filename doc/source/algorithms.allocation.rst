@@ -1,10 +1,16 @@
+***************************
 Portfolio allocation module
-===========================
+***************************
+
 Some algorithms of portfolio allocation.
 
 .. currentmodule:: fynance.algorithms.allocation
 
+Allocation algorithms
+=====================
+
 .. autosummary::
+   :toctree: generated/
 
    fynance.algorithms.allocation.ERC
    fynance.algorithms.allocation.HRP
@@ -13,17 +19,3 @@ Some algorithms of portfolio allocation.
    fynance.algorithms.allocation.MVP
    fynance.algorithms.allocation.MVP_uc
    fynance.algorithms.allocation.rolling_allocation
-
-.. autofunction:: ERC
-
-.. autofunction:: HRP
-
-.. autofunction:: IVP
-
-.. autofunction:: MDP
-
-.. autofunction:: MVP
-
-.. autofunction:: MVP_uc
-
-.. autofunction:: rolling_allocation

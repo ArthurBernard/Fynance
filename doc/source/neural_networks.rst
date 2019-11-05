@@ -1,8 +1,10 @@
-=======================
-Neural Networks package
-=======================
+----------------------------------------------------------
+ Neural Networks package (:mod:`fynance.neural_networks`)
+----------------------------------------------------------
+
 Several kind of neural networks and tools to applied them to financial strategies.
 
-.. toctree::
-    
-    neural_networks.rolling_neural_networks.rst
+.. automodule:: fynance.neural_networks
+   :no-members:
+   :no-inherited-members:
+   :no-special-members:

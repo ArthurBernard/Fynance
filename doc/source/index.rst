@@ -2,7 +2,7 @@
  Welcome to Fynance project 
 ============================
 
-This is the documentation of ``fynance``, a **python/cython project** that includes several **machine learning**, **econometric** and **statistical** subpackages specialy adapted for **financial analysis** and **backtest trading strategies**.
+This is the documentation of ``fynance``, a **python/cython project** that includes several **machine learning**, **econometric** and **statistical** subpackages specialy adapted for **financial analysis**, **portfolio allocation** and **backtest trading strategies**.
 
 --------------
  Installation 
@@ -30,7 +30,7 @@ If you want to compile ``fynance`` package from cython files you must set ``USE_
  Presentation 
 --------------
 
-The ``fynance`` package contains currently five available modules:
+The ``fynance`` package contains currently five subpackages:
 
 - Algorithms :mod:`fynance.algorithms` contains:
    - Portfolio allocations :mod:`fynance.algorithms.allocation`.
@@ -45,10 +45,10 @@ The ``fynance`` package contains currently five available modules:
 
 - Neural networks :mod:`fynance.neural_networks` with Keras (backend Tensorflow or Theano).
 
-- Tools :mod:`fynance.tools` contains:
-   - Financial indicators :mod:`fynance.tools.indicators`.
-   - Statistical momentums :mod:`fynance.tools.momentums`.
-   - Metrics :mod:`fynance.tools.metrics`. 
+- Feature tools :mod:`fynance.features` contains:
+   - Financial indicators :mod:`fynance.features.indicators`.
+   - Statistical momentums :mod:`fynance.features.momentums`.
+   - Metrics :mod:`fynance.features.metrics`. 
 
 ----------
  Contents 
@@ -61,4 +61,4 @@ The ``fynance`` package contains currently five available modules:
    backtest
    models
    neural_networks
-   tools
+   features

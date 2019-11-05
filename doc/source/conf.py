@@ -4,14 +4,16 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-08-21 07:05:30
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-27 14:08:40
+# @Last modified time: 2019-11-05 15:30:47
 
 """ Configuration file of documentation. """
 
 # Built-in packages
 import os
 import sys
+import re
 from unittest.mock import MagicMock
+from datetime import date
 # import glob
 
 # Third party packages
@@ -59,11 +61,17 @@ extensions = [
 ]
 
 project = 'fynance'
-copyright = '2018-2019, Arthur Bernard'
+copyright = '2018-{}, Arthur Bernard'.format(date.today().year)
 author = 'Arthur Bernard'
 
-version = "1.0.8"
-release = "1.0.8"
+# The default replacements for |version| and |release|, also used in various
+# other places throughout the built documents.
+import fynance
+version = re.sub(r'\.dev-.*$', r'.dev', fynance.__version__)
+release = fynance.__version__
+
+# version = "1.0.8"
+# release = "1.0.8"
 
 templates_path = ['_templates']
 source_suffix = '.rst'
@@ -90,16 +98,8 @@ html_theme_option = {
     'sidebar': 'left',
     'scipy_org_logo': False,
     'navigation_links': True,
-    'rootlinks': [
-        (
-            'https://github.com/ArthurBernard/Fynance',
-            'Fynance'
-        ),
-        (
-            'https://fynance.readthedocs.io',
-            'Docs'
-        ),
-    ]
+    'rootlinks': [('https://github.com/ArthurBernard/Fynance/', 'Fynance'),
+                  ('https://fynance.readthedocs.io/', 'Docs')]
 }
 html_sidebars = {'index': ['searchbox.html', 'indexsidebar.html']}
 html_static_path = ['_static']
