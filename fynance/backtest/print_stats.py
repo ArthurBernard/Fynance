@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 # coding: utf-8
+# @Author: ArthurBernard
+# @Email: arthur.bernard.92@gmail.com
+# @Date: 2019-11-05 15:50:33
+# @Last modified by: ArthurBernard
+# @Last modified time: 2019-11-05 15:50:56
 
 # Built-in packages
 
-# External packages
+# Third party packages
 import numpy as np
 
-# Internal packages
-from fynance.tools.metrics import accuracy, sharpe, calmar
+# Local packages
+from fynance.features.metrics import accuracy, sharpe, calmar
 
 __all__ = ['set_text_stats']
 

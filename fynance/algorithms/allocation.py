@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-09-12 14:52:08
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-25 14:11:18
+# @Last modified time: 2019-11-05 17:20:52
 
 """ Algorithms of portfolio allocation. """
 
@@ -18,7 +18,7 @@ from scipy.spatial.distance import squareform
 from scipy.optimize import Bounds, LinearConstraint, minimize
 
 # Local packages
-from fynance.tools.metrics import diversified_ratio
+from fynance.features.metrics import diversified_ratio
 from .rolling import _RollingMechanism
 
 # TODO : cython
@@ -486,9 +486,7 @@ def MDP(X, w0=None, up_bound=1., low_bound=0.):
     .. math::
 
         w = \text{arg max } D(w) \\
-        u.c. \begin{cases}w'e = 1 \\
-                          0 \leq w_i \leq 1 \\
-             \end{cases}
+        u.c. \begin{cases}w'e = 1 \\ 0 \leq w_i \leq 1 \\ \end{cases}
 
     Where :math:`D(w)` is the diversified ratio of portfolio weighted by `w`.
 
@@ -513,7 +511,9 @@ def MDP(X, w0=None, up_bound=1., low_bound=0.):
 
     References
     ----------
-    .. [5] tobam.fr/wp-content/uploads/2014/12/TOBAM-JoPM-Maximum-Div-2008.pdf
+    .. [5] `Choueifaty, Y., and Coignard, Y., 2008, Toward Maximum
+           Diversification. <https://www.tobam.fr/wp-content/uploads/2014/12/
+           TOBAM-JoPM-Maximum-Div-2008.pdf>`_
 
     """
     T, N = X.shape

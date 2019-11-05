@@ -4,9 +4,9 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-09-12 17:54:50
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-28 13:39:14
+# @Last modified time: 2019-11-05 20:22:04
 
-""" Module with some algorithms.
+"""
 
 .. currentmodule:: fynance.algorithms
 
@@ -15,7 +15,6 @@
    :caption: Contents:
 
    algorithms.allocation
-
 
 """
 

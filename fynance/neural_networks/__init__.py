@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# coding: utf-8
+# @Author: ArthurBernard
+# @Email: arthur.bernard.92@gmail.com
+# @Date: 2019-11-05 19:52:23
+# @Last modified by: ArthurBernard
+# @Last modified time: 2019-11-05 20:01:15
 
-""" 
-
-Some models, tools, etc for neural network
-
-.. automodule:: fynance.neural_networks
-   :members:
+""" Some models, tools, etc for neural network
 
 """
+
+# Built-in packages
+
+# Third party packages
+
+# Local packages
 from . import roll_neural_network
 from .roll_neural_network import RollNeuralNet
 from . import roll_multi_neural_networks

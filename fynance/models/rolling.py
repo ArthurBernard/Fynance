@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-04-23 19:15:17
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-27 14:00:38
+# @Last modified time: 2019-11-05 20:32:52
 
 """ Basis of rolling models.
 
@@ -302,6 +302,11 @@ class RollingXGB(_RollingBasis):
 
 class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
     """ Rolling version of the vanilla neural network model.
+
+    Methods
+    -------
+    set_roll_period
+    sub_predict
 
     TODO:
     - fix train and predict methods
