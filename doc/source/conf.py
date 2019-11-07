@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-08-21 07:05:30
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-11-05 15:30:47
+# @Last modified time: 2019-11-07 17:04:30
 
 """ Configuration file of documentation. """
 
@@ -44,9 +44,6 @@ class Mock(MagicMock):
 #    '__call__', '__mul__', '__getitem__', '__len__',
 # ]
 
-# autosummary_generate = glob.glob("reference/*.rst")
-
-# sys.path.insert(0, os.path.abspath('../..'))
 sys.path.append(os.path.abspath('../..'))
 sys.path.append(os.path.abspath('../sphinxext'))
 
@@ -60,7 +57,7 @@ extensions = [
     'matplotlib.sphinxext.plot_directive',
 ]
 
-project = 'fynance'
+project = 'Fynance'
 copyright = '2018-{}, Arthur Bernard'.format(date.today().year)
 author = 'Arthur Bernard'
 
@@ -70,9 +67,6 @@ import fynance
 version = re.sub(r'\.dev-.*$', r'.dev', fynance.__version__)
 release = fynance.__version__
 
-# version = "1.0.8"
-# release = "1.0.8"
-
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
@@ -81,28 +75,26 @@ pygments_style = 'sphinx'  # Style of code source
 add_function_parentheses = False  # Parentheses are appended to function
 add_module_names = True  # Module names are prepended to all object name
 
+# --------------------------------------------------------------------------- #
+#                                HTML config                                  #
+# --------------------------------------------------------------------------- #
+
 themedir = os.path.join(os.pardir, 'scipy-sphinx-theme', '_theme')
 html_theme = 'scipy'
 html_theme_path = [themedir]
 
-# USELESS ?
-# numpydoc_show_class_members = True
-# class_members_toctree = False
-# nitpicky = True
-# numpydoc_attributes_as_param_list = False
-
-# html_theme = 'scipy-sphinx-theme'  # 'sphinx_rtd_theme'  # Theme of docs
-# html_theme_path = ["./_theme/scipy/"]
-html_theme_option = {
-    'edit_links': True,
+html_theme_options = {
+    'edit_link': True,
     'sidebar': 'left',
     'scipy_org_logo': False,
     'navigation_links': True,
-    'rootlinks': [('https://github.com/ArthurBernard/Fynance/', 'Fynance'),
-                  ('https://fynance.readthedocs.io/', 'Docs')]
+    'rootlinks': [("https://github.com/ArthurBernard/Fynance/", "Fynance"),
+                  ("https://fynance.readthedocs.io/", "Docs")]
 }
 html_sidebars = {'index': ['searchbox.html', 'indexsidebar.html']}
+html_title = '{} v{} Reference Guide'.format(project, version)
 html_static_path = ['_static']
+
 html_context = {
     "display_github": True,  # Integrate GitHub
     "github_user": "ArthurBernard",  # Username
@@ -110,6 +102,14 @@ html_context = {
     "github_version": "master",  # Version
     "conf_py_path": "/source/",  # Path in the checkout to the docs root
 }
+
+html_domain_indices = True
+html_copy_source = False
+html_file_suffix = '.html'
+
+# --------------------------------------------------------------------------- #
+#                             Intersphinx config                              #
+# --------------------------------------------------------------------------- #
 
 intersphinx_mapping = {
     'python': (
@@ -122,5 +122,17 @@ intersphinx_mapping = {
     ),
 }
 
+# --------------------------------------------------------------------------- #
+#                             Autosummary config                              #
+# --------------------------------------------------------------------------- #
 
 autosummary_generate = True
+# autosummary_generate = glob.glob("reference/*.rst")
+
+# --------------------------------------------------------------------------- #
+#                               Autodoc config                                #
+# --------------------------------------------------------------------------- #
+
+autodoc_default_options = {
+    'inherited-members': None,
+}

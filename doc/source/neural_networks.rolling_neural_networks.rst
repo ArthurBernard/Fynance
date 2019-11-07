@@ -6,7 +6,8 @@ The main idea behind Rolling Neural Network is to train the model by followig th
 
 .. image:: _static/rolling_mechanism.png
 
-.. currentmodule:: fynance.neural_networks
+Rolling neural networks with Keras
+==================================
 
 .. autosummary::
    :toctree: generated/
