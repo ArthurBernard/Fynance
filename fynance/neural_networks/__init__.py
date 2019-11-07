@@ -4,9 +4,17 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-11-05 19:52:23
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-11-05 20:01:15
+# @Last modified time: 2019-11-07 18:02:18
 
 """ Some models, tools, etc for neural network
+
+.. currentmodule:: fynance.neural_networks
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Contents:
+
+   neural_networks.rolling_neural_networks
 
 """
 
