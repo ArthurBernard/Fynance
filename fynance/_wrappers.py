@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-10-11 10:10:43
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-30 14:32:27
+# @Last modified time: 2019-11-08 11:11:54
 
 """ Some wrappers functions. """
 
@@ -53,15 +53,19 @@ def wrap_axis(func):
     @wraps(func)
     def check_axis(X, *args, axis=0, min_size=0, **kwargs):
         shape = X.shape
+        if X.ndim > 2:
+            warn('currently, array of dimensions larger than 2 are not '
+                 'supported, it may lead to some issues')
+
         if shape[axis] < min_size:
 
             raise ArraySizeError(shape[axis], axis=axis, min_size=min_size)
 
-        elif len(X.shape) <= axis:
+        elif X.ndim <= axis:
 
             raise np.AxisError(axis, len(X.shape))
 
-        elif axis == 1 and len(shape) == 2:
+        elif axis == 1 and X.ndim == 2:
 
             return func(X.T, *args, axis=0, **kwargs).T
 
