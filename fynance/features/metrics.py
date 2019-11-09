@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-11-05 15:53:44
+# @Last modified time: 2019-11-08 11:33:38
 
 """ Metric functions used for financial analysis. """
 
@@ -155,8 +155,8 @@ def annual_return(X, period=252, axis=0, dtype=None, ddof=0):
     """
     if ddof >= X.shape[0]:
 
-        raise ValueError("degree of freedom {} is greater than size {} \
-            of X in axis {}".format(ddof, X.shape[axis], axis))
+        raise ValueError("degree of freedom {} is greater than size {} of X "
+                         "in axis {}".format(ddof, X.shape[axis], axis))
 
     return _annual_return(X, period, ddof)
 
@@ -171,8 +171,8 @@ def _annual_return(X, period, ddof):
 
     if (ret < 0).any():
 
-        raise ValueError('initial value X[0] and final value X[-1] must \
-            be of the same sign.')
+        raise ValueError('initial value X[0] and final value X[-1] must '
+                         'be of the same sign.')
 
     sign = np.sign(X[0])
     power = period / (T - ddof)
@@ -260,11 +260,11 @@ def _annual_volatility(X, period, log, axis, ddof):
 
 @WrapperArray('dtype', 'axis', 'ddof', min_size=2)
 def calmar(X, period=252, axis=0, dtype=None, ddof=0):
-    r""" Compute the Calmar Ratio [3]_ for each `X`' series.
+    r""" Compute the Calmar Ratio for each `X`' series.
 
     Notes
     -----
-    It is the compouned annual return
+    Calmar ratio [3]_ is the compouned annual return
     (:func:`~fynance.features.metrics.annual_return`) over the maximum drawdown
     (:func:`~fynance.features.metrics.mdd`). Let :math:`T` the number of time
     observations, DD the vector of drawdown:
@@ -446,8 +446,8 @@ def drawdown(X, raw=False, axis=0, dtype=None):
 def _drawdown(X, raw):
     if (X[0] == 0).any() and not raw:
 
-        warn('Cannot compute drawdown in percentage without initial values \
-            X[0] strictly positive.')
+        warn('Cannot compute drawdown in percentage without initial values '
+             'X[0] strictly positive.')
         raw = True
 
     if len(X.shape) == 2:
@@ -648,7 +648,7 @@ def perf_returns(R, kind='raw', base=100., axis=0, dtype=None):
 
 @WrapperArray('dtype', 'axis')
 def perf_strat(X, S=None, base=100., axis=0, dtype=None, reinvest=False):
-    """ Compute the performance of a strategy.
+    """ Compute the performance of strategies for each `X`' series.
 
     With respect to this underlying and signal series along time axis.
 
@@ -691,31 +691,115 @@ def perf_strat(X, S=None, base=100., axis=0, dtype=None, reinvest=False):
 
     """
     if S is None:
-        S = np.ones(X)
+        S = np.ones(X.shape)
+
+    elif S.ndim < X.ndim and S.shape[0] == X.shape[0]:
+        S = S.reshape(S.shape + (1,) * (X.ndim - S.ndim))
+
+    elif S.shape == X.shape:
+        pass
+
+    else:
+        raise ValueError('S and X could not be broadcast, must have the same '
+                         'shape or axis {} of same size and S.ndim < X.ndim '
+                         '(but S:{} and X:{})'.format(axis, S.shape, X.shape))
 
     R = np.zeros(X.shape)
     X = base * X / X[0]
 
     if not reinvest:
-        R[1:] = X[1:] - X[:-1]
         kind = 'raw'
+        R[1:] = X[1:] - X[:-1]
 
     elif reinvest:
-        R[1:] = X[1:] / X[:-1] - 1
         kind = 'pct'
+        R[1:] = X[1:] / X[:-1] - 1
 
     return perf_returns(R * S, base=base, kind=kind, axis=axis, dtype=dtype)
 
 
+@WrapperArray('dtype', 'axis')
+def returns_strat(X, S=None, kind='pct', base=100., axis=0, dtype=None):
+    """ Compute the returns of strategies for each `X`' series.
+
+    With respect to this underlying and signal series along time axis.
+
+    Parameters
+    ----------
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Time-series of prices or index values.
+    S : np.ndarray[dtype, ndim=1 or 2]
+        Time-series of signals, if `None` considering a long only position.
+        ``S`` array must have the same shape than ``X``. Default is None.
+    kind : {'raw', 'pct'}
+        - If `'raw'`, then considers returns as following :math:`R_t
+          = X_t - X_{t-1}`.
+        - If `'pct'` (default), then considers returns as following
+          :math:`R_t = \\frac{X_t - X_{t-1}}{X_{t-1}}`.
+    base : float, optional
+        Initial value for measure the returns, default is 100. Relevant only if
+        ``kind='raw'``.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
+
+    Returns
+    -------
+    np.ndarray[dtype, ndim=1 or 2]
+        Returns along time axis.
+
+    See Also
+    --------
+    perf_returns, perf_index
+
+    Examples
+    --------
+    >>> X = np.array([10., 12., 15., 14., 16., 18., 16.])
+    >>> S = np.array([1., 1., 1., 0., 1., 1., -1.])
+    >>> returns_strat(X, S, base=10., kind='raw')
+    array([ 0.,  2.,  3., -0.,  2.,  2.,  2.])
+    >>> returns_strat(X, S)
+    array([ 0. , 0.2, 0.3,  0. ,  0.2,  0.2, 0.2])
+
+    """
+    if S is None:
+        S = np.ones(X.shape)
+
+    elif S.ndim < X.ndim and S.shape[0] == X.shape[0]:
+        S = S.reshape(S.shape + (1,) * (X.ndim - S.ndim))
+
+    elif S.shape == X.shape:
+        pass
+
+    else:
+        raise ValueError('S and X could not be broadcast, must have the same '
+                         'shape or axis {} of same size and S.ndim < X.ndim '
+                         '(but S:{} and X:{})'.format(axis, S.shape, X.shape))
+
+    R = np.zeros(X.shape)
+    X = base * X / X[0]
+
+    if kind == 'raw':
+        R[1:] = X[1:] - X[:-1]
+
+    elif kind == 'pct':
+        R[1:] = X[1:] / X[:-1] - 1
+
+    return R * S
+
+
 @WrapperArray('dtype', 'axis', 'null', 'ddof', min_size=2)
 def sharpe(X, rf=0, period=252, log=False, axis=0, dtype=None, ddof=0):
-    r""" Compute the Sharpe ratio [7]_ for each `X`' series.
+    r""" Compute the Sharpe ratio for each `X`' series.
 
     Notes
     -----
-    It is computed as the annualized expected returns (:func:`~annual_return`)
-    minus the risk-free rate (noted :math:`rf`) over the annualized volatility
-    of returns (:func:`~annual_volatility`) such that:
+    Sharpe ratio [7]_ is computed as the annualized expected returns
+    (:func:`~annual_return`) minus the risk-free rate (noted :math:`rf`) over
+    the annualized volatility of returns (:func:`~annual_volatility`) such
+    that:
 
     .. math::
 
@@ -1034,15 +1118,15 @@ def _roll_annual_volatility(X, period, log, w, axis, ddof):
 
 @WrapperArray('dtype', 'axis', 'window', 'ddof', min_size=2)
 def roll_calmar(X, period=252., w=None, axis=0, dtype=None, ddof=0):
-    r""" Compute the rolling Calmar ratio [3]_.
+    r""" Compute the rolling Calmar ratio of each `X`' series.
 
     Notes
     -----
-    It is the rolling compouned annual return
+    Calmar ratio [3]_ is the rolling compouned annual return
     (:func:`~fynance.features.metrics.roll_annual_return`) over the rolling
-    maximum drawdown (:func:`~fynance.features.metrics.roll_mdd`). Let :math:`T`
-    the number of time observations, DD the vector of drawdown, :math:`\forall
-    t \in [1:T]`:
+    maximum drawdown (:func:`~fynance.features.metrics.roll_mdd`). Let
+    :math:`T` the number of time observations, DD the vector of drawdown,
+    :math:`\forall t \in [1:T]`:
 
     .. math::
 
@@ -1171,8 +1255,8 @@ def roll_drawdown(X, w=None, raw=False, axis=0, dtype=None):
 def _roll_drawdown(X, w, raw):
     if (X[0] == 0).any() and not raw:
 
-        warn('Cannot compute drawdown in percentage without initial values \
-            X[0] strictly positive.')
+        warn('Cannot compute drawdown in percentage without initial values '
+             'X[0] strictly positive.')
         raw = True
 
     if len(X.shape) == 2:
@@ -1297,11 +1381,11 @@ def _roll_mdd(X, w, raw):
 @WrapperArray('dtype', 'axis', 'window', 'ddof', min_size=2)
 def roll_sharpe(X, rf=0, period=252, w=None, log=False, axis=0, dtype=None,
                 ddof=0):
-    r""" Compute rolling sharpe ratio [7]_.
+    r""" Compute rolling sharpe ratio of each `X`' series.
 
     Notes
     -----
-    It is computed as the rolling annualized expected returns
+    Sharpe ratio [7]_ is computed as the rolling annualized expected returns
     (:func:`~roll_annual_return`) minus the risk-free rate (noted :math:`rf`)
     over the rolling annualized volatility of returns
     (:func:`~roll_annual_volatility`) such that :math:`\forall t \in [1:T]`:
