@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-11-08 11:33:38
+# @Last modified time: 2019-11-09 20:35:29
 
 """ Metric functions used for financial analysis. """
 
@@ -720,7 +720,7 @@ def perf_strat(X, S=None, base=100., axis=0, dtype=None, reinvest=False):
 
 @WrapperArray('dtype', 'axis')
 def returns_strat(X, S=None, kind='pct', base=100., axis=0, dtype=None):
-    """ Compute the returns of strategies for each `X`' series.
+    r""" Compute the returns of strategies for each `X`' series.
 
     With respect to this underlying and signal series along time axis.
 
@@ -735,7 +735,7 @@ def returns_strat(X, S=None, kind='pct', base=100., axis=0, dtype=None):
         - If `'raw'`, then considers returns as following :math:`R_t
           = X_t - X_{t-1}`.
         - If `'pct'` (default), then considers returns as following
-          :math:`R_t = \\frac{X_t - X_{t-1}}{X_{t-1}}`.
+          :math:`R_t = \frac{X_t - X_{t-1}}{X_{t-1}}`.
     base : float, optional
         Initial value for measure the returns, default is 100. Relevant only if
         ``kind='raw'``.
@@ -761,7 +761,8 @@ def returns_strat(X, S=None, kind='pct', base=100., axis=0, dtype=None):
     >>> returns_strat(X, S, base=10., kind='raw')
     array([ 0.,  2.,  3., -0.,  2.,  2.,  2.])
     >>> returns_strat(X, S)
-    array([ 0. , 0.2, 0.3,  0. ,  0.2,  0.2, 0.2])
+    array([ 0.        ,  0.2       ,  0.25      , -0.        ,  0.14285714,
+            0.125     ,  0.11111111])
 
     """
     if S is None:
