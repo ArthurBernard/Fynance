@@ -1,6 +1,6 @@
---------------------------------------------------
- Financial models package (:mod:`fynance.models`) 
---------------------------------------------------
+------------------------------------------
+ Financial models (:mod:`fynance.models`) 
+------------------------------------------
 
 Several financial models (deep learning, econometric, statistic etc.).
 

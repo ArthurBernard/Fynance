@@ -32,23 +32,25 @@ If you want to compile ``fynance`` package from cython files you must set ``USE_
 
 The ``fynance`` package contains currently five subpackages:
 
-- Algorithms :mod:`fynance.algorithms` contains:
-   - Portfolio allocations :mod:`fynance.algorithms.allocation`.
-   - Rolling objects :mod:`fynance.algorithms.rolling` for algorithms.
+- Algorithms (:mod:`fynance.algorithms`) contains:
+   - Portfolio allocations (e.g. :func:`~fynance.algorithms.allocation.ERC`, :func:`~fynance.algorithms.allocation.HRP`, :func:`~fynance.algorithms.allocation.IVP`, :func:`~fynance.algorithms.allocation.MDP`, :func:`~fynance.algorithms.allocation.MVP`, etc.).
+   - Rolling objects for algorithms (e.g. :func:`~fynance.algorithms.allocation.rolling_allocation`, etc.).
 
-- Backtesting objects :mod:`fynance.backtest`. TODO : improve backtest module.
+- Backtesting objects (:mod:`fynance.backtest`).
+   - Module to plot profit and loss, and measure of performance.
 
-- Time-series models :mod:`fynance.models` contains:
-   - Econometric models :mod:`fynance.models.econometric_models`.
-   - Neural network models :mod:`fynance.models.neural_network` (PyTorch).
-   - Rolling objects :mod:`fynance.models.rolling` for models, currently work only with neural network models.
+- Time-series models (:mod:`fynance.models`) contains:
+   - Econometric models (e.g. :func:`~fynance.models.econometric_models.MA`, :func:`~fynance.models.econometric_models.ARMA`, :func:`~fynance.models.econometric_models.ARMA_GARCH` and :func:`~fynance.models.econometric_models.ARMAX_GARCH`, etc.).
+   - Neural network models with PyTorch (e.g. :func:`~fynance.models.neural_network.MultiLayerPerceptron`, etc.).
+   - Rolling objects for models, currently work only with neural network models (e.g. :func:`~fynance.models.rolling._RollingBasis`, :func:`~fynance.models.rolling.RollMultiLayerPerceptron`, etc.).
 
-- Neural networks :mod:`fynance.neural_networks` with Keras (backend Tensorflow or Theano).
+- Neural networks (:mod:`fynance.neural_networks`) with Keras (backend Tensorflow or Theano).
+   - Rolling neural network models.
 
-- Feature tools :mod:`fynance.features` contains:
-   - Financial indicators :mod:`fynance.features.indicators`.
-   - Statistical momentums :mod:`fynance.features.momentums`.
-   - Metrics :mod:`fynance.features.metrics`. 
+- Feature tools (:mod:`fynance.features`) contains:
+   - Financial indicators (e.g. :func:`~fynance.features.indicators.bollinger_band`, :func:`~fynance.features.indicators.cci`, :func:`~fynance.features.indicators.hma`, :func:`~fynance.features.indicators.macd_hist`, :func:`~fynance.features.indicators.macd_line`, :func:`~fynance.features.indicators.rsi`, etc.).
+   - Statistical momentums (e.g. :func:`~fynance.features.momentums.sma`, :func:`~fynance.features.momentums.ema`, :func:`~fynance.features.momentums.wma`, :func:`~fynance.features.momentums.smstd`, :func:`~fynance.features.momentums.emstd` :func:`~fynance.features.momentums.wmstd`, etc.).
+   - Metrics (e.g. :func:`~fynance.features.metrics.annual_return`, :func:`~fynance.features.metrics.annual_volatility`, :func:`~fynance.features.metrics.calmar`, :func:`~fynance.features.metrics.diversified_ratio`, :func:`~fynance.features.metrics.mdd`, :func:`~fynance.features.metrics.sharpe`, :func:`~fynance.features.metrics.z_score`, etc.).
 
 ----------
  Contents 

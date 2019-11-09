@@ -1,6 +1,6 @@
-----------------------------------------------------------
- Neural Networks package (:mod:`fynance.neural_networks`)
-----------------------------------------------------------
+--------------------------------------------------
+ Neural Networks (:mod:`fynance.neural_networks`)
+--------------------------------------------------
 
 Several kind of neural networks and tools to applied them to financial strategies.
 

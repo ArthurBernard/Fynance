@@ -1,6 +1,6 @@
-----------------------------------------------------------
- Financial algorithms package (:mod:`fynance.algorithms`) 
-----------------------------------------------------------
+--------------------------------------------------
+ Financial algorithms (:mod:`fynance.algorithms`) 
+--------------------------------------------------
 
 Several financial algorithms (portfolio allocation, etc.).
 

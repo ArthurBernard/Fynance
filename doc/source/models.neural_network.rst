@@ -1,10 +1,13 @@
-****************************
-Neural network models module
-****************************
+*********************
+Neural network models
+*********************
 
-Some basis of neural network models with PyTorch package.
+Some basis of neural network models with PyTorch package: Multi-Layer Perceptron (:func:`~fynance.models.neural_network.MultiLayerPerceptron`).
 
 .. currentmodule:: fynance.models.neural_network
+
+Neural networks
+===============
 
 .. autosummary::
    :toctree: generated/

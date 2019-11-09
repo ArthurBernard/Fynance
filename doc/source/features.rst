@@ -1,6 +1,6 @@
---------------------------------------------
- Features package (:mod:`fynance.features`) 
---------------------------------------------
+------------------------------------
+ Features (:mod:`fynance.features`) 
+------------------------------------
 
 .. automodule:: fynance.features
    :no-members:
