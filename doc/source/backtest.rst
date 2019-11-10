@@ -1,6 +1,6 @@
---------------------------------------------
- BackTest package (:mod:`fynance.backtest`) 
---------------------------------------------
+------------------------------------
+ BackTest (:mod:`fynance.backtest`) 
+------------------------------------
 
 Different tools to backtest or analyze financial strategies or models.
 

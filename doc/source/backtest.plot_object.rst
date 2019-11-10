@@ -1,25 +1,19 @@
-******************
-Plot object module
-******************
-Objects to plot backtest or analysis of financial strategies and models.
+*****************
+Plotting backtest
+*****************
 
-.. autosummary::
-   
-   fynance.backtest.PlotBackTest
-   fynance.backtest.DynaPlotBackTest
+Objects to plot backtest of financial strategies and models (:func:`~fynance.backtest.PlotBackTest`). There is also an object to plot dynamicaly backtest (:func:`~fynance.backtest.DynaPlotBackTest`), i.e. the backtest results are progressively ploted along the computation are done.
 
 Static object
 =============
 
-.. autoclass:: fynance.backtest.PlotBackTest
-   :members:
-   :show-inheritance:
-   :special-members:
+.. autosummary::
+   
+   fynance.backtest.PlotBackTest
 
 Dynamic object
 ==============
 
-.. autoclass:: fynance.backtest.DynaPlotBackTest
-   :members:
-   :show-inheritance:
-   :special-members:
+.. autosummary::
+
+   fynance.backtest.DynaPlotBackTest
