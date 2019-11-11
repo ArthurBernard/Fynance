@@ -9,18 +9,33 @@
 [![Documentation Status](https://readthedocs.org/projects/fynance/badge/?version=latest)](https://fynance.readthedocs.io/en/latest/?badge=latest)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/ArthurBernard/Fynance.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ArthurBernard/Fynance/context:python)
 
-`fynance` is a beta version of **python/cython project** that includes several **machine learning**, **econometric** and **statistical** tools specialy adapted for **trading strategy** and **financial analysis**.
+The **Fynance project** provides efficient tools to financial annalysis, such that the **Python package** `fynance` that includes several **machine learning**, **econometric** and **statistical** subpackages specialy adapted to **backtest trading strategy** and **financial analysis**, the [documentation](https://fynance.readthedocs.io/en/latest/index.html) with **examples and explanations** of functions, and **notebooks** with more complete examples.
 
-## Description
+*Currently the project is allways at a **beta level**. But some parts of the project can be considered as stable, such as ``fynance.features`` (this subpackage is already coded in **Cython** to be time-efficient), ``fynance.algorithms.allocation`` (this subpackage seems stable but have to be cleaned and write in Cython), and the other subpackages are always in progress (subject to deep modification).*
 
-This project contains several **python** (and **cython**) tools for **trading strategy** and **financial analysis**:
-- Econometric models
-- Neural Networks
-- Feature extraction methods
-- Financial indicators
-- Backtesting
-- Notebooks with some exemples
-- Etc.
+## Prsentation
+
+The ``fynance`` package contains currently five subpackages:
+
+- **Algorithms** (``fynance.algorithms``) contains:
+    - **Portfolio allocations** (e.g. ERC, HRP, IVP, MDP, MVP, etc.).
+    - **Rolling objects** for algorithms (e.g. rolling_allocation, etc.).
+
+- **Backtesting** objects (``fynance.backtest``) contains:
+    - Module to plot profit and loss, and measure of performance.
+
+- **Time-series models** (``fynance.models``) contains:
+    - **Econometric models** (e.g. MA, ARMA, ARMA_GARCH and ARMAX_GARCH, etc.).
+    - **Neural network models** with **PyTorch** (e.g. MultiLayerPerceptron, etc.).
+    - **Rolling objects** for models, currently work only with neural network models (e.g. \_RollingBasis, RollMultiLayerPerceptron, etc.).
+
+- **Neural networks** (``fynance.neural_networks``) with **Keras** (backend Tensorflow or Theano) contains:
+    - Rolling neural network models.
+
+- **Feature** tools (``fynance.features``) contains:
+    - **Financial indicators** (e.g. bollinger_band, cci, hma, macd_hist, macd_line, rsi, etc.).
+    - **Statistical momentums** (e.g. sma, ema, wma, smstd, emstd wmstd, etc.).
+    - **Metrics** (e.g. annual_return, annual_volatility, calmar, diversified_ratio, mdd, sharpe, z_score, etc.).
 
 Please refer you to the [documentation](https://fynance.readthedocs.io/en/latest/index.html) to see more details on different tools available in `fynance` package. Documentation contains some descriptions and examples for functions, classes and methods.    
 
@@ -41,7 +56,7 @@ Use the command:
 
 #### Compile from cython files   
 
-If you want to compile fynance package from cython files you must set `USE_CYTHON = True` in `setup.py` file.    
+If you want to compile fynance package from cython files you must set ``USE_CYTHON=True`` in `setup.py` file.    
 
 > $ python setup.py build_ext --inplace    
 > $ python setup.py install --user   
