@@ -4,27 +4,7 @@
 
 This is the documentation of ``fynance``, a **Python package** that includes several **machine learning**, **econometric** and **statistical** subpackages specialy adapted to **backtest financial analysis**, **portfolio allocation** and **backtest trading strategies**.
 
---------------
- Installation 
---------------
-
-From PyPI
-=========
-
-   $ pip install fynance
-
-From source (GitHub)
-====================
-
-If you want to compile ``fynance`` package from cython files you must set ``USE_CYTHON=True`` in ``setup.py`` file. Otherwise set it to ``USE_CYTHON=False``. By default ``USE_CYTHON='auto'``.
-
-   $ git clone https://github.com/ArthurBernard/Fynance.git
-
-   $ cd Fynance
-
-   $ python setup.py build_ext --inplace
-
-   $ python setup.py install --user
+*Currently the project is allways at a **beta level**. But some parts of the project can be considered as stable, such as ``fynance.features`` (this subpackage is already coded in **Cython** to be time-efficient), ``fynance.algorithms.allocation`` (this subpackage seems stable but have to be cleaned and write in Cython), and the other subpackages are always in progress (subject to deep modification).*
 
 --------------
  Presentation 
@@ -51,6 +31,28 @@ The ``fynance`` package contains currently five subpackages:
    - **Financial indicators** (e.g. :func:`~fynance.features.indicators.bollinger_band`, :func:`~fynance.features.indicators.cci`, :func:`~fynance.features.indicators.hma`, :func:`~fynance.features.indicators.macd_hist`, :func:`~fynance.features.indicators.macd_line`, :func:`~fynance.features.indicators.rsi`, etc.).
    - **Statistical momentums** (e.g. :func:`~fynance.features.momentums.sma`, :func:`~fynance.features.momentums.ema`, :func:`~fynance.features.momentums.wma`, :func:`~fynance.features.momentums.smstd`, :func:`~fynance.features.momentums.emstd` :func:`~fynance.features.momentums.wmstd`, etc.).
    - **Metrics** (e.g. :func:`~fynance.features.metrics.annual_return`, :func:`~fynance.features.metrics.annual_volatility`, :func:`~fynance.features.metrics.calmar`, :func:`~fynance.features.metrics.diversified_ratio`, :func:`~fynance.features.metrics.mdd`, :func:`~fynance.features.metrics.sharpe`, :func:`~fynance.features.metrics.z_score`, etc.).
+
+--------------
+ Installation 
+--------------
+
+From PyPI
+=========
+
+   $ pip install fynance
+
+From source (GitHub)
+====================
+
+If you want to compile ``fynance`` package from cython files you must set ``USE_CYTHON=True`` in ``setup.py`` file. Otherwise set it to ``USE_CYTHON=False``. By default ``USE_CYTHON='auto'``.
+
+   $ git clone https://github.com/ArthurBernard/Fynance.git
+
+   $ cd Fynance
+
+   $ python setup.py build_ext --inplace
+
+   $ python setup.py install --user
 
 ----------
  Contents 

@@ -13,7 +13,7 @@ The **Fynance project** provides efficient tools to financial annalysis, such th
 
 *Currently the project is allways at a **beta level**. But some parts of the project can be considered as stable, such as ``fynance.features`` (this subpackage is already coded in **Cython** to be time-efficient), ``fynance.algorithms.allocation`` (this subpackage seems stable but have to be cleaned and write in Cython), and the other subpackages are always in progress (subject to deep modification).*
 
-## Prsentation
+## Presentation
 
 The ``fynance`` package contains currently five subpackages:
 
@@ -29,7 +29,7 @@ The ``fynance`` package contains currently five subpackages:
     - **Neural network models** with **PyTorch** (e.g. MultiLayerPerceptron, etc.).
     - **Rolling objects** for models, currently work only with neural network models (e.g. \_RollingBasis, RollMultiLayerPerceptron, etc.).
 
-- **Neural networks** (``fynance.neural_networks``) with **Keras** (backend Tensorflow or Theano) contains:
+- **Neural networks** (``fynance.neural_networks``) with **Keras** (backend **Tensorflow** or **Theano**) contains:
     - Rolling neural network models.
 
 - **Feature** tools (``fynance.features``) contains:
@@ -41,23 +41,16 @@ Please refer you to the [documentation](https://fynance.readthedocs.io/en/latest
 
 ## Installation
 
-#### From pip
+### From PyPI
 
 > $ pip install fynance
 
-#### From GitHub
+### From source (GitHub)
 
-Use the command:
+If you want to compile ``fynance`` package from cython files you must set ``USE_CYTHON=True`` in ``setup.py`` file. Otherwise set it to ``USE_CYTHON=False``. By default ``USE_CYTHON='auto'``.
 
 > $ git clone https://github.com/ArthurBernard/Fynance.git    
 > $ cd Fynance   
-> $ python setup.py build_ext --inplace    
-> $ python setup.py install --user   
-
-#### Compile from cython files   
-
-If you want to compile fynance package from cython files you must set ``USE_CYTHON=True`` in `setup.py` file.    
-
 > $ python setup.py build_ext --inplace    
 > $ python setup.py install --user   
 

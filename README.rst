@@ -1,6 +1,6 @@
-=====================================================================
-Fynance - Machine learning tools for financial analysis [In Progress]
-=====================================================================
+=======================================================================
+ Fynance - Machine learning tools for financial analysis [In Progress] 
+=======================================================================
 
 .. image:: https://img.shields.io/pypi/pyversions/fynance
     :alt: PyPI - Python Version
@@ -21,66 +21,65 @@ Fynance - Machine learning tools for financial analysis [In Progress]
     :target: https://lgtm.com/projects/g/ArthurBernard/Fynance/context:python)
     :alt: Language grade: Python
 
-`fynance` is a beta version of **python/cython project** [*]_ that includes several **machine learning**, **econometric** and **statistical** tools specialy adapted for **trading strategy** and **financial analysis**.
+The **Fynance project** [*]_ provides efficient tools to financial annalysis, such that the **Python package** `fynance` that includes several **machine learning**, **econometric** and **statistical** subpackages specialy adapted to **backtest trading strategy** and **financial analysis**, the [documentation](https://fynance.readthedocs.io/en/latest/index.html) with **examples and explanations** of functions, and **notebooks** with more complete examples.
 
-Description
-===========
+*Currently the project is allways at a **beta level**. But some parts of the project can be considered as stable, such as ``fynance.features`` (this subpackage is already coded in **Cython** to be time-efficient), ``fynance.algorithms.allocation`` (this subpackage seems stable but have to be cleaned and write in Cython), and the other subpackages are always in progress (subject to deep modification).*
 
-This project contains several **python** (and **cython**) tools for **trading strategy** and **financial analysis**:
+--------------
+ Presentation 
+--------------
 
-- Neural Networks 
+The ``fynance`` package contains currently five subpackages:
 
-- Feature extraction methods    
+- **Algorithms** (``fynance.algorithms``) contains:
+    - **Portfolio allocations** (e.g. ERC, HRP, IVP, MDP, MVP, etc.).
+    - **Rolling objects** for algorithms (e.g. rolling_allocation, etc.).
 
-- Financial indicators    
+- **Backtesting** objects (``fynance.backtest``) contains:
+    - Module to plot profit and loss, and measure of performance.
 
-- Backtesting    
+- **Time-series models** (``fynance.models``) contains:
+    - **Econometric models** (e.g. MA, ARMA, ARMA_GARCH and ARMAX_GARCH, etc.).
+    - **Neural network models** with **PyTorch** (e.g. MultiLayerPerceptron, etc.).
+    - **Rolling objects** for models, currently work only with neural network models (e.g. \_RollingBasis, RollMultiLayerPerceptron, etc.).
 
-- Econometric models   
+- **Neural networks** (``fynance.neural_networks``) with **Keras** (backend **Tensorflow** or **Theano**) contains:
+    - Rolling neural network models.
 
-- Notebooks with some exemples    
-
-- Etc.    
+- **Feature** tools (``fynance.features``) contains:
+    - **Financial indicators** (e.g. bollinger_band, cci, hma, macd_hist, macd_line, rsi, etc.).
+    - **Statistical momentums** (e.g. sma, ema, wma, smstd, emstd wmstd, etc.).
+    - **Metrics** (e.g. annual_return, annual_volatility, calmar, diversified_ratio, mdd, sharpe, z_score, etc.).
 
 Please refer you to the `documentation`_ to see more details on different tools available in `fynance` package. Documentation contains some descriptions and examples for functions, classes and methods.    
 
 .. _documentation: https://fynance.readthedocs.io/en/latest/index.html
 
-Installation
-============
+--------------
+ Installation 
+--------------
 
-From pip
---------
+From PyPI
+=========
 
-    $ pip install fynance
+   $ pip install fynance
 
-From GitHub
------------
+From source (GitHub)
+====================
 
-Use the command:
+If you want to compile ``fynance`` package from cython files you must set ``USE_CYTHON=True`` in ``setup.py`` file. Otherwise set it to ``USE_CYTHON=False``. By default ``USE_CYTHON='auto'``.
 
-    $ git clone https://github.com/ArthurBernard/Fynance.git
+   $ git clone https://github.com/ArthurBernard/Fynance.git
 
-    $ cd Fynance
+   $ cd Fynance
 
-    $ python setup.py build_ext --inplace
-    
-    $ python setup.py install --user
+   $ python setup.py build_ext --inplace
 
-Compile from cython files   
--------------------------
+   $ python setup.py install --user
 
-If you want to compile fynance package from cython files you must edit `setup.py` file and set :: USE_CYTHON = True 
-
-And use the commad:
-
-    $ python setup.py build_ext --inplace    
-    
-    $ python setup.py install --user   
-
-
-Demo
-====
+------
+ Demo 
+------
 
 - **Backtest** (performance, drawdown and rolling sharpe ratio) of a **trading strategy** did with a **rolling neural network** (see Notebooks/Exemple_Rolling_NeuralNetwork.ipynb for more details):
 
