@@ -43,7 +43,11 @@ Please refer you to the [documentation](https://fynance.readthedocs.io/en/latest
 
 ### From PyPI
 
-> $ pip install fynance
+    $ pip install fynance
+
+```console
+$ pip install fynance
+```
 
 ### From source (GitHub)
 
@@ -53,6 +57,13 @@ If you want to compile ``fynance`` package from cython files you must set ``USE_
 > $ cd Fynance   
 > $ python setup.py build_ext --inplace    
 > $ python setup.py install --user   
+
+```bash
+$ git clone https://github.com/ArthurBernard/Fynance.git    
+$ cd Fynance   
+$ python setup.py build_ext --inplace    
+$ python setup.py install --user   
+```
 
 ## Demo
 
