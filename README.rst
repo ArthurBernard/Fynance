@@ -64,6 +64,8 @@ Please refer you to the `documentation`_ to see more details on different tools 
 From PyPI
 =========
 
+.. code-block:: console
+
    $ pip install fynance
 
 From source (GitHub)

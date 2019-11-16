@@ -43,20 +43,13 @@ Please refer you to the [documentation](https://fynance.readthedocs.io/en/latest
 
 ### From PyPI
 
-    $ pip install fynance
-
-```console
+```bash
 $ pip install fynance
 ```
 
 ### From source (GitHub)
 
 If you want to compile ``fynance`` package from cython files you must set ``USE_CYTHON=True`` in ``setup.py`` file. Otherwise set it to ``USE_CYTHON=False``. By default ``USE_CYTHON='auto'``.
-
-> $ git clone https://github.com/ArthurBernard/Fynance.git    
-> $ cd Fynance   
-> $ python setup.py build_ext --inplace    
-> $ python setup.py install --user   
 
 ```bash
 $ git clone https://github.com/ArthurBernard/Fynance.git    
