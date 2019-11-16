@@ -21,7 +21,9 @@
     :target: https://lgtm.com/projects/g/ArthurBernard/Fynance/context:python)
     :alt: Language grade: Python
 
-The **Fynance project** [*]_ provides efficient tools to financial annalysis, such that the **Python package** `fynance` that includes several **machine learning**, **econometric** and **statistical** subpackages specialy adapted to **backtest trading strategy** and **financial analysis**, the [documentation](https://fynance.readthedocs.io/en/latest/index.html) with **examples and explanations** of functions, and **notebooks** with more complete examples.
+The **Fynance project** [*]_ provides efficient tools to financial annalysis, such that the **Python package** `fynance` that includes several **machine learning**, **econometric** and **statistical** subpackages specialy adapted to **backtest trading strategy** and **financial analysis**, the `documentation`_ with **examples and explanations** of functions, and **notebooks** with more complete examples.
+
+.. _documentation: https://fynance.readthedocs.io/en/latest/index.html
 
 Currently the project is allways at a **beta level**. But some parts of the project can be considered as stable, such as ``fynance.features`` (this subpackage is already coded in **Cython** to be time-efficient), ``fynance.algorithms.allocation`` (this subpackage seems stable but have to be cleaned and write in Cython), and the other subpackages are always in progress (subject to deep modification).
 
@@ -38,6 +40,11 @@ The ``fynance`` package contains currently five subpackages:
 - **Backtesting** objects (``fynance.backtest``) contains:
     - Module to plot profit and loss, and measure of performance.
 
+- **Feature** tools (``fynance.features``) contains:
+    - **Financial indicators** (e.g. bollinger_band, cci, hma, macd_hist, macd_line, rsi, etc.).
+    - **Statistical momentums** (e.g. sma, ema, wma, smstd, emstd wmstd, etc.).
+    - **Metrics** (e.g. annual_return, annual_volatility, calmar, diversified_ratio, mdd, sharpe, z_score, etc.).
+
 - **Time-series models** (``fynance.models``) contains:
     - **Econometric models** (e.g. MA, ARMA, ARMA_GARCH and ARMAX_GARCH, etc.).
     - **Neural network models** with **PyTorch** (e.g. MultiLayerPerceptron, etc.).
@@ -45,11 +52,6 @@ The ``fynance`` package contains currently five subpackages:
 
 - **Neural networks** (``fynance.neural_networks``) with **Keras** (backend **Tensorflow** or **Theano**) contains:
     - Rolling neural network models.
-
-- **Feature** tools (``fynance.features``) contains:
-    - **Financial indicators** (e.g. bollinger_band, cci, hma, macd_hist, macd_line, rsi, etc.).
-    - **Statistical momentums** (e.g. sma, ema, wma, smstd, emstd wmstd, etc.).
-    - **Metrics** (e.g. annual_return, annual_volatility, calmar, diversified_ratio, mdd, sharpe, z_score, etc.).
 
 Please refer you to the `documentation`_ to see more details on different tools available in `fynance` package. Documentation contains some descriptions and examples for functions, classes and methods.    
 
@@ -69,12 +71,11 @@ From source (GitHub)
 
 If you want to compile ``fynance`` package from cython files you must set ``USE_CYTHON=True`` in ``setup.py`` file. Otherwise set it to ``USE_CYTHON=False``. By default ``USE_CYTHON='auto'``.
 
+.. code-block:: console
+
    $ git clone https://github.com/ArthurBernard/Fynance.git
-
    $ cd Fynance
-
    $ python setup.py build_ext --inplace
-
    $ python setup.py install --user
 
 ------

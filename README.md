@@ -24,6 +24,11 @@ The ``fynance`` package contains currently five subpackages:
 - **Backtesting** objects (``fynance.backtest``) contains:
     - Module to plot profit and loss, and measure of performance.
 
+- **Feature** tools (``fynance.features``) contains:
+    - **Financial indicators** (e.g. bollinger_band, cci, hma, macd_hist, macd_line, rsi, etc.).
+    - **Statistical momentums** (e.g. sma, ema, wma, smstd, emstd wmstd, etc.).
+    - **Metrics** (e.g. annual_return, annual_volatility, calmar, diversified_ratio, mdd, sharpe, z_score, etc.).
+
 - **Time-series models** (``fynance.models``) contains:
     - **Econometric models** (e.g. MA, ARMA, ARMA_GARCH and ARMAX_GARCH, etc.).
     - **Neural network models** with **PyTorch** (e.g. MultiLayerPerceptron, etc.).
@@ -31,11 +36,6 @@ The ``fynance`` package contains currently five subpackages:
 
 - **Neural networks** (``fynance.neural_networks``) with **Keras** (backend **Tensorflow** or **Theano**) contains:
     - Rolling neural network models.
-
-- **Feature** tools (``fynance.features``) contains:
-    - **Financial indicators** (e.g. bollinger_band, cci, hma, macd_hist, macd_line, rsi, etc.).
-    - **Statistical momentums** (e.g. sma, ema, wma, smstd, emstd wmstd, etc.).
-    - **Metrics** (e.g. annual_return, annual_volatility, calmar, diversified_ratio, mdd, sharpe, z_score, etc.).
 
 Please refer you to the [documentation](https://fynance.readthedocs.io/en/latest/index.html) to see more details on different tools available in `fynance` package. Documentation contains some descriptions and examples for functions, classes and methods.    
 
