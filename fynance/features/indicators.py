@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:33
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-11-18 15:35:16
+# @Last modified time: 2019-11-18 17:09:11
 
 """ Financial indicators. """
 
@@ -32,7 +32,7 @@ _handler_mstd = {'s': _smstd, 'w': _wmstd, 'e': _emstd}
 # =========================================================================== #
 
 
-@WrapperArray('dtype', 'axis', 'window')
+@WrapperArray('window')
 def bollinger_band(X, w=20, n=2, kind='s', axis=0, dtype=None):
     r""" Compute the bollinger bands of size `w` for each `X`' series'.
 
@@ -103,14 +103,26 @@ def bollinger_band(X, w=20, n=2, kind='s', axis=0, dtype=None):
     .z_score, rsi, hma, macd_hist, cci
 
     """
+    if dtype is None:
+        dtype = X.dtype
+
+    if X.dtype != np.float64:
+        X = X.astype(np.float64)
+
     if kind == 'e':
         w = 1 - 2 / (1 + w)
 
     warn('Since version 1.1.0, bollinger_band returns upper and lower bands.')
-    avg = _handler_ma[kind.lower()](X, w)
-    std = _handler_mstd[kind.lower()](X, w)
 
-    return avg + n * std, avg - n * std
+    if axis == 1:
+        avg = _handler_ma[kind.lower()](X.T, w).T
+        std = _handler_ma[kind.lower()](X.T, w).T
+
+    else:
+        avg = _handler_ma[kind.lower()](X, w)
+        std = _handler_mstd[kind.lower()](X, w)
+
+    return (avg + n * std).astype(dtype), (avg - n * std).astype(dtype)
 
 
 @WrapperArray('dtype', 'axis', 'window')
@@ -416,8 +428,8 @@ def rsi(X, w=14, kind='e', axis=0, dtype=None):
 
     Notes
     -----
-    It is the average gain of upward periods (noted :math:`ma^w(X^+_t)`)
-    divided by the average loss of downward (noted :math:`ma^w(X^-_t)`) periods
+    It is the average gain of upward periods (noted :math:`ma^w_t(X^+)`)
+    divided by the average loss of downward (noted :math:`ma^w_t(X^-)`) periods
     during the specified time frame `w`, such that :
 
     .. math::
