@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:33
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-11-05 15:54:50
+# @Last modified time: 2019-11-18 15:35:16
 
 """ Financial indicators. """
 
@@ -416,9 +416,9 @@ def rsi(X, w=14, kind='e', axis=0, dtype=None):
 
     Notes
     -----
-    It is the average gain of upward periods (noted `ma^w(X^+_t)`) divided by
-    the average loss of downward (noted `ma^w(X^-_t)`) periods during the
-    specified time frame `w`, such that :
+    It is the average gain of upward periods (noted :math:`ma^w(X^+_t)`)
+    divided by the average loss of downward (noted :math:`ma^w(X^-_t)`) periods
+    during the specified time frame `w`, such that :
 
     .. math::
 
