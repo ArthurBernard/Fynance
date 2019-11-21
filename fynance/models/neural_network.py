@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-05-06 20:16:31
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-09-26 17:10:55
+# @Last modified time: 2019-11-20 16:34:22
 
 """ Basis of neural networks models. """
 
@@ -218,8 +218,12 @@ class MultiLayerPerceptron(BaseNeuralNet):
         BaseNeuralNet.__init__(self)
 
         self.set_data(X=X, y=y, x_type=x_type, y_type=y_type)
-        layers_list = []
+        self._set_layers(layers, bias)
+        self._set_activation(activation, **activation_kwargs)
+        self._set_dropout(drop)
 
+    def _set_layers(self, layers, bias):
+        layers_list = []
         # Set input layer
         input_size = self.N
         for output_size in layers:
@@ -235,15 +239,35 @@ class MultiLayerPerceptron(BaseNeuralNet):
         layers_list += [torch.nn.Linear(input_size, self.M, bias=bias)]
         self.layers = torch.nn.ModuleList(layers_list)
 
+    def _set_activation(self, activation, **kwargs):
         # Set activation functions
-        if activation is not None:
-            self.activation = activation(**activation_kwargs)
+        if isinstance(activation, list):
+
+            if len(activation) != len(self.layers):
+
+                raise ValueError('if you pass a list of activation functions '
+                                 'this one must be of size of layers list + 1')
+
+            self.activation = [a(**kwargs) for a in activation]
+
+        elif activation is not None:
+            self.activation = activation(**kwargs)
 
         else:
             self.activation = lambda x: x
 
+    def _set_dropout(self, drop):
         # Set dropout parameters
-        if drop is not None:
+        if isinstance(drop, list):
+
+            if len(drop) != len(self.layers):
+
+                raise ValueError('if you pass a list of drop parameters '
+                                 'this one must be of size of layers list + 1')
+
+            self.drop = [torch.nn.Dropout(p=p) for p in drop]
+
+        elif drop is not None:
             self.drop = torch.nn.Dropout(p=drop)
 
         else:
@@ -251,10 +275,20 @@ class MultiLayerPerceptron(BaseNeuralNet):
 
     def forward(self, x):
         """ Forward computation. """
-        x = self.drop(x)
-
         for name, layer in enumerate(self.layers):
-            x = self.activation(layer(x))
+            if isinstance(self.drop, list):
+                x = self.drop[name](x)
+
+            else:
+                x = self.drop(x)
+
+            x = layer(x)
+
+            if isinstance(self.activation, list):
+                x = self.activation[name](x)
+
+            else:
+                x = self.activation(x)
 
         return x
 
