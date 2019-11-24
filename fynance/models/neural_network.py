@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-05-06 20:16:31
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-11-20 16:34:22
+# @Last modified time: 2019-11-24 11:49:18
 
 """ Basis of neural networks models. """
 
@@ -177,8 +177,9 @@ class MultiLayerPerceptron(BaseNeuralNet):
 
     Parameters
     ----------
-    X, y : array-like
-        Respectively inputs and outputs data.
+    X, y : array-like or int
+        - If it's an array-like, respectively inputs and outputs data.
+        - If it's an integer, respectively dimension of inputs and outputs.
     layers : list of int
         List of number of neurons in each hidden layer.
     activation : torch.nn.Module
@@ -217,15 +218,20 @@ class MultiLayerPerceptron(BaseNeuralNet):
         """ Initialize object. """
         BaseNeuralNet.__init__(self)
 
-        self.set_data(X=X, y=y, x_type=x_type, y_type=y_type)
-        self._set_layers(layers, bias)
-        self._set_activation(activation, **activation_kwargs)
-        self._set_dropout(drop)
+        if isinstance(X, int) and isinstance(y, int):
+            self.N, self.M = X, y
 
-    def _set_layers(self, layers, bias):
+        else:
+            self.set_data(X=X, y=y, x_type=x_type, y_type=y_type)
+
+        self.layers = self._set_layer_list(layers, bias)
+        self.activation = self._set_activation(activation, **activation_kwargs)
+        self.drop = self._set_dropout(drop)
+
+    def _set_layer_list(self, layers, bias, input_dim=None, output_dim=None):
         layers_list = []
         # Set input layer
-        input_size = self.N
+        input_size = self.N if input_dim is None else input_dim
         for output_size in layers:
             # Set hidden layers
             layers_list += [torch.nn.Linear(
@@ -236,25 +242,30 @@ class MultiLayerPerceptron(BaseNeuralNet):
             input_size = output_size
 
         # Set output layer
-        layers_list += [torch.nn.Linear(input_size, self.M, bias=bias)]
-        self.layers = torch.nn.ModuleList(layers_list)
+        output_size = self.M if output_dim is None else output_dim
+        layers_list += [torch.nn.Linear(input_size, output_size, bias=bias)]
 
-    def _set_activation(self, activation, **kwargs):
+        return torch.nn.ModuleList(layers_list)
+
+    def _set_activation(self, activation, n_layers=None, **kwargs):
         # Set activation functions
         if isinstance(activation, list):
+            n_layers = len(self.layers) if n_layers is None else n_layers
 
-            if len(activation) != len(self.layers):
+            if len(activation) != n_layers:
 
                 raise ValueError('if you pass a list of activation functions '
                                  'this one must be of size of layers list + 1')
 
-            self.activation = [a(**kwargs) for a in activation]
+            return [a(**kwargs) for a in activation]
 
         elif activation is not None:
-            self.activation = activation(**kwargs)
+
+            return activation(**kwargs)
 
         else:
-            self.activation = lambda x: x
+
+            return lambda x: x
 
     def _set_dropout(self, drop):
         # Set dropout parameters
@@ -265,13 +276,15 @@ class MultiLayerPerceptron(BaseNeuralNet):
                 raise ValueError('if you pass a list of drop parameters '
                                  'this one must be of size of layers list + 1')
 
-            self.drop = [torch.nn.Dropout(p=p) for p in drop]
+            return [torch.nn.Dropout(p=p) for p in drop]
 
         elif drop is not None:
-            self.drop = torch.nn.Dropout(p=drop)
+
+            return torch.nn.Dropout(p=drop)
 
         else:
-            self.drop = lambda x: x
+
+            return lambda x: x
 
     def forward(self, x):
         """ Forward computation. """
