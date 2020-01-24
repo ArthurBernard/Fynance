@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2018-12-14 19:11:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-11-09 20:35:29
+# @Last modified time: 2020-01-24 15:57:17
 
 """ Metric functions used for financial analysis. """
 
@@ -857,6 +857,12 @@ def sharpe(X, rf=0, period=252, log=False, axis=0, dtype=None, ddof=0):
     """
     ret = _annual_return(X, period, ddof)
     vol = _annual_volatility(X, period, log, axis, ddof)
+    if (vol == 0.).any():
+        res = ret - rf
+        res[vol == 0.] = np.inf
+        res[vol != 0.] = res[vol != 0.] / vol[vol != 0.]
+
+        return res
 
     return (ret - rf) / vol
 
