@@ -184,19 +184,19 @@ def display_perf(
     if plot_roll_sharpe is not None:
         ax_roll.plot(
             x_axis,
-            roll_sharpe(perf_est, period=period, win=win),
+            roll_sharpe(perf_est, period=period, w=win),
             color=sns.xkcd_rgb["pale red"],
             LineWidth=1.4
         )
         ax_roll.plot(
             x_axis,
-            roll_sharpe(perf_ivo, period=period, win=win),
+            roll_sharpe(perf_ivo, period=period, w=win),
             color=sns.xkcd_rgb["medium green"],
             LineWidth=1.2
         )
         ax_roll.plot(
             x_axis,
-            roll_sharpe(perf_idx, period=period, win=win),
+            roll_sharpe(perf_idx, period=period, w=win),
             color=sns.xkcd_rgb["denim blue"],
             LineWidth=1.
         )
