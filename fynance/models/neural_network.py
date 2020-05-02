@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-05-06 20:16:31
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-11-24 11:49:18
+# @Last modified time: 2019-11-25 18:28:48
 
 """ Basis of neural networks models. """
 
@@ -28,9 +28,9 @@ class BaseNeuralNet(torch.nn.Module):
 
     Attributes
     ----------
-    criterion : torch.nn.modules.loss
+    criterion : torch.nn.modules.loss.Loss
         A loss function.
-    optimizer : torch.optim
+    optimizer : torch.optim.Optimizer
         An optimizer algorithm.
     N, M : int
         Respectively input and output dimension.
@@ -47,12 +47,14 @@ class BaseNeuralNet(torch.nn.Module):
     MultiLayerPerceptron, RollingBasis
 
     """
+    lr_scheduler = None
+    optimizer = None
 
     def __init__(self):
         """ Initialize. """
         torch.nn.Module.__init__(self)
 
-    def set_optimizer(self, criterion, optimizer, **kwargs):
+    def set_optimizer(self, criterion, optimizer, params=None, **kwargs):
         """ Set the optimizer object.
 
         Set optimizer object with specified `criterion` as loss function and
@@ -60,12 +62,16 @@ class BaseNeuralNet(torch.nn.Module):
 
         Parameters
         ----------
-        criterion : torch.nn.modules.loss
+        criterion : Callabletorch.nn.modules.loss
             A loss function.
-        optimizer : torch.optim
+        optimizer : torch.optim.Optimizer
             An optimizer algorithm.
+        params : object or iterable object
+            Layer of parameters to optimize or dicts defining parameter groups.
+            If set to None then all parameters of model will be optimized.
+            Default is None.
         **kwargs
-            Keyword arguments of `optimizer`, cf PyTorch documentation [1]_.
+            Keyword arguments of ``optimizer``, cf PyTorch documentation [1]_.
 
         Returns
         -------
@@ -77,8 +83,35 @@ class BaseNeuralNet(torch.nn.Module):
         .. [1] https://pytorch.org/docs/stable/optim.html
 
         """
+        if params is None:
+            params = self.parameters()
+
+        elif isinstance(params, list):
+            params = [{'params': p.parameters()} for p in params]
+
+        else:
+            params = params.parameters()
+
         self.criterion = criterion()
-        self.optimizer = optimizer(self.parameters(), **kwargs)
+        self.optimizer = optimizer(params, **kwargs)
+
+        return self
+
+    def set_lr_scheduler(self, lr_scheduler, **kwargs):
+        """ Set dynamic learning rate.
+
+        Parameters
+        ----------
+        lr_scheduler : torch.optim.lr_scheduler._LRScheduler
+            Method from ``torch.optim.lr_scheduler`` to wrap ``self.optimizer``, cf module
+            ``torch.optim.lr_scheduler`` in PyTorch documentation [2]_.
+        **kwargs
+            Key
+
+
+        """
+        if self.optimizer:
+            self.lr_scheduler = lr_scheduler(self.optimizer, **kwargs)
 
         return self
 
@@ -102,6 +135,9 @@ class BaseNeuralNet(torch.nn.Module):
         loss = self.criterion(outputs, y)
         loss.backward()
         self.optimizer.step()
+
+        if self.lr_scheduler:
+            self.lr_scheduler.step()
 
         return loss
 
