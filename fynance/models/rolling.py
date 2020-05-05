@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-04-23 19:15:17
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-11-05 20:32:52
+# @Last modified time: 2020-05-05 22:08:43
 
 """ Basis of rolling models.
 
@@ -53,6 +53,7 @@ class _RollingBasis:
     Methods
     -------
     __call__
+    run
 
     Attributes
     ----------
@@ -241,6 +242,7 @@ class _RollingBasis:
                     loc='upper right', ncol=2, fontsize=10, handlelength=0.8,
                     columnspacing=0.5, frameon=True, lw=1.,
                 )
+                ax_loss.set_axes()
 
                 # Plot perf
                 ax_perf.plot(
@@ -252,6 +254,7 @@ class _RollingBasis:
                     perf_eval[: self.t], x=self.idx[: self.t],
                     names='Eval set', col='OrRd', lw=1.2, unit='perf'
                 )
+                ax_perf.set_axes()
                 ax_perf.ax.legend(loc='upper left', fontsize=10, frameon=True,
                                   handlelength=0.8, ncol=2, columnspacing=0.5)
                 f.canvas.draw()
@@ -261,7 +264,7 @@ class _RollingBasis:
 
 
 class RollingXGB(_RollingBasis):
-    """ Rolling version of eXtrem Gradient Boosting model.
+    """ Rolling version of eXtrem Gradient Boosting model. NOT YET IMPLEMETED.
 
     Model will roll train and test periods over a time axis, at time `t` the
     training period is from `t - n` to `t` and the testing period from `t` to
@@ -305,8 +308,10 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
 
     Methods
     -------
+    run
     set_roll_period
     sub_predict
+    save
 
     TODO:
     - fix train and predict methods
@@ -366,3 +371,14 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
     def sub_predict(self, X):
         """ Predict. """
         return self.predict(X=X)
+
+    def save(self, path):
+        """ Save the trained neural network model.
+
+        Parameters
+        ----------
+        path : str
+            Path to save the model.
+
+        """
+        pass
