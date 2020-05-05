@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-05-06 20:16:31
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-11-25 18:28:48
+# @Last modified time: 2020-05-05 20:25:59
 
 """ Basis of neural networks models. """
 
@@ -47,8 +47,11 @@ class BaseNeuralNet(torch.nn.Module):
     MultiLayerPerceptron, RollingBasis
 
     """
+
     lr_scheduler = None
     optimizer = None
+    seed_torch = None
+    seed_numpy = None
 
     def __init__(self):
         """ Initialize. """
@@ -103,8 +106,9 @@ class BaseNeuralNet(torch.nn.Module):
         Parameters
         ----------
         lr_scheduler : torch.optim.lr_scheduler._LRScheduler
-            Method from ``torch.optim.lr_scheduler`` to wrap ``self.optimizer``, cf module
-            ``torch.optim.lr_scheduler`` in PyTorch documentation [2]_.
+            Method from ``torch.optim.lr_scheduler`` to wrap
+            ``self.optimizer``, cf module ``torch.optim.lr_scheduler`` in
+            PyTorch documentation [2]_.
         **kwargs
             Key
 
@@ -185,6 +189,29 @@ class BaseNeuralNet(torch.nn.Module):
                              periods in y'.format(self.T, T_veri))
 
         return self
+
+    def set_seed(self, seed_torch=None, seed_numpy=None):
+        r""" Set seed for PyTorch and NumPy random number generator.
+
+        Parameters
+        ----------
+        seed_torch, seed_numpy : bool or int, optional
+            If `seed` is an int :math:`0 < seed < 2^32` set respectively
+            PyTorch and NumPy seed with the number. Otherwise if is True
+            then choose a random number, else doesn't set seed.
+
+        """
+        self.seed_torch = self._set_seed(seed_torch)
+        self.seed_numpy = self._set_seed(seed_numpy)
+        torch.manual_seed(self.seed_torch)
+        np.random.seed(self.seed_numpy)
+
+    def _set_seed(self, seed):
+        if isinstance(seed, int) and 0 <= seed < 2 ** 32:
+
+            return seed
+
+        return np.random.randint(0, 2 ** 32)
 
     def _set_data(self, X, dtype=None):
         """ Convert array-like data to tensor. """
