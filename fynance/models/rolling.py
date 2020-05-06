@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-04-23 19:15:17
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-05-05 22:08:43
+# @Last modified time: 2020-05-06 14:20:48
 
 """ Basis of rolling models.
 
@@ -125,7 +125,7 @@ class _RollingBasis:
 
         # Set boundary of period
         self.T = self.T if end is None else min(self.T, end)
-        self.t = max(self.n - self.r, min(start, self.T - self.n - self.s))
+        self.t0 = max(self.n - self.r, min(start, self.T - self.n - self.s))
 
         return self
 
@@ -136,36 +136,55 @@ class _RollingBasis:
         self.loss_train = []
         self.loss_eval = []
         self.loss_test = []
+        # self.t_idx = np.arange(self.T)
+        self._e = self.e
+        self.t = self.t0
 
         return self
 
     def __next__(self):
         """ Incrementing method. """
         # TODO : to finish
-        # Time forward incrementation
-        self.t += self.r
+        self._e += 1
+        if self._e > self.e:
+            self._e = 1
+            # Time forward incrementation
+            self.t += self.r
 
-        if self.t + self.s > self.T:
+            if self.t + self.s > self.T:
 
-            raise StopIteration
+                raise StopIteration
 
+            self.t_idx = np.arange(self.t - self.n, self.t)
         # TODO : Set training part in an other method
         # Run epochs
-        for epoch in range(self.e):
+        # for epoch in range(self.e):
+        if True:
             loss_epoch = 0.
+            # Shuffle time indexes
+            # np.random.shuffle(self.t_idx[self.t - self.n: self.t])
+            np.random.shuffle(self.t_idx)
             # Run batchs
-            for t in range(self.t - self.n, self.t, self.b):
+            # for t in range(self.t - self.n, self.t, self.b):
+            for t in range(0, self.n, self.b):
                 # Set new train periods
-                s = min(t + self.b, self.t)
-                train_slice = slice(t, s)
+                # s = min(t + self.b, self.t)
+                s = min(t + self.b, self.n)
+                train_slice = self.t_idx[t: s]  # slice(t, s)
                 # Train model
-                lo = self._train(
-                    X=self.X[train_slice],
-                    y=self.f(self.y[train_slice]),
-                )
+                try:
+                    lo = self._train(
+                        X=self.X[train_slice],
+                        y=self.f(self.y[train_slice]),
+                    )
+                except Exception as e:
+                    print(train_slice)
+                    print(self.X[train_slice])
+                    print(self.f(self.y[train_slice]))
+                    raise e
                 loss_epoch += lo.item()
 
-            self.loss_train += [loss_epoch]
+            self.loss_train += [loss_epoch / s]
 
         # Set eval and test periods
         return slice(self.t - self.r, self.t), slice(self.t, self.t + self.s)
@@ -233,30 +252,48 @@ class _RollingBasis:
                 perf_test[test_slice] = perf_test[self.t - 1] * cumret
 
                 ax_loss.ax.clear()
-                ax_perf.ax.clear()
                 # Plot loss
                 ax_loss.plot(np.array([self.loss_test]).T, names='Test',
                              col='BuGn', lw=2.)
+                ax_loss.plot(np.array([self.loss_train]).T, names='Train',
+                             col='RdPu', lw=1.)
                 ax_loss.plot(
                     np.array([self.loss_eval]).T, names='Eval', col='YlOrBr',
                     loc='upper right', ncol=2, fontsize=10, handlelength=0.8,
                     columnspacing=0.5, frameon=True, lw=1.,
                 )
-                ax_loss.set_axes()
+                ax_loss.ax.plot(
+                    np.arange(0, len(self.loss_test), self.e),
+                    np.array([self.loss_test]).T[::self.e],
+                    'r.', lw=3,
+                )
+                # ax_loss.set_axes()
+                # ax_loss.ax.set_yscale('log')
+                ax_loss.ax.set_ylabel('Loss')
+                ax_loss.ax.set_xlabel('Epochs')
+                ax_loss.ax.tick_params(axis='x', labelsize=10)
 
-                # Plot perf
-                ax_perf.plot(
-                    perf_test[: self.t + self.s],
-                    x=self.idx[: self.t + self.s],
-                    names='Test set', col='GnBu', lw=1.7, unit='perf',
-                )
-                ax_perf.plot(
-                    perf_eval[: self.t], x=self.idx[: self.t],
-                    names='Eval set', col='OrRd', lw=1.2, unit='perf'
-                )
-                ax_perf.set_axes()
-                ax_perf.ax.legend(loc='upper left', fontsize=10, frameon=True,
-                                  handlelength=0.8, ncol=2, columnspacing=0.5)
+                if self._e == self.e:
+                    ax_perf.ax.clear()
+                    # Plot perf
+                    ax_perf.plot(
+                        perf_test[self.t0: self.t + self.s],
+                        x=self.idx[self.t0: self.t + self.s],
+                        names='Test set', col='GnBu', lw=1.7, unit='perf',
+                    )
+                    ax_perf.plot(
+                        perf_eval[self.t0: self.t],
+                        x=self.idx[self.t0: self.t],
+                        names='Eval set', col='OrRd', lw=1.2, unit='perf'
+                    )
+                    # ax_perf.set_axes()
+                    ax_perf.ax.set_yscale('log')
+                    ax_perf.ax.set_ylabel('Perf.')
+                    ax_perf.ax.set_xlabel('Date')
+                    ax_perf.ax.tick_params(axis='x', rotation=30, labelsize=10)
+                    ax_perf.ax.legend(loc='upper left', fontsize=10, frameon=True,
+                                      handlelength=0.8, ncol=2, columnspacing=0.5)
+
                 f.canvas.draw()
                 # plt.draw()
 
