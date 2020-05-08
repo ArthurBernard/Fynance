@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-04-23 19:15:17
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-05-07 09:58:12
+# @Last modified time: 2020-05-08 20:15:15
 
 """ Basis of rolling models.
 
@@ -26,7 +26,7 @@ import torch
 # Local packages
 # from fynance.models.xgb import XGBData
 from fynance.models.neural_network import MultiLayerPerceptron
-from fynance.backtest.dynamic_plot_backtest import DynaPlotBackTest
+from fynance.backtest.dynamic_plot_backtest import BacktestNeuralNet
 
 # Set plot style
 plt.style.use('seaborn')
@@ -36,7 +36,7 @@ __all__ = ['_RollingBasis', 'RollMultiLayerPerceptron']
 
 
 class _RollingBasis:
-    """ Base object to roll a neural network model.
+    r""" Base object to roll a neural network model.
 
     Rolling over a time axis with a train period from `t - n` to `t` and a
     testing period from `t` to `t + s`.
@@ -61,8 +61,12 @@ class _RollingBasis:
         Respectively size of training, testing and rolling period.
     b, e, T : int
         Respectively batch size, number of epochs and size of entire dataset.
-    t : int
-        The current time period.
+    t, _e, i : int
+        Respectively the current time period, the current epoch and the current
+        iteration.
+    n_iter : int
+        The total number of iteration :math:`n_iter = e \times (T - t0 - s)
+        \times r`.
     y_eval, y_test : np.ndarray[ndim=1 or 2, dtype=np.float64]
         Respectively evaluating (or training) and testing predictions.
 
@@ -126,19 +130,20 @@ class _RollingBasis:
         # Set boundary of period
         self.T = self.T if end is None else min(self.T, end)
         self.t0 = max(self.n - self.r, min(start, self.T - self.n - self.s))
+        self.n_iter = (self.T - self.t0 - self.s) // self.r * self.e
 
         return self
 
     def __iter__(self):
         """ Set iterative method. """
-        self.y_eval = np.zeros(self.y_shape)
-        self.y_test = np.zeros(self.y_shape)
-        self.loss_train = []
-        self.loss_eval = []
-        self.loss_test = []
-        # self.t_idx = np.arange(self.T)
+        self.y_eval = np.zeros(self.y_shape, dtype=np.float64)
+        self.y_test = np.zeros(self.y_shape, dtype=np.float64)
+        self.loss_eval = np.zeros([self.n_iter], dtype=np.float64)
+        self.loss_test = np.zeros([self.n_iter], dtype=np.float64)
+        self.loss_train = np.zeros([self.n_iter], dtype=np.float64)
         self._e = self.e
         self.t = self.t0
+        self.i = -1
 
         return self
 
@@ -146,6 +151,7 @@ class _RollingBasis:
         """ Incrementing method. """
         # TODO : to finish
         self._e += 1
+        self.i += 1
         if self._e > self.e:
             self._e = 1
             # Time forward incrementation
@@ -158,17 +164,14 @@ class _RollingBasis:
             self.t_idx = np.arange(self.t - self.n, self.t)
         # TODO : Set training part in an other method
         # Run epochs
-        # for epoch in range(self.e):
         loss_epoch = 0.
         # Shuffle time indexes
         np.random.shuffle(self.t_idx)
         # Run batchs
-        # for t in range(self.t - self.n, self.t, self.b):
         for t in range(0, self.n, self.b):
             # Set new train periods
-            # s = min(t + self.b, self.t)
             s = min(t + self.b, self.n)
-            train_slice = self.t_idx[t: s]  # slice(t, s)
+            train_slice = self.t_idx[t: s]
             # Train model
             try:
                 lo = self._train(
@@ -182,13 +185,17 @@ class _RollingBasis:
                 raise e
             loss_epoch += lo.item()
 
-        self.loss_train += [loss_epoch / s]
+        self.loss_train[self.i] = loss_epoch / s
 
         # Set eval and test periods
-        return slice(self.t - self.r, self.t), slice(self.t, self.t + self.s)
+        y_eval = self.sub_predict(self.X[self.t - self.r: self.t])
+        y_test = self.sub_predict(self.X[self.t: self.t + self.s])
 
-    def run(self, backtest_plot=True, backtest_kpi=True, figsize=(9, 6)):
-        """ Run neural network model.
+        return y_eval, y_test
+
+    def run(self, backtest_plot=True, backtest_kpi=True, figsize=(9, 6),
+            func=np.sign):
+        """ Run neural network model and backtest predictions.
 
         Parameters
         ----------
@@ -196,111 +203,60 @@ class _RollingBasis:
             If True, display plot of backtest performances.
         backtest_kpi : bool, optional
             If True, display kpi of backtest performances.
+        figsize : tuple of int, optional
+            Size of the figure to plot loss and performances.
+        func : callable, optional
+            Function to apply on the prediction, default is `np.sign` function.
+            If func is None, then `func = lambda x: x` so the raw values of the
+            prediction are used to compute returns.
 
         """
         y = self.y.numpy()
+        r = np.exp(y) - 1
         y_perf = np.exp(np.cumsum(y, axis=0))
-        perf_eval = 100. * np.ones(y.shape)
-        perf_test = 100. * np.ones(y.shape)
+        y_perf = 100. * y_perf / y_perf[self.t0]
+        perf_eval = 100. * np.ones(y.shape, dtype=np.float64)
+        perf_test = 100. * np.ones(y.shape, dtype=np.float64)
 
         # Set dynamic plot object
-        f, (ax_1, ax_2) = plt.subplots(2, 1, figsize=figsize)
-        plt.ion()
-        ax_loss = DynaPlotBackTest(
-            f, ax_1, title='Model loss', ylabel='Loss', xlabel='Epochs',
-            yscale='log', tick_params={'axis': 'x', 'labelsize': 10}
-        )
-        ax_perf = DynaPlotBackTest(
-            f, ax_2, title='Model perf.', ylabel='Perf.',
-            xlabel='Date', yscale='log',
-            tick_params={'axis': 'x', 'rotation': 30, 'labelsize': 10}
-        )
+        bnn = BacktestNeuralNet(figsize)
 
         # TODO : get stats, loss, etc.
         # TODO : plot loss, perf, etc.
-        for eval_slice, test_slice in self:
+        for y_eval, y_test in self:
             # Predict on training and testing period
-            self.y_eval[eval_slice] = self.sub_predict(self.X[eval_slice])
-            self.y_test[test_slice] = self.sub_predict(self.X[test_slice])
+            eval_set = slice(self.t - self.r, self.t)
+            test_set = slice(self.t, self.t + self.s)
+            self.y_eval[eval_set] = y_eval
+            self.y_test[test_set] = y_test
             # Compute losses
-            self.loss_eval += [self._get_loss(self.y_eval[eval_slice],
-                                              y[eval_slice])]
-            self.loss_test += [self._get_loss(self.y_test[test_slice],
-                                              y[test_slice])]
+            self.loss_eval[self.i] = self._get_loss(y_eval, self.y[eval_set])
+            self.loss_test[self.i] = self._get_loss(y_test, self.y[test_set])
 
             if backtest_kpi:
                 self._display_kpi()
 
             if backtest_plot:
-                ax_loss.ax.clear()
-                # Plot loss
-                ax_loss.plot(np.array(self.loss_test), names='Test',
-                             col='BuGn', lw=2.)
-                ax_loss.plot(np.array(self.loss_train), names='Train',
-                             col='RdPu', lw=1.)
-                ax_loss.plot(
-                    np.array(self.loss_eval), names='Eval', col='YlOrBr',
-                    loc='upper right', ncol=2, fontsize=10, handlelength=0.8,
-                    columnspacing=0.5, frameon=True, lw=1.,
-                )
-                ax_loss.ax.plot(
-                    np.arange(0, len(self.loss_test), self.e),
-                    np.array([self.loss_test]).T[::self.e],
-                    'r.', lw=3,
-                )
-                # ax_loss.set_axes()
-                ax_loss.ax.set_yscale('log')
-                ax_loss.ax.set_ylabel('Loss')
-                ax_loss.ax.set_xlabel('Epochs')
-                ax_loss.ax.tick_params(axis='x', labelsize=10)
+                self._display_plot_loss(bnn)
 
                 if self._e == self.e:
-                    # Set performances of training period
-                    returns = np.sign(self.y_eval[eval_slice]) * y[eval_slice]
-                    cumret = np.exp(np.cumsum(returns, axis=0))
-                    perf_eval[eval_slice] = perf_eval[self.t - self.r - 1] * cumret
+                    v0 = perf_eval[self.t - self.r - 1]
+                    perf_eval[eval_set] = get_perf2(r[eval_set], func(y_eval),
+                                                    v0=v0)
+                    v0 = perf_test[self.t - 1]
+                    perf_test[test_set] = get_perf2(r[test_set], func(y_test),
+                                                    v0=v0)
+                    self._display_plot_perf(bnn, perf_test, perf_eval, y_perf)
 
-                    # Set performances of estimated period
-                    returns = np.sign(self.y_test[test_slice]) * y[test_slice]
-                    cumret = np.exp(np.cumsum(returns, axis=0))
-                    perf_test[test_slice] = perf_test[self.t - 1] * cumret
-
-                    ax_perf.ax.clear()
-                    # Plot perf of the test set
-                    ax_perf.plot(
-                        perf_test[self.t0: self.t + self.s],
-                        x=self.idx[self.t0: self.t + self.s],
-                        names='Test set', col='GnBu', lw=1.7, unit='perf',
-                    )
-                    # Plot perf of the eval set
-                    ax_perf.plot(
-                        perf_eval[self.t0: self.t],
-                        x=self.idx[self.t0: self.t],
-                        names='Eval set', col='OrRd', lw=1.2, unit='perf'
-                    )
-                    # Plot perf of the underlying
-                    ax_perf.plot(
-                        100 * y_perf[self.t0: self.t] / y_perf[self.t0],
-                        x=self.idx[self.t0: self.t],
-                        names='Underlying', col='RdPu', lw=1.2, unit='perf'
-                    )
-                    # ax_perf.set_axes()
-                    ax_perf.ax.set_yscale('log')
-                    ax_perf.ax.set_ylabel('Perf.')
-                    ax_perf.ax.set_xlabel('Date')
-                    ax_perf.ax.tick_params(axis='x', rotation=30, labelsize=10)
-                    ax_perf.ax.legend(loc='upper left', fontsize=10, frameon=True,
-                                      handlelength=0.8, ncol=2, columnspacing=0.5)
-
-                f.canvas.draw()
-                # plt.draw()
+                bnn.f.canvas.draw()
 
         return self
 
     def _get_loss(self, input, target):
         # input, target : np.array
         # Compute loss function
-        lo = self.criterion(torch.from_numpy(input), torch.from_numpy(target))
+        lo = self.criterion(torch.from_numpy(input), target.to(torch.float32))
+        # torch.from_numpy(target))
 
         return lo.item()
 
@@ -312,6 +268,21 @@ class _RollingBasis:
         txt += 'Eval loss is {:5.2} | '.format(self.loss_eval[-1])
         txt += 'Test loss is {:5.2} | '.format(self.loss_test[-1])
         print(txt, end='\r')
+
+    def _display_plot_loss(self, bnn):
+        bnn.plot_loss(self.loss_test[: self.i + 1],
+                      self.loss_eval[: self.i + 1],
+                      self.loss_train[: self.i + 1])
+
+    def _display_plot_perf(self, bnn, perf_test, perf_eval, y_perf):
+        bnn.plot_perf(perf_test[self.t0: self.t + self.s],
+                      perf_eval[self.t0 - self.s: self.t],
+                      y_perf[self.t0 - self.s: self.t],
+                      self.idx[self.t0 - self.s: self.t + self.s])
+
+
+def get_perf2(ret, signal, v0=100):
+    return v0 * np.cumprod(ret * signal + 1, axis=0)
 
 
 def get_perf(signal, underlying, v0=100):
