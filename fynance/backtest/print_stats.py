@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-11-05 15:50:33
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-11-05 15:50:56
+# @Last modified time: 2020-05-08 09:22:17
 
 # Built-in packages
 
@@ -80,8 +80,8 @@ def set_text_stats(underly, period=252, accur=True, perf=True, vol=True,
         txt += '| {:14} | {:10.2%} |\n'.format(underlying, perf_targ)
         for key, pred in kwpred.items():
             vect_fee = np.zeros(pred.shape)
-            vect_fee[1:] += np.abs(pred[1:] - pred[:-1]) * fees
-            perf = np.exp(np.cumsum(underly * pred - vect_fee))
+            vect_fee[1:] += (pred[1:] - pred[:-1]) * fees
+            perf = np.cumprod((np.exp(underly) - 1 - vect_fee) * pred + 1)
             perf_pred = np.sign(perf[-1] / perf[0]) * np.float_power(
                 np.abs(perf[-1] / perf[0]), period / perf.size) - 1.
             txt += '| {:14} | {:10.2%} |\n'.format(key, perf_pred)
@@ -95,8 +95,8 @@ def set_text_stats(underly, period=252, accur=True, perf=True, vol=True,
         txt += '| {:14} | {:10.2%} |\n'.format(underlying, vol_targ)
         for key, pred in kwpred.items():
             vect_fee = np.zeros(pred.shape)
-            vect_fee[1:] += np.abs(pred[1:] - pred[:-1]) * fees
-            perf = np.exp(np.cumsum(underly * pred - vect_fee))
+            vect_fee[1:] += (pred[1:] - pred[:-1]) * fees
+            perf = np.cumprod((np.exp(underly) - 1 - vect_fee) * pred + 1)
             vol_pred = np.sqrt(period) * np.std(perf[1:] / perf[:-1] - 1)
             txt += '| {:14} | {:10.2%} |\n'.format(key, vol_pred)
     # Compute sharpe Ratio
@@ -108,8 +108,8 @@ def set_text_stats(underly, period=252, accur=True, perf=True, vol=True,
         txt += '| {:14} | {:10.2f} |\n'.format(underlying, sharpe_targ)
         for key, pred in kwpred.items():
             vect_fee = np.zeros(pred.shape)
-            vect_fee[1:] += np.abs(pred[1:] - pred[:-1]) * fees
-            perf = np.exp(np.cumsum(underly * pred - vect_fee))
+            vect_fee[1:] += (pred[1:] - pred[:-1]) * fees
+            perf = np.cumprod((np.exp(underly) - 1 - vect_fee) * pred + 1)
             sharpe_pred = sharpe(perf, period=period)
             txt += '| {:14} | {:10.2f} |\n'.format(key, sharpe_pred)
     # Compute calmar
@@ -121,8 +121,8 @@ def set_text_stats(underly, period=252, accur=True, perf=True, vol=True,
         txt += '| {:14} | {:10.2f} |\n'.format(underlying, calmar_targ)
         for key, pred in kwpred.items():
             vect_fee = np.zeros(pred.shape)
-            vect_fee[1:] += np.abs(pred[1:] - pred[:-1]) * fees
-            perf = np.exp(np.cumsum(underly * pred - vect_fee))
+            vect_fee[1:] += (pred[1:] - pred[:-1]) * fees
+            perf = np.cumprod((np.exp(underly) - 1 - vect_fee) * pred + 1)
             calmar_pred = calmar(perf, period=period)
             txt += '| {:14} | {:10.2f} |\n'.format(key, calmar_pred)
     txt += '+=============================+\n'

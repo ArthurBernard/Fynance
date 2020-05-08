@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+""" Functions to plot backtest. """
+
 # Built-in packages
 
 # External packages
@@ -23,12 +25,22 @@ __all__ = ['display_perf']
 # =========================================================================== #
 
 
+def compute_perf(logret, signal, fee):
+    fees = np.zeros(logret.shape)
+    fees[1:] = (signal[1:] - signal[:-1]) * fee
+    pctret = np.exp(logret) - 1 - fees
+
+    return np.cumprod(pctret * signal + 1)
+
+
 def display_perf(
     y_idx, y_est, period=252, title='', params_iv={},
     plot_drawdown=True, plot_roll_sharpe=True, x_axis=None,
     underlying='Underlying', win=252, fees=0,
 ):
-    """ Print dynamic plot of performance indicators (perf, rolling sharpe
+    """ Plot performance and print KPI of backtest.
+
+    Print dynamic plot of performance indicators (perf, rolling sharpe
     and draw down) of a strategy (raw and iso-volatility) versus its
     underlying.
 
@@ -72,16 +84,11 @@ def display_perf(
     if x_axis is None:
         x_axis = range(y_idx.size)
 
-    # Compute returns
-    vect_fee = np.zeros(y_est.shape)
-    vect_fee[1:] += np.abs(y_est[1:] - y_est[:-1]) * fees
-    vect_ret = y_idx * y_est
-
     # Compute perf.
     perf_idx = np.exp(np.cumsum(y_idx))
-    perf_est = np.exp(np.cumsum(vect_ret - vect_fee))
+    perf_est = compute_perf(y_idx, y_est, fees)
     iv = iso_vol(np.exp(np.cumsum(y_idx)), **params_iv)
-    perf_ivo = np.exp(np.cumsum((vect_ret - vect_fee) * iv))
+    perf_ivo = compute_perf(y_idx, y_est * iv, fees)
 
     # Print stats. table
     txt = set_text_stats(
@@ -136,13 +143,13 @@ def display_perf(
             'Strat Iso-Vol: {:.0f} %'.format(ax_perf.lines[1].get_ydata()[j] - 100),
             '{}: {:.0f} %'.format(underlying, ax_perf.lines[2].get_ydata()[j] - 100),
         ], loc='upper left', frameon=True, fontsize=10)
-        if plot_drawdown is not None:
+        if plot_drawdown:
             ax_dd.legend([
                 'Strategy: {:.2f} %'.format(ax_dd.lines[0].get_ydata()[j]),
                 'Strat Iso-Vol: {:.2f} %'.format(ax_dd.lines[1].get_ydata()[j]),
                 '{}: {:.2f} %'.format(underlying, ax_dd.lines[2].get_ydata()[j]),
             ], loc='upper left', frameon=True, fontsize=10)
-        if plot_roll_sharpe is not None:
+        if plot_roll_sharpe:
             ax_roll.legend([
                 'Strategy: {:.2f}'.format(ax_roll.lines[0].get_ydata()[j]),
                 'Strat Iso-Vol: {:.2f}'.format(ax_roll.lines[1].get_ydata()[j]),
@@ -158,7 +165,7 @@ def display_perf(
     ax_perf.set_title(title)
     ax_perf.tick_params(axis='x', rotation=30, labelsize=10)
     # Plot DrawDowns
-    if plot_drawdown is not None:
+    if plot_drawdown:
         ax_dd.plot(
             x_axis,
             100 * drawdown(perf_est),
@@ -181,7 +188,7 @@ def display_perf(
         ax_dd.set_title('DrawDown in percentage')
         ax_dd.tick_params(axis='x', rotation=30, labelsize=10)
     # Plot rolling Sharpe ratio
-    if plot_roll_sharpe is not None:
+    if plot_roll_sharpe:
         ax_roll.plot(
             x_axis,
             roll_sharpe(perf_est, period=period, w=win),
@@ -201,6 +208,7 @@ def display_perf(
             LineWidth=1.
         )
         ax_roll.set_ylabel('Sharpe ratio')
+        ax_roll.set_yscale('log')
         ax_roll.set_xlabel('Date')
         ax_roll.set_title('Rolling Sharpe ratio')
         ax_roll.tick_params(axis='x', rotation=30, labelsize=10)
