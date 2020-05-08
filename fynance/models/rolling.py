@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-04-23 19:15:17
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-05-06 14:20:48
+# @Last modified time: 2020-05-07 09:58:12
 
 """ Basis of rolling models.
 
@@ -159,32 +159,30 @@ class _RollingBasis:
         # TODO : Set training part in an other method
         # Run epochs
         # for epoch in range(self.e):
-        if True:
-            loss_epoch = 0.
-            # Shuffle time indexes
-            # np.random.shuffle(self.t_idx[self.t - self.n: self.t])
-            np.random.shuffle(self.t_idx)
-            # Run batchs
-            # for t in range(self.t - self.n, self.t, self.b):
-            for t in range(0, self.n, self.b):
-                # Set new train periods
-                # s = min(t + self.b, self.t)
-                s = min(t + self.b, self.n)
-                train_slice = self.t_idx[t: s]  # slice(t, s)
-                # Train model
-                try:
-                    lo = self._train(
-                        X=self.X[train_slice],
-                        y=self.f(self.y[train_slice]),
-                    )
-                except Exception as e:
-                    print(train_slice)
-                    print(self.X[train_slice])
-                    print(self.f(self.y[train_slice]))
-                    raise e
-                loss_epoch += lo.item()
+        loss_epoch = 0.
+        # Shuffle time indexes
+        np.random.shuffle(self.t_idx)
+        # Run batchs
+        # for t in range(self.t - self.n, self.t, self.b):
+        for t in range(0, self.n, self.b):
+            # Set new train periods
+            # s = min(t + self.b, self.t)
+            s = min(t + self.b, self.n)
+            train_slice = self.t_idx[t: s]  # slice(t, s)
+            # Train model
+            try:
+                lo = self._train(
+                    X=self.X[train_slice],
+                    y=self.f(self.y[train_slice]),
+                )
+            except Exception as e:
+                print(train_slice)
+                print(self.X[train_slice])
+                print(self.f(self.y[train_slice]))
+                raise e
+            loss_epoch += lo.item()
 
-            self.loss_train += [loss_epoch / s]
+        self.loss_train += [loss_epoch / s]
 
         # Set eval and test periods
         return slice(self.t - self.r, self.t), slice(self.t, self.t + self.s)
@@ -200,8 +198,11 @@ class _RollingBasis:
             If True, display kpi of backtest performances.
 
         """
-        perf_eval = 100. * np.ones(self.y.shape)
-        perf_test = 100. * np.ones(self.y.shape)
+        y = self.y.numpy()
+        y_perf = np.exp(np.cumsum(y, axis=0))
+        perf_eval = 100. * np.ones(y.shape)
+        perf_test = 100. * np.ones(y.shape)
+
         # Set dynamic plot object
         f, (ax_1, ax_2) = plt.subplots(2, 1, figsize=figsize)
         plt.ion()
@@ -222,43 +223,23 @@ class _RollingBasis:
             self.y_eval[eval_slice] = self.sub_predict(self.X[eval_slice])
             self.y_test[test_slice] = self.sub_predict(self.X[test_slice])
             # Compute losses
-            self.loss_eval += [self.criterion(
-                torch.from_numpy(self.y_eval[eval_slice]),
-                self.y[eval_slice]
-            ).item()]
-            self.loss_test += [self.criterion(
-                torch.from_numpy(self.y_test[test_slice]),
-                self.y[test_slice]
-            ).item()]
+            self.loss_eval += [self._get_loss(self.y_eval[eval_slice],
+                                              y[eval_slice])]
+            self.loss_test += [self._get_loss(self.y_test[test_slice],
+                                              y[test_slice])]
 
             if backtest_kpi:
-                # Display %
-                pct = self.t - self.n - self.s
-                pct = pct / (self.T - self.n - self.T % self.s)
-                txt = '{:5.2%} is done | '.format(pct)
-                txt += 'Eval loss is {:5.2} | '.format(self.loss_eval[-1])
-                txt += 'Test loss is {:5.2} | '.format(self.loss_test[-1])
-                print(txt, end='\r')
+                self._display_kpi()
 
             if backtest_plot:
-                # Set performances of training period
-                returns = np.sign(self.y_eval[eval_slice]) * self.y[eval_slice].numpy()
-                cumret = np.exp(np.cumsum(returns, axis=0))
-                perf_eval[eval_slice] = perf_eval[self.t - self.r - 1] * cumret
-
-                # Set performances of estimated period
-                returns = np.sign(self.y_test[test_slice]) * self.y[test_slice].numpy()
-                cumret = np.exp(np.cumsum(returns, axis=0))
-                perf_test[test_slice] = perf_test[self.t - 1] * cumret
-
                 ax_loss.ax.clear()
                 # Plot loss
-                ax_loss.plot(np.array([self.loss_test]).T, names='Test',
+                ax_loss.plot(np.array(self.loss_test), names='Test',
                              col='BuGn', lw=2.)
-                ax_loss.plot(np.array([self.loss_train]).T, names='Train',
+                ax_loss.plot(np.array(self.loss_train), names='Train',
                              col='RdPu', lw=1.)
                 ax_loss.plot(
-                    np.array([self.loss_eval]).T, names='Eval', col='YlOrBr',
+                    np.array(self.loss_eval), names='Eval', col='YlOrBr',
                     loc='upper right', ncol=2, fontsize=10, handlelength=0.8,
                     columnspacing=0.5, frameon=True, lw=1.,
                 )
@@ -268,23 +249,40 @@ class _RollingBasis:
                     'r.', lw=3,
                 )
                 # ax_loss.set_axes()
-                # ax_loss.ax.set_yscale('log')
+                ax_loss.ax.set_yscale('log')
                 ax_loss.ax.set_ylabel('Loss')
                 ax_loss.ax.set_xlabel('Epochs')
                 ax_loss.ax.tick_params(axis='x', labelsize=10)
 
                 if self._e == self.e:
+                    # Set performances of training period
+                    returns = np.sign(self.y_eval[eval_slice]) * y[eval_slice]
+                    cumret = np.exp(np.cumsum(returns, axis=0))
+                    perf_eval[eval_slice] = perf_eval[self.t - self.r - 1] * cumret
+
+                    # Set performances of estimated period
+                    returns = np.sign(self.y_test[test_slice]) * y[test_slice]
+                    cumret = np.exp(np.cumsum(returns, axis=0))
+                    perf_test[test_slice] = perf_test[self.t - 1] * cumret
+
                     ax_perf.ax.clear()
-                    # Plot perf
+                    # Plot perf of the test set
                     ax_perf.plot(
                         perf_test[self.t0: self.t + self.s],
                         x=self.idx[self.t0: self.t + self.s],
                         names='Test set', col='GnBu', lw=1.7, unit='perf',
                     )
+                    # Plot perf of the eval set
                     ax_perf.plot(
                         perf_eval[self.t0: self.t],
                         x=self.idx[self.t0: self.t],
                         names='Eval set', col='OrRd', lw=1.2, unit='perf'
+                    )
+                    # Plot perf of the underlying
+                    ax_perf.plot(
+                        100 * y_perf[self.t0: self.t] / y_perf[self.t0],
+                        x=self.idx[self.t0: self.t],
+                        names='Underlying', col='RdPu', lw=1.2, unit='perf'
                     )
                     # ax_perf.set_axes()
                     ax_perf.ax.set_yscale('log')
@@ -298,6 +296,26 @@ class _RollingBasis:
                 # plt.draw()
 
         return self
+
+    def _get_loss(self, input, target):
+        # input, target : np.array
+        # Compute loss function
+        lo = self.criterion(torch.from_numpy(input), torch.from_numpy(target))
+
+        return lo.item()
+
+    def _display_kpi(self):
+        # Display %
+        pct = self.t - self.n - self.s
+        pct = pct / (self.T - self.n - self.T % self.s)
+        txt = '{:5.2%} is done | '.format(pct)
+        txt += 'Eval loss is {:5.2} | '.format(self.loss_eval[-1])
+        txt += 'Test loss is {:5.2} | '.format(self.loss_test[-1])
+        print(txt, end='\r')
+
+
+def get_perf(signal, underlying, v0=100):
+    return v0 * np.exp(np.cumsum(signal * underlying, axis=0))
 
 
 class RollingXGB(_RollingBasis):
@@ -407,7 +425,7 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
 
     def sub_predict(self, X):
         """ Predict. """
-        return self.predict(X=X)
+        return self.predict(X=X).numpy()
 
     def save(self, path):
         """ Save the trained neural network model.
