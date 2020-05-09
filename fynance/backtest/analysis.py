@@ -4,9 +4,9 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-11-08 08:31:40
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-01-28 12:02:35
+# @Last modified time: 2020-05-09 11:36:48
 
-""" Objects to analyze financial time-series. """
+""" Objects to analyze financial time-series. UNFINISHED. """
 
 # Built-in packages
 
@@ -15,7 +15,7 @@ import fynance as fy
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from IPython.display import display
+# from IPython.display import display
 from matplotlib import pyplot as plt
 
 # Local packages
@@ -272,7 +272,8 @@ class MarketAnalyzer:
             'z_score': '{:.2f}',
         })
 
-        display(style)
+        # display(style)
+        print(style)
 
     def get_perf(self):
         """ Get asset performances.
