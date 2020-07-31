@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-03-05 13:50:16
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-05-08 10:09:08
+# @Last modified time: 2020-07-31 19:42:35
 
 """ Module with some function plot backtest. """
 
@@ -133,18 +133,18 @@ class PlotBackTest:
         if x is None:
             x = np.arange(T)
 
-        if names is None:
-            names = [r'$Model_{}$'.format(i) for i in range(N)]
-
-        elif isinstance(names, str):
-            names = [r'${}_{}$'.format(names, i) for i in range(N)]
-
         col = sns.color_palette(col, N)
 
         # Set graphs
         h = self.ax.plot(x, y, LineWidth=lw)
 
-        # Set lines
+        # Set name lines
+        if names is None:
+            names = 'Model'
+
+        names = [r'${}_{}$'.format(names, i) for i in range(N)]
+
+        # Set color and label lines
         if len(y.shape) == 1:
             h[0].set_color(col[0])
             h[0].set_label(self._set_name(names[0][1:-3], y, unit=unit))
