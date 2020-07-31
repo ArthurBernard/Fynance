@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-20 19:57:33
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-11-18 17:09:11
+# @Last modified time: 2019-11-18 17:57:42
 
 """ Financial indicators. """
 
@@ -116,13 +116,16 @@ def bollinger_band(X, w=20, n=2, kind='s', axis=0, dtype=None):
 
     if axis == 1:
         avg = _handler_ma[kind.lower()](X.T, w).T
-        std = _handler_ma[kind.lower()](X.T, w).T
+        std = _handler_mstd[kind.lower()](X.T, w).T
 
     else:
         avg = _handler_ma[kind.lower()](X, w)
         std = _handler_mstd[kind.lower()](X, w)
 
-    return (avg + n * std).astype(dtype), (avg - n * std).astype(dtype)
+    up_band = avg + n * std
+    low_band = avg - n * std
+
+    return (up_band).astype(dtype), (low_band).astype(dtype)
 
 
 @WrapperArray('dtype', 'axis', 'window')
