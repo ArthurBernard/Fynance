@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-09-28 13:58:30
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-11-05 20:16:04
+# @Last modified time: 2020-09-11 20:17:05
 
 """ Module with some financial, statistic and econometric tools to extract
 features.
@@ -18,6 +18,7 @@ features.
    features.indicators
    features.metrics
    features.momentums
+   features.scale
 
 """
 from . import metrics_cy
@@ -32,6 +33,8 @@ from . import indicators
 from .indicators import *
 from . import money_management
 from .money_management import * 
+from . import scale
+from .scale import *
 
 __all__ = metrics_cy.__all__
 __all__ += metrics.__all__
@@ -39,3 +42,4 @@ __all__ += momentums_cy.__all__
 __all__ += momentums.__all__
 __all__ += indicators.__all__
 __all__ += money_management.__all__
+__all__ += scale.__all__
