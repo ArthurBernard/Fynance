@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2020-09-11 18:47:27
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-09-11 20:42:20
+# @Last modified time: 2020-09-11 21:10:51
 
 """ Object to scale data. """
 
@@ -70,9 +70,10 @@ class Scale:
     X : np.ndarray[dtype, ndim=1 or 2]
         Data to fit the parameters of scale transformation.
     kind : str, optional
-        Kind of scale transformation. Defaut is standardized.
-        - "std" : Standardized see ``fynance.features.scale.standardize``.
-        - "norm" : Normalized see ``fynance.features.scale.normalize``.
+        - "std" : Standardized scale transformation (default), see
+          :func:`~fynance.features.scale.standardize`.
+        - "norm" : Normalized scale transformation, see
+          :func:`~fynance.features.scale.normalize`.
         - "raw" : No scale is apply.
     a, b : float or array_like, optional
         Some scale factors to apply after the transformation. By default is
@@ -98,6 +99,10 @@ class Scale:
         The axis along which is computed the scale parameters.
     kind : str
         The kind of scale transformation.
+
+    See Also
+    --------
+    normalize, standardize
 
     """
 
@@ -154,9 +159,10 @@ class Scale:
         X : np.ndarray[dtype, ndim=1 or 2]
             Data to fit the parameters of scale transformation.
         kind : str, optional
-            Kind of scale transformation. Defaut is standardized.
-            - "std" : Standardized see ``fynance.features.scale.standardize``.
-            - "norm" : Normalized see ``fynance.features.scale.normalize``.
+            - "std" : Standardized scale transformation (default), see
+              :func:`~fynance.features.scale.standardize`.
+            - "norm" : Normalized scale transformation, see
+              :func:`~fynance.features.scale.normalize`.
             - "raw" : No scale is apply.
         a, b : float or array_like, optional
             Some scale factors to apply after the transformation. By default is
@@ -222,7 +228,7 @@ class Scale:
 def standardize(X, a=0, b=1, axis=0):
     r""" Substitutes the mean and divid by the standard deviation.
 
-    ..math::
+    .. math::
 
         Standardize(X) = b \times \frac{X - X_{mean}}{X_{std}} + a
 
@@ -239,6 +245,10 @@ def standardize(X, a=0, b=1, axis=0):
     -------
     np.ndarray[dtype, ndim=1 or 2]
         The scaled data.
+
+    See Also
+    --------
+    Scale, normalize
 
     """
     m = np.mean(X, axis=axis)
@@ -257,7 +267,7 @@ def normalize(X, a=0, b=1, axis=0):
     Substitutes the minimum and divid by the difference between the maximum and
     the minimum. Then multiply by ``b`` minus ``a`` and add ``a``.
 
-    ..math::
+    .. math::
 
         Normalize(X) = (b - a) \times \frac{X - X_{min}}{X_{max} - X_{min}} + a
 
@@ -274,6 +284,10 @@ def normalize(X, a=0, b=1, axis=0):
     -------
     np.ndarray[dtype, ndim=1 or 2]
         The scaled data.
+
+    See Also
+    --------
+    Scale, standardize
 
     """
     m = np.min(X, axis=axis)
