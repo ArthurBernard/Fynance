@@ -23,6 +23,7 @@ The ``fynance`` package contains currently five subpackages:
    - **Financial indicators** (e.g. :func:`~fynance.features.indicators.bollinger_band`, :func:`~fynance.features.indicators.cci`, :func:`~fynance.features.indicators.hma`, :func:`~fynance.features.indicators.macd_hist`, :func:`~fynance.features.indicators.macd_line`, :func:`~fynance.features.indicators.rsi`, etc.).
    - **Statistical momentums** (e.g. :func:`~fynance.features.momentums.sma`, :func:`~fynance.features.momentums.ema`, :func:`~fynance.features.momentums.wma`, :func:`~fynance.features.momentums.smstd`, :func:`~fynance.features.momentums.emstd` :func:`~fynance.features.momentums.wmstd`, etc.).
    - **Metrics** (e.g. :func:`~fynance.features.metrics.annual_return`, :func:`~fynance.features.metrics.annual_volatility`, :func:`~fynance.features.metrics.calmar`, :func:`~fynance.features.metrics.diversified_ratio`, :func:`~fynance.features.metrics.mdd`, :func:`~fynance.features.metrics.sharpe`, :func:`~fynance.features.metrics.z_score`, etc.).
+   - **Scale** (e.g. :func:`~fynance.features.scale.Scale`, :func:`~fynance.features.scale.normalization`, :func:`~fynance.features.scale.standardization`, etc.)
 
 - **Time-series models** (:mod:`fynance.models`) contains:
    - **Econometric models** (e.g. :func:`~fynance.models.econometric_models.MA`, :func:`~fynance.models.econometric_models.ARMA`, :func:`~fynance.models.econometric_models.ARMA_GARCH` and :func:`~fynance.models.econometric_models.ARMAX_GARCH`, etc.).
