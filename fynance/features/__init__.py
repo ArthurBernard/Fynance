@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-09-28 13:58:30
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-09-11 20:17:05
+# @Last modified time: 2020-09-11 21:00:14
 
 """ Module with some financial, statistic and econometric tools to extract
 features.
@@ -21,6 +21,7 @@ features.
    features.scale
 
 """
+
 from . import metrics_cy
 from .metrics_cy import *
 from . import metrics

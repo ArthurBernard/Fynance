@@ -7,7 +7,7 @@
    :no-inherited-members:
    :no-special-members:
 
-These modules contain several financial features such as metrics and indicators, and also some statistical features as moving averages and moving standard deviations.
+These modules contain several financial features such as metrics, indicators, scale transformation and also some statistical features as moving averages and moving standard deviations.
 
 Some precisions about parameters' notation in the following modules:
 

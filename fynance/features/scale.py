@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2020-09-11 18:47:27
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-09-11 20:27:47
+# @Last modified time: 2020-09-11 20:42:20
 
 """ Object to scale data. """
 
@@ -21,6 +21,8 @@ __all__ = ["normalize", "Scale", "standardize"]
 # TODO :
 #     - Use wrapper for axis for scale methods
 #     - Use wrapper for axis for standardize and normalize functions
+#     - Append functions or method to scale with moving functions.
+
 
 def _get_norm_params(X, axis=0):
     params = {
