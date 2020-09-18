@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-19 19:54:59
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-11-05 17:24:48
+# @Last modified time: 2020-09-18 21:43:43
 
 """ Setup script. """
 
@@ -142,6 +142,11 @@ extensions = [
     Extension(
         'fynance.estimator.estimator_cy',
         ['fynance/estimator/estimator_cy' + ext],
+        include_dirs=[numpy.get_include(), '.']
+    ),
+    Extension(
+        'fynance.features.roll_functions_cy',
+        ['fynance/features/roll_functions_cy' + ext],
         include_dirs=[numpy.get_include(), '.']
     ),
 ]
