@@ -24,6 +24,7 @@ The ``fynance`` package contains currently five subpackages:
    - **Statistical momentums** (e.g. :func:`~fynance.features.momentums.sma`, :func:`~fynance.features.momentums.ema`, :func:`~fynance.features.momentums.wma`, :func:`~fynance.features.momentums.smstd`, :func:`~fynance.features.momentums.emstd` :func:`~fynance.features.momentums.wmstd`, etc.).
    - **Metrics** (e.g. :func:`~fynance.features.metrics.annual_return`, :func:`~fynance.features.metrics.annual_volatility`, :func:`~fynance.features.metrics.calmar`, :func:`~fynance.features.metrics.diversified_ratio`, :func:`~fynance.features.metrics.mdd`, :func:`~fynance.features.metrics.sharpe`, :func:`~fynance.features.metrics.z_score`, etc.).
    - **Scale** (e.g. :func:`~fynance.features.scale.Scale`, :func:`~fynance.features.scale.normalize`, :func:`~fynance.features.scale.standardize`, etc.)
+   - **Rolling functions** (e.g. :func:`~fynance.features.roll_functions.roll_min`, :func:`~fynance.features.roll_functions.roll_max`)
 
 - **Time-series models** (:mod:`fynance.models`) contains:
    - **Econometric models** (e.g. :func:`~fynance.models.econometric_models.MA`, :func:`~fynance.models.econometric_models.ARMA`, :func:`~fynance.models.econometric_models.ARMA_GARCH` and :func:`~fynance.models.econometric_models.ARMAX_GARCH`, etc.).
