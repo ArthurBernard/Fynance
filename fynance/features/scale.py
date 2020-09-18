@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2020-09-11 18:47:27
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-09-11 21:10:51
+# @Last modified time: 2020-09-18 22:38:26
 
 """ Object to scale data. """
 
@@ -14,6 +14,8 @@
 import numpy as np
 
 # Local packages
+from fynance.features.roll_functions import roll_min, roll_max
+from fynance.features.momentums import *
 
 __all__ = ["normalize", "Scale", "standardize"]
 
@@ -21,7 +23,7 @@ __all__ = ["normalize", "Scale", "standardize"]
 # TODO :
 #     - Use wrapper for axis for scale methods
 #     - Use wrapper for axis for standardize and normalize functions
-#     - Append functions or method to scale with moving functions.
+#     - Finish functions or method to scale with moving functions.
 
 
 def _get_norm_params(X, axis=0):
@@ -33,6 +35,16 @@ def _get_norm_params(X, axis=0):
     return params
 
 
+def _normalize(X, m, s, a, b):
+
+    return (b - a) * (X - m) / (s - m) + a
+
+
+def _revert_normalize(X, m, s, a, b):
+
+    return _normalize(X, a, b, m, s)
+
+
 def _get_std_params(X, axis=0):
     params = {
         "m": np.mean(X, axis=axis),
@@ -42,24 +54,37 @@ def _get_std_params(X, axis=0):
     return params
 
 
-def _normalize(X, m, s, a, b):
-
-    return (b - a) * (X - m) / (s - m) + a
-
-
 def _standardize(X, m, s, a, b):
 
     return b * (X - m) / s + a
 
 
-def _revert_normalize(X, m, s, a, b):
-
-    return _normalize(X, a, b, m, s)
-
-
 def _revert_standardize(X, m, s, a, b):
 
     return _standardize(X, a, b, m, s)
+
+
+def _get_roll_norm_params(X, w, axis=0):
+    params = {
+        "m": roll_min(X, w, axis=axis),
+        "s": roll_max(X, w, axis=axis),
+    }
+
+    return params
+
+
+def _get_roll_std_params(X, w, kind_moment="simple", axis=0):
+    handler = {
+        "simple": [sma, smstd],
+        "weighted": [wma, wmstd],
+        "exponential": [ema, emstd],
+    }
+    params = {
+        "m": handler[kind][0](X, w=w, axis=axis),
+        "s": handler[kind][1](X, w=w, axis=axis),
+    }
+
+    return params
 
 
 class Scale:
@@ -80,6 +105,9 @@ class Scale:
         respectively 0 and 1.
     axis : int, optional
         Axis along which compute the scale parameters. Default is 0.
+    **kwargs : keyword arguments for particular functions (e.g: for rolling
+            stantandardization kind_moment = {"simple", "weighted",
+            "exponential"} cf :mod:`~fynance.features.momentums).
 
     Methods
     -------
@@ -108,18 +136,24 @@ class Scale:
 
     handle_func = {
         "raw": lambda x, a, b: x,
-        "std": _standardize,
         "norm": _normalize,
+        "std": _standardize,
+        "roll_norm": _normalize,
+        "roll_std": _standardize,
     }
     handle_params = {
         "raw": lambda x: {},
-        "std": _get_std_params,
         "norm": _get_norm_params,
+        "std": _get_std_params,
+        "roll_norm": _get_roll_norm_params,
+        "roll_std": _get_roll_std_params,
     }
     handle_revert = {
         "raw": lambda x, a, b: x,
-        "std": _revert_standardize,
         "norm": _revert_normalize,
+        "std": _revert_standardize,
+        "roll_norm": _revert_normalize,
+        "roll_std": _revert_standardize,
     }
 
     def __init__(self, X, kind="std", a=0., b=1., axis=0):
@@ -151,7 +185,7 @@ class Scale:
         return ("Scale transformation '{}' with the following parameters: {}"
                 "".format(self.kind, self.parmas))
 
-    def fit(self, X, kind=None, a=0., b=1., axis=0):
+    def fit(self, X, kind=None, a=0., b=1., axis=0, **kwargs):
         """ Compute the parameters of the scale transformation.
 
         Parameters
@@ -169,6 +203,9 @@ class Scale:
             respectively 0 and 1.
         axis : int, optional
             Axis along which compute the scale parameters. Default is 0.
+        **kwargs : keyword arguments for particular functions (e.g: for rolling
+            stantandardization kind_moment = {"simple", "weighted",
+            "exponential"} cf :mod:`~fynance.features.momentums).
 
         """
         if kind is None:
@@ -177,7 +214,7 @@ class Scale:
         if axis is None:
             axis = self.axis
 
-        self.params = self.handle_params[kind](X, axis=axis)
+        self.params = self.handle_params[kind](X, axis=axis, **kwargs)
         self.params.update({"a": a, "b": b})
 
     def scale(self, X, axis=None):
