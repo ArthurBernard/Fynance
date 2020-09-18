@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2020-09-18 21:15:59
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-09-18 21:49:35
+# @Last modified time: 2020-09-18 22:21:22
 
 """ Rolling functions. """
 
@@ -31,7 +31,7 @@ def roll_min(X, w=None, axis=0, dtype=None):
 
     .. math::
 
-        roll_min^w_t(X) = min(X_{t - w}, ..., X_t)
+        roll\_min^w_t(X) = min(X_{t - w}, ..., X_t)
 
     Parameters
     ----------
@@ -96,7 +96,7 @@ def roll_max(X, w=None, axis=0, dtype=None):
 
     .. math::
 
-        roll_max^w_t(X) = max(X_{t - w}, ..., X_t)
+        roll\_max^w_t(X) = max(X_{t - w}, ..., X_t)
 
     Parameters
     ----------
