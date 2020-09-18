@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-07-24 15:11:52
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-10-30 13:39:03
+# @Last modified time: 2020-09-18 21:52:31
 # cython: language_level=3, wraparound=False, boundscheck=False
 
 # Built-in packages
@@ -22,6 +22,8 @@ __all__ = [
     'ema_cy_1d', 'ema_cy_2d', 'smstd_cy_1d', 'smstd_cy_2d',
     'wmstd_cy_1d', 'wmstd_cy_2d', 'emstd_cy_1d', 'emstd_cy_2d',
 ]
+
+# FIXME : problem with window size => window is w + 1 instead of w
 
 # =========================================================================== #
 #                               Moving Averages                               #
@@ -582,132 +584,3 @@ cpdef double [:, :] emstd_cy_2d(double [:, :] X, double alpha):
         n += 1
 
     return sd
-
-
-# =========================================================================== #
-#                                 Old Script                                  #
-# =========================================================================== #
-
-
-cpdef np.ndarray[np.float64_t, ndim=1] sma_cy(
-        np.ndarray[np.float64_t, ndim=1] X, 
-        int k=21,
-    ):
-    """ Simple moving average of k lags. Vectorized method. """
-    cdef np.ndarray[np.float64_t, ndim=1] ma
-
-    ma = np.cumsum(X, dtype=np.float64)
-    ma[k: ] = (ma[k: ] - ma[: -k]) / <np.float64_t>k
-    ma[: k] /= np.arange(1, k + 1, dtype=np.float64)
-
-    return ma
-
-
-cpdef np.ndarray[np.float64_t, ndim=2] sma_cynp_2d(
-        np.ndarray[np.float64_t, ndim=2] X, 
-        int k=21,
-    ):
-    """ Simple moving average of k lags. Vectorized method. """
-    cdef np.ndarray[np.float64_t, ndim=2] ma, arange
-
-    arange = np.arange(1, k + 1, dtype=np.float64).reshape([k, 1])
-
-    ma = np.cumsum(X, dtype=np.float64, axis=0)
-    ma[k: ] = (ma[k: ] - ma[: -k]) / <np.float64_t>k
-    ma[: k] /= arange # np.arange(1, k + 1, dtype=np.float64)
-
-    return ma
-
-
-cpdef np.ndarray[np.float64_t, ndim=1] wma_cy(
-        np.ndarray[np.float64_t, ndim=1] series, 
-        int lags=21,
-    ):
-    """ Weighted moving average of k lags. """
-    cdef int t, t_0, t_T, T = series.size
-    cdef double m
-    cdef np.ndarray[np.float64_t, ndim=1] ma, arange
-
-    arange = np.arange(1, T, dtype=np.float64)
-    ma = np.zeros([T], dtype=np.float64)
-
-    for t in range(T):
-        m = <double>min(t + 1, lags)
-        m = m * (m + 1.) / 2.
-        t_0 = max(t - lags + 1, 0)
-        t_T =  min(t + 1, lags)
-
-        ma[t] = sum(arange[: t_T] * series[t_0: t + 1])
-        ma[t] = ma[t] / m
-
-    return ma
-
-
-cpdef np.ndarray[np.float64_t, ndim=1] ema_cy(
-        np.ndarray[np.float64_t, ndim=1] series,
-        float alpha=0.94,
-    ):
-    """ Exponential moving average. """
-    cdef int t, T=series.size
-    cdef np.ndarray[np.float64_t, ndim=1] ema=np.zeros([T], dtype=np.float64)
-    
-    ema[0] = series[0]
-
-    for t in range(1, T):
-        ema[t] = alpha * ema[t - 1] + (1. - alpha) * series[t]
-
-    return ema
-
-
-cpdef np.ndarray[np.float64_t, ndim=1] smstd_cy(
-        np.ndarray[np.float64_t, ndim=1] series, 
-        int lags=21,
-    ):
-    """ Simple moving standard deviation along k lags. """
-    cdef int t, T = series.size
-    cdef np.ndarray[np.float64_t, ndim=1] ma = sma_cy(series, k=lags)
-    cdef np.ndarray[np.float64_t, ndim=1] std = np.zeros([T], dtype=np.float64)
-    
-    for t in range(T):
-        std[t] = np.sum(
-            np.square(series[max(t-lags+1, 0): t+1] - ma[t], dtype=np.float64),
-            dtype=np.float64
-            )  / <double>min(t + 1, lags)
-
-    return np.sqrt(std, dtype=np.float64)
-
-
-cpdef np.ndarray[np.float64_t, ndim=1] wmstd_cy(
-        np.ndarray[np.float64_t, ndim=1] series, 
-        int lags=21
-    ):
-    """ Weighted moving standard deviation along k lags. """
-    cdef int t, T = series.size
-    cdef float m
-    cdef np.ndarray[np.float64_t, ndim=1] ma = wma_cy(series, lags=lags)
-    cdef np.ndarray[np.float64_t, ndim=1] std = np.zeros([T], dtype=np.float)
-    
-    for t in range(T):
-        m = <double>min(t + 1, lags)
-        std[t] = np.sum(
-            np.arange(1., m + 1., dtype=np.float64) \
-            * (series[max(t - lags + 1, 0): t + 1] - ma[t]) ** 2 \
-            / (m * (m + 1.) / 2.), dtype=np.float64
-        )
-
-    return np.sqrt(std, dtype=np.float64)
-
-
-cpdef np.ndarray[np.float64_t, ndim=1] emstd_cy(
-        np.ndarray[np.float64_t, ndim=1] series, 
-        float alpha=0.94,
-    ):
-    """ Exponential moving standard deviation. """
-    cdef t, T = series.size
-    cdef np.ndarray[np.float64_t, ndim=1] ma = ema_cy(series, alpha=alpha)
-    cdef np.ndarray[np.float64_t, ndim=1] std = np.zeros([T], dtype=np.float64)
-
-    for t in range(1, T):
-        std[t] = alpha * std[t-1] + (1. - alpha) * (series[t] - ma[t]) ** 2
-
-    return np.sqrt(std, dtype=np.float64)

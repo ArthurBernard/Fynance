@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-07-09 10:49:19
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-11-05 15:53:02
+# @Last modified time: 2020-09-18 20:38:34
 # cython: language_level=3, wraparound=False, boundscheck=False
 
 # Built-in packages
@@ -16,7 +16,6 @@ import numpy as np
 cimport numpy as np
 
 # Local packages
-from fynance.features.momentums_cy import smstd_cy, sma_cy
 from fynance.features.momentums_cy import sma_cy_1d, sma_cy_2d
 
 
