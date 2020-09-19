@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2020-09-11 18:47:27
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-09-19 10:34:43
+# @Last modified time: 2020-09-19 10:54:36
 
 """ Object to scale data. """
 
@@ -104,19 +104,21 @@ class Scale:
           :func:`~fynance.features.scale.normalize`.
         - "raw" : No scale is apply.
         - "roll_std" : Standardized scale transformation, computed with
-          rolling mean and standard deviation. See
-          :func:`~fynance.features.scale.roll_standardize`.
+          rolling mean and standard deviation (see
+          :func:`~fynance.features.scale.roll_standardize`).
         - "roll_norm" : Normalized scale transformation, computed with
-          roling minimum and maximum. See
-          :func:`~fynance.features.scale.roll_normalize`.
+          roling minimum and maximum (see
+          :func:`~fynance.features.scale.roll_normalize`).
     a, b : float or array_like, optional
         Some scale factors to apply after the transformation. By default is
         respectively 0 and 1.
     axis : int, optional
         Axis along which compute the scale parameters. Default is 0.
-    **kwargs : keyword arguments for particular functions (e.g: for rolling
-            stantandardization ``kind_moment={"s", "w", "e"}`` cf
-            :func:`~fynance.features.scale.roll_standardize`).
+    **kwargs : keyword arguments for particular functions
+        E.g: for rolling function set ``w`` the lagged window (see
+        :func:`~fynance.features.scale.roll_normalize`) or for rolling
+        standardization set ``kind_moment={"s", "w", "e"}`` (see
+        :func:`~fynance.features.scale.roll_standardize`).
 
     Methods
     -------
@@ -208,18 +210,20 @@ class Scale:
               :func:`~fynance.features.scale.normalize`.
             - "raw" : No scale is apply.
             - "roll_std" : Standardized scale transformation, computed with
-              rolling mean and standard deviation. See
-              :func:`~fynance.features.scale.roll_standardize`.
+              rolling mean and standard deviation (see
+              :func:`~fynance.features.scale.roll_standardize`).
             - "roll_norm" : Normalized scale transformation, computed with
-              roling minimum and maximum. See
-              :func:`~fynance.features.scale.roll_normalize`.
+              roling minimum and maximum (see
+              :func:`~fynance.features.scale.roll_normalize`).
         a, b : float or array_like, optional
             Some scale factors to apply after the transformation. By default is
             respectively 0 and 1.
         axis : int, optional
             Axis along which compute the scale parameters. Default is 0.
-        **kwargs : keyword arguments for particular functions (e.g: for rolling
-            stantandardization ``kind_moment={"s", "w", "e"}`` cf
+        **kwargs : keyword arguments for particular functions
+            E.g: for rolling function set ``w`` the lagged window (see
+            :func:`~fynance.features.scale.roll_normalize`) or for rolling
+            standardization set ``kind_moment={"s", "w", "e"}`` (see
             :func:`~fynance.features.scale.roll_standardize`).
 
         """
@@ -318,7 +322,7 @@ def roll_standardize(X, w=None, a=0, b=1, axis=0, kind_moment="s"):
 
     .. math::
 
-        RollStandardize(X)^w_t = b \times \frac{X_t - RollMean(X)^w_t}\
+        RollStandardize(X)^w_t = b \times \frac{X_t - RollMean(X)^w_t}
         {RollStd(X)^w_t} + a
 
     Parameters
@@ -413,7 +417,7 @@ def roll_normalize(X, w=None, a=0, b=1, axis=0):
 
     .. math::
 
-        RollNormalize(X)^w_t = (b - a) \times \frac{X_t - RollMin(X)^w_t}\
+        RollNormalize(X)^w_t = (b - a) \times \frac{X_t - RollMin(X)^w_t}
         {RollMax(X)^w_t - RollMin(X)^w_t} + a
 
     Parameters
