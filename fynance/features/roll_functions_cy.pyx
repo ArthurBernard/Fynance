@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2020-09-18 21:12:58
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-09-18 21:57:47
+# @Last modified time: 2020-09-19 09:43:04
 # cython: language_level=3, wraparound=False, boundscheck=False
 
 # Built-in packages
@@ -62,8 +62,7 @@ cpdef double [:] roll_min_cy_1d(double [:] X, int w):
 
     cdef double [:] roll_min = var
     cdef double _min = <double>0.
-    cdef int t = 0
-    cdef int i
+    cdef int i, t = 0
 
     if w == X.shape[0]:
 
@@ -109,7 +108,7 @@ cpdef double [:, :] roll_min_cy_2d(double [:, :] X, int w):
 
     cdef double [:, :] roll_min = var
     cdef double _min
-    cdef int t, n = 0
+    cdef int i, t, n = 0
 
     if w == X.shape[0]:
         while n < N:
@@ -172,8 +171,7 @@ cpdef double [:] roll_max_cy_1d(double [:] X, int w):
 
     cdef double [:] roll_max = var
     cdef double _max = <double>0.
-    cdef int t = 0
-    cdef int i
+    cdef int i, t = 0
 
     if w == X.shape[0]:
 
@@ -219,7 +217,7 @@ cpdef double [:, :] roll_max_cy_2d(double [:, :] X, int w):
 
     cdef double [:, :] roll_max = var
     cdef double _max
-    cdef int t, n = 0
+    cdef int i, t, n = 0
 
     if w == X.shape[0]:
         while n < N:
