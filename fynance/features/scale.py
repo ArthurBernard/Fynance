@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2020-09-11 18:47:27
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-09-19 11:02:44
+# @Last modified time: 2020-09-19 11:42:43
 
 """ Object to scale data. """
 
@@ -73,21 +73,21 @@ def _revert_standardize(X, m, s, a, b):
 
 
 def _get_roll_norm_params(X, w=None, axis=0):
-    params = {
-        "m": roll_min(X, w, axis=axis),
-        "s": roll_max(X, w, axis=axis),
-    }
+    m = roll_min(X, w, axis=axis)
+    s = roll_max(X, w, axis=axis)
+    idx = m == s
+    m[idx] = 0.
+    s[idx] = 2 * s[idx]
 
-    return params
+    return {"m": m, "s": s}
 
 
 def _get_roll_std_params(X, w=None, kind_moment="s", axis=0):
-    params = {
-        "m": _HANDLER_MOMENTUM[kind_moment][0](X, w=w, axis=axis),
-        "s": _HANDLER_MOMENTUM[kind_moment][1](X, w=w, axis=axis),
-    }
+    m = _HANDLER_MOMENTUM[kind_moment][0](X, w=w, axis=axis)
+    s = _HANDLER_MOMENTUM[kind_moment][1](X, w=w, axis=axis)
+    s[s == 0] = 1.
 
-    return params
+    return {"m": m, "s": s}
 
 
 class Scale:
