@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2020-09-11 18:47:27
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-09-18 22:38:26
+# @Last modified time: 2020-09-19 10:22:29
 
 """ Object to scale data. """
 
@@ -17,13 +17,21 @@ import numpy as np
 from fynance.features.roll_functions import roll_min, roll_max
 from fynance.features.momentums import *
 
-__all__ = ["normalize", "Scale", "standardize"]
+__all__ = ["normalize", "roll_normalize", "roll_standardize", "Scale",
+           "standardize"]
 
 
 # TODO :
 #     - Use wrapper for axis for scale methods
 #     - Use wrapper for axis for standardize and normalize functions
 #     - Finish functions or method to scale with moving functions.
+
+
+_HANDLER_MOMENTUM = {
+    "simple": [sma, smstd],
+    "weighted": [wma, wmstd],
+    "exponential": [ema, emstd],
+}
 
 
 def _get_norm_params(X, axis=0):
@@ -74,14 +82,9 @@ def _get_roll_norm_params(X, w, axis=0):
 
 
 def _get_roll_std_params(X, w, kind_moment="simple", axis=0):
-    handler = {
-        "simple": [sma, smstd],
-        "weighted": [wma, wmstd],
-        "exponential": [ema, emstd],
-    }
     params = {
-        "m": handler[kind][0](X, w=w, axis=axis),
-        "s": handler[kind][1](X, w=w, axis=axis),
+        "m": _HANDLER_MOMENTUM[kind][0](X, w=w, axis=axis),
+        "s": _HANDLER_MOMENTUM[kind][1](X, w=w, axis=axis),
     }
 
     return params
@@ -100,6 +103,12 @@ class Scale:
         - "norm" : Normalized scale transformation, see
           :func:`~fynance.features.scale.normalize`.
         - "raw" : No scale is apply.
+        - "roll_std" : Standardized scale transformation, computed with
+          rolling mean and standard deviation. See
+          :func:`~fynance.features.scale.roll_standardize`.
+        - "roll_norm" : Normalized scale transformation, computed with
+          roling minimum and maximum. See
+          :func:`~fynance.features.scale.roll_normalize`.
     a, b : float or array_like, optional
         Some scale factors to apply after the transformation. By default is
         respectively 0 and 1.
@@ -130,7 +139,7 @@ class Scale:
 
     See Also
     --------
-    normalize, standardize
+    normalize, standardize, roll_standardize, roll_normalize
 
     """
 
@@ -198,6 +207,12 @@ class Scale:
             - "norm" : Normalized scale transformation, see
               :func:`~fynance.features.scale.normalize`.
             - "raw" : No scale is apply.
+            - "roll_std" : Standardized scale transformation, computed with
+              rolling mean and standard deviation. See
+              :func:`~fynance.features.scale.roll_standardize`.
+            - "roll_norm" : Normalized scale transformation, computed with
+              roling minimum and maximum. See
+              :func:`~fynance.features.scale.roll_normalize`.
         a, b : float or array_like, optional
             Some scale factors to apply after the transformation. By default is
             respectively 0 and 1.
@@ -205,7 +220,7 @@ class Scale:
             Axis along which compute the scale parameters. Default is 0.
         **kwargs : keyword arguments for particular functions (e.g: for rolling
             stantandardization kind_moment = {"simple", "weighted",
-            "exponential"} cf :mod:`~fynance.features.momentums).
+            "exponential"} cf :mod:`~fynance.features.scale.roll_standardize`).
 
         """
         if kind is None:
@@ -285,11 +300,63 @@ def standardize(X, a=0, b=1, axis=0):
 
     See Also
     --------
-    Scale, normalize
+    Scale, normalize, roll_standardize
 
     """
     m = np.mean(X, axis=axis)
     s = np.std(X, axis=axis)
+
+    if axis == 1:
+
+        return _standardize(X.T, m, s, a, b).T
+
+    return _standardize(X, m, s, a, b)
+
+
+def roll_standardize(X, w=None, a=0, b=1, axis=0, kind_moment="simple"):
+    r""" Substitutes the rolling mean and divid by the rolling standard dev.
+
+    .. math::
+
+        RollStandardize(X)^w_t = b \times \frac{X_t - RollMean(X)^w_t}\
+        {RollStd(X)^w_t} + a
+
+    Parameters
+    ----------
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Data to scale.
+    w : int, optional
+        Size of the lagged window of the moving average/standard deviation,
+        must be positive. If ``w is None`` or ``w=0``, then
+        ``w=X.shape[axis]``. Default is None.
+    a, b : float or array_like, optional
+        Respectively an additional and multiply factor.
+    axis : int, optional
+        Axis along which to scale the data.
+    kind_moment : str, optional {'simple', 'weighted', 'exponential'}
+        - If 'simple' (default) then compute basic moving averages and
+          standard deviations, see :func:`~fynance.features.momentums.sma` and
+          :func:`~fynance.features.momentums.smstd`.
+        - If 'weighted' then compute the weighted moving averages and standard
+          deviations, see :func:`~fynance.features.momentums.wma` and
+          :func:`~fynance.features.momentums.wmstd`.
+        - If 'exponential' then compute the exponential moving averages and
+          standard deviations, see :func:`~fynance.features.momentums.ema` and
+          :func:`~fynance.features.momentums.emstd`.
+
+    Returns
+    -------
+    np.ndarray[dtype, ndim=1 or 2]
+        The scaled data.
+
+    See Also
+    --------
+    Scale, normalize, standardize, roll_standardize
+
+    """
+    mean, std = _HANDLER_MOMENTUM[kind_moment]
+    m = mean(X, w, axis=axis)
+    s = std(X, w, axis=axis)
 
     if axis == 1:
 
@@ -324,11 +391,56 @@ def normalize(X, a=0, b=1, axis=0):
 
     See Also
     --------
-    Scale, standardize
+    Scale, standardize, roll_normalize
 
     """
     m = np.min(X, axis=axis)
     s = np.max(X, axis=axis)
+
+    if axis == 1:
+
+        return _normalize(X.T, m, s, a, b).T
+
+    return _normalize(X, m, s, a, b)
+
+
+def roll_normalize(X, w=None, a=0, b=1, axis=0):
+    r""" Scale the data between ``a`` and ``b``.
+
+    Substitutes the rolling minimum and divid by the difference between the
+    rolling maximum and the minimum. Then multiply by ``b`` minus ``a`` and
+    add ``a``.
+
+    .. math::
+
+        RollNormalize(X)^w_t = (b - a) \times \frac{X_t - RollMin(X)^w_t}\
+        {RollMax(X)^w_t - RollMin(X)^w_t} + a
+
+    Parameters
+    ----------
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Data to scale.
+    w : int, optional
+        Size of the lagged window of the rolling minimum/maximum, must be
+        positive. If ``w is None`` or ``w=0``, then ``w=X.shape[axis]``.
+        Default is None.
+    a, b : float or array_like, optional
+        Respectively the lower and upper bound of the transformation.
+    axis : int, optional
+        Axis along which to scale the data.
+
+    Returns
+    -------
+    np.ndarray[dtype, ndim=1 or 2]
+        The scaled data.
+
+    See Also
+    --------
+    Scale, standardize, normalize, roll_standardize
+
+    """
+    m = roll_min(X, w, axis=axis)
+    s = roll_max(X, w, axis=axis)
 
     if axis == 1:
 
