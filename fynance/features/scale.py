@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2020-09-11 18:47:27
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-09-19 10:54:36
+# @Last modified time: 2020-09-19 11:02:44
 
 """ Object to scale data. """
 
@@ -72,7 +72,7 @@ def _revert_standardize(X, m, s, a, b):
     return _standardize(X, a, b, m, s)
 
 
-def _get_roll_norm_params(X, w, axis=0):
+def _get_roll_norm_params(X, w=None, axis=0):
     params = {
         "m": roll_min(X, w, axis=axis),
         "s": roll_max(X, w, axis=axis),
@@ -81,10 +81,10 @@ def _get_roll_norm_params(X, w, axis=0):
     return params
 
 
-def _get_roll_std_params(X, w, kind_moment="s", axis=0):
+def _get_roll_std_params(X, w=None, kind_moment="s", axis=0):
     params = {
-        "m": _HANDLER_MOMENTUM[kind][0](X, w=w, axis=axis),
-        "s": _HANDLER_MOMENTUM[kind][1](X, w=w, axis=axis),
+        "m": _HANDLER_MOMENTUM[kind_moment][0](X, w=w, axis=axis),
+        "s": _HANDLER_MOMENTUM[kind_moment][1](X, w=w, axis=axis),
     }
 
     return params
@@ -167,13 +167,13 @@ class Scale:
         "roll_std": _revert_standardize,
     }
 
-    def __init__(self, X, kind="std", a=0., b=1., axis=0):
+    def __init__(self, X, kind="std", a=0., b=1., axis=0, **kwargs):
         """ Initialize the scale object. """
         self.func = self.handle_func[kind]
         self.revert_func = self.handle_revert[kind]
         self.kind = kind
         self.axis = axis
-        self.fit(X, kind, a, b, axis)
+        self.fit(X, kind, a, b, axis, **kwargs)
 
     def __call__(self, X, axis=None):
         """ Callable method to scale data with fitted parameters.
