@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2020-09-11 18:47:27
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-09-19 10:22:29
+# @Last modified time: 2020-09-19 10:34:43
 
 """ Object to scale data. """
 
@@ -28,9 +28,9 @@ __all__ = ["normalize", "roll_normalize", "roll_standardize", "Scale",
 
 
 _HANDLER_MOMENTUM = {
-    "simple": [sma, smstd],
-    "weighted": [wma, wmstd],
-    "exponential": [ema, emstd],
+    "s": [sma, smstd],
+    "w": [wma, wmstd],
+    "e": [ema, emstd],
 }
 
 
@@ -81,7 +81,7 @@ def _get_roll_norm_params(X, w, axis=0):
     return params
 
 
-def _get_roll_std_params(X, w, kind_moment="simple", axis=0):
+def _get_roll_std_params(X, w, kind_moment="s", axis=0):
     params = {
         "m": _HANDLER_MOMENTUM[kind][0](X, w=w, axis=axis),
         "s": _HANDLER_MOMENTUM[kind][1](X, w=w, axis=axis),
@@ -115,8 +115,8 @@ class Scale:
     axis : int, optional
         Axis along which compute the scale parameters. Default is 0.
     **kwargs : keyword arguments for particular functions (e.g: for rolling
-            stantandardization kind_moment = {"simple", "weighted",
-            "exponential"} cf :mod:`~fynance.features.momentums).
+            stantandardization ``kind_moment={"s", "w", "e"}`` cf
+            :func:`~fynance.features.scale.roll_standardize`).
 
     Methods
     -------
@@ -219,8 +219,8 @@ class Scale:
         axis : int, optional
             Axis along which compute the scale parameters. Default is 0.
         **kwargs : keyword arguments for particular functions (e.g: for rolling
-            stantandardization kind_moment = {"simple", "weighted",
-            "exponential"} cf :mod:`~fynance.features.scale.roll_standardize`).
+            stantandardization ``kind_moment={"s", "w", "e"}`` cf
+            :func:`~fynance.features.scale.roll_standardize`).
 
         """
         if kind is None:
@@ -313,7 +313,7 @@ def standardize(X, a=0, b=1, axis=0):
     return _standardize(X, m, s, a, b)
 
 
-def roll_standardize(X, w=None, a=0, b=1, axis=0, kind_moment="simple"):
+def roll_standardize(X, w=None, a=0, b=1, axis=0, kind_moment="s"):
     r""" Substitutes the rolling mean and divid by the rolling standard dev.
 
     .. math::
@@ -333,15 +333,15 @@ def roll_standardize(X, w=None, a=0, b=1, axis=0, kind_moment="simple"):
         Respectively an additional and multiply factor.
     axis : int, optional
         Axis along which to scale the data.
-    kind_moment : str, optional {'simple', 'weighted', 'exponential'}
-        - If 'simple' (default) then compute basic moving averages and
-          standard deviations, see :func:`~fynance.features.momentums.sma` and
+    kind_moment : str {"s", "w", "e"}, optional
+        - If "s" (default) then compute basic moving averages and standard
+          deviations, see :func:`~fynance.features.momentums.sma` and
           :func:`~fynance.features.momentums.smstd`.
-        - If 'weighted' then compute the weighted moving averages and standard
+        - If "w" then compute the weighted moving averages and standard
           deviations, see :func:`~fynance.features.momentums.wma` and
           :func:`~fynance.features.momentums.wmstd`.
-        - If 'exponential' then compute the exponential moving averages and
-          standard deviations, see :func:`~fynance.features.momentums.ema` and
+        - If "e" then compute the exponential moving averages and standard
+          deviations, see :func:`~fynance.features.momentums.ema` and
           :func:`~fynance.features.momentums.emstd`.
 
     Returns
