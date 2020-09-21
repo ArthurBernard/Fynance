@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-05-06 20:16:31
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-05-05 20:25:59
+# @Last modified time: 2020-09-21 06:55:49
 
 """ Basis of neural networks models. """
 
@@ -19,6 +19,19 @@ import torch.nn
 # Local packages
 
 __all__ = ['BaseNeuralNet', 'MultiLayerPerceptron']
+
+
+_TYPE_HANDLER = {
+    "int": torch.int64,
+    "int64": torch.int64,
+    "int32": torch.int32,
+    "int16": torch.int16,
+    "int8": torch.int8,
+    "float": torch.float64,
+    "float64": torch.float64,
+    "float32": torch.float32,
+    "float16": torch.float16,
+}
 
 
 class BaseNeuralNet(torch.nn.Module):
@@ -231,6 +244,10 @@ class BaseNeuralNet(torch.nn.Module):
         else:
             raise ValueError('Unkwnown data type: {}'.format(type(X)))
 
+    def save_model(self, path):
+        """ Save the model with this weights and parameters. """
+        pass
+
 
 class MultiLayerPerceptron(BaseNeuralNet):
     r""" Neural network with MultiLayer Perceptron architecture.
@@ -287,6 +304,8 @@ class MultiLayerPerceptron(BaseNeuralNet):
         else:
             self.set_data(X=X, y=y, x_type=x_type, y_type=y_type)
 
+        self.n_layers = len(layers) + 1
+
         self.layers = self._set_layer_list(layers, bias)
         self.activation = self._set_activation(activation, **activation_kwargs)
         self.drop = self._set_dropout(drop)
@@ -334,7 +353,7 @@ class MultiLayerPerceptron(BaseNeuralNet):
         # Set dropout parameters
         if isinstance(drop, list):
 
-            if len(drop) != len(self.layers):
+            if len(drop) != self.n_layers:
 
                 raise ValueError('if you pass a list of drop parameters '
                                  'this one must be of size of layers list + 1')
@@ -343,21 +362,16 @@ class MultiLayerPerceptron(BaseNeuralNet):
 
         elif drop is not None:
 
-            return torch.nn.Dropout(p=drop)
+            return [torch.nn.Dropout(p=drop) for _ in range(self.n_layers)]
 
         else:
 
-            return lambda x: x
+            return [lambda x: x for _ in range(self.n_layers)]
 
     def forward(self, x):
         """ Forward computation. """
         for name, layer in enumerate(self.layers):
-            if isinstance(self.drop, list):
-                x = self.drop[name](x)
-
-            else:
-                x = self.drop(x)
-
+            x = self.drop[name](x)
             x = layer(x)
 
             if isinstance(self.activation, list):
