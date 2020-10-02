@@ -1,4 +1,4 @@
-# Fynance - Machine learning tools for financial analysis [In Progress]
+# Fynance - Machine learning tools designed for finance
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/fynance)
 [![PyPI](https://img.shields.io/pypi/v/fynance.svg)](https://pypi.org/project/fynance/)
@@ -9,9 +9,12 @@
 [![Documentation Status](https://readthedocs.org/projects/fynance/badge/?version=latest)](https://fynance.readthedocs.io/en/latest/?badge=latest)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/ArthurBernard/Fynance.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ArthurBernard/Fynance/context:python)
 
-The **Fynance project** provides efficient tools to financial annalysis, such that the **Python package** `fynance` that includes several **machine learning**, **econometric** and **statistical** subpackages specialy adapted to **backtest trading strategy** and **financial analysis**, the [documentation](https://fynance.readthedocs.io/en/latest/index.html) with **examples and explanations** of functions, and **notebooks** with more complete examples.
+- **Documentation**: http://fynance.readthedocs.io/en/latest/index.html
+- **Source code**: http://github.com/ArthurBernard/Fynance
 
-*Currently the project is allways at a **beta level**. But some parts of the project can be considered as stable, such as ``fynance.features`` (this subpackage is already coded in **Cython** to be time-efficient), ``fynance.algorithms.allocation`` (this subpackage seems stable but have to be cleaned and write in Cython), and the other subpackages are always in progress (subject to deep modification).*
+**Fynance** is Python (and Cython) package, it provides **machine learning**, **econometric** and **statistical** tools designed for **financial analysis** and **backtest of trading strategy**. The [**documentation**](https://fynance.readthedocs.io/en/latest/index.html) is available with some **examples** of the use of functions and objects.
+
+*Currently the project is always at a **beta level**. Some parts of the project can be considered as stable, such that ``fynance.features`` (this subpackage is already coded in **Cython** to be time-efficient), ``fynance.algorithms.allocation`` (this subpackage seems stable but have to be cleaned and write in Cython), and the other subpackages are always in progress (subject to deep modifications).*
 
 ## Presentation
 
@@ -28,6 +31,8 @@ The ``fynance`` package contains currently five subpackages:
     - **Financial indicators** (e.g. bollinger_band, cci, hma, macd_hist, macd_line, rsi, etc.).
     - **Statistical momentums** (e.g. sma, ema, wma, smstd, emstd wmstd, etc.).
     - **Metrics** (e.g. annual_return, annual_volatility, calmar, diversified_ratio, mdd, sharpe, z_score, etc.).
+    - **Scale** (e.g. Scale object, normalize, standardize, roll_normalize, roll_standardize, etc.).
+    - **Rolling functions** (e.g. roll_min, roll_max).
 
 - **Time-series models** (``fynance.models``) contains:
     - **Econometric models** (e.g. MA, ARMA, ARMA_GARCH and ARMAX_GARCH, etc.).
