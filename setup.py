@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-19 19:54:59
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-09-18 21:43:43
+# @Last modified time: 2020-09-25 19:22:01
 
 """ Setup script. """
 
@@ -147,6 +147,11 @@ extensions = [
     Extension(
         'fynance.features.roll_functions_cy',
         ['fynance/features/roll_functions_cy' + ext],
+        include_dirs=[numpy.get_include(), '.']
+    ),
+    Extension(
+        'fynance.algorithms.browsers_cy',
+        ['fynance/algorithms/browsers_cy' + ext],
         include_dirs=[numpy.get_include(), '.']
     ),
 ]
