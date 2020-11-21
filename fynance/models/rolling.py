@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-04-23 19:15:17
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-05-08 20:15:15
+# @Last modified time: 2020-11-21 18:21:49
 
 """ Basis of rolling models.
 
@@ -17,6 +17,7 @@ Examples
 """
 
 # Built-in packages
+from multiprocessing import Process
 
 # External packages
 import numpy as np
@@ -155,14 +156,21 @@ class _RollingBasis:
         if self._e > self.e:
             self._e = 1
             # Time forward incrementation
-            self.t += self.r
+            # self.t += self.r
 
-            if self.t + self.s > self.T:
+            if self.t + self.r + self.s > self.T:
 
                 raise StopIteration
 
+            self.t += self.r
             self.t_idx = np.arange(self.t - self.n, self.t)
-        # TODO : Set training part in an other method
+
+        eval_set = slice(self.t - self.r, self.t)
+        test_set = slice(self.t, self.t + self.s)
+
+        return eval_set, test_set
+
+    def _training(self):
         # Run epochs
         loss_epoch = 0.
         # Shuffle time indexes
@@ -187,12 +195,6 @@ class _RollingBasis:
 
         self.loss_train[self.i] = loss_epoch / s
 
-        # Set eval and test periods
-        y_eval = self.sub_predict(self.X[self.t - self.r: self.t])
-        y_test = self.sub_predict(self.X[self.t: self.t + self.s])
-
-        return y_eval, y_test
-
     def run(self, backtest_plot=True, backtest_kpi=True, figsize=(9, 6),
             func=np.sign):
         """ Run neural network model and backtest predictions.
@@ -215,70 +217,91 @@ class _RollingBasis:
         r = np.exp(y) - 1
         y_perf = np.exp(np.cumsum(y, axis=0))
         y_perf = 100. * y_perf / y_perf[self.t0]
-        perf_eval = 100. * np.ones(y.shape, dtype=np.float64)
-        perf_test = 100. * np.ones(y.shape, dtype=np.float64)
+        self.perf_eval = 100. * np.ones(y.shape, dtype=np.float64)
+        self.perf_test = 100. * np.ones(y.shape, dtype=np.float64)
 
         # Set dynamic plot object
-        bnn = BacktestNeuralNet(figsize)
+        self.bnn = BacktestNeuralNet(figsize)
+
+        p_print = None
 
         # TODO : get stats, loss, etc.
         # TODO : plot loss, perf, etc.
-        for y_eval, y_test in self:
+        for eval_set, test_set in self:
+            self._training()
+
             # Predict on training and testing period
-            eval_set = slice(self.t - self.r, self.t)
-            test_set = slice(self.t, self.t + self.s)
-            self.y_eval[eval_set] = y_eval
-            self.y_test[test_set] = y_test
+            self.y_eval[eval_set] = self.sub_predict(self.X[eval_set])
+            self.y_test[test_set] = self.sub_predict(self.X[test_set])
             # Compute losses
-            self.loss_eval[self.i] = self._get_loss(y_eval, self.y[eval_set])
-            self.loss_test[self.i] = self._get_loss(y_test, self.y[test_set])
+            self.loss_eval[self.i] = self._get_loss_on(self.y_eval, eval_set)
+            self.loss_test[self.i] = self._get_loss_on(self.y_test, test_set)
 
-            if backtest_kpi:
-                self._display_kpi()
+            if self._e == self.e:
+                v0 = self.perf_eval[self.t - self.r - 1]
+                self.perf_eval[eval_set] = get_perf2(
+                    r[eval_set], func(self.y_eval[eval_set]), v0=v0
+                )
+                v0 = self.perf_test[self.t - 1]
+                self.perf_test[test_set] = get_perf2(
+                    r[test_set], func(self.y_test[test_set]), v0=v0
+                )
 
-            if backtest_plot:
-                self._display_plot_loss(bnn)
+            if self.t > self.t0 + self.r:
+                if p_print is None or not p_print.is_alive():
+                    p_print = Process(
+                        target=self._print,
+                        args=(self.t, self.i, r, y_perf, func,
+                              backtest_plot, backtest_kpi)
+                    )
+                    p_print.start()
 
-                if self._e == self.e:
-                    v0 = perf_eval[self.t - self.r - 1]
-                    perf_eval[eval_set] = get_perf2(r[eval_set], func(y_eval),
-                                                    v0=v0)
-                    v0 = perf_test[self.t - 1]
-                    perf_test[test_set] = get_perf2(r[test_set], func(y_test),
-                                                    v0=v0)
-                    self._display_plot_perf(bnn, perf_test, perf_eval, y_perf)
-
-                bnn.f.canvas.draw()
+        self._print(self.t, self.i, r, y_perf, func, backtest_plot,
+                    backtest_kpi)
 
         return self
 
-    def _get_loss(self, input, target):
-        # input, target : np.array
+    def _print(self, t, i, r, y_perf, func, backtest_plot, backtest_kpi):
+        if backtest_kpi:
+            self._display_kpi(t)
+
+        if backtest_plot:
+            self._display_plot_loss(self.bnn, i)
+
+            self._display_plot_perf(
+                self.bnn, self.perf_test, self.perf_eval, y_perf, t
+            )
+
+            self.bnn.f.canvas.draw()
+
+    def _get_loss_on(self, y, _slice):
         # Compute loss function
-        lo = self.criterion(torch.from_numpy(input), target.to(torch.float32))
-        # torch.from_numpy(target))
+        lo = self.criterion(
+            torch.from_numpy(y[_slice]).to(torch.float32),
+            self.y[_slice].to(torch.float32)
+        )
 
         return lo.item()
 
-    def _display_kpi(self):
+    def _display_kpi(self, t):
         # Display %
-        pct = self.t - self.n - self.s
+        pct = t - self.n - self.s
         pct = pct / (self.T - self.n - self.T % self.s)
         txt = '{:5.2%} is done | '.format(pct)
         txt += 'Eval loss is {:5.2} | '.format(self.loss_eval[-1])
         txt += 'Test loss is {:5.2} | '.format(self.loss_test[-1])
         print(txt, end='\r')
 
-    def _display_plot_loss(self, bnn):
-        bnn.plot_loss(self.loss_test[: self.i + 1],
-                      self.loss_eval[: self.i + 1],
-                      self.loss_train[: self.i + 1])
+    def _display_plot_loss(self, bnn, i):
+        bnn.plot_loss(self.loss_test[: i],
+                      self.loss_eval[: i],
+                      self.loss_train[: i])
 
-    def _display_plot_perf(self, bnn, perf_test, perf_eval, y_perf):
-        bnn.plot_perf(perf_test[self.t0: self.t + self.s],
-                      perf_eval[self.t0 - self.s: self.t],
-                      y_perf[self.t0 - self.s: self.t],
-                      self.idx[self.t0 - self.s: self.t + self.s])
+    def _display_plot_perf(self, bnn, perf_test, perf_eval, y_perf, t):
+        bnn.plot_perf(perf_test[self.t0: t + self.s],
+                      perf_eval[self.t0 - self.s: t],
+                      y_perf[self.t0 - self.s: t],
+                      self.idx[self.t0 - self.s: t + self.s])
 
 
 def get_perf2(ret, signal, v0=100):
