@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-02-19 19:54:59
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-09-25 19:22:01
+# @Last modified time: 2020-11-22 10:58:32
 
 """ Setup script. """
 
@@ -31,9 +31,9 @@ CLASSIFIERS = [
     'Programming Language :: Python',
     'Programming Language :: Cython',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.5',
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
     'Topic :: Office/Business :: Financial',
     'Topic :: Scientific/Engineering :: Artificial Intelligence',
 ]
