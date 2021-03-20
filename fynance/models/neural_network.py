@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-05-06 20:16:31
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-09-21 06:55:49
+# @Last modified time: 2021-03-20 11:25:23
 
 """ Basis of neural networks models. """
 
@@ -54,6 +54,8 @@ class BaseNeuralNet(torch.nn.Module):
     train_on
     predict
     set_data
+    save_model
+    load_model
 
     See Also
     --------
@@ -129,6 +131,10 @@ class BaseNeuralNet(torch.nn.Module):
         """
         if self.optimizer:
             self.lr_scheduler = lr_scheduler(self.optimizer, **kwargs)
+
+        else:
+            raise ValueError('You should specify an optimizer object, '
+                             'see `set_optimizer` method.')
 
         return self
 
@@ -244,9 +250,55 @@ class BaseNeuralNet(torch.nn.Module):
         else:
             raise ValueError('Unkwnown data type: {}'.format(type(X)))
 
-    def save_model(self, path):
-        """ Save the model with this weights and parameters. """
-        pass
+    def save_model(self, path, save_optimizer=False):
+        """ Save the model with this weights and parameters.
+
+        Parameters
+        ----------
+        path : str or os.PathLike object
+            Path to save the model.
+        save_optimizer : bool, optional
+            If True, then save also the optimizer.
+
+        """
+        state_dict = {"model": self.stat_dict()}
+        if save_optimizer:
+            state_dict["optimizer"] = self.optimizer.state_dict()
+
+        torch.save(state_dict, path)
+
+    def load_model(self, path, load_optimizer=False):
+        """ Save the model with this weights and parameters.
+
+        Parameters
+        ----------
+        path : str or os.PathLike object
+            Path to load the model.
+        load_optimizer : bool, optional
+            If True, then load also the optimizer.
+
+        """
+        state_dict = torch.load(path)
+        self.load_stat_dict(state_dict['model'])
+
+        if load_optimizer:
+            if 'optimizer' not in state_dict:
+                raise ValueError('No optimizer available, set `load_optimizer`'
+                                 ' to False')
+
+            elif getattr(self, 'optimizer', None) is None:
+                raise ValueError('You should specify an optimizer object, '
+                                 'see `set_optimizer` method.')
+
+            self.optimizer.load_state_dict(state_dict['optimizer'])
+
+    # def _run(self, epochs, batch_size=64):
+    #    for e in tqdm(range(epochs), desc="Training", total=epochs):
+
+    # def _run_one_epoch():
+    #    for t in range(0, self.T, batch_size):
+    #        s = mi(t + batch_size, self.T)
+    #        loss += self.train_on(X=self.X[t: s], y=self.y[t: s]).item()
 
 
 class MultiLayerPerceptron(BaseNeuralNet):
