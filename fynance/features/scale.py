@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2020-09-11 18:47:27
 # @Last modified by: ArthurBernard
-# @Last modified time: 2020-09-19 11:42:43
+# @Last modified time: 2021-03-12 22:16:21
 
 """ Object to scale data. """
 
@@ -194,7 +194,7 @@ class Scale:
     def __repr__(self):
         """ Return string representation. """
         return ("Scale transformation '{}' with the following parameters: {}"
-                "".format(self.kind, self.parmas))
+                "".format(self.kind, self.params))
 
     def fit(self, X, kind=None, a=0., b=1., axis=0, **kwargs):
         """ Compute the parameters of the scale transformation.
