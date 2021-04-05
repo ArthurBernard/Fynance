@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2021-03-27 10:44:32
 # @Last modified by: ArthurBernard
-# @Last modified time: 2021-03-27 13:31:46
+# @Last modified time: 2021-04-05 21:02:25
 
 """ Plot objects. """
 
@@ -12,14 +12,18 @@
 
 # Third party packages
 import numpy as np
+from matplotlib import pyplot as plt
 
 # Local packages
 
 
-__all__ = []
+__all__ = ["PlotSeries"]
 
 
-class _Plot:
+# TODO : Allow Pandas and PyTorch objects
+
+
+class PlotSeries:
     """ Plot object.
 
     Attributes
@@ -37,41 +41,40 @@ class _Plot:
     update
     set_axes ??
 
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes, optional
+        Axe to display series data. If None, then a new axe is created.
+
     See Also
     --------
     DynaPlotBackTest, display_perf, set_text_stats
 
     """
 
-    def __init__(self, fig, ax):
-        """ Initialize method.
+    def __init__(self, ax=None):
+        """ Initialize method. """
+        if ax is None:
+            f, ax = plt.subplots(1, 1, figsize=(16, 10))
 
-        Sets size of training and predicting period, inital value to backtest,
-        a target filter and training parameters.
-
-        Parameters
-        ----------
-        fig : matplotlib.figure.Figure
-            Figure to display backtest.
-        ax : matplotlib.axes
-            Axe(s) to display a part of backtest.
-
-        References
-        ----------
-        .. [1] https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes
-
-        """
-        self.fig = fig
         self.ax = ax
+
+    def __call__(self, y, x=None, append=False, **kwargs):
+        """ Plot data or update the data to plot. """
+        if not hasattr(self, 'h'):
+            self.plot(y, x=x, **kwargs)
+
+        else:
+            self.update(y, x=x, append=append)
 
     def plot(self, y, x=None, **kwargs):
         """ Plot performances, loss function or any data.
 
         Parameters
         ----------
-        y : np.ndarray[np.float64, ndim=1], with shape (`T`)
+        y : np.ndarray[np.float64, ndim=1], with shape (`T`,)
             Returns, indexes, time-series or any data to plot.
-        x : np.ndarray[ndim=1], with shape (`T`), optional
+        x : np.ndarray[ndim=1], with shape (`T`,), optional
             x-axis, can be series of integers, dates or string. If `x` is let
             to None, then range from 0 to `T` is used.
         **kwargs : `matplotlib.lines.Line2D` properties, optional
@@ -169,9 +172,13 @@ class _Plot:
         return self
 
 
-class _MultiPlot(_Plot):
+class _MultiPlot(PlotSeries):
     def plot(self, y, x=None, **kwargs):
-        pass
+        if len(y.shape) != 2:
+            raise ValueError("y must be a two-dimensional array.")
+
+        T, N = y.shape
+
 
 
 if __name__ == "__main__":
