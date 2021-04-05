@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2021-04-05 18:43:52
 # @Last modified by: ArthurBernard
-# @Last modified time: 2021-04-05 20:34:43
+# @Last modified time: 2021-04-05 21:21:26
 
 """ Basis class of series objects. """
 
