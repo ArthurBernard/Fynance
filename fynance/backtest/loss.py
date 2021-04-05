@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2021-03-27 11:24:24
 # @Last modified by: ArthurBernard
-# @Last modified time: 2021-03-27 13:53:59
+# @Last modified time: 2021-04-05 19:58:14
 
 """ Loss object. """
 
@@ -14,7 +14,7 @@
 import numpy as np
 
 # Local packages
-from fynance.backtest.plot import _Plot
+from fynance.backtest.plot import PlotSeries
 
 
 # TODO : Inherits of methods and properties of numpy ndarray ?
@@ -74,7 +74,7 @@ class LossSeries:
         """ Represent the loss series as string. """
         return str(self.values)
 
-    def set_plot(self, fig, ax, **kwargs):
+    def set_plot(self, ax=None, **kwargs):
         """ Instanciate plot object for the loss series.
 
         Parameters
@@ -103,7 +103,7 @@ class LossSeries:
 
         """
         # Setup plot object
-        self.plot = _Plot(fig, ax)
+        self.plot = PlotSeries(ax=ax)
 
         # Set ax properties
         ax.set_title('Loss function')
