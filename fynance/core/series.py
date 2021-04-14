@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2021-04-05 18:43:52
 # @Last modified by: ArthurBernard
-# @Last modified time: 2021-04-05 21:21:26
+# @Last modified time: 2021-04-14 11:21:09
 
 """ Basis class of series objects. """
 
@@ -73,8 +73,8 @@ class Series(np.ndarray):
             auto legends), linewidth, antialiasing, marker face color.
             Example::
 
-            >>> plot([1, 2, 3], [1, 2, 3], 'go-', label='line 1', linewidth=2)
-            >>> plot([1, 2, 3], [1, 4, 9], 'rs', label='line 2')
+            >> plot([1, 2, 3], [1, 2, 3], 'go-', label='line 1', linewidth=2)
+            >> plot([1, 2, 3], [1, 4, 9], 'rs', label='line 2')
 
             If you specify multiple lines with one plot call, the kwargs apply
             to all those lines. In case the label object is iterable, each

@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2021-03-27 11:24:24
 # @Last modified by: ArthurBernard
-# @Last modified time: 2021-04-05 19:58:14
+# @Last modified time: 2021-04-14 11:21:35
 
 """ Loss object. """
 
@@ -88,8 +88,8 @@ class LossSeries:
             auto legends), linewidth, antialiasing, marker face color.
             Example::
 
-            >>> plot([1, 2, 3], [1, 2, 3], 'go-', label='line 1', linewidth=2)
-            >>> plot([1, 2, 3], [1, 4, 9], 'rs', label='line 2')
+            >> plot([1, 2, 3], [1, 2, 3], 'go-', label='line 1', linewidth=2)
+            >> plot([1, 2, 3], [1, 4, 9], 'rs', label='line 2')
 
             If you specify multiple lines with one plot call, the kwargs apply
             to all those lines. In case the label object is iterable, each
