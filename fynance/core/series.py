@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2021-04-05 18:43:52
 # @Last modified by: ArthurBernard
-# @Last modified time: 2021-04-14 11:21:09
+# @Last modified time: 2021-05-01 11:44:33
 
 """ Basis class of series objects. """
 
@@ -38,7 +38,7 @@ class Series(np.ndarray):
         self.plot_series = getattr(obj, 'plot_series', None)
 
     def append(self, values, axis=0):
-        """ Append value to Series.
+        """ Append values to Series.
 
         Parameters
         ----------
@@ -91,7 +91,7 @@ class Series(np.ndarray):
         self.plot_series = PlotSeries(ax=ax)
 
         # Set line properties with kwargs parameters and plot data series
-        self.plot_series(self, **kwargs)
+        self.plot_series(y=self, **kwargs)
 
     def update_plot(self):
         """ Update the plot object for Series with self data. """
@@ -99,8 +99,9 @@ class Series(np.ndarray):
             # Instanciate PlotSeries object
             self.plot()
 
-        # Call PlotSeries object with updated data series
-        self.plot_series(self)
+        else:
+            # Call PlotSeries object with updated data series
+            self.plot_series(y=self)
 
 
 if __name__ == "__main__":
