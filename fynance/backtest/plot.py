@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2021-03-27 10:44:32
 # @Last modified by: ArthurBernard
-# @Last modified time: 2021-04-14 11:21:13
+# @Last modified time: 2021-04-17 10:53:13
 
 """ Plot objects. """
 
@@ -37,9 +37,9 @@ class PlotSeries:
 
     Methods
     -------
+    __call__
     plot
     update
-    set_axes ??
 
     Parameters
     ----------
@@ -60,12 +60,34 @@ class PlotSeries:
         self.ax = ax
 
     def __call__(self, y, x=None, append=False, **kwargs):
-        """ Plot data or update the data to plot. """
+        """ Automatic call plot method or update method.
+
+        Parameters
+        ----------
+        y : np.ndarray[np.float64, ndim=1], with shape (`T`,)
+            Returns, indexes, time-series or any data.
+        x : np.ndarray[ndim=1], with shape (`T`,), optional
+            x-axis, can be series of integers, dates or string.
+        append : bool, optional
+            If True then increment the x-data and y-data with the `x` and `y`
+            argument, otherwise reset the x-data and y-data. Only used in
+            ``update`` method.
+        **kwargs : `matplotlib.lines.Line2D` properties, optional
+            *kwargs* are used to specify properties like a line label (for
+            auto legends), linewidth, antialiasing, marker face color. Only
+            used in ``plot`` method.
+
+        Returns
+        -------
+        PlotSeries
+            Self object.
+
+        """
         if not hasattr(self, 'h'):
-            self.plot(y, x=x, **kwargs)
+            return self.plot(y, x=x, **kwargs)
 
         else:
-            self.update(y, x=x, append=append)
+            return self.update(y, x=x, append=append)
 
     def plot(self, y, x=None, **kwargs):
         """ Plot performances, loss function or any data.
@@ -93,12 +115,13 @@ class PlotSeries:
 
         Returns
         -------
-        pbt : PlotBackTest
+        PlotSeries
             Self object.
 
         References
         ----------
-        .. [3] https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html
+        .. [3] https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.\
+        plot.html
 
         """
         # Check data
@@ -144,7 +167,7 @@ class PlotSeries:
 
         Returns
         -------
-        PlotBackTest
+        PlotSeries
             Self object.
 
         """
