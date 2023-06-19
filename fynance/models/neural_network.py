@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-05-06 20:16:31
 # @Last modified by: ArthurBernard
-# @Last modified time: 2021-03-20 11:25:23
+# @Last modified time: 2023-06-16 08:30:18
 
 """ Basis of neural networks models. """
 
@@ -261,7 +261,7 @@ class BaseNeuralNet(torch.nn.Module):
             If True, then save also the optimizer.
 
         """
-        state_dict = {"model": self.stat_dict()}
+        state_dict = {"model": self.state_dict()}
         if save_optimizer:
             state_dict["optimizer"] = self.optimizer.state_dict()
 
@@ -279,7 +279,7 @@ class BaseNeuralNet(torch.nn.Module):
 
         """
         state_dict = torch.load(path)
-        self.load_stat_dict(state_dict['model'])
+        self.load_state_dict(state_dict['model'])
 
         if load_optimizer:
             if 'optimizer' not in state_dict:
@@ -293,12 +293,26 @@ class BaseNeuralNet(torch.nn.Module):
             self.optimizer.load_state_dict(state_dict['optimizer'])
 
     # def _run(self, epochs, batch_size=64):
+    #    loss = []
     #    for e in tqdm(range(epochs), desc="Training", total=epochs):
+    #        loss.append(self._run_one_epoch())
+    #
+    #    return loss
 
-    # def _run_one_epoch():
+    # def _run_one_epoch(batch_size):
+    #    loss = 0
     #    for t in range(0, self.T, batch_size):
+    #        loss += self._run_one_batch(t, batch_size)
+    #
+    #     return loss
+
+
     #        s = mi(t + batch_size, self.T)
     #        loss += self.train_on(X=self.X[t: s], y=self.y[t: s]).item()
+
+    # def _run_one_batch(self, t, batch_size):
+    #    s = min(t + batch_size, self.T)
+    #    return self.train_on(X=self.X[t: s], y=self.y[t: s]).item()
 
 
 class MultiLayerPerceptron(BaseNeuralNet):
