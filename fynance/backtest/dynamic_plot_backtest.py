@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-03-05 19:17:04
 # @Last modified by: ArthurBernard
-# @Last modified time: 2022-06-17 12:30:45
+# @Last modified time: 2023-02-10 10:45:49
 
 """ Module with some function plot backtest. """
 
@@ -46,8 +46,8 @@ class DynaPlotBackTest(PlotBackTest):
 
     plt.ion()
     test_plot_kw = dict(label='Test set', color='b', lw=2.)
-    train_plot_kw = dict(label='Train set', color='r', lw=1.)
-    eval_plot_kw = dict(label='Eval set', color='g', lw=1.)
+    train_plot_kw = dict(label='Train set', color='g', lw=1.)
+    eval_plot_kw = dict(label='Eval set', color='r', lw=1.)
     legend_kw = {
         "loc": "upper right",
         "ncol": 2,
@@ -205,9 +205,9 @@ class DynaPlotAccuracy(DynaPlotBackTest):
     """
 
     ax_kw = {
-        "title": "Model Accuracy",
+        # "title": "Model Accuracy",
         "ylabel": "Accuracy",
-        "xlabel": "Epochs",
+        # "xlabel": "Epochs",
         "yscale": "linear",
         # "xscale": "linear",
         "tick_params": {"axis": "x", "labelsize": 10},
@@ -245,8 +245,8 @@ class DynaPlotAccuracy(DynaPlotBackTest):
         kwargs : dict, optional
             Axes configuration, cf matplotlib documentation [1]_. Default is
             {'yscale': 'linear', 'xscale': 'linear', 'ylabel': 'Accuracy',
-            'xlabel': 'Epoch', 'title': 'Model Accuracy', 'tick_params': {'axis':
-            'x', 'labelsize': 10}}
+            'xlabel': 'Epoch', 'title': 'Model Accuracy', 'tick_params':
+            {'axis': 'x', 'labelsize': 10}}
 
         References
         ----------
@@ -328,10 +328,10 @@ class DynaPlotLoss(DynaPlotBackTest):
     """
 
     ax_kw = {
-        "title": "Model Loss",
+        # "title": "Model Loss",
         "ylabel": "Loss",
-        "xlabel": "Epochs",
-        "yscale": "log",
+        # "xlabel": "Epochs",
+        "yscale": "linear",
         # "xscale": "linear",
         "tick_params": {"axis": "x", "labelsize": 10},
     }
@@ -431,32 +431,32 @@ class DynaPlotPerf(DynaPlotBackTest):
     DynaPlotPerf, DynaPlotAccuracy
 
     """
-        
+
     ax_kw = {
-        "title": "Model Perf",
+        # "title": "Model Perf",
         "ylabel": "Perf.",
-        "xlabel": "Date",
+        "xlabel": "Epochs",
         "yscale": "log",
         # "xscale": "linear",
         "tick_params": {"axis": "x", "rotation": 30, "labelsize": 10},
     }
     test_plot_kw = {
-        "label": "Test set", 
+        "label": "Test set",
         "color": "b",
         "lw": 1.7,
-        "unit": 'perf',
+        # "unit": 'perf',
     }
     eval_plot_kw = {
         "label": "Eval set",
         "color": "r",
         "lw": 1.2,
-        "unit": "perf",
+        # "unit": "perf",
     }
     under_plot_kw = {
         "label": "Underlying",
         "color": "g",
         "lw": 1.2,
-        "unit": "perf"
+        # "unit": "perf"
     }
     legend_kw = {
         "loc": "upper left",
@@ -492,6 +492,8 @@ class DynaPlotPerf(DynaPlotBackTest):
         self.ax_kw.update(kwargs)
         DynaPlotBackTest.__init__(self, fig=fig, ax=ax, size=size,
                                   **self.ax_kw)
+        self.set_axes()
+        self.ax2 = self.ax.twinx()
 
     def plot(self, test, eval, underlying=None, index=None, clear=True):
         """ Plot performance results of the model for test and evaluate set.
@@ -510,26 +512,37 @@ class DynaPlotPerf(DynaPlotBackTest):
         """
         if clear:
             self.clear()
+            self.ax2.clear()
 
         # Set index
-        if index is not None:
-            idx_test = index[-test.shape[0]:]
-            idx_eval = index[: eval.shape[0]]
+        # if index is not None:
+        #    idx_test = index[-test.shape[0]:]
+        #    idx_eval = index[: eval.shape[0]]
 
-        else:
-            idx_test = idx_eval = None
+        # else:
+        #    idx_test = idx_eval = None
 
         # Plot perf
-        DynaPlotBackTest.plot(self, test, x=idx_test, **self.test_plot_kw)
-        DynaPlotBackTest.plot(self, eval, x=idx_eval, **self.eval_plot_kw)
+        # DynaPlotBackTest.plot(self, test, x=idx_test, **self.test_plot_kw)
+        # DynaPlotBackTest.plot(self, eval, x=idx_eval, **self.eval_plot_kw)
+        self.h_test = self.ax.plot(test, **self.test_plot_kw)
+        self.h_eval = self.ax2.plot(eval, **self.eval_plot_kw)
 
         # Plot perf of the underlying
-        if underlying is not None:
-            DynaPlotBackTest.plot(self, underlying, x=idx_eval,
-                                  **self.under_plot_kw)
+        # if underlying is not None:
+        #    DynaPlotBackTest.plot(self, underlying, x=idx_eval,
+        #                          **self.under_plot_kw)
 
         self.set_axes()
-        self.ax.legend(**self.legend_kw)
+        # TEMPORARY SET AXES
+        self.ax.set_ylabel('Test perf.', color='b')
+        self.ax.tick_params(axis="y", labelcolor='b')
+
+        self.ax2.set_ylabel("Eval perf", color="r")
+        self.ax2.set_yscale("log")
+        self.ax2.tick_params(axis="y", labelcolor="r")
+
+        # self.ax.legend(**self.legend_kw)
 
     def update(self, test, eval, underlying=None, index=None):
         """ Update plot performance results for test and evaluate set.
@@ -545,17 +558,17 @@ class DynaPlotPerf(DynaPlotBackTest):
 
         """
         # Set index
-        if index is not None:
-            idx_test = index[-test.shape[0]:]
-            idx_eval = index[: eval.shape[0]]
+        # if index is not None:
+        #    idx_test = index[-test.shape[0]:]
+        #    idx_eval = index[: eval.shape[0]]
 
-        else:
-            idx_test = idx_eval = None
+        # else:
+        #    idx_test = idx_eval = None
 
         # Plot perf
         DynaPlotBackTest.update(self, test, label=self.test_plot_kw['label'])
         DynaPlotBackTest.update(self, eval, label=self.eval_plot_kw['label'])
-    
+
         if underlying is not None:
             DynaPlotBackTest.update(self, underlying,
                                     label=self.under_plot_kw['label'])
@@ -581,10 +594,11 @@ class BacktestNeuralNet:
 
     def __init__(self, figsize=(9, 6), loss_xlim=None, perf_xlim=None,
                  accu_xlim=None, plot_accuracy=False, plot_loss=True,
-                 plot_perf=False):
+                 plot_perf=False, **subplot_kw):
         # Set dynamic plot object
         n_rows = plot_accuracy + plot_loss + plot_perf
-        self.f, self.axes = plt.subplots(n_rows, 1, figsize=figsize)
+        self.f, self.axes = plt.subplots(n_rows, 1, figsize=figsize,
+                                         **subplot_kw)
 
         if n_rows == 1:
             self.axes = [self.axes]
