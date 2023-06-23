@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2023-06-16 08:27:56
 # @Last modified by: ArthurBernard
-# @Last modified time: 2023-06-21 17:11:58
+# @Last modified time: 2023-06-23 20:02:01
 
 """ Recurrent Neural Network models. """
 
@@ -425,6 +425,97 @@ class GatedRecurrentUnit(BaseNeuralNet):
         Y = self.f_y(self.W_y(self.drop(H)))
 
         return Y, H
+
+
+class _LongShortTermMemory(_RecurrentNeuralNetwork):
+    """ Long short term memory neural network.
+
+    Parameters
+    ----------
+    X, y : array-like or int
+        - If it's an array-like, respectively inputs and outputs data.
+        - If it's an integer, respectively dimension of inputs and outputs.
+    drop : float, optional
+        Probability of an element to be zeroed.
+    hidden_activation, memory_activation : torch.nn.Module, optional
+        Activation functions for respectively hidden and memory state, default
+        both are Tanh function.
+    hidden_state_size, memory_state_size : int, optional
+        Size of respectively hidden and memory states, default hidden state is
+        the same size than input and default memory state is the same size than
+        hidden state.
+    reset_activation, updated_activation : torch.nn.Module, optional
+        Activation functions for reset and update gate, default are both
+        Sigmoid function.
+
+    Attributes
+    ----------
+    criterion : torch.nn.modules.loss
+        A loss function.
+    optimizer : torch.optim
+        An optimizer algorithm.
+    W_c, W_r, W_u
+        Respectively recurrent (hidden), reset and update wheights.
+    f_h, f_r, f_u : torch.nn.Module, optional
+        Respectively hidden (recurrent), reset, and update activation
+        functions.
+
+    Methods
+    -------
+    __call__
+    set_optimizer
+    train_on
+    predict
+    set_data
+
+    See Also
+    --------
+    BaseNeuralNet, MultiLayerPerceptron
+
+    """
+
+    def __init__(
+        self, X, y, drop=None, x_type=None, y_type=None, bias=True,
+        hidden_activation=nn.Tanh, hidden_state_size=None,
+        memory_activation=nn.Tanh, memory_state_size=None,
+        reset_activation=nn.Sigmoid, update_activation=nn.Sigmoid,
+    ):
+
+        _RecurrentNeuralNetwork.__init__(
+            self,
+            X,
+            y,
+            drop=drop,
+            x_type=x_type,
+            y_type=y_type,
+            bias=bias,
+            hidden_activation=hidden_activation,
+            hidden_state_size=hidden_state_size,
+        )
+
+        self.C = self.H if memory_state_size is None else memory_state_size
+        self.f_c = memory_activation()
+
+        # self.W_u = nn.Linear(self.N + self.H, self.H)
+        # self.W_r = nn.Linear(self.N + self.H, self.H)
+
+        # self.f_u = update_activation()
+        # self.f_r = reset_activation()
+
+    def forward(self, X, H):
+        # C = torch.cat([X, H], dim=1)
+
+        # # Update gate
+        # G_u = self.f_u(self.W_u(self.drop(C)))
+
+        # # Reset gate
+        # G_r = self.f_r(self.W_r(self.drop(C)))
+
+        # C_tild = torch.cat([X, G_r * H])
+        # H_tild = self.f_h(self.W_h(self.drop(C_tild)))
+
+        # return G_u * H_tild + (1 - G_u) * H
+        pass
 
 
 if __name__ == "__main__":
