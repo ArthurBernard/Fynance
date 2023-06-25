@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2023-06-16 08:27:56
 # @Last modified by: ArthurBernard
-# @Last modified time: 2023-06-23 20:02:01
+# @Last modified time: 2023-06-25 23:02:05
 
 """ Recurrent Neural Network models. """
 
@@ -494,28 +494,47 @@ class _LongShortTermMemory(_RecurrentNeuralNetwork):
         )
 
         self.C = self.H if memory_state_size is None else memory_state_size
+
+        # Set forget gate
+        self.W_f = nn.Linear(self.N + self.H, self.C)
+        self.f_f = forget_activation()
+
+        # Set update gate
+        self.W_u = nn.Linear(self.N + self.H, self.C)
+        self.f_u = update_activation()
+
+        # Set candidate value
+        self.W_c = nn.Linear(self.N + self.H, self.C)
         self.f_c = memory_activation()
 
-        # self.W_u = nn.Linear(self.N + self.H, self.H)
-        # self.W_r = nn.Linear(self.N + self.H, self.H)
+        # Set output gate
+        self.W_o = nn.Linear(self.N + self.H, self.C)
+        self.f_o = output_activation()
 
-        # self.f_u = update_activation()
-        # self.f_r = reset_activation()
+        # Set hidden activation
+        self.f_h = hidden_activation()
 
-    def forward(self, X, H):
+    def forward(self, X, H, C):
         # C = torch.cat([X, H], dim=1)
+        X_H = torch.cat([X, H], dim=1)
 
-        # # Update gate
-        # G_u = self.f_u(self.W_u(self.drop(C)))
+        # Forget gate
+        G_f = self.f_f(self.W_f(self.drop(X_H)))
 
-        # # Reset gate
-        # G_r = self.f_r(self.W_r(self.drop(C)))
+        # Candidate value
+        C_tild = self.f_c(self.W_c(self.drop(X_H)))
 
-        # C_tild = torch.cat([X, G_r * H])
-        # H_tild = self.f_h(self.W_h(self.drop(C_tild)))
+        # Update gate
+        G_u = self.f_u(self.W_u(self.drop(X_H)))
 
-        # return G_u * H_tild + (1 - G_u) * H
-        pass
+        C = G_f * C + G_u * C_tild
+
+        # Output gate
+        G_o = self.f_o(self.W_o(self.drop(X_H)))
+
+        H = G_o * self.f_h(C)
+
+        return H, C
 
 
 if __name__ == "__main__":
