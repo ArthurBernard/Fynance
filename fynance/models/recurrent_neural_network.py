@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2023-06-16 08:27:56
 # @Last modified by: ArthurBernard
-# @Last modified time: 2023-06-25 23:02:05
+# @Last modified time: 2023-06-26 10:29:54
 
 """ Recurrent Neural Network models. """
 
@@ -263,7 +263,7 @@ class RecurrentNeuralNetwork(_ForwardLayer, _RecurrentNeuralNetwork):
         _ForwardLayer.__init__(self, forward_activation=forward_activation)
 
     def forward(self, X, H):
-        H = super(_RecurrentNeuralNetwork, self).forward(X, H)
+        H = super(RecurrentNeuralNetwork, self).forward(X, H)
         Y = self.f_y(self.W_y(self.drop(H)))
 
         return Y, H
@@ -352,7 +352,7 @@ class _GatedRecurrentUnit(_RecurrentNeuralNetwork):
         return G_u * H_tild + (1 - G_u) * H
 
 
-class GatedRecurrentUnit(BaseNeuralNet):
+class GatedRecurrentUnit(_ForwardLayer, _GatedRecurrentUnit):
     """ Gated Recurrent Unit neural network.
 
     Parameters
@@ -444,9 +444,10 @@ class _LongShortTermMemory(_RecurrentNeuralNetwork):
         Size of respectively hidden and memory states, default hidden state is
         the same size than input and default memory state is the same size than
         hidden state.
-    reset_activation, updated_activation : torch.nn.Module, optional
-        Activation functions for reset and update gate, default are both
-        Sigmoid function.
+    forget_activation, updated_activation, output_activation : torch.nn.Module,
+    optional
+        Activation functions for respectively forget, update and output gate,
+        default are Sigmoid function for the three.
 
     Attributes
     ----------
@@ -454,11 +455,12 @@ class _LongShortTermMemory(_RecurrentNeuralNetwork):
         A loss function.
     optimizer : torch.optim
         An optimizer algorithm.
-    W_c, W_r, W_u
-        Respectively recurrent (hidden), reset and update wheights.
-    f_h, f_r, f_u : torch.nn.Module, optional
-        Respectively hidden (recurrent), reset, and update activation
-        functions.
+    W_f, W_i, W_o, W_c : torch.nn.Linear
+        Respectively forget, update and output gate weights and weight to
+        compute the candidate value for cell memory.
+    f_f, f_i, f_o, f_c : torch.nn.Linear
+        Respectively activation function for forget, update and output gate and
+        activation function to compute the candidate value for cell memory.
 
     Methods
     -------
@@ -478,7 +480,8 @@ class _LongShortTermMemory(_RecurrentNeuralNetwork):
         self, X, y, drop=None, x_type=None, y_type=None, bias=True,
         hidden_activation=nn.Tanh, hidden_state_size=None,
         memory_activation=nn.Tanh, memory_state_size=None,
-        reset_activation=nn.Sigmoid, update_activation=nn.Sigmoid,
+        forget_activation=nn.Sigmoid, update_activation=nn.Sigmoid,
+        output_activation=nn.Sigmoid,
     ):
 
         _RecurrentNeuralNetwork.__init__(
@@ -500,10 +503,10 @@ class _LongShortTermMemory(_RecurrentNeuralNetwork):
         self.f_f = forget_activation()
 
         # Set update gate
-        self.W_u = nn.Linear(self.N + self.H, self.C)
-        self.f_u = update_activation()
+        self.W_i = nn.Linear(self.N + self.H, self.C)
+        self.f_i = update_activation()
 
-        # Set candidate value
+        # Set weight and activation for candidate value
         self.W_c = nn.Linear(self.N + self.H, self.C)
         self.f_c = memory_activation()
 
@@ -525,9 +528,9 @@ class _LongShortTermMemory(_RecurrentNeuralNetwork):
         C_tild = self.f_c(self.W_c(self.drop(X_H)))
 
         # Update gate
-        G_u = self.f_u(self.W_u(self.drop(X_H)))
+        G_i = self.f_i(self.W_i(self.drop(X_H)))
 
-        C = G_f * C + G_u * C_tild
+        C = G_f * C + G_i * C_tild
 
         # Output gate
         G_o = self.f_o(self.W_o(self.drop(X_H)))
@@ -535,6 +538,151 @@ class _LongShortTermMemory(_RecurrentNeuralNetwork):
         H = G_o * self.f_h(C)
 
         return H, C
+
+
+class LongShortTermMemory(_ForwardLayer, _LongShortTermMemory):
+    """ Long short term memory neural network.
+
+    Parameters
+    ----------
+    X, y : array-like or int
+        - If it's an array-like, respectively inputs and outputs data.
+        - If it's an integer, respectively dimension of inputs and outputs.
+    drop : float, optional
+        Probability of an element to be zeroed.
+    forward_activation : torch.nn.Module, optional
+        Activation functions, default is Softmax.
+    hidden_activation, memory_activation : torch.nn.Module, optional
+        Activation functions for respectively hidden and memory state, default
+        both are Tanh function.
+    hidden_state_size, memory_state_size : int, optional
+        Size of respectively hidden and memory states, default hidden state is
+        the same size than input and default memory state is the same size than
+        hidden state.
+    forget_activation, updated_activation, output_activation : torch.nn.Module,
+    optional
+        Activation functions for respectively forget, update and output gate,
+        default are Sigmoid function for the three.
+
+    Attributes
+    ----------
+    criterion : torch.nn.modules.loss
+        A loss function.
+    optimizer : torch.optim
+        An optimizer algorithm.
+    W_f, W_i, W_o, W_c, W_y : torch.nn.Linear
+        Respectively forget, update and output gate weights, weight to
+        compute the candidate value for cell memory and forward weight.
+    f_f, f_i, f_o, f_c, f_y : torch.nn.Linear
+        Respectively activation function for forget, update and output gate,
+        activation function to compute the candidate value for cell memory and
+        forward activation function.
+
+    Methods
+    -------
+    __call__
+    set_optimizer
+    train_on
+    predict
+    set_data
+
+    See Also
+    --------
+    BaseNeuralNet, MultiLayerPerceptron, RecurrentNerualNetwork,
+    GatedRecurrentUnit
+
+    """
+
+    def __init__(
+        self, X, y, drop=None, x_type=None, y_type=None, bias=True,
+        forward_activation=nn.Softmax, hidden_activation=nn.Tanh,
+        hidden_state_size=None, memory_activation=nn.Tanh,
+        memory_state_size=None, forget_activation=nn.Sigmoid,
+        update_activation=nn.Sigmoid, output_activation=nn.Sigmoid,
+    ):
+
+        _LongShortTermMemory.__init__(
+            self,
+            X,
+            y,
+            drop=drop,
+            x_type=x_type,
+            y_type=y_type,
+            bias=bias,
+            hidden_activation=hidden_activation,
+            hidden_state_size=hidden_state_size,
+            memory_activation=memory_activation,
+            memory_state_size=memory_state_size,
+            forget_activation=forget_activation,
+            update_activation=update_activation,
+            output_activation=output_activation,
+        )
+
+        _ForwardLayer.__init__(self, forward_activation=forward_activation)
+
+    def forward(self, X, H, C):
+        H, C = super(LongShortTermMemory, self).forward(X, H, C)
+        Y = self.f_y(self.W_y(self.drop(H)))
+
+        return Y, H, C
+
+    @torch.enable_grad()
+    def train_on(self, X, y, H, C):
+        """ Trains the neural network model.
+
+        Parameters
+        ----------
+        X, y, H, C : torch.Tensor
+            Respectively inputs, outputs, states and cell memory to train
+            model.
+
+        Returns
+        -------
+        torch.nn.modules.loss
+            Loss outputs.
+        torch.Tensor
+            Updated states of the model.
+        torch.Tensor
+            Cell memory of the model.
+
+        """
+        self.optimizer.zero_grad()
+        outputs, H, C = self(X, H, C)
+        loss = self.criterion(outputs, y)
+        loss.backward()
+        self.optimizer.step()
+
+        if self.lr_scheduler:
+            self.lr_scheduler.step()
+
+        return loss, H.detach(), C.detach()
+
+    @torch.no_grad()
+    def predict(self, X, H, C):
+        """ Predicts outputs of neural network model.
+
+        Parameters
+        ----------
+        X : torch.Tensor
+            Inputs to compute prediction.
+        H : torch.Tensor
+            States of the model.
+        C : torch.Tensor
+            Cell memory of the model.
+
+        Returns
+        -------
+        torch.Tensor
+            Outputs prediction.
+        torch.Tensor
+            Updated states of the model.
+        torch.Tensor
+            Cell memory of the model.
+
+        """
+        Y, H, C = self(X, H, C)
+
+        return Y.detach(), H.detach(), C.detach()
 
 
 if __name__ == "__main__":
