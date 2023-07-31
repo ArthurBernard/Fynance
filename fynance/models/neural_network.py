@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-05-06 20:16:31
 # @Last modified by: ArthurBernard
-# @Last modified time: 2023-06-16 08:30:18
+# @Last modified time: 2023-07-28 11:32:15
 
 """ Basis of neural networks models. """
 
@@ -125,8 +125,11 @@ class BaseNeuralNet(torch.nn.Module):
             ``self.optimizer``, cf module ``torch.optim.lr_scheduler`` in
             PyTorch documentation [2]_.
         **kwargs
-            Key
+            Keyword arguments to pass to the learning rate scheduler.
 
+        References
+        ----------
+        .. [2] https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
 
         """
         if self.optimizer:

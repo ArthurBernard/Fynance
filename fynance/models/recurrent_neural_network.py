@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2023-06-16 08:27:56
 # @Last modified by: ArthurBernard
-# @Last modified time: 2023-06-26 10:29:54
+# @Last modified time: 2023-07-31 17:30:04
 
 """ Recurrent Neural Network models. """
 
@@ -17,7 +17,8 @@ from torch import nn
 # Local packages
 from fynance.models.neural_network import BaseNeuralNet
 
-__all__ = []
+__all__ = ['RecurrentNeuralNetwork', 'GatedRecurrentUnit',
+           'LongShortTermMemory']
 
 
 class _RecurrentNeuralNetwork(BaseNeuralNet):
@@ -35,17 +36,6 @@ class _RecurrentNeuralNetwork(BaseNeuralNet):
     hidden_state_size : int, optional
         Size of hidden states, default is the same size than input.
 
-    Attributes
-    ----------
-    criterion : torch.nn.modules.loss
-        A loss function.
-    optimizer : torch.optim
-        An optimizer algorithm.
-    W_h
-        Recurrent wheights.
-    f_h : torch.nn.Module, optional
-        Activation functions.
-
     Methods
     -------
     __call__
@@ -53,6 +43,17 @@ class _RecurrentNeuralNetwork(BaseNeuralNet):
     train_on
     predict
     set_data
+
+    Attributes
+    ----------
+    criterion : torch.nn.modules.loss
+        A loss function.
+    optimizer : torch.optim
+        An optimizer algorithm.
+    W_h : torch.nn.Linear
+        Recurrent wheights.
+    f_h : torch.nn.Module
+        Activation functions.
 
     See Also
     --------
@@ -218,17 +219,6 @@ class RecurrentNeuralNetwork(_ForwardLayer, _RecurrentNeuralNetwork):
     hidden_state_size : int, optional
         Size of hidden states, default is the same size than input.
 
-    Attributes
-    ----------
-    criterion : torch.nn.modules.loss
-        A loss function.
-    optimizer : torch.optim
-        An optimizer algorithm.
-    W_h, W_y
-        Respectively recurrent and forward wheights.
-    f_y, f_h : torch.nn.Module, optional
-        Respectively forward and hidden activation functions.
-
     Methods
     -------
     __call__
@@ -237,9 +227,20 @@ class RecurrentNeuralNetwork(_ForwardLayer, _RecurrentNeuralNetwork):
     predict
     set_data
 
+    Attributes
+    ----------
+    criterion : torch.nn.modules.loss
+        A loss function.
+    optimizer : torch.optim
+        An optimizer algorithm.
+    W_h, W_y : torch.nn.Linear
+        Respectively recurrent and forward wheights.
+    f_y, f_h : torch.nn.Module
+        Respectively forward and hidden activation functions.
+
     See Also
     --------
-    BaseNeuralNet, MultiLayerPerceptron
+    GatedRecurrentUnit, LongShortTermMemory
 
     """
 
@@ -263,6 +264,21 @@ class RecurrentNeuralNetwork(_ForwardLayer, _RecurrentNeuralNetwork):
         _ForwardLayer.__init__(self, forward_activation=forward_activation)
 
     def forward(self, X, H):
+        """ Forward method.
+
+        Parameters
+        ----------
+        X, H : torch.Tensor
+            Respectively input data and hidden state.
+
+        Returns
+        -------
+        torch.Tensor
+            Output data.
+        torch.Tensor
+            Hidden state.
+
+        """
         H = super(RecurrentNeuralNetwork, self).forward(X, H)
         Y = self.f_y(self.W_y(self.drop(H)))
 
@@ -287,18 +303,6 @@ class _GatedRecurrentUnit(_RecurrentNeuralNetwork):
         Activation functions for reset and update gate, default are both
         Sigmoid function.
 
-    Attributes
-    ----------
-    criterion : torch.nn.modules.loss
-        A loss function.
-    optimizer : torch.optim
-        An optimizer algorithm.
-    W_c, W_r, W_u
-        Respectively recurrent (hidden), reset and update wheights.
-    f_h, f_r, f_u : torch.nn.Module, optional
-        Respectively hidden (recurrent), reset, and update activation
-        functions.
-
     Methods
     -------
     __call__
@@ -306,6 +310,18 @@ class _GatedRecurrentUnit(_RecurrentNeuralNetwork):
     train_on
     predict
     set_data
+
+    Attributes
+    ----------
+    criterion : torch.nn.modules.loss
+        A loss function.
+    optimizer : torch.optim
+        An optimizer algorithm.
+    W_c, W_r, W_u : torch.nn.Linear
+        Respectively recurrent (hidden), reset and update wheights.
+    f_h, f_r, f_u : torch.nn.Module
+        Respectively hidden (recurrent), reset, and update activation
+        functions.
 
     See Also
     --------
@@ -371,18 +387,6 @@ class GatedRecurrentUnit(_ForwardLayer, _GatedRecurrentUnit):
         Activation functions for reset and update gate, default are both
         Sigmoid function.
 
-    Attributes
-    ----------
-    criterion : torch.nn.modules.loss
-        A loss function.
-    optimizer : torch.optim
-        An optimizer algorithm.
-    W_c, W_r, W_u, W_y
-        Respectively recurrent (hidden), reset, update and forward wheights.
-    f_h, f_r, f_u, f_y : torch.nn.Module, optional
-        Respectively hidden (recurrent), reset, update and forward activation
-        functions.
-
     Methods
     -------
     __call__
@@ -391,9 +395,21 @@ class GatedRecurrentUnit(_ForwardLayer, _GatedRecurrentUnit):
     predict
     set_data
 
+    Attributes
+    ----------
+    criterion : torch.nn.modules.loss
+        A loss function.
+    optimizer : torch.optim
+        An optimizer algorithm.
+    W_c, W_r, W_u, W_y : torch.nn.Linear
+        Respectively recurrent (hidden), reset, update and forward wheights.
+    f_h, f_r, f_u, f_y : torch.nn.Module
+        Respectively hidden (recurrent), reset, update and forward activation
+        functions.
+
     See Also
     --------
-    BaseNeuralNet, MultiLayerPerceptron
+    RecurrentNeuralNetwork, LongShortTermMemory
 
     """
 
@@ -421,6 +437,21 @@ class GatedRecurrentUnit(_ForwardLayer, _GatedRecurrentUnit):
         _ForwardLayer.__init__(self, forward_activation=forward_activation)
 
     def forward(self, X, H):
+        """ Forward method.
+
+        Parameters
+        ----------
+        X, H : torch.Tensor
+            Respectively input data and hidden state.
+
+        Returns
+        -------
+        torch.Tensor
+            Output data.
+        torch.Tensor
+            Hidden state.
+
+        """
         H = super(_GatedRecurrentUnit, self).forward(X, H)
         Y = self.f_y(self.W_y(self.drop(H)))
 
@@ -449,6 +480,14 @@ class _LongShortTermMemory(_RecurrentNeuralNetwork):
         Activation functions for respectively forget, update and output gate,
         default are Sigmoid function for the three.
 
+    Methods
+    -------
+    __call__
+    set_optimizer
+    train_on
+    predict
+    set_data
+
     Attributes
     ----------
     criterion : torch.nn.modules.loss
@@ -458,17 +497,9 @@ class _LongShortTermMemory(_RecurrentNeuralNetwork):
     W_f, W_i, W_o, W_c : torch.nn.Linear
         Respectively forget, update and output gate weights and weight to
         compute the candidate value for cell memory.
-    f_f, f_i, f_o, f_c : torch.nn.Linear
+    f_f, f_i, f_o, f_c : torch.nn.Module
         Respectively activation function for forget, update and output gate and
         activation function to compute the candidate value for cell memory.
-
-    Methods
-    -------
-    __call__
-    set_optimizer
-    train_on
-    predict
-    set_data
 
     See Also
     --------
@@ -564,6 +595,14 @@ class LongShortTermMemory(_ForwardLayer, _LongShortTermMemory):
         Activation functions for respectively forget, update and output gate,
         default are Sigmoid function for the three.
 
+    Methods
+    -------
+    __call__
+    set_optimizer
+    train_on
+    predict
+    set_data
+
     Attributes
     ----------
     criterion : torch.nn.modules.loss
@@ -573,23 +612,14 @@ class LongShortTermMemory(_ForwardLayer, _LongShortTermMemory):
     W_f, W_i, W_o, W_c, W_y : torch.nn.Linear
         Respectively forget, update and output gate weights, weight to
         compute the candidate value for cell memory and forward weight.
-    f_f, f_i, f_o, f_c, f_y : torch.nn.Linear
+    f_f, f_i, f_o, f_c, f_y : torch.nn.Module
         Respectively activation function for forget, update and output gate,
         activation function to compute the candidate value for cell memory and
         forward activation function.
 
-    Methods
-    -------
-    __call__
-    set_optimizer
-    train_on
-    predict
-    set_data
-
     See Also
     --------
-    BaseNeuralNet, MultiLayerPerceptron, RecurrentNerualNetwork,
-    GatedRecurrentUnit
+    RecurrentNeuralNetwork, GatedRecurrentUnit
 
     """
 
@@ -621,6 +651,23 @@ class LongShortTermMemory(_ForwardLayer, _LongShortTermMemory):
         _ForwardLayer.__init__(self, forward_activation=forward_activation)
 
     def forward(self, X, H, C):
+        """ Forward method.
+
+        Parameters
+        ----------
+        X, H, C : torch.Tensor
+            Respectively input data, hidden state and memory state.
+
+        Returns
+        -------
+        torch.Tensor
+            Output data.
+        torch.Tensor
+            Hidden state.
+        torch.Tensor
+            Memory state.
+
+        """
         H, C = super(LongShortTermMemory, self).forward(X, H, C)
         Y = self.f_y(self.W_y(self.drop(H)))
 
