@@ -1,5 +1,5 @@
-fynance.features.metrics.z\_score
-=================================
+fynance\.features\.metrics\.z\_score
+====================================
 
 .. currentmodule:: fynance.features.metrics
 

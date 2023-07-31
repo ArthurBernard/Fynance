@@ -1,5 +1,5 @@
-fynance.algorithms.allocation.MVP\_uc
-=====================================
+fynance\.algorithms\.allocation\.MVP\_uc
+========================================
 
 .. currentmodule:: fynance.algorithms.allocation
 

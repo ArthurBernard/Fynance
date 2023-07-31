@@ -1,5 +1,5 @@
-fynance.features.indicators.cci
-===============================
+fynance\.features\.indicators\.cci
+==================================
 
 .. currentmodule:: fynance.features.indicators
 

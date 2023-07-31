@@ -1,5 +1,5 @@
-fynance.features.indicators.rsi
-===============================
+fynance\.features\.indicators\.rsi
+==================================
 
 .. currentmodule:: fynance.features.indicators
 

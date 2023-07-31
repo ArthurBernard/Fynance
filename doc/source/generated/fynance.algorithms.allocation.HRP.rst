@@ -1,5 +1,5 @@
-fynance.algorithms.allocation.HRP
-=================================
+fynance\.algorithms\.allocation\.HRP
+====================================
 
 .. currentmodule:: fynance.algorithms.allocation
 

@@ -1,5 +1,5 @@
-fynance.algorithms.allocation.IVP
-=================================
+fynance\.algorithms\.allocation\.IVP
+====================================
 
 .. currentmodule:: fynance.algorithms.allocation
 

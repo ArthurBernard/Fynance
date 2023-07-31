@@ -26,6 +26,7 @@ fynance.models.neural_network.BaseNeuralNet
          BaseNeuralNet.float
          BaseNeuralNet.forward
          BaseNeuralNet.half
+         BaseNeuralNet.load_model
          BaseNeuralNet.load_state_dict
          BaseNeuralNet.modules
          BaseNeuralNet.named_buffers
@@ -39,9 +40,11 @@ fynance.models.neural_network.BaseNeuralNet
          BaseNeuralNet.register_forward_hook
          BaseNeuralNet.register_forward_pre_hook
          BaseNeuralNet.register_parameter
-         BaseNeuralNet.requires_grad_
+         BaseNeuralNet.save_model
          BaseNeuralNet.set_data
+         BaseNeuralNet.set_lr_scheduler
          BaseNeuralNet.set_optimizer
+         BaseNeuralNet.set_seed
          BaseNeuralNet.share_memory
          BaseNeuralNet.state_dict
          BaseNeuralNet.to
@@ -50,15 +53,8 @@ fynance.models.neural_network.BaseNeuralNet
          BaseNeuralNet.type
          BaseNeuralNet.zero_grad
       
-         BaseNeuralNet.__call__
   
 
   
-  
-   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
-      .. autosummary::
-         :toctree:
-      
-         BaseNeuralNet.dump_patches
   
   

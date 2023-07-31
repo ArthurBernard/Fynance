@@ -1,5 +1,5 @@
-fynance.features.indicators.bollinger\_band
-===========================================
+fynance\.features\.indicators\.bollinger\_band
+==============================================
 
 .. currentmodule:: fynance.features.indicators
 

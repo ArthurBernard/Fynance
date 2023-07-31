@@ -1,5 +1,5 @@
-fynance.features.metrics.perf\_returns
-======================================
+fynance\.features\.metrics\.perf\_returns
+=========================================
 
 .. currentmodule:: fynance.features.metrics
 

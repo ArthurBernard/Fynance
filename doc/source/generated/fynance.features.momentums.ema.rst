@@ -1,5 +1,5 @@
-fynance.features.momentums.ema
-==============================
+fynance\.features\.momentums\.ema
+=================================
 
 .. currentmodule:: fynance.features.momentums
 

@@ -1,5 +1,5 @@
-fynance.features.metrics.mdd
-============================
+fynance\.features\.metrics\.mdd
+===============================
 
 .. currentmodule:: fynance.features.metrics
 

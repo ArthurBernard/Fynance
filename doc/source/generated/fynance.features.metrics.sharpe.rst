@@ -1,5 +1,5 @@
-fynance.features.metrics.sharpe
-===============================
+fynance\.features\.metrics\.sharpe
+==================================
 
 .. currentmodule:: fynance.features.metrics
 

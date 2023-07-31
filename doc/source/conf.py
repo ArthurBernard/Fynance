@@ -4,7 +4,7 @@
 # @Email: arthur.bernard.92@gmail.com
 # @Date: 2019-08-21 07:05:30
 # @Last modified by: ArthurBernard
-# @Last modified time: 2019-11-07 17:04:30
+# @Last modified time: 2023-07-28 12:41:36
 
 """ Configuration file of documentation. """
 

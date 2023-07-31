@@ -1,5 +1,5 @@
-fynance.algorithms.allocation.ERC
-=================================
+fynance\.algorithms\.allocation\.ERC
+====================================
 
 .. currentmodule:: fynance.algorithms.allocation
 

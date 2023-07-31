@@ -1,5 +1,5 @@
-fynance.features.momentums.wmstd
-================================
+fynance\.features\.momentums\.wmstd
+===================================
 
 .. currentmodule:: fynance.features.momentums
 

@@ -1,5 +1,5 @@
-fynance.features.metrics.roll\_mdd
-==================================
+fynance\.features\.metrics\.roll\_mdd
+=====================================
 
 .. currentmodule:: fynance.features.metrics
 

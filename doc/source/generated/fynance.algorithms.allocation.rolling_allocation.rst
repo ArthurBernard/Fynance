@@ -1,5 +1,5 @@
-fynance.algorithms.allocation.rolling\_allocation
-=================================================
+fynance\.algorithms\.allocation\.rolling\_allocation
+====================================================
 
 .. currentmodule:: fynance.algorithms.allocation
 

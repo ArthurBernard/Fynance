@@ -26,6 +26,7 @@ fynance.models.rolling.RollMultiLayerPerceptron
          RollMultiLayerPerceptron.float
          RollMultiLayerPerceptron.forward
          RollMultiLayerPerceptron.half
+         RollMultiLayerPerceptron.load_model
          RollMultiLayerPerceptron.load_state_dict
          RollMultiLayerPerceptron.modules
          RollMultiLayerPerceptron.named_buffers
@@ -33,17 +34,21 @@ fynance.models.rolling.RollMultiLayerPerceptron
          RollMultiLayerPerceptron.named_modules
          RollMultiLayerPerceptron.named_parameters
          RollMultiLayerPerceptron.parameters
+         RollMultiLayerPerceptron.pre_run
          RollMultiLayerPerceptron.predict
          RollMultiLayerPerceptron.register_backward_hook
          RollMultiLayerPerceptron.register_buffer
          RollMultiLayerPerceptron.register_forward_hook
          RollMultiLayerPerceptron.register_forward_pre_hook
          RollMultiLayerPerceptron.register_parameter
-         RollMultiLayerPerceptron.requires_grad_
          RollMultiLayerPerceptron.run
+         RollMultiLayerPerceptron.save
+         RollMultiLayerPerceptron.save_model
          RollMultiLayerPerceptron.set_data
+         RollMultiLayerPerceptron.set_lr_scheduler
          RollMultiLayerPerceptron.set_optimizer
          RollMultiLayerPerceptron.set_roll_period
+         RollMultiLayerPerceptron.set_seed
          RollMultiLayerPerceptron.share_memory
          RollMultiLayerPerceptron.state_dict
          RollMultiLayerPerceptron.sub_predict
@@ -53,15 +58,8 @@ fynance.models.rolling.RollMultiLayerPerceptron
          RollMultiLayerPerceptron.type
          RollMultiLayerPerceptron.zero_grad
       
-         RollMultiLayerPerceptron.__call__
   
 
   
-  
-   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
-      .. autosummary::
-         :toctree:
-      
-         RollMultiLayerPerceptron.dump_patches
   
   

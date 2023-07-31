@@ -1,5 +1,5 @@
-fynance.features.metrics.roll\_drawdown
-=======================================
+fynance\.features\.metrics\.roll\_drawdown
+==========================================
 
 .. currentmodule:: fynance.features.metrics
 

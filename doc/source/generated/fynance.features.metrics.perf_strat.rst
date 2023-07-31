@@ -1,5 +1,5 @@
-fynance.features.metrics.perf\_strat
-====================================
+fynance\.features\.metrics\.perf\_strat
+=======================================
 
 .. currentmodule:: fynance.features.metrics
 

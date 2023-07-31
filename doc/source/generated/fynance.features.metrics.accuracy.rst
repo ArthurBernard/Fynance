@@ -1,5 +1,5 @@
-fynance.features.metrics.accuracy
-=================================
+fynance\.features\.metrics\.accuracy
+====================================
 
 .. currentmodule:: fynance.features.metrics
 

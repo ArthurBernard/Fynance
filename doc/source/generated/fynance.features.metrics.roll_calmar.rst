@@ -1,5 +1,5 @@
-fynance.features.metrics.roll\_calmar
-=====================================
+fynance\.features\.metrics\.roll\_calmar
+========================================
 
 .. currentmodule:: fynance.features.metrics
 

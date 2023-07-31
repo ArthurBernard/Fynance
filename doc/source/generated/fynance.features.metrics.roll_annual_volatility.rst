@@ -1,5 +1,5 @@
-fynance.features.metrics.roll\_annual\_volatility
-=================================================
+fynance\.features\.metrics\.roll\_annual\_volatility
+====================================================
 
 .. currentmodule:: fynance.features.metrics
 

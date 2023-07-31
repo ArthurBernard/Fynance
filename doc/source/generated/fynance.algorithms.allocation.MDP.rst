@@ -1,5 +1,5 @@
-fynance.algorithms.allocation.MDP
-=================================
+fynance\.algorithms\.allocation\.MDP
+====================================
 
 .. currentmodule:: fynance.algorithms.allocation
 

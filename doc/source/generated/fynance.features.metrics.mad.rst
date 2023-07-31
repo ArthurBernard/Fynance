@@ -1,5 +1,5 @@
-fynance.features.metrics.mad
-============================
+fynance\.features\.metrics\.mad
+===============================
 
 .. currentmodule:: fynance.features.metrics
 

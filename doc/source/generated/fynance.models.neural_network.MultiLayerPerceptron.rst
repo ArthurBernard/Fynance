@@ -26,6 +26,7 @@ fynance.models.neural_network.MultiLayerPerceptron
          MultiLayerPerceptron.float
          MultiLayerPerceptron.forward
          MultiLayerPerceptron.half
+         MultiLayerPerceptron.load_model
          MultiLayerPerceptron.load_state_dict
          MultiLayerPerceptron.modules
          MultiLayerPerceptron.named_buffers
@@ -39,9 +40,11 @@ fynance.models.neural_network.MultiLayerPerceptron
          MultiLayerPerceptron.register_forward_hook
          MultiLayerPerceptron.register_forward_pre_hook
          MultiLayerPerceptron.register_parameter
-         MultiLayerPerceptron.requires_grad_
+         MultiLayerPerceptron.save_model
          MultiLayerPerceptron.set_data
+         MultiLayerPerceptron.set_lr_scheduler
          MultiLayerPerceptron.set_optimizer
+         MultiLayerPerceptron.set_seed
          MultiLayerPerceptron.share_memory
          MultiLayerPerceptron.state_dict
          MultiLayerPerceptron.to
@@ -50,15 +53,8 @@ fynance.models.neural_network.MultiLayerPerceptron
          MultiLayerPerceptron.type
          MultiLayerPerceptron.zero_grad
       
-         MultiLayerPerceptron.__call__
   
 
   
-  
-   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
-      .. autosummary::
-         :toctree:
-      
-         MultiLayerPerceptron.dump_patches
   
   

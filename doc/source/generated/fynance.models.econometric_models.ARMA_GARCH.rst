@@ -1,5 +1,5 @@
-fynance.models.econometric\_models.ARMA\_GARCH
-==============================================
+fynance\.models\.econometric\_models\.ARMA\_GARCH
+=================================================
 
 .. currentmodule:: fynance.models.econometric_models
 

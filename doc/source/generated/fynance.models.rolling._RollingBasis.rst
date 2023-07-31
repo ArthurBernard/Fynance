@@ -14,6 +14,7 @@ fynance.models.rolling._RollingBasis
          :toctree:
       
          _RollingBasis.__call__
+         _RollingBasis.pre_run
          _RollingBasis.run
       
   

@@ -1,5 +1,5 @@
-fynance.features.indicators.macd\_line
-======================================
+fynance\.features\.indicators\.macd\_line
+=========================================
 
 .. currentmodule:: fynance.features.indicators
 

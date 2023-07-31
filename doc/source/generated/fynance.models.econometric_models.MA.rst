@@ -1,5 +1,5 @@
-fynance.models.econometric\_models.MA
-=====================================
+fynance\.models\.econometric\_models\.MA
+========================================
 
 .. currentmodule:: fynance.models.econometric_models
 

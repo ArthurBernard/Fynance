@@ -1,5 +1,5 @@
-fynance.features.metrics.roll\_annual\_return
-=============================================
+fynance\.features\.metrics\.roll\_annual\_return
+================================================
 
 .. currentmodule:: fynance.features.metrics
 
