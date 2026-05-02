@@ -6,8 +6,8 @@
 # External packages
 import numpy as np
 from matplotlib import pyplot as plt
-#import seaborn as sns
 
+#import seaborn as sns
 # Internal packages
 #from fynance.backtest.dynamic_plot_backtest import DynaPlotBackTest
 from fynance.neural_networks.roll_neural_network import RollNeuralNet
@@ -84,16 +84,16 @@ class RollMultiNeuralNet(RollNeuralNet):
         RollNeuralNet.__call__(
             self, y, X, NN, start=start, end=end, x_axis=x_axis
         )
-        # Set neural network model 
+        # Set neural network model
         if isinstance(NN, list):
             self.NN = NN
             self.n_NN = len(NN)
         else:
             self.NN = [NN]
             self.n_NN = 1
-        
+
         return self
-        
+
     def __iter__(self):
         """ Set iterative method """
         self.y_train = np.zeros([self.T, self.n_NN])
@@ -102,7 +102,7 @@ class RollMultiNeuralNet(RollNeuralNet):
         self.loss_train = np.ones([k, self.n_NN])
         self.loss_estim = np.ones([k, self.n_NN])
         return self
-    
+
     def __next__(self):
         """ Incrementing method """
         # Incremant time
@@ -110,46 +110,46 @@ class RollMultiNeuralNet(RollNeuralNet):
         t = self.t
         if self.t >= self.T:
             raise StopIteration
-        
+
         # Splitting
         subtrain_X = self.X[t - self.n: t, :]
         subtrain_y = self.f(self.y[t - self.n: t, :])
         subestim_X = self.X[t: t + self.s, :]
         subestim_y = self.f(self.y[t: t + self.s, :])
-        
+
         # TODO : asynchronize this loop
         for i in range(self.n_NN):
             # Training
             self.y_train[t - self.s: t, i] = self._train(
-                y=subtrain_y, X=subtrain_X, i=i, 
+                y=subtrain_y, X=subtrain_X, i=i,
                 val_set=(subestim_X, subestim_y)
             )
-            
+
             # Estimating
             self.y_estim[t: t + self.s, i] = self.NN[i].predict(
                 subestim_X
             ).flatten()
-        
+
         return self.y_train[t - self.s: t, :], self.y_estim[t: t + self.s, :]
-    
+
     def _train(self, y, X, i, val_set=None):
         """ Train method and return prediction on training set """
         # Set parameters
         k = self.params['epochs'] * ((self.t - self.n) // self.s - 1)
         k_1 = self.params['epochs'] * (self.t - self.n) // self.s
-        
+
         # Fit loss
         hist = self.NN[i].fit(
             x=X, y=y, validation_data=val_set, **self.params
         )
         self.loss_train[k: k_1, i] = hist.history['loss']
         self.loss_estim[k: k_1, i] = hist.history['val_loss']
-        
+
         # Return prediction
         return self.NN[i].predict(
             X[-self.s: ], verbose=self.params['verbose']
         ).flatten()
-        
+
     def run(self, y, X, NN, plot_loss=True, plot_perf=True, x_axis=None):
         """ Train several rolling neural networks along pre-specified train 
         period and predict along test period. Display loss and performance 
@@ -190,7 +190,7 @@ class RollMultiNeuralNet(RollNeuralNet):
         # Start Rolling Neural Network
         for pred_train, pred_estim in self(y, X, NN, x_axis=x_axis):
             t, s = self.t, self.s
-            
+
             # Set performances of training period
             returns = np.sign(pred_train) * y[t - s: t]
             cum_ret = np.exp(np.cumsum(returns, axis=0))

@@ -81,7 +81,7 @@ class DynaPlotBackTest(PlotBackTest):
         .. [1] https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes
 
         """
-        super(DynaPlotBackTest, self).__init__(fig, ax, size, True, **kwargs)
+        super().__init__(fig, ax, size, True, **kwargs)
         self.ax_params = kwargs
 
     def set_axes(self, **kwargs):
@@ -103,12 +103,10 @@ class DynaPlotBackTest(PlotBackTest):
         ax_params.update(kwargs)
         self._set_axes(**ax_params)
 
-    def _set_axes(self, yscale='linear', xscale='linear', ylabel='',
+    def _set_axes(self, yscale='linear', xscale=None, ylabel='',
                   xlabel='', title='', tick_params={}):
         """ Set axes parameters. """
         self.ax.set_yscale(yscale)
-        # FIXME : the below line avoid to display date on x-axis
-        # self.ax.set_xscale(xscale)
         self.ax.set_ylabel(ylabel)
         self.ax.set_xlabel(xlabel, x=0.9)
         self.ax.set_title(title)
@@ -213,7 +211,7 @@ class DynaPlotAccuracy(DynaPlotBackTest):
         "tick_params": {"axis": "x", "labelsize": 10},
     }
     test_plot_kw = {
-        "label": "Test set", 
+        "label": "Test set",
         "color": "b",
         "lw": 1.7,
         "unit": 'perf',

@@ -33,4 +33,4 @@ class ArraySizeError(ValueError, IndexError):
         if msg_prefix is not None:
             msg = '{}: {}'.format(msg_prefix, msg)
 
-        super(ArraySizeError, self).__init__(msg)
+        super().__init__(msg)

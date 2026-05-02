@@ -23,14 +23,17 @@
 # Third party packages
 
 # Local packages
-from . import roll_neural_network
-from .roll_neural_network import RollNeuralNet
-from . import roll_multi_neural_networks
-from .roll_multi_neural_networks import RollMultiNeuralNet
-from . import roll_aggregated_multi_neural_networks
+from . import (
+    roll_aggregated_multi_neural_networks,
+    roll_multi_neural_networks,
+    roll_multi_roll_neural_networks,
+    roll_neural_network,
+)
 from .roll_aggregated_multi_neural_networks import RollAggrMultiNeuralNet
-from . import roll_multi_roll_neural_networks
+from .roll_multi_neural_networks import RollMultiNeuralNet
 from .roll_multi_roll_neural_networks import RollMultiRollNeuralNet
+from .roll_neural_network import RollNeuralNet
+
 #from . import set_neuralnetwork_tools
 #from .set_neuralnetwork_tools import *
 
