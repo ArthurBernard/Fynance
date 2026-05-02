@@ -23,6 +23,7 @@ __pycache__/
 
 # Claude Code (local only, not pushed)
 .claude/
+CLAUDE.md
 
 # Task tracking (local only)
 todo/
