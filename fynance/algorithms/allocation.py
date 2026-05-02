@@ -13,13 +13,12 @@ from __future__ import annotations
 # Built-in packages
 from typing import Callable
 
-# Third party packages
+# Third-party
 import numpy as np
 import pandas as pd
 import scipy.cluster.hierarchy as sch
 from numpy.typing import NDArray
 from scipy.optimize import Bounds, LinearConstraint, minimize
-from scipy.spatial.distance import squareform
 
 # Local packages
 from fynance.features.metrics import diversified_ratio
@@ -171,40 +170,41 @@ def _get_quasi_diag(link):
 
 
 def _get_rec_bisec(mat_cov, sortIx):
-    """ Compute weights.
-
-    TODO : verify the efficiency /! must be not efficient /!
+    """ Compute weights via recursive bisection.
 
     Parameters
     ----------
-    mat_cov: pd.DataFrame
-        Matrix variance-covariance
-    sortIx: list
-        Sorted list of items.
+    mat_cov: np.ndarray
+        Matrix variance-covariance (N x N).
+    sortIx: list or np.ndarray of int
+        Sorted list of asset indices (0..N-1).
 
     Returns
     -------
-    pd.DataFrame
-       Weights.
+    np.ndarray
+        Weight vector of shape (N,) indexed by sortIx order.
 
     """
-    w = pd.Series(1.0, index=sortIx)
-    cItems = [sortIx]  # initialize all items in one cluster
+    n = len(sortIx)
+    w = np.ones(n)
+    cItems = [list(range(n))]
 
     while len(cItems) > 0:
         cItems = [i[j: k] for i in cItems for j, k in (
             (0, int(len(i) / 2)),
             (int(len(i) / 2), len(i))
-        ) if len(i) > 1]  # bi-section
+        ) if len(i) > 1]
 
-        for i in range(0, len(cItems), 2):  # parse in pairs
-            cItems0 = cItems[i]  # cluster 1
-            cItems1 = cItems[i + 1]  # cluster 2
+        for i in range(0, len(cItems), 2):
+            cItems0_idx = cItems[i]
+            cItems1_idx = cItems[i + 1]
+            cItems0 = [sortIx[j] for j in cItems0_idx]
+            cItems1 = [sortIx[j] for j in cItems1_idx]
             cVar0 = _get_cluster(mat_cov, cItems0)
             cVar1 = _get_cluster(mat_cov, cItems1)
             alpha = 1 - cVar0 / (cVar0 + cVar1)
-            w[cItems0] *= alpha  # weight 1
-            w[cItems1] *= 1 - alpha  # weight 2
+            w[cItems0_idx] *= alpha
+            w[cItems1_idx] *= 1 - alpha
 
     return w
 
@@ -214,10 +214,10 @@ def _get_cluster(mat_cov, cItems):
 
     Parameters
     ----------
-    mat_cov: pd.DataFrame
+    mat_cov: np.ndarray
         Covariance matrix.
-    cItems: list
-        Cluster.
+    cItems: list or np.ndarray of int
+        Cluster asset indices.
 
     Returns
     -------
@@ -225,11 +225,11 @@ def _get_cluster(mat_cov, cItems):
         Cluster variance
 
     """
-    cov_ = mat_cov.loc[cItems, cItems]  # matrix slice
+    cov_ = mat_cov[np.ix_(cItems, cItems)]
     w_ = _get_IVP(cov_).reshape(-1, 1)
-    cVar = ((w_.T @ cov_) @ w_)  # [0, 0]
+    cVar = (w_.T @ cov_) @ w_
 
-    return cVar.values[0, 0]
+    return float(cVar.item())
 
 
 def _get_IVP(mat_cov):
@@ -281,35 +281,39 @@ def HRP(
     Returns
     -------
     np.ndarray
-        Vecotr of weights computed by HRP algorithm.
+        Vector of weights computed by HRP algorithm.
 
     References
     ----------
     .. [2] https://ssrn.com/abstract=2708678
 
     """
-    if not isinstance(X, pd.DataFrame):
-        X = pd.DataFrame(X)
+    X = np.asarray(X, dtype=np.float64)
+    T, N = X.shape
+    up_bound = max(up_bound, 1.0 / N)
+    low_bound = min(low_bound, 1.0 / N)
 
-    idx = X.columns
-    up_bound = max(up_bound, 1 / X.shape[1])
-    low_bound = min(low_bound, 1 / X.shape[1])
+    mat_cov = np.cov(X, rowvar=False)
+    diag_cov = np.sqrt(np.diag(mat_cov))
+    outer_diag = np.outer(diag_cov, diag_cov)
+    with np.errstate(invalid='ignore', divide='ignore'):
+        mat_corr = np.divide(mat_cov, outer_diag)
+        mat_corr = np.where(np.isnan(mat_corr) | np.isinf(mat_corr), 0.0, mat_corr)
 
-    # Compute covariance and correlation matrix
-    mat_cov = X.cov()
-    mat_corr = X.corr().fillna(0)
-    # Compute distance matrix
-    # print(mat_corr)
-    mat_dist = _corr_dist(mat_corr).fillna(0)
-    mat_dist_corr = squareform(mat_dist)
-    link = sch.linkage(mat_dist_corr, method=method, metric=metric)
-    # Sort linked matrix
+    with np.errstate(invalid='ignore'):
+        mat_dist = ((1.0 - mat_corr) / 2.0) ** 0.5
+        mat_dist = np.where(np.isnan(mat_dist), 0.0, mat_dist)
+
+    mat_dist_upper = mat_dist[np.triu_indices(N, k=1)]
+    link = sch.linkage(mat_dist_upper, method=method, metric=metric)
     sortIx = _get_quasi_diag(link)
-    sortIx = mat_corr.index[sortIx].tolist()
-    w = _get_rec_bisec(mat_cov, sortIx)
-    w = w.loc[idx].to_numpy(copy=True).reshape([w.size, 1])
+    w_sorted = _get_rec_bisec(mat_cov, sortIx)
 
-    return _normalize(w, up_bound=up_bound, low_bound=low_bound)
+    w = np.empty(N)
+    for i, col_idx in enumerate(sortIx):
+        w[col_idx] = w_sorted[i]
+
+    return _normalize(w.reshape([N, 1]), up_bound=up_bound, low_bound=low_bound)
 
 
 # =========================================================================== #
@@ -630,7 +634,7 @@ def rolling_allocation(
         Weights of the portfolio allocated following ``f`` algorithm.
 
     """
-    X = pd.DataFrame(X).fillna(method='ffill')
+    X = pd.DataFrame(X).ffill()
     idx = X.index
     w_mat = pd.DataFrame(index=idx, columns=X.columns)
     portfolio = pd.Series(100., index=idx, name='portfolio')
@@ -651,7 +655,7 @@ def rolling_allocation(
         # Select X
         sub_X = X_.loc[slice_n].copy()
         assets = list(X.columns[sub_X.apply(process)])
-        sub_X = sub_X.fillna(method='bfill')
+        sub_X = sub_X.bfill()
         # Compute weights
         if len(assets) == 1:
             w = np.array([[1.]])
@@ -663,13 +667,13 @@ def rolling_allocation(
         w_mat.loc[roll.d, :] = w_mat.loc[roll.d, :].fillna(0.)
         # Compute portfolio performance
         perf = _perf_alloc(
-            X.loc[slice_s, assets].fillna(method='bfill').values,
+            X.loc[slice_s, assets].bfill().values,
             w=w,
             drift=drift
         )
         portfolio.loc[slice_s] = portfolio.loc[roll.d] * perf.flatten()
 
-    w_mat = w_mat.fillna(method='ffill').fillna(0.)
+    w_mat = w_mat.ffill().fillna(0.)
 
     return portfolio, w_mat
 
