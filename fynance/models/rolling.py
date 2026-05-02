@@ -3,14 +3,18 @@
 
 """ Basis of rolling models. """
 
+from __future__ import annotations
+
 # Built-in packages
 from multiprocessing import Process
+from typing import Callable
 
 # External packages
 import numpy as np
 import pandas as pd
 import torch
 from matplotlib import pyplot as plt
+from numpy.typing import NDArray
 
 from fynance.backtest.dynamic_plot_backtest import BacktestNeuralNet
 
@@ -58,15 +62,30 @@ class _RollingBasis:
 
     """
 
-    def __init__(self, X, y, f=None, index=None):
+    def __init__(
+        self,
+        X: NDArray | torch.Tensor,
+        y: NDArray | torch.Tensor,
+        f: Callable | None = None,
+        index: NDArray | None = None,
+    ):
         self.T = X.shape[0]
         self.y_shape = y.shape
         self.f = (lambda x: x) if f is None else f
         self.idx = np.arange(self.T) if index is None else index
-        self.log = []
+        self.log: list[str] = []
 
-    def __call__(self, train_period, test_period, start=0, end=None,
-                 roll_period=None, eval_period=None, batch_size=64, epochs=1):
+    def __call__(
+        self,
+        train_period: int,
+        test_period: int,
+        start: int = 0,
+        end: int | None = None,
+        roll_period: int | None = None,
+        eval_period: int | None = None,
+        batch_size: int = 64,
+        epochs: int = 1,
+    ) -> _RollingBasis:
         """ Configure rolling window parameters.
 
         Parameters
@@ -323,17 +342,36 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
 
     """
 
-    def __init__(self, X, y, layers=[], activation=None, drop=None, bias=True,
-                 x_type=None, y_type=None, activation_kwargs={}, **kwargs):
+    def __init__(
+        self,
+        X: NDArray | torch.Tensor,
+        y: NDArray | torch.Tensor,
+        layers: list[int] = [],
+        activation: type[torch.nn.Module] | None = None,
+        drop: float | None = None,
+        bias: bool = True,
+        x_type=None,
+        y_type=None,
+        activation_kwargs: dict = {},
+        **kwargs,
+    ):
         _RollingBasis.__init__(self, X, y, **kwargs)
         MultiLayerPerceptron.__init__(self, X, y, layers=layers, bias=bias,
                                       activation=activation, drop=drop,
                                       x_type=x_type, y_type=y_type,
                                       activation_kwargs=activation_kwargs)
 
-    def set_roll_period(self, train_period, test_period, start=0, end=None,
-                        roll_period=None, eval_period=None, batch_size=64,
-                        epochs=1):
+    def set_roll_period(
+        self,
+        train_period: int,
+        test_period: int,
+        start: int = 0,
+        end: int | None = None,
+        roll_period: int | None = None,
+        eval_period: int | None = None,
+        batch_size: int = 64,
+        epochs: int = 1,
+    ) -> _RollingBasis:
         """ Configure rolling window parameters.
 
         This is the preferred entry-point for ``RollMultiLayerPerceptron``
@@ -364,7 +402,7 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
     def _train(self, X, y):
         return self.train_on(X=X, y=y)
 
-    def sub_predict(self, X):
+    def sub_predict(self, X: torch.Tensor) -> NDArray:
         """ Return predictions as a numpy array. """
         return self.predict(X=X).numpy()
 

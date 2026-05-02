@@ -8,10 +8,12 @@
 
 """ Loss object. """
 
-# Built-in packages
+from __future__ import annotations
 
+# Built-in packages
 # Third party packages
 import numpy as np
+from numpy.typing import NDArray
 
 # Local packages
 from fynance.backtest.plot import PlotSeries
@@ -41,7 +43,7 @@ class LossSeries:
         """ Initialize loss series object. """
         self.values = np.array([])
 
-    def append(self, other):
+    def append(self, other: float | int | list | NDArray) -> None:
         """ Append value to loss series.
 
         Parameters
@@ -55,7 +57,7 @@ class LossSeries:
 
         self.values = np.append(self.values, other)
 
-    def reset(self):
+    def reset(self) -> None:
         """ Drop the stored values in the loss series. """
         self.values = np.array([])
 

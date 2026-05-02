@@ -8,10 +8,12 @@
 
 """ Statical momentum functions. """
 
-# Built-in packages
+from __future__ import annotations
 
+# Built-in packages
 # External packages
 import numpy as np
+from numpy.typing import NDArray
 
 from fynance._wrappers import WrapperArray
 
@@ -32,7 +34,7 @@ __all__ = [
 
 
 @WrapperArray('dtype', 'axis', 'window')
-def sma(X, w=None, axis=0, dtype=None):
+def sma(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDArray:
     r""" Compute simple moving average(s) of size `w` for each `X`' series.
 
     .. math::
@@ -97,7 +99,7 @@ def _sma(X, w):
 
 
 @WrapperArray('dtype', 'axis', 'window')
-def wma(X, w=None, axis=0, dtype=None):
+def wma(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDArray:
     r""" Compute weighted moving average(s) of size `w` for each `X`' series.
 
     .. math::
@@ -150,7 +152,7 @@ def _wma(X, w):
 
 
 @WrapperArray('dtype', 'axis')
-def ema(X, alpha=0.94, w=None, axis=0, dtype=None):
+def ema(X: NDArray, alpha: float = 0.94, w: int | None = None, axis: int = 0, dtype=None) -> NDArray:
     r""" Compute exponential moving average(s) for each `X`' series.
 
     .. math::
@@ -226,7 +228,7 @@ def _ema(X, alpha):
 
 
 @WrapperArray('dtype', 'axis', 'window', 'ddof')
-def smstd(X, w=None, ddof=0, axis=0, dtype=None):
+def smstd(X: NDArray, w: int | None = None, ddof: int = 0, axis: int = 0, dtype=None) -> NDArray:
     r""" Compute simple moving standard deviation(s) for each `X`' series'.
 
     .. math::
@@ -289,7 +291,7 @@ def _smstd(X, w, ddof=0):
 
 
 @WrapperArray('dtype', 'axis', 'window')
-def wmstd(X, w=None, axis=0, dtype=None):
+def wmstd(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDArray:
     r""" Compute weighted moving standard(s) deviation for each `X`' series'.
 
     .. math::
@@ -343,7 +345,7 @@ def _wmstd(X, w):
 
 
 @WrapperArray('dtype', 'axis')
-def emstd(X, alpha=0.94, w=None, axis=0, dtype=None):
+def emstd(X: NDArray, alpha: float = 0.94, w: int | None = None, axis: int = 0, dtype=None) -> NDArray:
     r""" Compute exponential moving standard deviation(s) for each `X`' series.
 
     .. math::

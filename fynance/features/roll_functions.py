@@ -8,10 +8,12 @@
 
 """ Rolling functions. """
 
-# Built-in packages
+from __future__ import annotations
 
+# Built-in packages
 # Third party packages
 import numpy as np
+from numpy.typing import NDArray
 
 from fynance._wrappers import WrapperArray
 
@@ -27,7 +29,7 @@ __all__ = ["roll_min", "roll_max"]
 
 
 @WrapperArray('dtype', 'axis', 'window')
-def roll_min(X, w=None, axis=0, dtype=None):
+def roll_min(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDArray:
     r""" Compute simple rolling minimum of size `w` for each `X`' series.
 
     .. math::
@@ -92,7 +94,7 @@ def _roll_min(X, w):
 
 
 @WrapperArray('dtype', 'axis', 'window')
-def roll_max(X, w=None, axis=0, dtype=None):
+def roll_max(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDArray:
     r""" Compute simple rolling maximum of size `w` for each `X`' series.
 
     .. math::
