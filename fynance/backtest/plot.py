@@ -129,7 +129,7 @@ class PlotSeries:
             T = y.size
 
         else:
-            raise ValueError(f"y must be a 1-dimensional array")
+            raise ValueError("y must be a 1-dimensional array")
 
         if x is None:
             x = np.arange(T)
@@ -176,7 +176,7 @@ class PlotSeries:
             T = y.size
 
         else:
-            raise ValueError(f"y must be a 1-dimensional array")
+            raise ValueError("y must be a 1-dimensional array")
 
         if append:
             _x = self.h.get_xdata()
