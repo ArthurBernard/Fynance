@@ -3,13 +3,90 @@
 
 """ Filter functions for time-series financial data. """
 
+# Built-in
 import math
 
+# Third-party
+import numba as nb
 import numpy as np
 from numpy.typing import NDArray
 from scipy.optimize import minimize
 
+# Local
+
 __all__ = ['kalman_filter', 'rts_smoother', 'kalman_loglikelihood', 'fit_kalman']
+
+
+@nb.njit(cache=True)
+def _kalman_filter_core(y, G, F, W, V, m0, C0):
+    """Numba-compiled Kalman filter forward pass loop.
+
+    Parameters
+    ----------
+    y, G, F, W, V, m0, C0 : float arrays
+        Inputs as created in kalman_filter (already float64 dtype).
+
+    Returns
+    -------
+    m, C, a, R, e, S : float arrays
+        Outputs (same shapes as in kalman_filter).
+    """
+    T, n = y.shape
+
+    m = np.zeros((T, n))
+    C = np.zeros((T, n, n))
+    a = np.zeros((T, n))
+    R = np.zeros((T, n, n))
+    e = np.zeros((T, n))
+    S = np.zeros((T, n, n))
+
+    m_prev = m0.copy()
+    C_prev = C0.copy()
+
+    for t in range(T):
+        # Predict
+        a[t] = G @ m_prev
+        R[t] = G @ C_prev @ G.T + W
+
+        # Innovation
+        e[t] = y[t] - F @ a[t]
+        S[t] = F @ R[t] @ F.T + V
+
+        # Update
+        K = R[t] @ F.T @ np.linalg.inv(S[t])
+        m[t] = a[t] + K @ e[t]
+        C[t] = (np.eye(n) - K @ F) @ R[t]
+
+        m_prev = m[t]
+        C_prev = C[t]
+
+    return m, C, a, R, e, S
+
+
+@nb.njit(cache=True)
+def _rts_smoother_core(m, C, a, R, G):
+    """Numba-compiled RTS smoother backward pass loop.
+
+    Parameters
+    ----------
+    m, C, a, R, G : float arrays
+        Inputs from kalman_filter and the transition matrix.
+
+    Returns
+    -------
+    ms, Cs : float arrays
+        Smoothed means and covariances.
+    """
+    T, n = m.shape
+    ms = m.copy()
+    Cs = C.copy()
+
+    for t in range(T - 2, -1, -1):
+        L = C[t] @ G.T @ np.linalg.pinv(R[t + 1])
+        ms[t] = m[t] + L @ (ms[t + 1] - a[t + 1])
+        Cs[t] = C[t] + L @ (Cs[t + 1] - R[t + 1]) @ L.T
+
+    return ms, Cs
 
 
 def kalman_filter(
@@ -83,42 +160,17 @@ def kalman_filter(
     (5, 1)
 
     """
-    y = np.asarray(y, dtype=float)
-    G = np.asarray(G, dtype=float)
-    F = np.asarray(F, dtype=float)
-    W = np.asarray(W, dtype=float)
-    V = np.asarray(V, dtype=float)
+    y = np.asarray(y, dtype=np.float64)
+    G = np.asarray(G, dtype=np.float64)
+    F = np.asarray(F, dtype=np.float64)
+    W = np.asarray(W, dtype=np.float64)
+    V = np.asarray(V, dtype=np.float64)
 
     T, n = y.shape
+    m0_init = np.zeros(n, dtype=np.float64) if m0 is None else np.asarray(m0, dtype=np.float64)
+    C0_init = np.eye(n, dtype=np.float64) if C0 is None else np.asarray(C0, dtype=np.float64)
 
-    m = np.zeros((T, n))
-    C = np.zeros((T, n, n))
-    a = np.zeros((T, n))
-    R = np.zeros((T, n, n))
-    e = np.zeros((T, n))
-    S = np.zeros((T, n, n))
-
-    m_prev = np.zeros(n) if m0 is None else np.asarray(m0, dtype=float)
-    C_prev = np.eye(n) if C0 is None else np.asarray(C0, dtype=float)
-
-    for t in range(T):
-        # Predict
-        a[t] = G @ m_prev
-        R[t] = G @ C_prev @ G.T + W
-
-        # Innovation
-        e[t] = y[t] - F @ a[t]
-        S[t] = F @ R[t] @ F.T + V
-
-        # Update
-        K = R[t] @ F.T @ np.linalg.inv(S[t])
-        m[t] = a[t] + K @ e[t]
-        C[t] = (np.eye(n) - K @ F) @ R[t]
-
-        m_prev = m[t]
-        C_prev = C[t]
-
-    return m, C, a, R, e, S
+    return _kalman_filter_core(y, G, F, W, V, m0_init, C0_init)
 
 
 def rts_smoother(
@@ -167,16 +219,13 @@ def rts_smoother(
     True
 
     """
-    T, n = m.shape
-    ms = m.copy()
-    Cs = C.copy()
+    m = np.asarray(m, dtype=np.float64)
+    C = np.asarray(C, dtype=np.float64)
+    a = np.asarray(a, dtype=np.float64)
+    R = np.asarray(R, dtype=np.float64)
+    G = np.asarray(G, dtype=np.float64)
 
-    for t in range(T - 2, -1, -1):
-        L = C[t] @ G.T @ np.linalg.pinv(R[t + 1])
-        ms[t] = m[t] + L @ (ms[t + 1] - a[t + 1])
-        Cs[t] = C[t] + L @ (Cs[t + 1] - R[t + 1]) @ L.T
-
-    return ms, Cs
+    return _rts_smoother_core(m, C, a, R, G)
 
 
 def kalman_loglikelihood(e: NDArray, S: NDArray) -> float:
