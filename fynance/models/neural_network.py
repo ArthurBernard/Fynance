@@ -467,7 +467,7 @@ class MultiLayerPerceptron(BaseNeuralNet):
 
 
 def _type_convert(dtype):
-    if dtype is np.float64 or dtype is np.float or dtype is np.double:
+    if dtype is np.float64:
         return torch.float64
 
     elif dtype is np.float32:
@@ -482,13 +482,13 @@ def _type_convert(dtype):
     elif dtype is np.int8:
         return torch.int8
 
-    elif dtype is np.int16 or dtype is np.short:
+    elif dtype is np.int16:
         return torch.int16
 
     elif dtype is np.int32:
         return torch.int32
 
-    elif dtype is np.int64 or dtype is np.int or dtype is np.long:
+    elif dtype is np.int64:
         return torch.int64
 
     else:
