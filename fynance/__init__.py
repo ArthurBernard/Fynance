@@ -25,7 +25,6 @@ algorithms      --- Financial algorithms
 backtest        --- Backtest strategy tools
 features        --- Features extraction
 models          --- Econometric and Neural Network models (using PyTorch)
-neural_networks --- Neural network models (using Keras)
 
 Utility tools
 -------------
@@ -49,11 +48,9 @@ from .backtest import *
 from .estimator import *
 from .features import *
 from .models import *
-from .neural_networks import *
 
 __all__ += models.__all__
 __all__ += estimator.__all__
 __all__ += features.__all__
-__all__ += neural_networks.__all__
 __all__ += backtest.__all__
 __all__ += algorithms.__all__
