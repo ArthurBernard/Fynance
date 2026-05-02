@@ -1,104 +1,146 @@
 #!/usr/bin/env python3
 # coding: utf-8
-# @Author: ArthurBernard
-# @Email: arthur.bernard.92@gmail.com
-# @Date: 2023-07-27 09:10:43
-# @Last modified by: ArthurBernard
-# @Last modified time: 2023-08-02 12:26:48
 
-""" Neural network with attention model. """
+""" Attention mechanisms for sequential financial data. """
 
-# Built-in packages
+import math
 
-# Third party packages
 import torch
 from torch import nn
-# from torch.nn import functional as F
 
-# Local packages
-from fynance.models.neural_network import BaseNeuralNet
-
-__all__ = []
+__all__ = ['ScaledDotProductAttention', 'MultiHeadAttention']
 
 
-class _BaseAttention(BaseNeuralNet):
+class ScaledDotProductAttention(nn.Module):
+    r""" Scaled Dot-Product Attention.
 
-    pass
-
-
-class ScaledDotProductAttention(_BaseAttention):
-    r""" Scaled Dot-Product Attention model.
-
-    Attention model described in the paper "Attention is All You Need".
-
-    .. math:: A(Q, K, V) = softmax(\frac{QK^T}{\sqrt{d_k}})V
+    Computes :math:`\text{Attention}(Q, K, V) =
+    \text{softmax}\!\left(\frac{QK^T}{\sqrt{d_k}}\right)V`.
 
     Parameters
     ----------
-    n_q, n_k : int
-        Respectively lenght of the queries and keys (and values).
-    d_k, d_v : int
-        Respectively dimension of the keys (and queries) and values.
-
-    Methods
-    -------
-    __call__
-
-    Attribute
-    ---------
-    w_q, w_k, w_v : torch.nn.Linear
-        Respectively queries, keys and values weights.
-    softmax : torch.nn.Softmax
-        Softmax activation function.
+    dropout : float, optional
+        Dropout probability applied to the attention weights, default 0.
 
     References
     ----------
-    "Attention is All You Need" (Ashish Vaswani, Noam Shazeer, Niki Parmar,
-    Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia
-    Polosukhin, arxiv, 2017).
+    Vaswani et al., "Attention is All You Need", arXiv 2017.
 
     """
 
-    def __init__(self, n_q, n_k, d_k, d_v):
-
-        self.w_q = nn.Linear(n_q, d_k, bias=False)
-        self.w_k = nn.Linear(n_k, d_k, bias=False)
-        self.w_v = nn.Linear(n_k, d_v, bias=False)
-
+    def __init__(self, dropout=0.0):
+        super().__init__()
+        self.dropout = nn.Dropout(p=dropout)
         self.softmax = nn.Softmax(dim=-1)
 
-    def forward(self, q, k, v, mask=None):
-        """ Forward method.
+    def forward(self, Q, K, V, mask=None):
+        """ Compute attention.
 
         Parameters
         ----------
-        q, k, v : torch.Tensor
-            Queries, keys and values input data, respectively of shape (n_q,
-            d_k), (n_k, d_k) and (n_k, d_v).
+        Q : torch.Tensor
+            Queries, shape ``(B, ..., T, d_k)``.
+        K : torch.Tensor
+            Keys, shape ``(B, ..., S, d_k)``.
+        V : torch.Tensor
+            Values, shape ``(B, ..., S, d_v)``.
+        mask : torch.Tensor, optional
+            Boolean mask of shape ``(B, ..., T, S)``.  Positions where
+            ``mask == 0`` are set to ``-inf`` before softmax.
 
         Returns
         -------
         torch.Tensor
-            Output of the attention model of shape (n_q, d_v).
+            Output of shape ``(B, ..., T, d_v)``.
         torch.Tensor
-            Attention residual (?) of shape (n_q, n_k). # FIXME
+            Attention weights of shape ``(B, ..., T, S)``.
 
         """
-        q = self.w_q(q)
-        k = self.w_k(k)
-        v = self.w_v(v)
+        d_k = Q.size(-1)
+        scores = Q @ K.transpose(-2, -1) / math.sqrt(d_k)
 
-        attn = self.dropout(self.softmax(q / q.size(1) ** 0.5 @ k.T))
-        output = attn @ v
+        if mask is not None:
+            scores = scores.masked_fill(mask == 0, float('-inf'))
 
-        return output, attn
+        attn = self.dropout(self.softmax(scores))
+        return attn @ V, attn
 
 
-class SelfAttention(ScaledDotProductAttention):
+class MultiHeadAttention(nn.Module):
+    r""" Multi-Head Self-Attention.
+
+    Splits the input into ``num_heads`` heads, applies
+    :class:`ScaledDotProductAttention` in parallel, then re-projects.  A
+    residual connection and layer norm are applied.
+
+    Parameters
+    ----------
+    d_model : int
+        Model dimension (must be divisible by ``num_heads``).
+    num_heads : int
+        Number of attention heads.
+    dropout : float, optional
+        Dropout on attention weights and output projection, default 0.
+
+    Examples
+    --------
+    >>> import torch
+    >>> mha = MultiHeadAttention(64, 4)
+    >>> x = torch.randn(2, 10, 64)
+    >>> out, attn = mha(x)
+    >>> out.shape
+    torch.Size([2, 10, 64])
+    >>> attn.shape
+    torch.Size([2, 4, 10, 10])
+
+    """
+
+    def __init__(self, d_model, num_heads, dropout=0.0):
+        super().__init__()
+        if d_model % num_heads != 0:
+            raise ValueError(
+                f'd_model ({d_model}) must be divisible by num_heads ({num_heads})'
+            )
+        self.d_model = d_model
+        self.num_heads = num_heads
+        self.d_k = d_model // num_heads
+
+        self.w_q = nn.Linear(d_model, d_model)
+        self.w_k = nn.Linear(d_model, d_model)
+        self.w_v = nn.Linear(d_model, d_model)
+        self.w_o = nn.Linear(d_model, d_model)
+
+        self.attention = ScaledDotProductAttention(dropout=dropout)
+        self.norm = nn.LayerNorm(d_model)
+        self.dropout = nn.Dropout(p=dropout)
 
     def forward(self, x, mask=None):
-        return super().forward(q=x, k=x, v=x, mask=mask)
+        """ Forward pass.
 
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input of shape ``(B, T, d_model)``.
+        mask : torch.Tensor, optional
+            Attention mask of shape ``(B, 1, T, T)`` or ``(B, T, T)``.
 
-if __name__ == "__main__":
-    pass
+        Returns
+        -------
+        torch.Tensor
+            Output of shape ``(B, T, d_model)``.
+        torch.Tensor
+            Averaged attention weights of shape ``(B, num_heads, T, T)``.
+
+        """
+        B, T, _ = x.shape
+
+        Q = self.w_q(x).view(B, T, self.num_heads, self.d_k).transpose(1, 2)
+        K = self.w_k(x).view(B, T, self.num_heads, self.d_k).transpose(1, 2)
+        V = self.w_v(x).view(B, T, self.num_heads, self.d_k).transpose(1, 2)
+
+        out, attn = self.attention(Q, K, V, mask=mask)
+
+        out = out.transpose(1, 2).contiguous().view(B, T, self.d_model)
+        out = self.w_o(out)
+
+        return self.norm(x + self.dropout(out)), attn

@@ -1,35 +1,22 @@
 #!/usr/bin/env python3
 # coding: utf-8
-# @Author: ArthurBernard
-# @Email: arthur.bernard.92@gmail.com
-# @Date: 2019-04-23 19:15:17
-# @Last modified by: ArthurBernard
-# @Last modified time: 2020-11-21 18:21:49
 
-""" Basis of rolling models.
-
-Examples
---------
-# >>> roll_xgb = RollingXGB(X, y)
-# >>> for pred_eval, pred_test in roll_xgb(256, 64):
-# >>>     plot(pred_eval, pred_test)
-
-"""
+""" Basis of rolling models. """
 
 # Built-in packages
 from multiprocessing import Process
 
 # External packages
 import numpy as np
-from matplotlib import pyplot as plt
+import pandas as pd
 import torch
+from matplotlib import pyplot as plt
 
-# Local packages
-# from fynance.models.xgb import XGBData
-from fynance.models.neural_network import MultiLayerPerceptron
 from fynance.backtest.dynamic_plot_backtest import BacktestNeuralNet
 
-# Set plot style
+# Local packages
+from fynance.models.neural_network import MultiLayerPerceptron
+
 plt.style.use('seaborn-v0_8')
 
 
@@ -37,24 +24,20 @@ __all__ = ['_RollingBasis', 'RollMultiLayerPerceptron']
 
 
 class _RollingBasis:
-    r""" Base object to roll a neural network model.
+    r""" Base object to roll a model over a time axis.
 
-    Rolling over a time axis with a train period from `t - n` to `t` and a
-    testing period from `t` to `t + s`.
+    At each step the model trains on ``X[t-n:t]`` and predicts on
+    ``X[t:t+s]``.  Call :meth:`set_roll_period` (or :meth:`__call__`) to
+    configure the window sizes, then iterate with :func:`run`.
 
     Parameters
     ----------
     X, y : array_like
         Respectively input and output data.
     f : callable, optional
-        Function to transform target, e.g. ``torch.sign`` function.
+        Function to transform target, e.g. ``torch.sign``.
     index : array_like, optional
         Time index of data.
-
-    Methods
-    -------
-    __call__
-    run
 
     Attributes
     ----------
@@ -63,38 +46,28 @@ class _RollingBasis:
     b, e, T : int
         Respectively batch size, number of epochs and size of entire dataset.
     t, _e, i : int
-        Respectively the current time period, the current epoch and the current
-        iteration.
+        Respectively the current time period, the current epoch and the
+        current iteration.
     n_iter : int
-        The total number of iteration :math:`n_iter = e \times (T - t0 - s)
-        \times r`.
-    y_eval, y_test : np.ndarray[ndim=1 or 2, dtype=np.float64]
-        Respectively evaluating (or training) and testing predictions.
+        Total number of iterations.
+    y_eval, y_test : np.ndarray
+        Respectively evaluating and testing predictions.
+    log : list of dict
+        Per-step record of ``{step, train_loss, eval_loss, test_loss}``,
+        populated by :meth:`run`.  Use :meth:`get_stats` to get a DataFrame.
 
     """
 
-    # TODO : other methods
     def __init__(self, X, y, f=None, index=None):
-        """ Initialize shape of target. """
         self.T = X.shape[0]
         self.y_shape = y.shape
+        self.f = (lambda x: x) if f is None else f
+        self.idx = np.arange(self.T) if index is None else index
+        self.log = []
 
-        if f is None:
-            self.f = lambda x: x
-
-        else:
-            self.f = f
-
-        if index is None:
-            self.idx = np.arange(self.T)
-
-        else:
-            self.idx = index
-
-    # TODO : fix callable method to overwritten problem with torch.nn.Module
     def __call__(self, train_period, test_period, start=0, end=None,
                  roll_period=None, eval_period=None, batch_size=64, epochs=1):
-        """ Callable method to set target features data, and model.
+        """ Configure rolling window parameters.
 
         Parameters
         ----------
@@ -105,38 +78,33 @@ class _RollingBasis:
         end : int, optional
             Ending observation, default is last observation.
         roll_period : int, optional
-            Size of the rolling period, default is the same size of the
-            testing sub-period.
+            Size of the rolling period, default equals ``test_period``.
         eval_period : int, optional
-            Size of the evaluating period, default is the same size of the
-            testing sub-period if training sub-period is large enough.
+            Size of the evaluating period (unused, kept for API compat).
         batch_size : int, optional
-            Size of a training batch, default is 64.
+            Training batch size, default is 64.
         epochs : int, optional
-            Number of epochs on the same subperiod, default is 1.
+            Number of epochs per sub-period, default is 1.
 
         Returns
         -------
         _RollingBasis
-            The rolling basis model.
 
         """
-        # Set size of subperiods
         self.n = train_period
         self.s = test_period
         self.r = test_period if roll_period is None else roll_period
         self.b = batch_size
         self.e = epochs
 
-        # Set boundary of period
         self.T = self.T if end is None else min(self.T, end)
         self.t0 = max(self.n - self.r, min(start, self.T - self.n - self.s))
         self.n_iter = (self.T - self.t0 - self.s) // self.r * self.e
+        self.log = []
 
         return self
 
     def __iter__(self):
-        """ Set iterative method. """
         self.y_eval = np.zeros(self.y_shape, dtype=np.float64)
         self.y_test = np.zeros(self.y_shape, dtype=np.float64)
         self.loss_eval = np.zeros([self.n_iter], dtype=np.float64)
@@ -149,19 +117,12 @@ class _RollingBasis:
         return self
 
     def __next__(self):
-        """ Incrementing method. """
-        # TODO : to finish
         self._e += 1
         self.i += 1
         if self._e > self.e:
             self._e = 1
-            # Time forward incrementation
-            # self.t += self.r
-
             if self.t + self.r + self.s > self.T:
-
                 raise StopIteration
-
             self.t += self.r
             self.t_idx = np.arange(self.t - self.n, self.t)
 
@@ -170,17 +131,54 @@ class _RollingBasis:
 
         return eval_set, test_set
 
+    def get_stats(self):
+        """ Return per-step loss history as a DataFrame.
+
+        Returns
+        -------
+        pd.DataFrame
+            Columns: ``step``, ``train_loss``, ``eval_loss``, ``test_loss``.
+
+        """
+        if not self.log:
+            return pd.DataFrame(
+                columns=['step', 'train_loss', 'eval_loss', 'test_loss']
+            )
+        return pd.DataFrame(self.log)
+
+    def plot_loss(self, figsize=(9, 4)):
+        """ Plot train / eval / test loss curves.
+
+        Parameters
+        ----------
+        figsize : tuple of int, optional
+
+        Returns
+        -------
+        matplotlib.figure.Figure
+
+        """
+        df = self.get_stats()
+        if df.empty:
+            raise RuntimeError('No log data — run the model first.')
+
+        fig, ax = plt.subplots(figsize=figsize)
+        ax.plot(df['step'], df['train_loss'], label='Train')
+        ax.plot(df['step'], df['eval_loss'], label='Eval')
+        ax.plot(df['step'], df['test_loss'], label='Test')
+        ax.set_xlabel('Step')
+        ax.set_ylabel('Loss')
+        ax.legend()
+        fig.tight_layout()
+
+        return fig
+
     def _training(self):
-        # Run epochs
         loss_epoch = 0.
-        # Shuffle time indexes
         np.random.shuffle(self.t_idx)
-        # Run batchs
         for t in range(0, self.n, self.b):
-            # Set new train periods
             s = min(t + self.b, self.n)
             train_slice = self.t_idx[t: s]
-            # Train model
             try:
                 lo = self._train(
                     X=self.X[train_slice],
@@ -197,20 +195,18 @@ class _RollingBasis:
 
     def run(self, backtest_plot=True, backtest_kpi=True, figsize=(9, 6),
             func=np.sign):
-        """ Run neural network model and backtest predictions.
+        """ Run the rolling model and collect backtest predictions.
 
         Parameters
         ----------
         backtest_plot : bool, optional
-            If True, display plot of backtest performances.
+            If True, display a live backtest performance plot.
         backtest_kpi : bool, optional
-            If True, display kpi of backtest performances.
+            If True, print KPIs to stdout at each step.
         figsize : tuple of int, optional
-            Size of the figure to plot loss and performances.
+            Figure size.
         func : callable, optional
-            Function to apply on the prediction, default is `np.sign` function.
-            If func is None, then `func = lambda x: x` so the raw values of the
-            prediction are used to compute returns.
+            Function applied to predictions before computing returns.
 
         """
         y = self.y.numpy()
@@ -220,22 +216,24 @@ class _RollingBasis:
         self.perf_eval = 100. * np.ones(y.shape, dtype=np.float64)
         self.perf_test = 100. * np.ones(y.shape, dtype=np.float64)
 
-        # Set dynamic plot object
         self.bnn = BacktestNeuralNet(figsize)
-
+        self.log = []
         p_print = None
 
-        # TODO : get stats, loss, etc.
-        # TODO : plot loss, perf, etc.
         for eval_set, test_set in self:
             self._training()
 
-            # Predict on training and testing period
             self.y_eval[eval_set] = self.sub_predict(self.X[eval_set])
             self.y_test[test_set] = self.sub_predict(self.X[test_set])
-            # Compute losses
             self.loss_eval[self.i] = self._get_loss_on(self.y_eval, eval_set)
             self.loss_test[self.i] = self._get_loss_on(self.y_test, test_set)
+
+            self.log.append({
+                'step': self.i,
+                'train_loss': self.loss_train[self.i],
+                'eval_loss': self.loss_eval[self.i],
+                'test_loss': self.loss_test[self.i],
+            })
 
             if self._e == self.e:
                 v0 = self.perf_eval[self.t - self.r - 1]
@@ -267,24 +265,19 @@ class _RollingBasis:
 
         if backtest_plot:
             self._display_plot_loss(self.bnn, i)
-
             self._display_plot_perf(
                 self.bnn, self.perf_test, self.perf_eval, y_perf, t
             )
-
             self.bnn.f.canvas.draw()
 
     def _get_loss_on(self, y, _slice):
-        # Compute loss function
         lo = self.criterion(
             torch.from_numpy(y[_slice]).to(torch.float32),
             self.y[_slice].to(torch.float32)
         )
-
         return lo.item()
 
     def _display_kpi(self, t):
-        # Display %
         pct = t - self.n - self.s
         pct = pct / (self.T - self.n - self.T % self.s)
         txt = '{:5.2%} is done | '.format(pct)
@@ -312,66 +305,26 @@ def get_perf(signal, underlying, v0=100):
     return v0 * np.exp(np.cumsum(signal * underlying, axis=0))
 
 
-class RollingXGB(_RollingBasis):
-    """ Rolling version of eXtrem Gradient Boosting model. NOT YET IMPLEMETED.
-
-    Model will roll train and test periods over a time axis, at time `t` the
-    training period is from `t - n` to `t` and the testing period from `t` to
-    `t + s`.
-
-    Attributes
-    ----------
-    n, s : int
-        Respectively size of training and testing period.
-
-    """
-
-    # TODO : to finish
-    def __init__(self, X, y, **kwargs):
-        """ Set data to XGBoot model.
-
-        Parameters
-        ----------
-        X, y : np.ndarray[ndim=2, dtype=np.float64]
-            Respectively features with shape `(T, N)` and target with shape
-            `(T, 1)` of the model.
-        kwargs : dict, optional
-            Parameters of DMatrix object, cf XGBoost documentation [1]_.
-
-        References
-        ----------
-        .. [1] https://xgboost.readthedocs.io/en/latest/python/python_api.html
-
-        """
-        _RollingBasis.__init__(self, X, y)
-        # self.data = XGBData(X, label=y, **kwargs)
-        self.bst = None
-
-    def _train(self):
-        # self.bst = xgb.train(params, )
-        pass
-
-
 class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
-    """ Rolling version of the vanilla neural network model.
+    """ Rolling version of the multi-layer perceptron model.
+
+    Combines :class:`MultiLayerPerceptron` with the walk-forward iterator
+    from :class:`_RollingBasis`.  Use :meth:`set_roll_period` instead of
+    calling the object directly (``__call__`` is captured by
+    ``torch.nn.Module``).
 
     Methods
     -------
-    run
     set_roll_period
+    run
     sub_predict
-    save
-
-    TODO:
-    - fix train and predict methods
-    - finish docstring
-    - finish methods
+    get_stats
+    plot_loss
 
     """
 
     def __init__(self, X, y, layers=[], activation=None, drop=None, bias=True,
                  x_type=None, y_type=None, activation_kwargs={}, **kwargs):
-        """ Initialize rolling multi-layer perceptron model. """
         _RollingBasis.__init__(self, X, y, **kwargs)
         MultiLayerPerceptron.__init__(self, X, y, layers=layers, bias=bias,
                                       activation=activation, drop=drop,
@@ -381,31 +334,25 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
     def set_roll_period(self, train_period, test_period, start=0, end=None,
                         roll_period=None, eval_period=None, batch_size=64,
                         epochs=1):
-        """ Callable method to set target features data, and model.
+        """ Configure rolling window parameters.
+
+        This is the preferred entry-point for ``RollMultiLayerPerceptron``
+        because ``__call__`` is captured by ``torch.nn.Module``.
 
         Parameters
         ----------
         train_period, test_period : int
             Size of respectively training and testing sub-periods.
         start : int, optional
-            Starting observation, default is first observation.
         end : int, optional
-            Ending observation, default is last observation.
         roll_period : int, optional
-            Size of the rolling period, default is the same size of the
-            testing sub-period.
         eval_period : int, optional
-            Size of the evaluating period, default is the same size of the
-            testing sub-period if training sub-period is large enough.
         batch_size : int, optional
-            Size of a training batch, default is 64.
         epochs : int, optional
-            Number of epochs, default is 1.
 
         Returns
         -------
         _RollingBasis
-            The rolling basis model.
 
         """
         return _RollingBasis.__call__(
@@ -418,16 +365,16 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
         return self.train_on(X=X, y=y)
 
     def sub_predict(self, X):
-        """ Predict. """
+        """ Return predictions as a numpy array. """
         return self.predict(X=X).numpy()
 
     def save(self, path):
-        """ Save the trained neural network model.
+        """ Save the model weights.
 
         Parameters
         ----------
         path : str
-            Path to save the model.
+            Destination path.
 
         """
-        pass
+        torch.save(self.state_dict(), path)

@@ -279,7 +279,7 @@ class RecurrentNeuralNetwork(_ForwardLayer, _RecurrentNeuralNetwork):
             Hidden state.
 
         """
-        H = super(RecurrentNeuralNetwork, self).forward(X, H)
+        H = super().forward(X, H)
         Y = self.f_y(self.W_y(self.drop(H)))
 
         return Y, H
@@ -362,7 +362,7 @@ class _GatedRecurrentUnit(_RecurrentNeuralNetwork):
         # Reset gate
         G_r = self.f_r(self.W_r(self.drop(C)))
 
-        C_tild = torch.cat([X, G_r * H])
+        C_tild = torch.cat([X, G_r * H], dim=1)
         H_tild = self.f_h(self.W_h(self.drop(C_tild)))
 
         return G_u * H_tild + (1 - G_u) * H
@@ -452,7 +452,7 @@ class GatedRecurrentUnit(_ForwardLayer, _GatedRecurrentUnit):
             Hidden state.
 
         """
-        H = super(_GatedRecurrentUnit, self).forward(X, H)
+        H = super().forward(X, H)
         Y = self.f_y(self.W_y(self.drop(H)))
 
         return Y, H
@@ -668,7 +668,7 @@ class LongShortTermMemory(_ForwardLayer, _LongShortTermMemory):
             Memory state.
 
         """
-        H, C = super(LongShortTermMemory, self).forward(X, H, C)
+        H, C = super().forward(X, H, C)
         Y = self.f_y(self.W_y(self.drop(H)))
 
         return Y, H, C
