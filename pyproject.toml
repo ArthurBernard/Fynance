@@ -1,0 +1,77 @@
+[build-system]
+requires = ["setuptools>=68", "Cython>=3.0", "numpy>=1.26"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fynance"
+version = "1.1.0.dev0"
+description = "Python and Cython scripts of machine learning, econometrics and statistical features for financial analysis"
+readme = "README.rst"
+license = { text = "MIT" }
+authors = [{ name = "Arthur Bernard", email = "arthur.bernard.92@gmail.com" }]
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python",
+    "Programming Language :: Cython",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "matplotlib>=3.7",
+    "numpy>=1.26",
+    "pandas>=2.0",
+    "scipy>=1.11",
+    "seaborn>=0.12",
+    "torch>=2.0",
+    "xgboost>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "Cython>=3.0",
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.4",
+    "mypy>=1.8",
+    "numpydoc",
+]
+doc = [
+    "sphinx>=7.0",
+    "furo",
+    "numpydoc",
+    "nbsphinx",
+]
+
+[project.urls]
+Homepage = "https://github.com/ArthurBernard/Fynance"
+Documentation = "https://fynance.readthedocs.io/"
+"Source Code" = "https://github.com/ArthurBernard/Fynance/"
+Download = "https://pypi.org/project/fynance/"
+
+[tool.setuptools.packages.find]
+include = ["fynance*"]
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules --exitfirst -vv --capture=no --ignore=fynance/dev"
+testpaths = ["fynance"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
