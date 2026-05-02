@@ -35,7 +35,12 @@ _wrappers   --- Fynance wrapper functions
 
 """
 
-from .version import version as __version__
+from importlib.metadata import version, PackageNotFoundError
+
+try:
+    __version__ = version("fynance")
+except PackageNotFoundError:
+    __version__ = "unknown"
 
 __all__ = ['__version__']
 
