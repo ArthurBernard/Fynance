@@ -16,7 +16,7 @@ from fynance.features.metrics import drawdown, roll_sharpe
 from fynance.backtest.print_stats import set_text_stats
 
 # Set plot style
-plt.style.use('seaborn')
+plt.style.use('seaborn-v0_8')
 
 __all__ = ['display_perf']
 

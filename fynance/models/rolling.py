@@ -30,7 +30,7 @@ from fynance.models.neural_network import MultiLayerPerceptron
 from fynance.backtest.dynamic_plot_backtest import BacktestNeuralNet
 
 # Set plot style
-plt.style.use('seaborn')
+plt.style.use('seaborn-v0_8')
 
 
 __all__ = ['_RollingBasis', 'RollMultiLayerPerceptron']

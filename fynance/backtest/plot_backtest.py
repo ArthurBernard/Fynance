@@ -18,7 +18,7 @@ import seaborn as sns
 # Local packages
 
 # Set plot style
-plt.style.use('seaborn')
+plt.style.use('seaborn-v0_8')
 
 __all__ = ['PlotBackTest']
 

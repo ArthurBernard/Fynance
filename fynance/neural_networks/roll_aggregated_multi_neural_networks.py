@@ -13,7 +13,7 @@ from fynance.backtest.dynamic_plot_backtest import DynaPlotBackTest
 from fynance.neural_networks.roll_multi_neural_networks import RollMultiNeuralNet
 
 # Set plot style
-plt.style.use('seaborn')
+plt.style.use('seaborn-v0_8')
 
 # TODO: Aggregated method
 

@@ -19,7 +19,7 @@ from matplotlib import pyplot as plt
 from fynance.backtest.dynamic_plot_backtest import DynaPlotBackTest
 
 # Set plot style
-plt.style.use('seaborn')
+plt.style.use('seaborn-v0_8')
 
 
 class RollNeuralNet:

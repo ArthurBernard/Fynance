@@ -13,7 +13,7 @@ from matplotlib import pyplot as plt
 from fynance.neural_networks.roll_neural_network import RollNeuralNet
 
 # Set plot style
-plt.style.use('seaborn')
+plt.style.use('seaborn-v0_8')
 
 
 class RollMultiNeuralNet(RollNeuralNet):

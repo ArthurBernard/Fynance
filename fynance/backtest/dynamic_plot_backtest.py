@@ -17,7 +17,7 @@ from matplotlib import pyplot as plt
 from fynance.backtest.plot_backtest import PlotBackTest
 
 # Set plot style
-plt.style.use('seaborn')
+plt.style.use('seaborn-v0_8')
 
 __all__ = ['DynaPlotBackTest']
 
