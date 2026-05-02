@@ -27,6 +27,7 @@ classifiers = [
 ]
 dependencies = [
     "matplotlib>=3.7",
+    "numba>=0.59",
     "numpy>=2.0",
     "pandas>=2.0",
     "scipy>=1.11",
@@ -39,6 +40,7 @@ dependencies = [
 dev = [
     "Cython>=3.0",
     "pytest>=7.4",
+    "pytest-benchmark>=4.0",
     "pytest-cov>=4.1",
     "ruff>=0.4",
     "mypy>=1.8",
