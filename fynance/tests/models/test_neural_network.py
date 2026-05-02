@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 
 from fynance.models.attention import MultiHeadAttention, ScaledDotProductAttention
-from fynance.models.neural_network import MultiLayerPerceptron
+from fynance.models.neural_network import MultiLayerPerceptron, _type_convert
 from fynance.models.recurrent_neural_network import (
     GatedRecurrentUnit,
     LongShortTermMemory,
@@ -24,6 +24,41 @@ X_np = RNG.standard_normal((T, N_IN)).astype(np.float32)
 y_np = RNG.standard_normal((T, N_OUT)).astype(np.float32)
 X_t = torch.from_numpy(X_np)
 y_t = torch.from_numpy(y_np)
+
+
+# ---------------------------------------------------------------------------
+# Type conversion
+# ---------------------------------------------------------------------------
+
+class TestTypeConvert:
+
+    def test_float64_mapping(self):
+        assert _type_convert(np.float64) == torch.float64
+
+    def test_float32_mapping(self):
+        assert _type_convert(np.float32) == torch.float32
+
+    def test_float16_mapping(self):
+        assert _type_convert(np.float16) == torch.float16
+
+    def test_uint8_mapping(self):
+        assert _type_convert(np.uint8) == torch.uint8
+
+    def test_int8_mapping(self):
+        assert _type_convert(np.int8) == torch.int8
+
+    def test_int16_mapping(self):
+        assert _type_convert(np.int16) == torch.int16
+
+    def test_int32_mapping(self):
+        assert _type_convert(np.int32) == torch.int32
+
+    def test_int64_mapping(self):
+        assert _type_convert(np.int64) == torch.int64
+
+    def test_unknown_type_raises_valueerror(self):
+        with pytest.raises(ValueError, match="Unkwnown type"):
+            _type_convert(object())
 
 
 # ---------------------------------------------------------------------------
