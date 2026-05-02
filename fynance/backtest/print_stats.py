@@ -6,10 +6,12 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2020-05-08 09:22:17
 
-# Built-in packages
+from __future__ import annotations
 
+# Built-in packages
 # Third party packages
 import numpy as np
+from numpy.typing import NDArray
 
 # Local packages
 from fynance.features.metrics import accuracy, calmar, sharpe
@@ -21,9 +23,18 @@ __all__ = ['set_text_stats']
 # =========================================================================== #
 
 
-def set_text_stats(underly, period=252, accur=True, perf=True, vol=True,
-                   sharp=True, calma=True, underlying='Underlying', fees=0,
-                   **kwpred):
+def set_text_stats(
+    underly: NDArray,
+    period: int = 252,
+    accur: bool = True,
+    perf: bool = True,
+    vol: bool = True,
+    sharp: bool = True,
+    calma: bool = True,
+    underlying: str = 'Underlying',
+    fees: float = 0,
+    **kwpred,
+) -> str:
     """ Set a table as string with different indicators (accuracy, perf, vol
     and sharpe) for underlying and several strategies.
 

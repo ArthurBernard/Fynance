@@ -9,7 +9,7 @@
 """ Description. """
 
 # Built-in packages
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 
 # Third party packages
 # import numpy as np

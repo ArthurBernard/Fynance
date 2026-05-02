@@ -8,8 +8,9 @@
 
 """ Recurrent Neural Network models. """
 
-# Built-in packages
+from __future__ import annotations
 
+# Built-in packages
 # Third party packages
 import torch
 from torch import nn
@@ -62,8 +63,15 @@ class _RecurrentNeuralNetwork(BaseNeuralNet):
     """
 
     def __init__(
-        self, X, y, drop=None, x_type=None, y_type=None, bias=True,
-        hidden_activation=nn.Tanh, hidden_state_size=None,
+        self,
+        X: torch.Tensor | int,
+        y: torch.Tensor | int,
+        drop: float | None = None,
+        x_type=None,
+        y_type=None,
+        bias: bool = True,
+        hidden_activation: type[nn.Module] = nn.Tanh,
+        hidden_state_size: int | None = None,
     ):
         BaseNeuralNet.__init__(self)
 
@@ -81,7 +89,7 @@ class _RecurrentNeuralNetwork(BaseNeuralNet):
 
         self.drop = self._set_dropout(drop)
 
-    def forward(self, X, H):
+    def forward(self, X: torch.Tensor, H: torch.Tensor) -> torch.Tensor:
         C = torch.cat([X, H], dim=1)
 
         return self.f_h(self.W_h(self.drop(C)))
@@ -97,7 +105,7 @@ class _RecurrentNeuralNetwork(BaseNeuralNet):
             return lambda x: x
 
     @torch.enable_grad()
-    def train_on(self, X, y, H):
+    def train_on(self, X: torch.Tensor, y: torch.Tensor, H: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """ Trains the neural network model.
 
         Parameters
@@ -125,7 +133,7 @@ class _RecurrentNeuralNetwork(BaseNeuralNet):
         return loss, outputs.detach()
 
     @torch.no_grad()
-    def predict(self, X, H):
+    def predict(self, X: torch.Tensor, H: torch.Tensor) -> torch.Tensor:
         """ Predicts outputs of neural network model.
 
         Parameters
@@ -152,7 +160,7 @@ class _ForwardLayer:
         self.f_y = forward_activation()
 
     @torch.enable_grad()
-    def train_on(self, X, y, H):
+    def train_on(self, X: torch.Tensor, y: torch.Tensor, H: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """ Trains the neural network model.
 
         Parameters
@@ -180,7 +188,7 @@ class _ForwardLayer:
         return loss, H.detach()
 
     @torch.no_grad()
-    def predict(self, X, H):
+    def predict(self, X: torch.Tensor, H: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """ Predicts outputs of neural network model.
 
         Parameters
@@ -674,7 +682,7 @@ class LongShortTermMemory(_ForwardLayer, _LongShortTermMemory):
         return Y, H, C
 
     @torch.enable_grad()
-    def train_on(self, X, y, H, C):
+    def train_on(self, X: torch.Tensor, y: torch.Tensor, H: torch.Tensor, C: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """ Trains the neural network model.
 
         Parameters
@@ -705,7 +713,7 @@ class LongShortTermMemory(_ForwardLayer, _LongShortTermMemory):
         return loss, H.detach(), C.detach()
 
     @torch.no_grad()
-    def predict(self, X, H, C):
+    def predict(self, X: torch.Tensor, H: torch.Tensor, C: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """ Predicts outputs of neural network model.
 
         Parameters

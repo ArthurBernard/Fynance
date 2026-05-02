@@ -5,7 +5,6 @@
 
 import math
 
-import torch
 from torch import nn
 
 __all__ = ['ScaledDotProductAttention', 'MultiHeadAttention']

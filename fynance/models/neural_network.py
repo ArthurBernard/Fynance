@@ -8,13 +8,17 @@
 
 """ Basis of neural networks models. """
 
+from __future__ import annotations
+
 # Built-in packages
+from typing import Any
 
 # External packages
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn
+from numpy.typing import NDArray
 
 # Local packages
 
@@ -142,7 +146,7 @@ class BaseNeuralNet(torch.nn.Module):
         return self
 
     @torch.enable_grad()
-    def train_on(self, X, y):
+    def train_on(self, X: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         """ Trains the neural network model.
 
         Parameters
@@ -168,7 +172,7 @@ class BaseNeuralNet(torch.nn.Module):
         return loss
 
     @torch.no_grad()
-    def predict(self, X):
+    def predict(self, X: torch.Tensor) -> torch.Tensor:
         """ Predicts outputs of neural network model.
 
         Parameters
@@ -184,7 +188,7 @@ class BaseNeuralNet(torch.nn.Module):
         """
         return self(X).detach()
 
-    def set_data(self, X, y, x_type=None, y_type=None):
+    def set_data(self, X: NDArray | torch.Tensor | pd.DataFrame, y: NDArray | torch.Tensor | pd.DataFrame, x_type=None, y_type=None):
         """ Set data inputs and outputs.
 
         Parameters
@@ -362,8 +366,18 @@ class MultiLayerPerceptron(BaseNeuralNet):
 
     """
 
-    def __init__(self, X, y, layers=[], activation=None, drop=None,
-                 x_type=None, y_type=None, bias=True, activation_kwargs={}):
+    def __init__(
+        self,
+        X: NDArray | torch.Tensor | pd.DataFrame | int,
+        y: NDArray | torch.Tensor | pd.DataFrame | int,
+        layers: list[int] = [],
+        activation: type[torch.nn.Module] | None = None,
+        drop: float | None = None,
+        x_type=None,
+        y_type=None,
+        bias: bool = True,
+        activation_kwargs: dict[str, Any] = {},
+    ):
         """ Initialize object. """
         BaseNeuralNet.__init__(self)
 

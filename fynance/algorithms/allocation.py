@@ -8,12 +8,16 @@
 
 """ Algorithms of portfolio allocation. """
 
+from __future__ import annotations
+
 # Built-in packages
+from typing import Callable
 
 # Third party packages
 import numpy as np
 import pandas as pd
 import scipy.cluster.hierarchy as sch
+from numpy.typing import NDArray
 from scipy.optimize import Bounds, LinearConstraint, minimize
 from scipy.spatial.distance import squareform
 
@@ -32,7 +36,12 @@ __all__ = ['ERC', 'HRP', 'IVP', 'MDP', 'MVP', 'MVP_uc', 'rolling_allocation']
 # =========================================================================== #
 
 
-def ERC(X, w0=None, up_bound=1., low_bound=0.):
+def ERC(
+    X: NDArray[np.float64],
+    w0: NDArray[np.float64] | None = None,
+    up_bound: float = 1.,
+    low_bound: float = 0.,
+) -> NDArray[np.float64]:
     r""" Get weights of Equal Risk Contribution portfolio allocation.
 
     Notes
@@ -243,7 +252,13 @@ def _get_IVP(mat_cov):
     return ivp
 
 
-def HRP(X, method='single', metric='euclidean', low_bound=0., up_bound=1.0):
+def HRP(
+    X: NDArray[np.float64],
+    method: str = 'single',
+    metric: str = 'euclidean',
+    low_bound: float = 0.,
+    up_bound: float = 1.0,
+) -> NDArray[np.float64]:
     r""" Get weights of the Hierarchical Risk Parity allocation.
 
     Notes
@@ -302,7 +317,12 @@ def HRP(X, method='single', metric='euclidean', low_bound=0., up_bound=1.0):
 # =========================================================================== #
 
 
-def IVP(X, normalize=False, low_bound=0., up_bound=1.0):
+def IVP(
+    X: NDArray[np.float64],
+    normalize: bool = False,
+    low_bound: float = 0.,
+    up_bound: float = 1.0,
+) -> NDArray[np.float64]:
     r""" Get weights of the Inverse Variance Portfolio allocation.
 
     Notes
@@ -356,7 +376,10 @@ def IVP(X, normalize=False, low_bound=0., up_bound=1.0):
 # =========================================================================== #
 
 
-def MVP(X, normalize=False):
+def MVP(
+    X: NDArray[np.float64],
+    normalize: bool = False,
+) -> NDArray[np.float64]:
     r""" Get weights of the Minimum Variance Portfolio allocation.
 
     Notes
@@ -401,7 +424,7 @@ def MVP(X, normalize=False):
         try:
             iv = np.linalg.pinv(mat_cov)
         except np.linalg.LinAlgError:
-            display(mat_cov)
+            print(mat_cov)
             raise np.linalg.LinAlgError
 
     e = np.ones([iv.shape[0], 1])
@@ -415,7 +438,12 @@ def MVP(X, normalize=False):
     return w
 
 
-def MVP_uc(X, w0=None, up_bound=1., low_bound=0.):
+def MVP_uc(
+    X: NDArray[np.float64],
+    w0: NDArray[np.float64] | None = None,
+    up_bound: float = 1.,
+    low_bound: float = 0.,
+) -> NDArray[np.float64]:
     r""" Get weights of the Minimum Variance Portfolio under constraints.
 
     Notes
@@ -478,7 +506,12 @@ def MVP_uc(X, w0=None, up_bound=1., low_bound=0.):
 # =========================================================================== #
 
 
-def MDP(X, w0=None, up_bound=1., low_bound=0.):
+def MDP(
+    X: NDArray[np.float64],
+    w0: NDArray[np.float64] | None = None,
+    up_bound: float = 1.,
+    low_bound: float = 0.,
+) -> NDArray[np.float64]:
     r""" Get weights of Maximum Diversified Portfolio allocation.
 
     Notes
@@ -549,7 +582,15 @@ def MDP(X, w0=None, up_bound=1., low_bound=0.):
 # =========================================================================== #
 
 
-def rolling_allocation(f, X, n=252, s=63, ret=True, drift=True, **kwargs):
+def rolling_allocation(
+    f: Callable[..., NDArray[np.float64]],
+    X: NDArray[np.float64],
+    n: int = 252,
+    s: int = 63,
+    ret: bool = True,
+    drift: bool = True,
+    **kwargs,
+) -> NDArray[np.float64]:
     r""" Roll an algorithm of portfolio allocation.
 
     Notes

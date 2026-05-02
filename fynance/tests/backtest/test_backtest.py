@@ -7,7 +7,6 @@ import pytest
 from fynance.backtest.loss import LossSeries
 from fynance.backtest.print_stats import set_text_stats
 
-
 # =========================================================================== #
 #                              LossSeries tests                                #
 # =========================================================================== #

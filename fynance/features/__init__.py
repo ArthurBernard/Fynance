@@ -26,6 +26,7 @@ features.
 # Cython imports
 # Python imports
 from . import (
+    filters,
     indicators,
     metrics,
     metrics_cy,
@@ -36,6 +37,7 @@ from . import (
     roll_functions_cy,
     scale,
 )
+from .filters import *
 from .indicators import *
 from .metrics import *
 from .metrics_cy import *
@@ -46,7 +48,8 @@ from .roll_functions import *
 from .roll_functions_cy import *
 from .scale import *
 
-__all__ = metrics_cy.__all__
+__all__ = filters.__all__
+__all__ += metrics_cy.__all__
 __all__ += metrics.__all__
 __all__ += momentums_cy.__all__
 __all__ += momentums.__all__

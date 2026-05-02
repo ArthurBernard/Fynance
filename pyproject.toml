@@ -67,11 +67,39 @@ testpaths = ["fynance"]
 [tool.ruff]
 target-version = "py310"
 line-length = 88
+exclude = ["*.pyx", "*.pxd", "setup.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]
 ignore = ["E501"]
 
+[tool.ruff.lint.per-file-ignores]
+"fynance/neural_networks/*.py" = ["F401", "F403", "F405", "W291", "W293"]
+"fynance/**/__init__.py" = ["F401", "F403", "F405"]
+"fynance/__init__.py" = ["F401", "F403", "F405"]
+# Dual Cython/Python files use star imports to pull Cython symbols
+"fynance/algorithms/browsers.py" = ["F403", "F405"]
+"fynance/features/metrics.py" = ["F403", "F405"]
+"fynance/features/momentums.py" = ["F403", "F405"]
+"fynance/features/roll_functions.py" = ["F403", "F405"]
+"fynance/features/scale.py" = ["F403", "F405"]
+"fynance/models/econometric_models.py" = ["F403", "F405"]
+
 [tool.mypy]
 python_version = "3.10"
 ignore_missing_imports = true
+warn_return_any = true
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = [
+  "fynance.features.metrics_cy",
+  "fynance.features.momentums_cy",
+  "fynance.features.roll_functions_cy",
+  "fynance.models.econometric_models_cy",
+]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["fynance"]
+ignore_errors = true
