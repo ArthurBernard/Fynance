@@ -12,7 +12,7 @@
 import numpy as np
 
 # Local packages
-from fynance.features.metrics import accuracy, sharpe, calmar
+from fynance.features.metrics import accuracy, calmar, sharpe
 
 __all__ = ['set_text_stats']
 

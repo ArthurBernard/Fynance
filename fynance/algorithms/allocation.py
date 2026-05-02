@@ -14,11 +14,12 @@
 import numpy as np
 import pandas as pd
 import scipy.cluster.hierarchy as sch
-from scipy.spatial.distance import squareform
 from scipy.optimize import Bounds, LinearConstraint, minimize
+from scipy.spatial.distance import squareform
 
 # Local packages
 from fynance.features.metrics import diversified_ratio
+
 from .rolling import _RollingMechanism
 
 # TODO : cython
@@ -142,20 +143,22 @@ def _get_quasi_diag(link):
 
     """
     link = link.astype(int)
-    sortIx = pd.Series([link[-1, 0], link[-1, 1]])
-    numItems = link[-1, 3]  # number of original items
+    numItems = link[-1, 3]  # number of original leaf items
+    # Use a plain list to avoid pandas dtype coercion issues
+    items = [int(link[-1, 0]), int(link[-1, 1])]
 
-    while sortIx.max() >= numItems:
-        sortIx.index = range(0, sortIx.shape[0] * 2, 2)  # make space
-        df0 = sortIx[sortIx >= numItems]  # find clusters
-        i, j = df0.index, df0.values - numItems
-        sortIx[i] = link[j, 0]  # item 1
-        df0 = pd.Series(link[j, 1], index=i + 1)
-        sortIx = sortIx.append(df0)  # item 2
-        sortIx = sortIx.sort_index()  # re-sort
-        sortIx.index = range(sortIx.shape[0])  # re-index
+    while max(items) >= numItems:
+        expanded = []
+        for item in items:
+            if item >= numItems:
+                cluster_idx = item - numItems
+                expanded.append(int(link[cluster_idx, 0]))
+                expanded.append(int(link[cluster_idx, 1]))
+            else:
+                expanded.append(item)
+        items = expanded
 
-    return sortIx.tolist()
+    return items
 
 
 def _get_rec_bisec(mat_cov, sortIx):
@@ -176,7 +179,7 @@ def _get_rec_bisec(mat_cov, sortIx):
        Weights.
 
     """
-    w = pd.Series(1, index=sortIx)
+    w = pd.Series(1.0, index=sortIx)
     cItems = [sortIx]  # initialize all items in one cluster
 
     while len(cItems) > 0:
@@ -521,7 +524,7 @@ def MDP(X, w0=None, up_bound=1., low_bound=0.):
 
     # Set function to minimze
     def f_max_divers_weights(w):
-        return - diversified_ratio(X, w=w).flatten()
+        return - diversified_ratio(X, W=w).flatten()
 
     # Set inital weights
     if w0 is None:

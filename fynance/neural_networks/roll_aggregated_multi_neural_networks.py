@@ -6,8 +6,8 @@
 # External packages
 import numpy as np
 from matplotlib import pyplot as plt
-# import seaborn as sns
 
+# import seaborn as sns
 # Internal packages
 from fynance.backtest.dynamic_plot_backtest import DynaPlotBackTest
 from fynance.neural_networks.roll_multi_neural_networks import RollMultiNeuralNet
@@ -96,10 +96,10 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
             self, y, X, NN, start=start, end=end, x_axis=x_axis
         )
         self.agg_y = np.zeros([self.T, 1])
-        
+
         return self
-        
-    
+
+
     def run(self, y, X, NN, plot_loss=True, plot_perf=True, x_axis=None):
         """ Train several rolling neural networks along pre-specified train 
         period and predict along test period. Display loss and performance 
@@ -141,7 +141,7 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
         # Start Rolling Neural Network
         for pred_train, pred_estim in self(y, X, NN, x_axis=x_axis):
             t, s, t_s = self.t, self.s, min(self.t + self.s, self.T)
-            
+
             # Set performances of training period
             returns = np.sign(pred_train) * y[t - s: t]
             cum_ret = np.exp(np.cumsum(returns, axis=0))
@@ -151,7 +151,7 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
             returns = np.sign(pred_estim) * y[t: t_s]
             cum_ret = np.exp(np.cumsum(returns, axis=0))
             self.perf_estim[t: t_s] = self.perf_estim[t - 1] * cum_ret
-            
+
             # Aggregate prediction
             self.aggregate(pred_estim, y[t: t_s], t=t, t_s=t_s)
             returns = np.sign(self.agg_y[t: t_s]) * y[t: t_s]
@@ -162,7 +162,7 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
             self._dynamic_plot(f, ax_loss=ax_loss, ax_perf=ax_perf)
 
         return self
-    
+
     def aggregate(self, mat_pred, y, t=0, t_s=-1):
         """ Method to aggregate predictions from several neural networks.
 
@@ -199,7 +199,7 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
             perfs = self.perf_estim[self.t]
             perf_list = []
             arg_list = []
-            for i in range(self.n_NN): 
+            for i in range(self.n_NN):
                 if len(perf_list) < 3:
                     perf_list += [perfs[i]]
                     arg_list += [i]
@@ -207,7 +207,7 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
                     j = np.argmin(perf_list)
                     perf_list[j] = perfs[i]
                     arg_list[j] = i
-                else: 
+                else:
                     pass
             y = mat_pred[:, arg_list[0]]
             y += mat_pred[:, arg_list[1]]
@@ -215,7 +215,7 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
             y /= 3
             return y
 
-    
+
     # TODO : Make method to customize aggregation function
     def set_aggregate(self, *args):
         """ Set your own aggregation method. 
@@ -251,27 +251,27 @@ class RollAggrMultiNeuralNet(RollMultiNeuralNet):
 
         """
         t, t_s = self.t, min(self.t + self.s, self.T)
-        
+
         dpbt = DynaPlotBackTest(
-            fig=f, ax=ax, title='Model performance', ylabel='Perf.', 
+            fig=f, ax=ax, title='Model performance', ylabel='Perf.',
             xlabel='Date', yscale='log',
             tick_params={'axis': 'x', 'rotation': 30, 'labelsize': 10}
         )
-        
+
         # Set graphs
         dpbt.plot(
-            self.perf_estim[: t_s], x=self.x_axis[: t_s],  
+            self.perf_estim[: t_s], x=self.x_axis[: t_s],
             names='Estim NN', col='GnBu', lw=1.7, unit='perf',
         )
         dpbt.plot(
-            self.perf_agg[: t_s], x=self.x_axis[: t_s], 
+            self.perf_agg[: t_s], x=self.x_axis[: t_s],
             names='Aggr NN', col='Reds', lw=2., unit='perf'
         )
         dpbt.plot(
-            self.perf_train[: t], x=self.x_axis[: t], 
+            self.perf_train[: t], x=self.x_axis[: t],
             names='Train NN', col='OrRd', lw=1.2, unit='perf'
         )
-        ax.legend(loc='upper left', ncol=2, fontsize=10, 
+        ax.legend(loc='upper left', ncol=2, fontsize=10,
             handlelength=0.8, columnspacing=0.5, frameon=True)
 
         return self

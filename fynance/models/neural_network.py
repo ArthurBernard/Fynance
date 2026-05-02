@@ -196,7 +196,7 @@ class BaseNeuralNet(torch.nn.Module):
 
         """
         if hasattr(self, 'N') and self.N != X.size(1):
-            raise ValueError('X must have {} input columns'.foramt(self.N))
+            raise ValueError('X must have {} input columns'.format(self.N))
 
         if hasattr(self, 'M') and self.M != y.size(1):
             raise ValueError('y must have {} output columns'.format(self.M))

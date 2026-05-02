@@ -13,9 +13,10 @@
 # Third party packages
 import numpy as np
 
+from fynance._wrappers import WrapperArray
+
 # Local packages
 from fynance.features.roll_functions_cy import *
-from fynance._wrappers import WrapperArray
 
 __all__ = ["roll_min", "roll_max"]
 

@@ -35,7 +35,7 @@ _wrappers   --- Fynance wrapper functions
 
 """
 
-from importlib.metadata import version, PackageNotFoundError
+from importlib.metadata import PackageNotFoundError, version
 
 try:
     __version__ = version("fynance")
@@ -44,12 +44,12 @@ except PackageNotFoundError:
 
 __all__ = ['__version__']
 
-from .models import *
+from .algorithms import *
+from .backtest import *
 from .estimator import *
 from .features import *
+from .models import *
 from .neural_networks import *
-from .backtest import *
-from .algorithms import *
 
 __all__ += models.__all__
 __all__ += estimator.__all__

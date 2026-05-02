@@ -16,8 +16,8 @@ import numpy as np
 
 # Local packages
 from fynance._wrappers import WrapperArray
-from fynance.features.momentums import _smstd, _emstd, _wmstd, _sma, _ema, _wma
 from fynance.features.metrics import roll_mad
+from fynance.features.momentums import _ema, _emstd, _sma, _smstd, _wma, _wmstd
 
 __all__ = [
     'bollinger_band', 'cci', 'hma', 'macd_hist', 'macd_line',

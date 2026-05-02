@@ -16,7 +16,6 @@ import numpy as np
 # Local packages
 from fynance.backtest.plot import PlotSeries
 
-
 # TODO : Inherits of methods and properties of numpy ndarray ?
 
 
