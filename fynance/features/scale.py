@@ -13,9 +13,10 @@
 # Third party packages
 import numpy as np
 
-# Local packages
-from fynance.features.roll_functions import roll_min, roll_max
 from fynance.features.momentums import *
+
+# Local packages
+from fynance.features.roll_functions import roll_max, roll_min
 
 __all__ = ["normalize", "roll_normalize", "roll_standardize", "Scale",
            "standardize"]

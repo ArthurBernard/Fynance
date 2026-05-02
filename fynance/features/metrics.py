@@ -14,11 +14,12 @@ from warnings import warn
 # External packages
 import numpy as np
 
+from fynance._exceptions import ArraySizeError
+
 # Internal packages
 from fynance._wrappers import WrapperArray
-from fynance._exceptions import ArraySizeError
 from fynance.features.metrics_cy import *
-from fynance.features.momentums import _sma, _ema, _wma, _smstd, _emstd, _wmstd
+from fynance.features.momentums import _ema, _emstd, _sma, _smstd, _wma, _wmstd
 
 # TODO:
 # - Append performance

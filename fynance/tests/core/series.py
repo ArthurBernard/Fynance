@@ -18,7 +18,6 @@ import pytest
 # Local packages
 from fynance.core.series import Series
 
-
 __all__ = []
 
 

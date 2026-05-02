@@ -16,14 +16,11 @@ Some tools to backtest strategies
 
 """
 
-from . import print_stats
-from .print_stats import *
-from . import plot_tools
-from .plot_tools import *
-from . import plot_backtest
-from .plot_backtest import *
-from . import dynamic_plot_backtest
+from . import dynamic_plot_backtest, plot_backtest, plot_tools, print_stats
 from .dynamic_plot_backtest import *
+from .plot_backtest import *
+from .plot_tools import *
+from .print_stats import *
 
 __all__ = print_stats.__all__
 __all__ += plot_tools.__all__

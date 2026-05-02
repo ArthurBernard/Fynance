@@ -14,10 +14,11 @@
 import numpy as np
 from scipy.optimize import fmin
 
-# Internal packages
-from fynance.models.econometric_models_cy import ARMA_GARCH_cy, ARMA_cy
+from fynance.estimator.estimator_cy import loglikelihood_cy, target_function_cy
 from fynance.models.econometric_models import get_parameters
-from fynance.estimator.estimator_cy import target_function_cy, loglikelihood_cy
+
+# Internal packages
+from fynance.models.econometric_models_cy import ARMA_cy, ARMA_GARCH_cy
 
 __all__ = ['estimation', 'target_function', 'loglikelihood']
 

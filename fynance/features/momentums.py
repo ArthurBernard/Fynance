@@ -13,9 +13,10 @@
 # External packages
 import numpy as np
 
+from fynance._wrappers import WrapperArray
+
 # Local packages
 from fynance.features.momentums_cy import *
-from fynance._wrappers import WrapperArray
 
 __all__ = [
     'sma', 'wma', 'ema', 'smstd', 'wmstd', 'emstd',
