@@ -2,10 +2,15 @@
 # coding: utf-8
 
 import numpy as np
-import pytest
 
 from fynance.features.indicators import (
-    bollinger_band, cci, hma, macd_hist, macd_line, rsi, signal_line,
+    bollinger_band,
+    cci,
+    hma,
+    macd_hist,
+    macd_line,
+    rsi,
+    signal_line,
 )
 
 N = 100

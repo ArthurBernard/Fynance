@@ -8,11 +8,14 @@
 
 """ Metric functions used for financial analysis. """
 
+from __future__ import annotations
+
 # Built-in packages
 from warnings import warn
 
 # External packages
 import numpy as np
+from numpy.typing import NDArray
 
 from fynance._exceptions import ArraySizeError
 
@@ -44,7 +47,7 @@ _handler_mstd = {'s': _smstd, 'w': _wmstd, 'e': _emstd}
 
 
 @WrapperArray('axis')
-def accuracy(y_true, y_pred, sign=True, axis=0):
+def accuracy(y_true: NDArray, y_pred: NDArray, sign: bool = True, axis: int = 0) -> float:
     r""" Compute the accuracy of prediction.
 
     Notes
@@ -98,7 +101,7 @@ def accuracy(y_true, y_pred, sign=True, axis=0):
 
 
 @WrapperArray('dtype', 'axis', 'ddof', min_size=2)
-def annual_return(X, period=252, axis=0, dtype=None, ddof=0):
+def annual_return(X: NDArray, period: int = 252, axis: int = 0, dtype=None, ddof: int = 0) -> NDArray:
     r""" Compute compouned annual returns of each `X`' series.
 
     The annualised return [1]_ is the process of converting returns on a whole
@@ -182,7 +185,7 @@ def _annual_return(X, period, ddof):
 
 
 @WrapperArray('dtype', 'axis', 'null', 'ddof', min_size=2)
-def annual_volatility(X, period=252, log=True, axis=0, dtype=None, ddof=0):
+def annual_volatility(X: NDArray, period: int = 252, log: bool = True, axis: int = 0, dtype=None, ddof: int = 0) -> NDArray:
     r""" Compute the annualized volatility of each `X`' series.
 
     In finance, volatility is the degree of variation of a trading price
@@ -260,7 +263,7 @@ def _annual_volatility(X, period, log, axis, ddof):
 
 
 @WrapperArray('dtype', 'axis', 'ddof', min_size=2)
-def calmar(X, period=252, axis=0, dtype=None, ddof=0):
+def calmar(X: NDArray, period: int = 252, axis: int = 0, dtype=None, ddof: int = 0) -> NDArray:
     r""" Compute the Calmar Ratio for each `X`' series.
 
     Notes
@@ -331,7 +334,7 @@ def calmar(X, period=252, axis=0, dtype=None, ddof=0):
 
 
 @WrapperArray('axis')
-def diversified_ratio(X, W=None, std_method='std', axis=0):
+def diversified_ratio(X: NDArray, W: NDArray | None = None, std_method: str = 'std', axis: int = 0) -> float:
     """ Compute diversification ratio of a portfolio.
 
     Notes
@@ -387,7 +390,7 @@ def diversified_ratio(X, W=None, std_method='std', axis=0):
 
 
 @WrapperArray('dtype', 'axis')
-def drawdown(X, raw=False, axis=0, dtype=None):
+def drawdown(X: NDArray, raw: bool = False, axis: int = 0, dtype=None) -> NDArray:
     r""" Measures the drawdown of each `X`' series.
 
     Function to compute measure of the decline from a historical peak in some
@@ -459,7 +462,7 @@ def _drawdown(X, raw):
 
 
 @WrapperArray('dtype')
-def mad(X, axis=0, dtype=None):
+def mad(X: NDArray, axis: int = 0, dtype=None) -> NDArray:
     """ Compute the Mean Absolute Deviation of each `X`' series.
 
     Compute the mean of the absolute value of the distance to the mean [6]_.
@@ -499,7 +502,7 @@ def mad(X, axis=0, dtype=None):
 
 
 @WrapperArray('dtype', 'axis')
-def mdd(X, raw=False, axis=0, dtype=None):
+def mdd(X: NDArray, raw: bool = False, axis: int = 0, dtype=None) -> NDArray:
     r""" Compute the maximum drawdown for each `X`' series.
 
     Drawdown (:func:~`fynance.features.metrics.drawdown`) is the measure of the
@@ -557,7 +560,7 @@ def mdd(X, raw=False, axis=0, dtype=None):
 
 
 @WrapperArray('dtype', 'axis')
-def perf_index(X, base=100., axis=0, dtype=None):
+def perf_index(X: NDArray, base: float = 100., axis: int = 0, dtype=None) -> NDArray:
     """ Compute performance of prices or index values along time axis.
 
     Parameters
@@ -592,7 +595,7 @@ def perf_index(X, base=100., axis=0, dtype=None):
 
 
 @WrapperArray('dtype', 'axis')
-def perf_returns(R, kind='raw', base=100., axis=0, dtype=None):
+def perf_returns(R: NDArray, kind: str = 'raw', base: float = 100., axis: int = 0, dtype=None) -> NDArray:
     """ Compute performance of returns along time axis.
 
     Parameters
@@ -641,14 +644,14 @@ def perf_returns(R, kind='raw', base=100., axis=0, dtype=None):
 
     else:
 
-        raise ValueError("unkwnown kind {} of returns, only {'raw', 'log',"
+        raise ValueError("unkwnown kind {} of returns, only {'raw', 'log',"  # noqa: F524
                          "'pct'} are supported".format(kind))
 
     return perf_index(X, base=base, axis=axis, dtype=dtype)
 
 
 @WrapperArray('dtype', 'axis')
-def perf_strat(X, S=None, base=100., axis=0, dtype=None, reinvest=False):
+def perf_strat(X: NDArray, S: NDArray | None = None, base: float = 100., axis: int = 0, dtype=None, reinvest: bool = False) -> NDArray:
     """ Compute the performance of strategies for each `X`' series.
 
     With respect to this underlying and signal series along time axis.
@@ -720,7 +723,7 @@ def perf_strat(X, S=None, base=100., axis=0, dtype=None, reinvest=False):
 
 
 @WrapperArray('dtype', 'axis')
-def returns_strat(X, S=None, kind='pct', base=100., axis=0, dtype=None):
+def returns_strat(X: NDArray, S: NDArray | None = None, kind: str = 'pct', base: float = 100., axis: int = 0, dtype=None) -> NDArray:
     r""" Compute the returns of strategies for each `X`' series.
 
     With respect to this underlying and signal series along time axis.
@@ -793,7 +796,7 @@ def returns_strat(X, S=None, kind='pct', base=100., axis=0, dtype=None):
 
 
 @WrapperArray('dtype', 'axis', 'null', 'ddof', min_size=2)
-def sharpe(X, rf=0, period=252, log=False, axis=0, dtype=None, ddof=0):
+def sharpe(X: NDArray, rf: float = 0, period: int = 252, log: bool = False, axis: int = 0, dtype=None, ddof: int = 0) -> NDArray:
     r""" Compute the Sharpe ratio for each `X`' series.
 
     Notes
@@ -869,7 +872,7 @@ def sharpe(X, rf=0, period=252, log=False, axis=0, dtype=None, ddof=0):
 
 
 @WrapperArray('dtype', 'axis', 'window')
-def z_score(X, w=0, kind='s', axis=0, dtype=None):
+def z_score(X: NDArray, w: int = 0, kind: str = 's', axis: int = 0, dtype=None) -> NDArray:
     r""" Compute the Z-score of each `X`' series.
 
     Notes
@@ -944,7 +947,7 @@ def z_score(X, w=0, kind='s', axis=0, dtype=None):
 
 
 @WrapperArray('dtype', 'axis', 'window', 'ddof', min_size=2)
-def roll_annual_return(X, period=252, w=None, axis=0, dtype=None, ddof=0):
+def roll_annual_return(X: NDArray, period: int = 252, w: int | None = None, axis: int = 0, dtype=None, ddof: int = 0) -> NDArray:
     r""" Compute rolling compouned annual returns of each `X`' series.
 
     The annualised return [1]_ is the process of converting returns on a whole
@@ -1029,8 +1032,10 @@ def _roll_annual_return(X, period, w, ddof):
 
 
 @WrapperArray('dtype', 'axis', 'null', 'window', 'ddof', min_size=3)
-def roll_annual_volatility(X, period=252, log=True, w=None, axis=0,
-                           dtype=None, ddof=0):
+def roll_annual_volatility(
+    X: NDArray, period: int = 252, log: bool = True, w: int | None = None,
+    axis: int = 0, dtype=None, ddof: int = 0,
+) -> NDArray:
     r""" Compute the annualized volatility of each `X`' series.
 
     In finance, volatility is the degree of variation of a trading price
@@ -1125,7 +1130,7 @@ def _roll_annual_volatility(X, period, log, w, axis, ddof):
 
 
 @WrapperArray('dtype', 'axis', 'window', 'ddof', min_size=2)
-def roll_calmar(X, period=252., w=None, axis=0, dtype=None, ddof=0):
+def roll_calmar(X: NDArray, period: float = 252., w: int | None = None, axis: int = 0, dtype=None, ddof: int = 0) -> NDArray:
     r""" Compute the rolling Calmar ratio of each `X`' series.
 
     Notes
@@ -1196,7 +1201,7 @@ def roll_calmar(X, period=252., w=None, axis=0, dtype=None, ddof=0):
 
 
 @WrapperArray('dtype', 'axis', 'window')
-def roll_drawdown(X, w=None, raw=False, axis=0, dtype=None):
+def roll_drawdown(X: NDArray, w: int | None = None, raw: bool = False, axis: int = 0, dtype=None) -> NDArray:
     r""" Measures the rolling drawdown of each `X`' series.
 
     Function to compute measure of the decline from a historical peak in some
@@ -1275,7 +1280,7 @@ def _roll_drawdown(X, w, raw):
 
 
 @WrapperArray('dtype', 'axis', 'window')
-def roll_mad(X, w=None, axis=0, dtype=None):
+def roll_mad(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDArray:
     """ Compute rolling Mean Absolut Deviation for each `X`' series.
 
     Compute the moving average of the absolute value of the distance to the
@@ -1327,7 +1332,7 @@ def roll_mad(X, w=None, axis=0, dtype=None):
 
 
 @WrapperArray('dtype', 'axis', 'window')
-def roll_mdd(X, w=None, raw=False, axis=0, dtype=None):
+def roll_mdd(X: NDArray, w: int | None = None, raw: bool = False, axis: int = 0, dtype=None) -> NDArray:
     """ Compute the rolling maximum drawdown for each `X`' series.
 
     Where drawdown is the measure of the decline from a historical peak in
@@ -1387,8 +1392,10 @@ def _roll_mdd(X, w, raw):
 
 
 @WrapperArray('dtype', 'axis', 'window', 'ddof', min_size=2)
-def roll_sharpe(X, rf=0, period=252, w=None, log=False, axis=0, dtype=None,
-                ddof=0):
+def roll_sharpe(
+    X: NDArray, rf: float = 0, period: int = 252, w: int | None = None,
+    log: bool = False, axis: int = 0, dtype=None, ddof: int = 0,
+) -> NDArray:
     r""" Compute rolling sharpe ratio of each `X`' series.
 
     Notes
@@ -1477,7 +1484,7 @@ def roll_sharpe(X, rf=0, period=252, w=None, log=False, axis=0, dtype=None,
 
 
 @WrapperArray('dtype', 'axis', 'window')
-def roll_z_score(X, w=None, kind='s', axis=0, dtype=None):
+def roll_z_score(X: NDArray, w: int | None = None, kind: str = 's', axis: int = 0, dtype=None) -> NDArray:
     r""" Compute vector of rolling/moving Z-score function.
 
     Notes

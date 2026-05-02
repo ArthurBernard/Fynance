@@ -582,7 +582,7 @@ class _BacktestNeuralNet:
     dyna_plots = {}
 
     def set_dyna_plot(self, name, klass, ax, **kwargs):
-        dyna_plots[name] = klass(self.f,  ax, **kwargs)
+        dyna_plots[name] = klass(self.f,  ax, **kwargs)  # noqa: F821
 
     def set_fig_and_axes(self, n_rows, n_cols, figsize):
         self.f, self.axes = plt.subplots(n_rows, n_cols, figsize=figsize)
