@@ -12,8 +12,10 @@
 
 .. toctree::
 
+    models.attention
     models.econometric_models
     models.neural_network
+    models.recurrent_neural_network
     models.rolling
 
 """
@@ -23,16 +25,19 @@ from . import (
     econometric_models,
     econometric_models_cy,
     neural_network,
+    recurrent_neural_network,
     rolling,
 )
 from .attention import *
 from .econometric_models import *
 from .econometric_models_cy import *
 from .neural_network import *
+from .recurrent_neural_network import *
 from .rolling import *
 
 __all__ = econometric_models.__all__
 __all__ += econometric_models_cy.__all__
 __all__ += neural_network.__all__
+__all__ += recurrent_neural_network.__all__
 __all__ += rolling.__all__
 __all__ += attention.__all__

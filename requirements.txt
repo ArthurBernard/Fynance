@@ -1,7 +1,8 @@
 # Runtime dependencies — authoritative versions are defined in pyproject.toml.
 # This file is kept for legacy compatibility (e.g. pip install -r requirements.txt).
 matplotlib>=3.7
-numpy>=1.26
+numba>=0.59
+numpy>=2.0
 pandas>=2.0
 scipy>=1.11
 seaborn>=0.12

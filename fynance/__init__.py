@@ -23,6 +23,7 @@ Subpackages
 -----------
 algorithms      --- Financial algorithms
 backtest        --- Backtest strategy tools
+estimator       --- Parameter estimation (Cython ARMA/GARCH)
 features        --- Features extraction
 models          --- Econometric and Neural Network models (using PyTorch)
 
