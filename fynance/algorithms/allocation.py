@@ -115,7 +115,7 @@ def ERC(
 # =========================================================================== #
 
 
-def _get_quasi_diag(link):
+def _get_quasi_diag(link: NDArray[np.float64]) -> list[int]:
     """ Compute quasi diagonal matrix.
 
     TODO : verify the efficiency
@@ -152,7 +152,7 @@ def _get_quasi_diag(link):
     return items
 
 
-def _get_rec_bisec(mat_cov, sortIx):
+def _get_rec_bisec(mat_cov: NDArray[np.float64], sortIx: list[int]) -> NDArray[np.float64]:
     """ Compute weights via recursive bisection.
 
     Parameters
@@ -192,7 +192,7 @@ def _get_rec_bisec(mat_cov, sortIx):
     return w
 
 
-def _get_cluster(mat_cov, cItems):
+def _get_cluster(mat_cov: NDArray[np.float64], cItems: list[int]) -> float:
     """ Compute cluster for variance.
 
     Parameters
@@ -215,18 +215,18 @@ def _get_cluster(mat_cov, cItems):
     return float(cVar.item())
 
 
-def _get_IVP(mat_cov):
+def _get_IVP(mat_cov: NDArray[np.float64]) -> NDArray[np.float64]:
     """ Compute the inverse-variance matrix.
 
     Parameters
     ----------
-    mat_cov : array_like
+    mat_cov : NDArray[np.float64]
         Variance-covariance matrix.
 
     Returns
     -------
-    pd.DataFrame
-        Matrix of inverse-variance.
+    NDArray[np.float64]
+        Inverse-variance weights.
 
     """
     ivp = 1. / np.diag(mat_cov)
@@ -664,7 +664,7 @@ def rolling_allocation(
 # =========================================================================== #
 
 
-def _perf_alloc(X, w, drift=True):
+def _perf_alloc(X: NDArray[np.float64], w: NDArray[np.float64], drift: bool = True) -> NDArray[np.float64]:
     # Compute portfolio performance following specified weights
     if w.ndim == 1 and not isinstance(w, pd.Series):
         w = w.reshape([w.size, 1])
@@ -678,7 +678,7 @@ def _perf_alloc(X, w, drift=True):
     return np.cumprod(perf @ w + 1)
 
 
-def _normalize(w, low_bound=0., up_bound=1., sum_w=1., max_iter=1000):
+def _normalize(w: NDArray[np.float64], low_bound: float = 0., up_bound: float = 1., sum_w: float = 1., max_iter: int = 1000) -> NDArray[np.float64]:
     # Iterative algorithm to set bounds
     if up_bound < sum_w / w.size or low_bound > sum_w / w.size:
 
