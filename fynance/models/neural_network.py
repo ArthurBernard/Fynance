@@ -353,13 +353,6 @@ class MultiLayerPerceptron(BaseNeuralNet):
     f : torch.nn.Module
         Activation function.
 
-    Methods
-    -------
-    set_optimizer
-    train_on
-    predict
-    set_data
-
     See Also
     --------
     BaseNeuralNet, RollMultiLayerPerceptron

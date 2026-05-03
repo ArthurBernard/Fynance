@@ -1,5 +1,5 @@
-fynance\.features\.scale\.normalize
-===================================
+﻿fynance.features.scale.normalize
+================================
 
 .. currentmodule:: fynance.features.scale
 

@@ -85,6 +85,14 @@ intersphinx_mapping = {
 autosummary_generate = True
 
 # --------------------------------------------------------------------------- #
+#                              Numpydoc config                                #
+# --------------------------------------------------------------------------- #
+
+# Let the class.rst template handle method tables; disable numpydoc's auto-
+# generated tables to avoid stub-file warnings for inherited PyTorch members.
+numpydoc_show_class_members = False
+
+# --------------------------------------------------------------------------- #
 #                               Autodoc config                                #
 # --------------------------------------------------------------------------- #
 

@@ -1,4 +1,4 @@
-fynance.features.scale.Scale
+﻿fynance.features.scale.Scale
 ============================
 
 .. currentmodule:: fynance.features.scale
@@ -7,19 +7,37 @@ fynance.features.scale.Scale
    :no-members:
    :no-inherited-members:
    :no-special-members:
+   :show-inheritance:
 
-  
-   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
-      .. autosummary::
-         :toctree:
-      
-         Scale.__call__
-         Scale.fit
-         Scale.revert
-         Scale.scale
-      
-  
 
-  
-  
-  
+
+
+
+.. rubric:: Methods
+
+.. autosummary::
+   :toctree:
+   :nosignatures:
+
+   
+   Scale.fit
+   Scale.revert
+   Scale.scale
+   
+   Scale.__call__
+
+
+
+
+
+
+.. rubric:: Attributes
+
+.. autosummary::
+   :toctree:
+
+   
+   Scale.handle_func
+   Scale.handle_params
+   Scale.handle_revert
+

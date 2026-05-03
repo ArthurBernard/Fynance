@@ -335,10 +335,7 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
     Methods
     -------
     set_roll_period
-    run
     sub_predict
-    get_stats
-    plot_loss
 
     """
 

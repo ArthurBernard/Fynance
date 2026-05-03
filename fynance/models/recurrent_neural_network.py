@@ -37,14 +37,6 @@ class _RecurrentNeuralNetwork(BaseNeuralNet):
     hidden_state_size : int, optional
         Size of hidden states, default is the same size than input.
 
-    Methods
-    -------
-    __call__
-    set_optimizer
-    train_on
-    predict
-    set_data
-
     Attributes
     ----------
     criterion : torch.nn.modules.loss
@@ -227,14 +219,6 @@ class RecurrentNeuralNetwork(_ForwardLayer, _RecurrentNeuralNetwork):
     hidden_state_size : int, optional
         Size of hidden states, default is the same size than input.
 
-    Methods
-    -------
-    __call__
-    set_optimizer
-    train_on
-    predict
-    set_data
-
     Attributes
     ----------
     criterion : torch.nn.modules.loss
@@ -311,14 +295,6 @@ class _GatedRecurrentUnit(_RecurrentNeuralNetwork):
         Activation functions for reset and update gate, default are both
         Sigmoid function.
 
-    Methods
-    -------
-    __call__
-    set_optimizer
-    train_on
-    predict
-    set_data
-
     Attributes
     ----------
     criterion : torch.nn.modules.loss
@@ -394,14 +370,6 @@ class GatedRecurrentUnit(_ForwardLayer, _GatedRecurrentUnit):
     reset_activation, updated_activation : torch.nn.Module, optional
         Activation functions for reset and update gate, default are both
         Sigmoid function.
-
-    Methods
-    -------
-    __call__
-    set_optimizer
-    train_on
-    predict
-    set_data
 
     Attributes
     ----------
@@ -490,11 +458,8 @@ class _LongShortTermMemory(_RecurrentNeuralNetwork):
 
     Methods
     -------
-    __call__
-    set_optimizer
     train_on
     predict
-    set_data
 
     Attributes
     ----------
@@ -605,11 +570,8 @@ class LongShortTermMemory(_ForwardLayer, _LongShortTermMemory):
 
     Methods
     -------
-    __call__
-    set_optimizer
     train_on
     predict
-    set_data
 
     Attributes
     ----------

@@ -7,32 +7,41 @@
    :no-members:
    :no-inherited-members:
    :no-special-members:
+   :show-inheritance:
 
-  {% block methods %}
-   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
-      .. autosummary::
-         :toctree:
-      {% for item in all_methods %}
-         {%- if not item.startswith('_') or item in ['__call__', '__mul__', '__getitem__', '__len__'] %}
-         {{ name }}.{{ item }}
-         {%- endif -%}
-      {%- endfor %}
-      {% for item in inherited_members %}
-         {%- if item in ['__call__', '__mul__', '__getitem__', '__len__'] %}
-         {{ name }}.{{ item }}
-         {%- endif -%}
-      {%- endfor %}
-  {% endblock %}
+{% block methods %}
+{% set own_public = methods | reject('in', inherited_members) | list %}
+{% set own_dunders = all_methods | select('in', ['__call__', '__len__', '__getitem__', '__mul__']) | reject('in', inherited_members) | list %}
+{% if own_public or own_dunders %}
+.. rubric:: Methods
 
-  {% block attributes %}
-  {% if attributes %}
-   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
-      .. autosummary::
-         :toctree:
-      {% for item in all_attributes %}
-         {%- if not item.startswith('_') %}
-         {{ name }}.{{ item }}
-         {%- endif -%}
-      {%- endfor %}
-  {% endif %}
-  {% endblock %}
+.. autosummary::
+   :toctree:
+   :nosignatures:
+
+   {% for item in own_public %}
+   {%- if item != '__init__' %}
+   {{ name }}.{{ item }}
+   {%- endif -%}
+   {%- endfor %}
+   {% for item in own_dunders %}
+   {{ name }}.{{ item }}
+   {%- endfor %}
+{% endif %}
+{% endblock %}
+
+{% block attributes %}
+{% set own_attrs = attributes | reject('in', inherited_members) | list %}
+{% if own_attrs %}
+.. rubric:: Attributes
+
+.. autosummary::
+   :toctree:
+
+   {% for item in own_attrs %}
+   {%- if not item.startswith('_') %}
+   {{ name }}.{{ item }}
+   {%- endif -%}
+   {%- endfor %}
+{% endif %}
+{% endblock %}

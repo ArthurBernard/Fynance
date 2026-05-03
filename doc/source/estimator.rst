@@ -2,9 +2,8 @@
 Estimator
 *********
 
-Cython implementation of ARMA/GARCH parameter estimation. This module is internal and not intended to be used directly — access it via :func:`fynance.models.econometric_models.get_parameters`.
+Internal Cython module implementing ARMA/GARCH parameter estimation via maximum likelihood.
 
-.. currentmodule:: fynance.estimator
-
-.. automodule:: fynance.estimator
-   :no-members:
+This module is not part of the public API and is not intended to be used directly.
+The public entry point is :func:`~fynance.models.econometric_models.get_parameters`,
+documented under :doc:`models.econometric_models`.
