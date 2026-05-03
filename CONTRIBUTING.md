@@ -44,6 +44,28 @@ chore: migrate setup.py metadata to pyproject.toml
 docs: add Git Flow section to CONTRIBUTING.md
 ```
 
+## Architecture
+
+| Subpackage | Description | Policy |
+|---|---|---|
+| `fynance.features` | Metrics, indicators, filters (Cython + Python) | Extend only — never rewrite Cython |
+| `fynance.algorithms` | Portfolio allocation (HRP, MVP, ERC, IVP, MDP) | Stable public API — deprecation path required |
+| `fynance.models` | PyTorch neural networks (MLP, GRU, LSTM, Transformer) | Modernize freely |
+| `fynance.backtest` | Performance evaluation, loss series | Improve freely |
+| `fynance.estimator` | Cython ARMA/GARCH parameter estimation | Do not duplicate in Python layer |
+
+## Code conventions
+
+**Numerical code:** new performance-critical functions go in the `.py` file using Numba `@njit`. Do not add new Cython files — Cython is only for wrapping C libraries.
+
+**ML:** PyTorch only. Do not extend the legacy Keras/TensorFlow code.
+
+**Type annotations:** all public APIs must be annotated. Use `numpy.typing.NDArray[np.float64]` for array arguments and return types.
+
+**Comments:** only when the *why* is non-obvious (a hidden constraint, a workaround, a subtle invariant). Do not describe what the code does.
+
+**Docstring examples:** must be correct and runnable — the test suite runs them via `--doctest-modules`.
+
 ## Running tests
 
 ```bash
@@ -57,7 +79,7 @@ pytest fynance/tests/features/test_metrics.py -v
 pytest --cov=fynance --cov-report=term-missing
 ```
 
-Tests must pass before opening a PR. No lookahead bias in time-series tests.
+Tests must pass before opening a PR. No lookahead bias in time-series tests (no shuffling, no future data leaking into training windows).
 
 ## Cython extensions
 
@@ -78,7 +100,7 @@ ruff check fynance/
 ## Release process (maintainer only)
 
 1. All planned features merged into `develop`, CI green.
-2. Bump version in `pyproject.toml` and `fynance/version.py`.
+2. Bump version in `pyproject.toml`.
 3. Update `CHANGELOG.md`.
 4. Open PR `develop` → `master`.
 5. After merge: `git tag vX.Y.Z && git push origin vX.Y.Z`.
