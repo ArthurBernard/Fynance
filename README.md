@@ -3,11 +3,10 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/fynance)
 [![PyPI](https://img.shields.io/pypi/v/fynance.svg)](https://pypi.org/project/fynance/)
 [![Status](https://img.shields.io/pypi/status/fynance.svg?colorB=blue)](https://pypi.org/project/fynance/)
-[![Build Status](https://travis-ci.org/ArthurBernard/Fynance.svg?branch=master)](https://travis-ci.org/ArthurBernard/Fynance)
+[![CI](https://github.com/ArthurBernard/Fynance/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/ArthurBernard/Fynance/actions/workflows/ci.yml)
 [![license](https://img.shields.io/github/license/ArthurBernard/fynance.svg)](https://github.com/ArthurBernard/Fynance/blob/master/LICENSE.txt)
 [![Downloads](https://pepy.tech/badge/fynance)](https://pepy.tech/project/fynance)
 [![Documentation Status](https://readthedocs.org/projects/fynance/badge/?version=latest)](https://fynance.readthedocs.io/en/latest/?badge=latest)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/ArthurBernard/Fynance.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ArthurBernard/Fynance/context:python)
 
 - **Documentation**: http://fynance.readthedocs.io/en/latest/index.html
 - **Source code**: http://github.com/ArthurBernard/Fynance
@@ -39,9 +38,6 @@ The ``fynance`` package contains currently five subpackages:
     - **Neural network models** with **PyTorch** (e.g. MultiLayerPerceptron, etc.).
     - **Rolling objects** for models, currently work only with neural network models (e.g. \_RollingBasis, RollMultiLayerPerceptron, etc.).
 
-- **Neural networks** (``fynance.neural_networks``) with **Keras** (backend **Tensorflow** or **Theano**) contains:
-    - Rolling neural network models.
-
 Please refer you to the [documentation](https://fynance.readthedocs.io/en/latest/index.html) to see more details on different tools available in `fynance` package. Documentation contains some descriptions and examples for functions, classes and methods.    
 
 ## Installation
@@ -54,13 +50,11 @@ $ pip install fynance
 
 ### From source (GitHub)
 
-If you want to compile ``fynance`` package from cython files you must set ``USE_CYTHON=True`` in ``setup.py`` file. Otherwise set it to ``USE_CYTHON=False``. By default ``USE_CYTHON='auto'``.
-
 ```bash
-$ git clone https://github.com/ArthurBernard/Fynance.git    
-$ cd Fynance   
-$ python setup.py build_ext --inplace    
-$ python setup.py install --user   
+$ git clone https://github.com/ArthurBernard/Fynance.git
+$ cd Fynance
+$ pip install -e ".[dev]"
+$ python setup.py build_ext --inplace
 ```
 
 ## Demo

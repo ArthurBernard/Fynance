@@ -76,7 +76,6 @@ select = ["E", "F", "W", "I"]
 ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
-"fynance/neural_networks/*.py" = ["F401", "F403", "F405", "W291", "W293"]
 "fynance/**/__init__.py" = ["F401", "F403", "F405"]
 "fynance/__init__.py" = ["F401", "F403", "F405"]
 # Dual Cython/Python files use star imports to pull Cython symbols

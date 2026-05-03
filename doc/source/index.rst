@@ -34,9 +34,6 @@ The ``fynance`` package contains currently five subpackages:
    - **Neural network models** with **PyTorch** (e.g. :func:`~fynance.models.neural_network.MultiLayerPerceptron`, etc.).
    - **Rolling objects** for models, currently work only with neural network models (e.g. :func:`~fynance.models.rolling._RollingBasis`, :func:`~fynance.models.rolling.RollMultiLayerPerceptron`, etc.).
 
-- **Neural networks** (:mod:`fynance.neural_networks`) with **Keras** (backend **Tensorflow** or **Theano**).
-   - Rolling neural network models.
-
 --------------
  Installation 
 --------------
@@ -51,14 +48,12 @@ From PyPI
 From source (GitHub)
 ====================
 
-If you want to compile ``fynance`` package from cython files you must set ``USE_CYTHON=True`` in ``setup.py`` file. Otherwise set it to ``USE_CYTHON=False``. By default ``USE_CYTHON='auto'``.
-
 .. code-block:: console
 
    $ git clone https://github.com/ArthurBernard/Fynance.git
    $ cd Fynance
+   $ pip install -e ".[dev]"
    $ python setup.py build_ext --inplace
-   $ python setup.py install --user
 
 ----------
  Contents 
@@ -71,4 +66,3 @@ If you want to compile ``fynance`` package from cython files you must set ``USE_
    backtest
    features
    models
-   neural_networks
