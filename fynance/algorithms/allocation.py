@@ -115,23 +115,6 @@ def ERC(
 # =========================================================================== #
 
 
-def _corr_dist(mat_corr):
-    """ Compute a distance matrix based on correlation.
-
-    Parameters
-    ----------
-    mat_corr: np.ndarray[ndim=2, dtype=float] or pd.DataFrame
-        Matrix correlation.
-
-    Returns
-    -------
-    mat_dist_corr: np.ndarray[ndim=2, dtype=float] or pd.DataFrame
-        Matrix distance correlation.
-
-    """
-    return ((1 - mat_corr) / 2.) ** 0.5
-
-
 def _get_quasi_diag(link):
     """ Compute quasi diagonal matrix.
 
@@ -298,11 +281,9 @@ def HRP(
     outer_diag = np.outer(diag_cov, diag_cov)
     with np.errstate(invalid='ignore', divide='ignore'):
         mat_corr = np.divide(mat_cov, outer_diag)
-        mat_corr = np.where(np.isnan(mat_corr) | np.isinf(mat_corr), 0.0, mat_corr)
+    mat_corr = np.clip(np.nan_to_num(mat_corr, nan=0.0, posinf=0.0, neginf=0.0), -1.0, 1.0)
 
-    with np.errstate(invalid='ignore'):
-        mat_dist = ((1.0 - mat_corr) / 2.0) ** 0.5
-        mat_dist = np.where(np.isnan(mat_dist), 0.0, mat_dist)
+    mat_dist = ((1.0 - mat_corr) / 2.0) ** 0.5
 
     mat_dist_upper = mat_dist[np.triu_indices(N, k=1)]
     link = sch.linkage(mat_dist_upper, method=method, metric=metric)

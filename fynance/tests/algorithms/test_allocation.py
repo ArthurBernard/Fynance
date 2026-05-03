@@ -154,9 +154,3 @@ def test_hrp_correlated(correlated_returns):
     w = HRP(correlated_returns)
     assert w.shape == (N, 1)
     assert abs(w.sum() - 1.0) < 1e-6
-
-
-@pytest.mark.benchmark(group="hrp")
-def test_hrp_benchmark(benchmark, returns):
-    """ Benchmark HRP allocation on 200 timesteps, 5 assets. """
-    benchmark(HRP, returns)
