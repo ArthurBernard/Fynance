@@ -157,7 +157,7 @@ class _RecurrentNeuralNetwork(BaseNeuralNet):
 class _ForwardLayer:
     def __init__(self, forward_activation=nn.Softmax):
         self.W_y = nn.Linear(self.H, self.M)
-        self.f_y = forward_activation()
+        self.f_y = nn.Softmax(dim=-1) if forward_activation is nn.Softmax else forward_activation()
 
     @torch.enable_grad()
     def train_on(self, X: torch.Tensor, y: torch.Tensor, H: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
