@@ -14,10 +14,10 @@ Scale functions
 .. autosummary::
    :toctree: generated/
 
-   fynance.features.scale.normalize
-   fynance.features.scale.standardize
-   fynance.features.scale.roll_normalize
-   fynance.features.scale.roll_standardize
+   normalize
+   standardize
+   roll_normalize
+   roll_standardize
 
 Scale object
 ============
@@ -25,4 +25,4 @@ Scale object
 .. autosummary::
    :toctree: generated/
 
-   fynance.features.scale.Scale
+   Scale

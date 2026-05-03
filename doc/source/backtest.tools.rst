@@ -4,10 +4,13 @@ Backtesting tools
 
 Some tools to display strategy's performances, rolling sharpe or drawdowns and other some metrics and statistics.
 
+.. currentmodule:: fynance.backtest
+
 Tools
 =====
 
 .. autosummary::
+   :toctree: generated/
 
-   fynance.backtest.display_perf
-   fynance.backtest.set_text_stats
+   display_perf
+   set_text_stats

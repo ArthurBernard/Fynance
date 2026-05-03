@@ -13,7 +13,7 @@ Currently the project is always at a **beta level**. But some parts of the proje
  Presentation 
 --------------
 
-The ``fynance`` package contains currently five subpackages:
+The ``fynance`` package contains six subpackages:
 
 - **Algorithms** (:mod:`fynance.algorithms`) contains:
    - **Portfolio allocations** (e.g. :func:`~fynance.algorithms.allocation.ERC`, :func:`~fynance.algorithms.allocation.HRP`, :func:`~fynance.algorithms.allocation.IVP`, :func:`~fynance.algorithms.allocation.MDP`, :func:`~fynance.algorithms.allocation.MVP`, etc.).
@@ -22,17 +22,20 @@ The ``fynance`` package contains currently five subpackages:
 - **Backtesting** objects (:mod:`fynance.backtest`).
    - Module to plot profit and loss, and measure of performance.
 
+- **Estimator** (:mod:`fynance.estimator`): Cython ARMA/GARCH parameter estimation, exposed via :mod:`fynance.models.econometric_models`.
+
 - **Feature** tools (:mod:`fynance.features`) contains:
-   - **Financial indicators** (e.g. :func:`~fynance.features.indicators.bollinger_band`, :func:`~fynance.features.indicators.cci`, :func:`~fynance.features.indicators.hma`, :func:`~fynance.features.indicators.macd_hist`, :func:`~fynance.features.indicators.macd_line`, :func:`~fynance.features.indicators.rsi`, etc.).
-   - **Statistical momentums** (e.g. :func:`~fynance.features.momentums.sma`, :func:`~fynance.features.momentums.ema`, :func:`~fynance.features.momentums.wma`, :func:`~fynance.features.momentums.smstd`, :func:`~fynance.features.momentums.emstd` :func:`~fynance.features.momentums.wmstd`, etc.).
-   - **Metrics** (e.g. :func:`~fynance.features.metrics.annual_return`, :func:`~fynance.features.metrics.annual_volatility`, :func:`~fynance.features.metrics.calmar`, :func:`~fynance.features.metrics.diversified_ratio`, :func:`~fynance.features.metrics.mdd`, :func:`~fynance.features.metrics.sharpe`, :func:`~fynance.features.metrics.z_score`, etc.).
-   - **Scale** (e.g. :func:`~fynance.features.scale.Scale`, :func:`~fynance.features.scale.normalize`, :func:`~fynance.features.scale.standardize`, :func:`~fynance.features.scale.roll_normalize`, :func:`~fynance.features.scale.roll_standardize`, etc.).
+   - **Kalman filter** and RTS smoother (e.g. :func:`~fynance.features.filters.kalman_filter`, :func:`~fynance.features.filters.rts_smoother`, :func:`~fynance.features.filters.fit_kalman`).
+   - **Financial indicators** (e.g. :func:`~fynance.features.indicators.bollinger_band`, :func:`~fynance.features.indicators.cci`, :func:`~fynance.features.indicators.hma`, :func:`~fynance.features.indicators.macd_hist`, :func:`~fynance.features.indicators.rsi`, etc.).
+   - **Statistical momentums** (e.g. :func:`~fynance.features.momentums.sma`, :func:`~fynance.features.momentums.ema`, :func:`~fynance.features.momentums.wma`, etc.).
+   - **Metrics** (e.g. :func:`~fynance.features.metrics.annual_return`, :func:`~fynance.features.metrics.sharpe`, :func:`~fynance.features.metrics.mdd`, etc.).
+   - **Scale** (e.g. :func:`~fynance.features.scale.normalize`, :func:`~fynance.features.scale.standardize`, etc.).
    - **Rolling functions** (e.g. :func:`~fynance.features.roll_functions.roll_min`, :func:`~fynance.features.roll_functions.roll_max`).
 
 - **Time-series models** (:mod:`fynance.models`) contains:
-   - **Econometric models** (e.g. :func:`~fynance.models.econometric_models.MA`, :func:`~fynance.models.econometric_models.ARMA`, :func:`~fynance.models.econometric_models.ARMA_GARCH` and :func:`~fynance.models.econometric_models.ARMAX_GARCH`, etc.).
-   - **Neural network models** with **PyTorch** (e.g. :func:`~fynance.models.neural_network.MultiLayerPerceptron`, etc.).
-   - **Rolling objects** for models, currently work only with neural network models (e.g. :func:`~fynance.models.rolling._RollingBasis`, :func:`~fynance.models.rolling.RollMultiLayerPerceptron`, etc.).
+   - **Econometric models** (e.g. :func:`~fynance.models.econometric_models.MA`, :func:`~fynance.models.econometric_models.ARMA`, :func:`~fynance.models.econometric_models.ARMA_GARCH`, etc.).
+   - **Neural network models** with **PyTorch**: MLP, RNN, GRU, LSTM, MultiHeadAttention.
+   - **Rolling walk-forward** evaluation (e.g. :func:`~fynance.models.rolling.RollMultiLayerPerceptron`).
 
 --------------
  Installation 
@@ -64,5 +67,6 @@ From source (GitHub)
 
    algorithms
    backtest
+   estimator
    features
    models

@@ -15,6 +15,7 @@ features.
    :maxdepth: 1
    :caption: Contents:
 
+   features.filters
    features.indicators
    features.metrics
    features.momentums

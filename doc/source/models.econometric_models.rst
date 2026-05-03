@@ -12,10 +12,10 @@ Time series models
 .. autosummary::
    :toctree: generated/
 
-   fynance.models.econometric_models.MA
-   fynance.models.econometric_models.ARMA
-   fynance.models.econometric_models.ARMA_GARCH
-   fynance.models.econometric_models.ARMAX_GARCH
+   MA
+   ARMA
+   ARMA_GARCH
+   ARMAX_GARCH
 
 
 Tools
@@ -24,4 +24,4 @@ Tools
 .. autosummary::
    :toctree: generated/
 
-   fynance.models.econometric_models.get_parameters
+   get_parameters

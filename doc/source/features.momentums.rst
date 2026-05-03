@@ -12,9 +12,9 @@ Moving averages
 .. autosummary::
    :toctree: generated/
 
-   fynance.features.momentums.ema
-   fynance.features.momentums.sma
-   fynance.features.momentums.wma
+   ema
+   sma
+   wma
 
 Moving standard deviation
 =========================
@@ -22,6 +22,6 @@ Moving standard deviation
 .. autosummary::
    :toctree: generated/
 
-   fynance.features.momentums.emstd
-   fynance.features.momentums.smstd
-   fynance.features.momentums.wmstd
+   emstd
+   smstd
+   wmstd
