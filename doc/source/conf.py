@@ -91,6 +91,9 @@ autosummary_generate = True
 # Let the class.rst template handle method tables; disable numpydoc's auto-
 # generated tables to avoid stub-file warnings for inherited PyTorch members.
 numpydoc_show_class_members = False
+# Explicit Methods/Attributes sections in docstrings are rendered as plain
+# summary tables without generating per-method stub files.
+numpydoc_class_members_toctree = False
 
 # --------------------------------------------------------------------------- #
 #                               Autodoc config                                #

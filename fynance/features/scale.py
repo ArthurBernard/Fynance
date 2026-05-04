@@ -121,6 +121,12 @@ class Scale:
         standardization set ``kind_moment={"s", "w", "e"}`` (see
         :func:`~fynance.features.scale.roll_standardize`).
 
+    Methods
+    -------
+    fit
+    scale
+    revert
+
     Attributes
     ----------
     func : callable
