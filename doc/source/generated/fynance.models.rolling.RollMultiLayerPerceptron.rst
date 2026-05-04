@@ -4,37 +4,7 @@
 .. currentmodule:: fynance.models.rolling
 
 .. autoclass:: RollMultiLayerPerceptron
-   :no-members:
-   :no-inherited-members:
-   :no-special-members:
+   :members:
+   :inherited-members:
+   :special-members: __call__, __iter__, __next__
    :show-inheritance:
-
-
-
-
-
-.. rubric:: Methods
-
-.. autosummary::
-   :toctree:
-   :nosignatures:
-
-   
-   RollMultiLayerPerceptron.save
-   RollMultiLayerPerceptron.set_roll_period
-   RollMultiLayerPerceptron.sub_predict
-   
-
-
-
-
-
-
-.. rubric:: Attributes
-
-.. autosummary::
-   :toctree:
-
-   
-   RollMultiLayerPerceptron.training
-

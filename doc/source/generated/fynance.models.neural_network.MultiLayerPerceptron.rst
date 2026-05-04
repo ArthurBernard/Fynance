@@ -4,35 +4,7 @@
 .. currentmodule:: fynance.models.neural_network
 
 .. autoclass:: MultiLayerPerceptron
-   :no-members:
-   :no-inherited-members:
-   :no-special-members:
+   :members:
+   :inherited-members:
+   :special-members: __call__, __iter__, __next__
    :show-inheritance:
-
-
-
-
-
-.. rubric:: Methods
-
-.. autosummary::
-   :toctree:
-   :nosignatures:
-
-   
-   MultiLayerPerceptron.forward
-   
-
-
-
-
-
-
-.. rubric:: Attributes
-
-.. autosummary::
-   :toctree:
-
-   
-   MultiLayerPerceptron.training
-

@@ -101,3 +101,28 @@ autodoc_inherit_docstrings = False
 
 # Suppress RST formatting warnings from third-party docstrings (torch.nn.Module)
 suppress_warnings = ['docutils']
+
+# --------------------------------------------------------------------------- #
+#                          Autodoc skip-member hook                           #
+# --------------------------------------------------------------------------- #
+
+import torch.nn as _torch_nn
+_TORCH_MODULE_ATTRS = frozenset(_torch_nn.Module.__dict__)
+
+
+def _skip_torch_member(app, what, name, obj, skip, options):
+    """Skip members that originate from torch.nn.Module, not from fynance."""
+    if skip:
+        return True
+    if what == 'module':
+        return skip
+    if name not in _TORCH_MODULE_ATTRS:
+        return skip
+    module = getattr(obj, '__module__', '') or ''
+    if not module.startswith('fynance'):
+        return True
+    return skip
+
+
+def setup(app):
+    app.connect('autodoc-skip-member', _skip_torch_member)

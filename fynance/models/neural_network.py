@@ -52,15 +52,6 @@ class BaseNeuralNet(torch.nn.Module):
     N, M : int
         Respectively input and output dimension.
 
-    Methods
-    -------
-    set_optimizer
-    train_on
-    predict
-    set_data
-    save_model
-    load_model
-
     See Also
     --------
     MultiLayerPerceptron, RollingBasis

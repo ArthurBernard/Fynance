@@ -4,37 +4,7 @@
 .. currentmodule:: fynance.models.recurrent_neural_network
 
 .. autoclass:: LongShortTermMemory
-   :no-members:
-   :no-inherited-members:
-   :no-special-members:
+   :members:
+   :inherited-members:
+   :special-members: __call__, __iter__, __next__
    :show-inheritance:
-
-
-
-
-
-.. rubric:: Methods
-
-.. autosummary::
-   :toctree:
-   :nosignatures:
-
-   
-   LongShortTermMemory.forward
-   LongShortTermMemory.predict
-   LongShortTermMemory.train_on
-   
-
-
-
-
-
-
-.. rubric:: Attributes
-
-.. autosummary::
-   :toctree:
-
-   
-   LongShortTermMemory.training
-

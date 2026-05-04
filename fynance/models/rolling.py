@@ -332,11 +332,6 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
     calling the object directly (``__call__`` is captured by
     ``torch.nn.Module``).
 
-    Methods
-    -------
-    set_roll_period
-    sub_predict
-
     """
 
     def __init__(

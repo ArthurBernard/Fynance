@@ -4,30 +4,7 @@
 .. currentmodule:: fynance.models.rolling
 
 .. autoclass:: _RollingBasis
-   :no-members:
-   :no-inherited-members:
-   :no-special-members:
+   :members:
+   :inherited-members:
+   :special-members: __call__, __iter__, __next__
    :show-inheritance:
-
-
-
-
-
-.. rubric:: Methods
-
-.. autosummary::
-   :toctree:
-   :nosignatures:
-
-   
-   _RollingBasis.get_stats
-   _RollingBasis.plot_loss
-   _RollingBasis.run
-   
-   _RollingBasis.__call__
-
-
-
-
-
-

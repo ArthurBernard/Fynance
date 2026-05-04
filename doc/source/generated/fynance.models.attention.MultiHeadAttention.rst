@@ -4,35 +4,7 @@
 .. currentmodule:: fynance.models.attention
 
 .. autoclass:: MultiHeadAttention
-   :no-members:
-   :no-inherited-members:
-   :no-special-members:
+   :members:
+   :inherited-members:
+   :special-members: __call__, __iter__, __next__
    :show-inheritance:
-
-
-
-
-
-.. rubric:: Methods
-
-.. autosummary::
-   :toctree:
-   :nosignatures:
-
-   
-   MultiHeadAttention.forward
-   
-
-
-
-
-
-
-.. rubric:: Attributes
-
-.. autosummary::
-   :toctree:
-
-   
-   MultiHeadAttention.training
-

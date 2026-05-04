@@ -456,11 +456,6 @@ class _LongShortTermMemory(_RecurrentNeuralNetwork):
         Activation functions for respectively forget, update and output gate,
         default are Sigmoid function for the three.
 
-    Methods
-    -------
-    train_on
-    predict
-
     Attributes
     ----------
     criterion : torch.nn.modules.loss
@@ -567,11 +562,6 @@ class LongShortTermMemory(_ForwardLayer, _LongShortTermMemory):
     optional
         Activation functions for respectively forget, update and output gate,
         default are Sigmoid function for the three.
-
-    Methods
-    -------
-    train_on
-    predict
 
     Attributes
     ----------
