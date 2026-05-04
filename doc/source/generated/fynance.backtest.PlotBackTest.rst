@@ -1,5 +1,7 @@
-﻿fynance.backtest.PlotBackTest
+﻿PlotBackTest
 =============================
+
+*Defined in* :mod:`fynance.backtest`
 
 .. currentmodule:: fynance.backtest
 

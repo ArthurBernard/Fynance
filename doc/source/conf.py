@@ -25,7 +25,13 @@ extensions = [
     'sphinx.ext.intersphinx',
     'numpydoc',
     'matplotlib.sphinxext.plot_directive',
+    'sphinx_design',
+    'sphinx_copybutton',
 ]
+
+# sphinx-copybutton: strip prompts when copying code blocks
+copybutton_prompt_text = r">>> |\.\.\. |\$ "
+copybutton_prompt_is_regexp = True
 
 import fynance
 project = 'Fynance'
@@ -40,7 +46,7 @@ master_doc = 'index'
 pygments_style = 'sphinx'
 
 add_function_parentheses = False
-add_module_names = True
+add_module_names = False
 
 # --------------------------------------------------------------------------- #
 #                                HTML config                                  #
@@ -54,6 +60,7 @@ html_theme_options = {
 }
 html_title = '{} v{} Reference Guide'.format(project, version)
 html_static_path = ['_static']
+html_css_files = ['custom.css']
 
 html_context = {
     "display_github": True,
@@ -101,6 +108,12 @@ numpydoc_class_members_toctree = False
 
 autodoc_default_options = {}
 autodoc_inherit_docstrings = False
+# Keep default values as written in source (e.g. torch.nn.Softmax) instead of
+# resolving them to <class 'torch.nn.modules.activation.Softmax'>.
+autodoc_preserve_defaults = True
+# Hide type annotations entirely — types are already documented in numpydoc
+# Parameters / Returns sections of the docstrings.
+autodoc_typehints = 'none'
 
 # Suppress RST formatting warnings from third-party docstrings (torch.nn.Module)
 suppress_warnings = ['docutils']

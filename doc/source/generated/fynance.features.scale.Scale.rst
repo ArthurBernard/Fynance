@@ -1,5 +1,7 @@
-﻿fynance.features.scale.Scale
+﻿Scale
 ============================
+
+*Defined in* :mod:`fynance.features.scale`
 
 .. currentmodule:: fynance.features.scale
 

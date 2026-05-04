@@ -1,5 +1,7 @@
-﻿fynance.models.rolling._RollingBasis
+﻿_RollingBasis
 ====================================
+
+*Defined in* :mod:`fynance.models.rolling`
 
 .. currentmodule:: fynance.models.rolling
 

@@ -1,5 +1,7 @@
-﻿fynance.models.recurrent_neural_network.RecurrentNeuralNetwork
+﻿RecurrentNeuralNetwork
 ==============================================================
+
+*Defined in* :mod:`fynance.models.recurrent_neural_network`
 
 .. currentmodule:: fynance.models.recurrent_neural_network
 

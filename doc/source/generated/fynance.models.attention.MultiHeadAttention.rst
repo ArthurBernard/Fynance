@@ -1,5 +1,7 @@
-﻿fynance.models.attention.MultiHeadAttention
+﻿MultiHeadAttention
 ===========================================
+
+*Defined in* :mod:`fynance.models.attention`
 
 .. currentmodule:: fynance.models.attention
 

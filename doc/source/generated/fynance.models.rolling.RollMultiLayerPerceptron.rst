@@ -1,5 +1,7 @@
-﻿fynance.models.rolling.RollMultiLayerPerceptron
+﻿RollMultiLayerPerceptron
 ===============================================
+
+*Defined in* :mod:`fynance.models.rolling`
 
 .. currentmodule:: fynance.models.rolling
 

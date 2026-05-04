@@ -1,5 +1,7 @@
-﻿fynance.backtest.DynaPlotBackTest
+﻿DynaPlotBackTest
 =================================
+
+*Defined in* :mod:`fynance.backtest`
 
 .. currentmodule:: fynance.backtest
 

@@ -1,5 +1,7 @@
-﻿fynance.models.attention.ScaledDotProductAttention
+﻿ScaledDotProductAttention
 ==================================================
+
+*Defined in* :mod:`fynance.models.attention`
 
 .. currentmodule:: fynance.models.attention
 

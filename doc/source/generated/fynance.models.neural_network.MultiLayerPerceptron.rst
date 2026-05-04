@@ -1,5 +1,7 @@
-﻿fynance.models.neural_network.MultiLayerPerceptron
+﻿MultiLayerPerceptron
 ==================================================
+
+*Defined in* :mod:`fynance.models.neural_network`
 
 .. currentmodule:: fynance.models.neural_network
 
