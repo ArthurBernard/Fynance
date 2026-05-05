@@ -45,6 +45,14 @@ __all__ = [
 def get_parameters(params, p=0, q=0, Q=0, P=0, cons=True):
     """ Get parameters for ARMA-GARCH models.
 
+    Helper that splits the flat ``params`` vector returned by
+    maximum-likelihood estimation into the structured groups expected
+    by the model evaluation routines: AR coefficients ``phi``, MA
+    coefficients ``theta``, GARCH ARCH/GARCH coefficients
+    ``alpha``/``beta``, and constants ``c`` and ``omega``. Pass the
+    same ``p, q, Q, P, cons`` configuration that was used at the
+    estimation step (see :mod:`fynance.estimator`).
+
     Parameters
     ----------
     params : np.ndarray[np.float64, ndim=1]

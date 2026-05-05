@@ -111,7 +111,19 @@ def _get_roll_std_params(X, w=None, kind_moment="s", axis=0):
 
 
 class Scale:
-    """ Object to scale data.
+    """ Fit/transform-style scaler for time-series data.
+
+    Wraps the four scaling primitives (``standardize``, ``normalize``,
+    ``roll_standardize``, ``roll_normalize``) behind a uniform fit /
+    scale / revert API. Parameters are fitted once at construction
+    and reused on subsequent calls — the typical pipeline pattern of
+    fitting on a training window and applying the same transform to
+    the test window, which avoids leaking test-period statistics into
+    training.
+
+    The ``revert`` method inverts the transformation, useful when the
+    target of an ML model was scaled and the prediction must be
+    converted back to the original units.
 
     Parameters
     ----------
@@ -304,9 +316,12 @@ class Scale:
 def standardize(X, a=0, b=1, axis=0):
     r""" Substitutes the mean and divid by the standard deviation.
 
-    .. math::
-
-        Standardize(X) = b \times \frac{X - X_{mean}}{X_{std}} + a
+    Z-score scaling: shifts the data to zero mean and unit variance,
+    then re-scales to ``[a, a + b]`` if the optional location/scale
+    factors are provided. The standard preprocessing for ML models
+    that assume features on comparable scales (linear regressions,
+    SVMs, neural networks). For time-series with regime shifts, prefer
+    :func:`roll_standardize` to avoid leaking future statistics.
 
     Parameters
     ----------

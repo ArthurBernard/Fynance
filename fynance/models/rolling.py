@@ -348,6 +348,18 @@ def get_perf(signal, underlying, v0=100):
 class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
     """ Rolling version of the multi-layer perceptron model.
 
+    End-to-end walk-forward training pipeline for an MLP: at each step
+    the model is fitted on a sliding window of length ``n``, evaluated
+    on the previous out-of-sample slice, then used to predict the next
+    slice. Losses (train, eval, test) and out-of-sample predictions are
+    accumulated step by step in ``self.log``, ``self.y_eval`` and
+    ``self.y_test`` for downstream analysis.
+
+    Use :meth:`set_roll_period` to configure window sizes and batch
+    options, then :meth:`run` to execute the loop. ``run`` can also
+    drive a live :class:`fynance.backtest.dynamic_plot_backtest.BacktestNeuralNet`
+    figure to monitor convergence.
+
     Combines :class:`MultiLayerPerceptron` with the walk-forward iterator
     from :class:`_RollingBasis`.  Use :meth:`set_roll_period` instead of
     calling the object directly (``__call__`` is captured by

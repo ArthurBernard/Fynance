@@ -127,6 +127,18 @@ def kalman_filter(
 ) -> tuple[NDArray, NDArray, NDArray, NDArray, NDArray, NDArray]:
     """ Linear Gaussian Kalman filter.
 
+    Recursive Bayesian estimator for the latent state ``x_t`` of a
+    linear Gaussian state-space model. At each step, the prior obtained
+    from the dynamics ``G`` is updated with the new observation through
+    the Kalman gain, yielding the posterior. The output is causal —
+    only past and present observations are used — making the filter
+    suitable for live signal extraction. For an offline smoothed
+    estimate that also conditions on future observations, run
+    :func:`rts_smoother` on the returned ``m, C, a, R``.
+
+    Implementation is JIT-compiled with Numba; the first call incurs
+    a one-off compilation cost.
+
     State-space model::
 
         x_t = G @ x_{t-1} + w_t,   w_t ~ N(0, W)

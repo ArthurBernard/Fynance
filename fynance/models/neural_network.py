@@ -60,6 +60,14 @@ _TYPE_HANDLER = {
 class BaseNeuralNet(torch.nn.Module):
     """ Base object for neural network model with PyTorch.
 
+    Thin wrapper around ``torch.nn.Module`` that bundles the boilerplate
+    of training a financial model: criterion + optimizer setup, a
+    one-batch ``train_on`` step, gradient-free ``predict``, data
+    coercion from NumPy / pandas / tensor, and weight serialization.
+    Subclass it (or one of the higher-level subclasses such as
+    :class:`MultiLayerPerceptron`) and implement the ``forward`` method
+    to define a new architecture; everything else is inherited.
+
     Inherits of torch.nn.Module object with some higher level methods.
 
     Attributes
@@ -346,6 +354,19 @@ class MultiLayerPerceptron(BaseNeuralNet):
 
     Refered as vanilla neural network model, with `n` hidden layers s.t
     n :math:`\geq` 1, with each one a specified number of neurons.
+
+    Each hidden layer is a ``torch.nn.Linear`` followed by an optional
+    dropout and the configured activation function. The MLP is the
+    standard baseline for tabular and sliding-window features in
+    finance — useful for non-linear regression on engineered features
+    (technical indicators, volatility, sentiment scores). For
+    time-ordered sequence input, prefer
+    :class:`fynance.models.recurrent_neural_network.LongShortTermMemory`
+    or attention-based architectures.
+
+    Configure the optimizer with :meth:`BaseNeuralNet.set_optimizer`
+    and wrap with :class:`fynance.models.rolling.RollMultiLayerPerceptron`
+    for walk-forward training.
 
     Parameters
     ----------

@@ -38,6 +38,18 @@ __all__ = ['PlotBackTest']
 class PlotBackTest:
     """ Plot backtest object.
 
+    Lightweight wrapper around a Matplotlib ``Figure`` / ``Axes``
+    pair used to render the cumulative-performance curve of one or
+    several strategies. Reuse an existing figure by passing ``fig``
+    and ``ax``, or let the constructor create one. Axis labels,
+    scales, ticks and title are configured once at construction via
+    ``**kwargs``; subsequent calls to :meth:`plot` only add data.
+
+    For live updates during walk-forward training, use
+    :class:`fynance.backtest.dynamic_plot_backtest.BacktestNeuralNet`,
+    which builds on the same primitives but refreshes the canvas on
+    each iteration.
+
     Attributes
     ----------
     fig : matplotlib.figure.Figure

@@ -54,6 +54,15 @@ __all__ = [
 def sma(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDArray:
     r""" Compute simple moving average(s) of size `w` for each `X`' series.
 
+    Equally weighted average over a sliding window of length ``w``.
+    Reacts slowly to new information but is robust to noise and is the
+    most common smoother in technical analysis. For a smoother that
+    reacts faster to recent observations, see :func:`ema` (exponential
+    weighting) or :func:`wma` (linear weighting).
+
+    The first ``w-1`` values use a shrinking window (i.e. ``sma_t`` for
+    ``t < w-1`` averages only the available observations, never NaN).
+
     .. math::
 
         sma^w_t(X) = \frac{1}{w} \sum^{w-1}_{i=0} X_{t-i}
@@ -171,6 +180,16 @@ def _wma(X, w):
 @WrapperArray('dtype', 'axis')
 def ema(X: NDArray, alpha: float = 0.94, w: int | None = None, axis: int = 0, dtype=None) -> NDArray:
     r""" Compute exponential moving average(s) for each `X`' series.
+
+    Geometrically decaying weighted average that gives more importance
+    to recent observations. Reacts faster than :func:`sma` to regime
+    changes; smaller ``alpha`` (or smaller equivalent window ``w``)
+    increases reactivity at the cost of more noise. The recursive
+    formulation makes computation O(T) per series, with no need to
+    store the full window.
+
+    Either ``alpha`` (smoothing factor in ``[0, 1]``) or ``w`` (window
+    size mapped to ``alpha = 1 - 2 / (1 + w)``) can be specified.
 
     .. math::
 

@@ -48,6 +48,14 @@ __all__ = ['RecurrentNeuralNetwork', 'GatedRecurrentUnit',
 class _RecurrentNeuralNetwork(BaseNeuralNet):
     """ Neural network with recurrent architecture.
 
+    Internal recurrent cell shared by all RNN-flavored models. At each
+    time step, the cell concatenates the input with the previous
+    hidden state and applies a single linear layer followed by an
+    activation. Subclasses (the public :class:`RecurrentNeuralNetwork`,
+    :class:`GatedRecurrentUnit`, :class:`LongShortTermMemory`) add a
+    forward output layer and the gating logic specific to each cell
+    type.
+
     Parameters
     ----------
     X, y : array-like or int
@@ -228,6 +236,13 @@ class _ForwardLayer:
 
 class RecurrentNeuralNetwork(_ForwardLayer, _RecurrentNeuralNetwork):
     """ Neural network with recurrent architecture.
+
+    Vanilla Elman RNN: a single recurrent linear layer followed by a
+    forward output layer. Each call to :meth:`forward` updates the
+    hidden state ``H`` and emits a prediction ``Y``. Suitable as a
+    baseline for short-horizon sequence prediction; for longer
+    dependencies, use :class:`GatedRecurrentUnit` or
+    :class:`LongShortTermMemory` to mitigate vanishing gradients.
 
     Parameters
     ----------
@@ -569,6 +584,15 @@ class _LongShortTermMemory(_RecurrentNeuralNetwork):
 
 class LongShortTermMemory(_ForwardLayer, _LongShortTermMemory):
     """ Long short term memory neural network.
+
+    LSTM cell (Hochreiter & Schmidhuber, 1997) with the four gates —
+    forget, input/update, candidate and output — followed by a forward
+    output layer. The cell state ``C`` and hidden state ``H`` are
+    threaded through the sequence, so the model can carry information
+    across many time steps without the vanishing-gradient pathology
+    that limits :class:`RecurrentNeuralNetwork`. Use it for sequence
+    modeling tasks where dependencies span dozens of steps (intraday
+    return series, multi-day momentum signals, regime detection).
 
     Parameters
     ----------

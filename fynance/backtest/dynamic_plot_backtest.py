@@ -39,6 +39,13 @@ __all__ = ['DynaPlotBackTest']
 class DynaPlotBackTest(PlotBackTest):
     """ Dynamic plot backtest object.
 
+    Subclass of :class:`PlotBackTest` configured for interactive
+    updates: ``plt.ion()`` is enabled so that the figure refreshes
+    on every call to :meth:`plot`. Includes default styling for
+    train / eval / test curves and a compact legend, suitable for
+    monitoring walk-forward training in real time alongside
+    :class:`fynance.models.rolling._RollingBasis`.
+
     Attributes
     ----------
     fig : matplotlib.figure.Figure

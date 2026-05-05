@@ -86,6 +86,17 @@ class ScaledDotProductAttention(nn.Module):
 class MultiHeadAttention(nn.Module):
     r""" Multi-Head Self-Attention.
 
+    Building block of the Transformer architecture (Vaswani et al.,
+    2017). Each attention head learns to attend to a different subspace
+    of the input — useful when several types of dependency coexist in
+    a sequence, e.g. short-term and long-term momentum. Outputs of the
+    heads are concatenated and projected back through ``w_o``;
+    residual connection plus layer norm stabilize training.
+
+    For finance-specific use, this layer is typically stacked with a
+    feed-forward sublayer to form a Transformer encoder block applied
+    to a return / order-book sequence.
+
     Splits the input into ``num_heads`` heads, applies
     :class:`ScaledDotProductAttention` in parallel, then re-projects.  A
     residual connection and layer norm are applied.
