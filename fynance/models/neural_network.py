@@ -70,6 +70,35 @@ class BaseNeuralNet(torch.nn.Module):
 
     Inherits of torch.nn.Module object with some higher level methods.
 
+    Public API contract (stable for the 1.x series)
+    ------------------------------------------------
+    - **Shapes** — feed-forward subclasses (e.g. :class:`MultiLayerPerceptron`)
+      expect ``X`` of shape ``(T, N)`` and ``y`` of shape ``(T, M)``,
+      where ``T`` is the number of observations, ``N`` the number of
+      input features and ``M`` the number of targets. Recurrent
+      subclasses in :mod:`fynance.models.recurrent_neural_network`
+      consume ``X`` of shape ``(T, S, N)``, where ``S`` is the sequence
+      length.
+    - **Dtypes** — :meth:`set_data` coerces inputs through
+      :meth:`_set_data`. The expected default for both ``X`` and ``y``
+      is a floating tensor (``torch.float32`` is the de-facto convention
+      in the project doctests). Pass ``x_type`` / ``y_type`` explicitly
+      to override; mismatched dtypes between ``X``, ``y`` and the model
+      parameters will raise at the first ``forward`` pass.
+    - **Device** — the wrapper does **not** move tensors automatically.
+      Models live on CPU unless the caller explicitly calls ``.to(device)``
+      on both the module and the data tensors before training.
+    - **State invariants** — typical lifecycle:
+      :meth:`set_optimizer` → :meth:`set_data` (optional) →
+      :meth:`train_on` (loops) → :meth:`predict`. ``train_on`` requires
+      ``criterion`` and ``optimizer`` to be set; calling it before
+      :meth:`set_optimizer` raises ``AttributeError``.
+    - **Serialization** — :meth:`save_model` / :meth:`load_model`
+      persist the module ``state_dict`` and, when ``save_optimizer`` /
+      ``load_optimizer`` is True, the optimizer ``state_dict``. Random
+      seeds, learning-rate schedulers and the cached training data
+      (``self.X``, ``self.y``) are **not** serialized.
+
     Attributes
     ----------
     criterion : torch.nn.modules.loss.Loss
@@ -174,17 +203,32 @@ class BaseNeuralNet(torch.nn.Module):
 
     @torch.enable_grad()
     def train_on(self, X: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
-        """ Trains the neural network model.
+        """ Trains the neural network model on a single batch.
+
+        Runs one forward / backward / optimizer-step cycle on the batch
+        ``(X, y)``. As a side effect, gradients of all parameters are
+        zeroed before the forward pass and the optimizer state is
+        advanced afterwards. If a learning-rate scheduler has been
+        registered via :meth:`set_lr_scheduler`, its ``step`` is also
+        called.
 
         Parameters
         ----------
         X, y : torch.Tensor
-            Respectively inputs and outputs to train model.
+            Respectively inputs and outputs to train model. Shapes must
+            match what ``self.forward`` expects (see the class-level
+            "Public API contract" section).
 
         Returns
         -------
-        torch.nn.modules.loss
-            Loss outputs.
+        torch.Tensor
+            The loss tensor produced by ``self.criterion(self(X), y)``,
+            with gradient already consumed by ``loss.backward()``.
+
+        Raises
+        ------
+        AttributeError
+            If :meth:`set_optimizer` has not been called yet.
 
         """
         self.optimizer.zero_grad()
@@ -202,15 +246,20 @@ class BaseNeuralNet(torch.nn.Module):
     def predict(self, X: torch.Tensor) -> torch.Tensor:
         """ Predicts outputs of neural network model.
 
+        Runs ``self.forward(X)`` under :func:`torch.no_grad`, so no
+        autograd graph is built. The returned tensor is detached and
+        lives on the same device as the model parameters.
+
         Parameters
         ----------
         X : torch.Tensor
-           Inputs to compute prediction.
+           Inputs to compute prediction. Same shape and dtype contract
+           as :meth:`train_on`.
 
         Returns
         -------
         torch.Tensor
-           Outputs prediction.
+           Outputs prediction (detached, gradient-free).
 
         """
         return self(X).detach()
@@ -218,12 +267,32 @@ class BaseNeuralNet(torch.nn.Module):
     def set_data(self, X: NDArray | torch.Tensor | pd.DataFrame, y: NDArray | torch.Tensor | pd.DataFrame, x_type=None, y_type=None):
         """ Set data inputs and outputs.
 
+        Coerces ``X`` and ``y`` to :class:`torch.Tensor` and caches them
+        as ``self.X`` / ``self.y``. After the call the attributes
+        ``self.T`` (number of observations), ``self.N`` (input columns)
+        and ``self.M`` (output columns) are set.
+
         Parameters
         ----------
         X, y : array-like
-            Respectively input and output data.
-        x_type, y_type : torch.dtype
-            Respectively input and ouput data types. Default is `None`.
+            Respectively input and output data. Accepted types:
+            :class:`numpy.ndarray`, :class:`torch.Tensor`,
+            :class:`pandas.DataFrame`. Shapes must be ``(T, N)`` and
+            ``(T, M)`` respectively.
+        x_type, y_type : torch.dtype, optional
+            Target dtypes for the resulting tensors. Default is `None`,
+            which preserves the input dtype.
+
+        Returns
+        -------
+        BaseNeuralNet
+            ``self``, to allow chaining.
+
+        Raises
+        ------
+        ValueError
+            If ``self.N`` / ``self.M`` were already set and ``X`` / ``y``
+            do not match, or if ``X`` and ``y`` have different lengths.
 
         """
         if hasattr(self, 'N') and self.N != X.size(1):

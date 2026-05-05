@@ -33,6 +33,24 @@ _exceptions --- Fynance exceptions
 tests       --- Run fynance unittests
 _wrappers   --- Fynance wrapper functions
 
+API stability policy (1.x series)
+---------------------------------
+The symbols re-exported below from :mod:`fynance.models`,
+:mod:`fynance.algorithms.allocation`, :mod:`fynance.features` and
+:mod:`fynance.estimator` form the **public, stable API** for the 1.x
+release line. Within 1.x:
+
+- public function and class signatures are frozen — no removals, no
+  backward-incompatible signature changes;
+- behavioural changes that would break user code go through one
+  release of :class:`DeprecationWarning` before becoming the new
+  default (see ``CONTRIBUTING.md``);
+- :mod:`fynance.backtest` and :mod:`fynance.models` *internal* helpers
+  (names prefixed with ``_``) remain free to evolve.
+
+Breaking changes are reserved for the 2.x line and tracked in
+``CHANGELOG.md``.
+
 """
 
 from importlib.metadata import PackageNotFoundError, version
