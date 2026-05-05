@@ -1,5 +1,7 @@
-fynance\.features\.metrics\.perf\_index
-=======================================
+﻿perf_index
+===================================
+
+*Defined in* :mod:`fynance.features.metrics`
 
 .. currentmodule:: fynance.features.metrics
 

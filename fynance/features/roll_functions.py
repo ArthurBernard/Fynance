@@ -6,7 +6,19 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2020-09-18 22:21:22
 
-""" Rolling functions. """
+""" Rolling extremum functions.
+
+Rolling minimum and maximum over a lagged window. Used directly as
+features (e.g. price-channel breakouts) and internally by
+:func:`fynance.features.scale.roll_normalize` to compute lookahead-safe
+min-max scaling parameters.
+
+Main entry points
+-----------------
+- :func:`roll_min` — rolling minimum over a window.
+- :func:`roll_max` — rolling maximum over a window.
+
+"""
 
 from __future__ import annotations
 

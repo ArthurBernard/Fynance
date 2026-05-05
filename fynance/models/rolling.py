@@ -1,7 +1,28 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-""" Basis of rolling models. """
+""" Walk-forward training wrappers for time-series models.
+
+Iterator-based base class :class:`_RollingBasis` that re-fits a model
+on a sliding training window and predicts on the next out-of-sample
+window. The pattern enforces strict temporal ordering, eliminating
+lookahead bias and matching how a strategy would actually be retrained
+in production.
+
+A concrete :class:`RollMultiLayerPerceptron` combines this iterator
+with :class:`fynance.models.neural_network.MultiLayerPerceptron`. The
+same pattern is applied to portfolio allocation in
+:func:`fynance.algorithms.allocation.rolling_allocation`.
+
+Main entry points
+-----------------
+- :class:`_RollingBasis` — iterator that yields ``(eval_set,
+  test_set)`` slices and tracks training/evaluation/test losses.
+- :class:`RollMultiLayerPerceptron` — walk-forward MLP, ready to use
+  via :meth:`RollMultiLayerPerceptron.set_roll_period` and
+  :meth:`RollMultiLayerPerceptron.run`.
+
+"""
 
 from __future__ import annotations
 
@@ -327,6 +348,18 @@ def get_perf(signal, underlying, v0=100):
 class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
     """ Rolling version of the multi-layer perceptron model.
 
+    End-to-end walk-forward training pipeline for an MLP: at each step
+    the model is fitted on a sliding window of length ``n``, evaluated
+    on the previous out-of-sample slice, then used to predict the next
+    slice. Losses (train, eval, test) and out-of-sample predictions are
+    accumulated step by step in ``self.log``, ``self.y_eval`` and
+    ``self.y_test`` for downstream analysis.
+
+    Use :meth:`set_roll_period` to configure window sizes and batch
+    options, then :meth:`run` to execute the loop. ``run`` can also
+    drive a live :class:`fynance.backtest.dynamic_plot_backtest.BacktestNeuralNet`
+    figure to monitor convergence.
+
     Combines :class:`MultiLayerPerceptron` with the walk-forward iterator
     from :class:`_RollingBasis`.  Use :meth:`set_roll_period` instead of
     calling the object directly (``__call__`` is captured by
@@ -335,10 +368,7 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
     Methods
     -------
     set_roll_period
-    run
     sub_predict
-    get_stats
-    plot_loss
 
     """
 

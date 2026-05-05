@@ -6,7 +6,23 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2020-01-24 15:57:17
 
-""" Metric functions used for financial analysis. """
+""" Performance and risk metrics for financial analysis.
+
+Compute risk-adjusted returns, drawdown statistics and other summary
+indicators commonly used to evaluate strategies and portfolios. All
+functions accept a 1-D or 2-D array of prices/returns and return the
+metric along the time axis.
+
+Main entry points
+-----------------
+- :func:`annual_return`, :func:`annual_volatility` — annualized
+  return and volatility from a price series.
+- :func:`sharpe`, :func:`calmar`, :func:`diversified_ratio` —
+  risk-adjusted performance ratios.
+- :func:`mdd`, :func:`drawdown` — maximum drawdown and drawdown path.
+- :func:`z_score`, :func:`accuracy` — statistical helpers.
+
+"""
 
 from __future__ import annotations
 
@@ -505,6 +521,14 @@ def mad(X: NDArray, axis: int = 0, dtype=None) -> NDArray:
 def mdd(X: NDArray, raw: bool = False, axis: int = 0, dtype=None) -> NDArray:
     r""" Compute the maximum drawdown for each `X`' series.
 
+    Maximum peak-to-trough decline observed over the full series. A
+    standard tail-risk indicator: it captures the worst loss an
+    investor would have endured, regardless of horizon. Reported in
+    relative terms by default (fraction of peak); use ``raw=True`` for
+    an absolute decline. For the full drawdown path use
+    :func:`drawdown`; combined with annual return, it gives the Calmar
+    ratio (:func:`calmar`).
+
     Drawdown (:func:~`fynance.features.metrics.drawdown`) is the measure of the
     decline from a historical peak in some variable [5]_ (typically the
     cumulative profit or total open equity of a financial trading strategy).
@@ -798,6 +822,18 @@ def returns_strat(X: NDArray, S: NDArray | None = None, kind: str = 'pct', base:
 @WrapperArray('dtype', 'axis', 'null', 'ddof', min_size=2)
 def sharpe(X: NDArray, rf: float = 0, period: int = 252, log: bool = False, axis: int = 0, dtype=None, ddof: int = 0) -> NDArray:
     r""" Compute the Sharpe ratio for each `X`' series.
+
+    Annualized excess return per unit of volatility — the most widely
+    used risk-adjusted performance metric. Higher is better; ratios
+    above 1 are usually considered good and above 2 excellent for
+    long-horizon strategies. Note that the Sharpe ratio penalizes both
+    upside and downside volatility symmetrically; use the Sortino or
+    Calmar ratio (:func:`calmar`) when only downside risk should be
+    penalized.
+
+    The ``period`` argument controls annualization (252 for daily
+    trading data, 12 for monthly, etc.). For a rolling estimate, see
+    :func:`roll_sharpe`.
 
     Notes
     -----

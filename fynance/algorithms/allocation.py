@@ -6,7 +6,28 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2019-11-05 17:20:52
 
-""" Algorithms of portfolio allocation. """
+""" Algorithms of portfolio allocation.
+
+Risk-based and mean-variance methods that compute portfolio weights
+from a sample of asset returns. Each function takes a 2-D array where
+columns are asset price/return series and returns the optimal weights
+as a 1-D array summing to one.
+
+A walk-forward wrapper, :func:`rolling_allocation`, applies any of
+these methods on a rolling training window — useful for backtesting
+allocation strategies without lookahead bias.
+
+Main entry points
+-----------------
+- :func:`ERC` — Equal Risk Contribution (risk-parity).
+- :func:`HRP` — Hierarchical Risk Parity.
+- :func:`IVP` — Inverse Variance Portfolio.
+- :func:`MDP` — Maximum Diversified Portfolio.
+- :func:`MVP`, :func:`MVP_uc` — Minimum Variance Portfolio (constrained
+  / unconstrained).
+- :func:`rolling_allocation` — walk-forward wrapper.
+
+"""
 
 from __future__ import annotations
 
@@ -42,6 +63,15 @@ def ERC(
     low_bound: float = 0.,
 ) -> NDArray[np.float64]:
     r""" Get weights of Equal Risk Contribution portfolio allocation.
+
+    Risk-parity allocation: each asset contributes the same amount of
+    total portfolio variance. ERC sits between the naive 1/N and the
+    minimum-variance portfolio — it requires only the covariance
+    matrix and is robust to noisy expected returns, which makes it a
+    common choice when return forecasts are unreliable.
+
+    The optimizer (SLSQP) minimizes a smooth surrogate of the
+    risk-contribution dispersion under sum-to-one and box constraints.
 
     Notes
     -----
@@ -244,6 +274,17 @@ def HRP(
 ) -> NDArray[np.float64]:
     r""" Get weights of the Hierarchical Risk Parity allocation.
 
+    Cluster-based allocation that avoids inverting the full
+    covariance matrix. Compared with classical Markowitz solutions,
+    HRP is far more stable when ``N`` is large or assets are highly
+    correlated, because it groups similar assets first and only
+    allocates risk *within* and *between* clusters.
+
+    Three steps: (1) build a correlation distance and run hierarchical
+    linkage, (2) reorder the covariance matrix into quasi-diagonal
+    form, (3) recursively bisect the ordered tree, allocating weights
+    by inverse variance to each branch.
+
     Notes
     -----
     Hierarchical Risk Parity algorithm is developed by Marco Lopez de Prado
@@ -367,6 +408,15 @@ def MVP(
 ) -> NDArray[np.float64]:
     r""" Get weights of the Minimum Variance Portfolio allocation.
 
+    Closed-form Markowitz allocation that minimizes the portfolio
+    variance subject only to a sum-to-one constraint. Weights are not
+    constrained to be positive — short positions are allowed and the
+    weights returned by the analytical formula can be negative or
+    larger than one. Use :func:`MVP_uc` for a constrained variant.
+
+    The covariance matrix must be invertible; pseudo-inverse is used
+    as a fallback when ``X`` has linearly dependent columns.
+
     Notes
     -----
     The vector of weights noted :math:`w` that minimize the portfolio variance
@@ -430,6 +480,12 @@ def MVP_uc(
     low_bound: float = 0.,
 ) -> NDArray[np.float64]:
     r""" Get weights of the Minimum Variance Portfolio under constraints.
+
+    Numerical (SLSQP) Markowitz allocation that minimizes portfolio
+    variance subject to box constraints on each weight, in addition
+    to the sum-to-one constraint. Use this variant whenever short
+    selling must be excluded or per-asset caps need to be enforced;
+    use :func:`MVP` for the unconstrained closed-form solution.
 
     Notes
     -----
@@ -577,6 +633,18 @@ def rolling_allocation(
     **kwargs,
 ) -> NDArray[np.float64]:
     r""" Roll an algorithm of portfolio allocation.
+
+    Generic walk-forward backtester for any allocation function ``f``
+    (e.g. :func:`ERC`, :func:`HRP`, :func:`MVP`). At each step the
+    weights are estimated on a training window of length ``n`` and held
+    for the next ``s`` periods. By construction this respects strict
+    temporal ordering — no future data leaks into the weights — which
+    is the same no-lookahead pattern used in
+    :class:`fynance.models.rolling._RollingBasis` for ML models.
+
+    Assets that are constant on more than 50% of the training window
+    are dropped from that step's allocation; the remaining weight mass
+    is redistributed across the active assets.
 
     Notes
     -----

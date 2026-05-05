@@ -9,5 +9,5 @@ Tools and objects to roll a model over time-series data, for walk-forward evalua
 .. autosummary::
    :toctree: generated/
 
-   fynance.models.rolling._RollingBasis
-   fynance.models.rolling.RollMultiLayerPerceptron
+   _RollingBasis
+   RollMultiLayerPerceptron

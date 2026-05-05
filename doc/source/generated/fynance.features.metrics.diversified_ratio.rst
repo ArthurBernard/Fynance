@@ -1,5 +1,7 @@
-fynance\.features\.metrics\.diversified\_ratio
-==============================================
+﻿diversified_ratio
+==========================================
+
+*Defined in* :mod:`fynance.features.metrics`
 
 .. currentmodule:: fynance.features.metrics
 

@@ -1,5 +1,7 @@
-fynance\.features\.metrics\.roll\_mad
-=====================================
+﻿roll_mad
+=================================
+
+*Defined in* :mod:`fynance.features.metrics`
 
 .. currentmodule:: fynance.features.metrics
 

@@ -1,7 +1,34 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-""" Filter functions for time-series financial data. """
+""" Filter functions for time-series financial data.
+
+Numba-accelerated implementations of the linear Kalman filter and the
+Rauch-Tung-Striebel (RTS) smoother, plus a maximum-likelihood routine
+to fit the noise covariances on observed data.
+
+Useful for denoising price series, estimating latent states (e.g. a
+slowly varying mean or trend), and extracting smoothed signals for
+downstream ML models. Causal output (:func:`kalman_filter`) is
+appropriate for live signals; the RTS smoother is non-causal and
+intended for offline analysis.
+
+Main entry points
+-----------------
+- :func:`kalman_filter` — forward causal pass, returning filtered
+  states and covariances.
+- :func:`rts_smoother` — backward pass producing smoothed estimates.
+- :func:`kalman_loglikelihood` — log-likelihood of observations under
+  given parameters.
+- :func:`fit_kalman` — maximum-likelihood fit of process and
+  observation noise covariances.
+
+References
+----------
+.. [1] Kalman, R. E. (1960). A new approach to linear filtering and
+       prediction problems.
+
+"""
 
 # Built-in
 import math
@@ -99,6 +126,18 @@ def kalman_filter(
     C0: NDArray | None = None,
 ) -> tuple[NDArray, NDArray, NDArray, NDArray, NDArray, NDArray]:
     """ Linear Gaussian Kalman filter.
+
+    Recursive Bayesian estimator for the latent state ``x_t`` of a
+    linear Gaussian state-space model. At each step, the prior obtained
+    from the dynamics ``G`` is updated with the new observation through
+    the Kalman gain, yielding the posterior. The output is causal —
+    only past and present observations are used — making the filter
+    suitable for live signal extraction. For an offline smoothed
+    estimate that also conditions on future observations, run
+    :func:`rts_smoother` on the returned ``m, C, a, R``.
+
+    Implementation is JIT-compiled with Numba; the first call incurs
+    a one-off compilation cost.
 
     State-space model::
 

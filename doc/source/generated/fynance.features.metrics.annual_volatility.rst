@@ -1,5 +1,7 @@
-fynance\.features\.metrics\.annual\_volatility
-==============================================
+﻿annual_volatility
+==========================================
+
+*Defined in* :mod:`fynance.features.metrics`
 
 .. currentmodule:: fynance.features.metrics
 

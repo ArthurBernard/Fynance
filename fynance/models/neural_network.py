@@ -6,7 +6,26 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2023-07-28 11:32:15
 
-""" Basis of neural networks models. """
+""" Base classes for PyTorch neural network models.
+
+Defines :class:`BaseNeuralNet`, a thin wrapper around
+``torch.nn.Module`` that adds higher-level training, prediction and
+serialization helpers, and :class:`MultiLayerPerceptron`, a
+configurable feed-forward MLP built on top of it.
+
+These classes are the foundation for the recurrent models in
+:mod:`fynance.models.recurrent_neural_network` and the walk-forward
+training wrappers in :mod:`fynance.models.rolling`.
+
+Main entry points
+-----------------
+- :class:`BaseNeuralNet` — base class with ``set_optimizer``,
+  ``train_on``, ``predict``, ``set_data``, ``save_model``,
+  ``load_model`` helpers.
+- :class:`MultiLayerPerceptron` — vanilla MLP with configurable
+  hidden layers, activation and dropout.
+
+"""
 
 from __future__ import annotations
 
@@ -40,6 +59,14 @@ _TYPE_HANDLER = {
 
 class BaseNeuralNet(torch.nn.Module):
     """ Base object for neural network model with PyTorch.
+
+    Thin wrapper around ``torch.nn.Module`` that bundles the boilerplate
+    of training a financial model: criterion + optimizer setup, a
+    one-batch ``train_on`` step, gradient-free ``predict``, data
+    coercion from NumPy / pandas / tensor, and weight serialization.
+    Subclass it (or one of the higher-level subclasses such as
+    :class:`MultiLayerPerceptron`) and implement the ``forward`` method
+    to define a new architecture; everything else is inherited.
 
     Inherits of torch.nn.Module object with some higher level methods.
 
@@ -328,6 +355,19 @@ class MultiLayerPerceptron(BaseNeuralNet):
     Refered as vanilla neural network model, with `n` hidden layers s.t
     n :math:`\geq` 1, with each one a specified number of neurons.
 
+    Each hidden layer is a ``torch.nn.Linear`` followed by an optional
+    dropout and the configured activation function. The MLP is the
+    standard baseline for tabular and sliding-window features in
+    finance — useful for non-linear regression on engineered features
+    (technical indicators, volatility, sentiment scores). For
+    time-ordered sequence input, prefer
+    :class:`fynance.models.recurrent_neural_network.LongShortTermMemory`
+    or attention-based architectures.
+
+    Configure the optimizer with :meth:`BaseNeuralNet.set_optimizer`
+    and wrap with :class:`fynance.models.rolling.RollMultiLayerPerceptron`
+    for walk-forward training.
+
     Parameters
     ----------
     X, y : array-like or int
@@ -352,13 +392,6 @@ class MultiLayerPerceptron(BaseNeuralNet):
         List with the number of neurons for each hidden layer.
     f : torch.nn.Module
         Activation function.
-
-    Methods
-    -------
-    set_optimizer
-    train_on
-    predict
-    set_data
 
     See Also
     --------

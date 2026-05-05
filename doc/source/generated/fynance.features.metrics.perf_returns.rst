@@ -1,5 +1,7 @@
-fynance\.features\.metrics\.perf\_returns
-=========================================
+﻿perf_returns
+=====================================
+
+*Defined in* :mod:`fynance.features.metrics`
 
 .. currentmodule:: fynance.features.metrics
 

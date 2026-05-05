@@ -6,7 +6,24 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2019-11-05 15:55:19
 
-""" Statical momentum functions. """
+""" Statistical momentum functions.
+
+Rolling moving averages and moving standard deviations in three flavors
+— simple, weighted and exponential — used as building blocks for
+technical indicators, scaling and signal generation.
+
+Implementations are vectorized with NumPy and accept 1-D or 2-D inputs.
+The window size ``w`` defaults to the full length of the series; the
+``axis`` keyword controls the time axis on 2-D arrays.
+
+Main entry points
+-----------------
+- :func:`sma`, :func:`wma`, :func:`ema` — moving averages (simple,
+  weighted, exponential).
+- :func:`smstd`, :func:`wmstd`, :func:`emstd` — moving standard
+  deviations.
+
+"""
 
 from __future__ import annotations
 
@@ -36,6 +53,15 @@ __all__ = [
 @WrapperArray('dtype', 'axis', 'window')
 def sma(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDArray:
     r""" Compute simple moving average(s) of size `w` for each `X`' series.
+
+    Equally weighted average over a sliding window of length ``w``.
+    Reacts slowly to new information but is robust to noise and is the
+    most common smoother in technical analysis. For a smoother that
+    reacts faster to recent observations, see :func:`ema` (exponential
+    weighting) or :func:`wma` (linear weighting).
+
+    The first ``w-1`` values use a shrinking window (i.e. ``sma_t`` for
+    ``t < w-1`` averages only the available observations, never NaN).
 
     .. math::
 
@@ -154,6 +180,16 @@ def _wma(X, w):
 @WrapperArray('dtype', 'axis')
 def ema(X: NDArray, alpha: float = 0.94, w: int | None = None, axis: int = 0, dtype=None) -> NDArray:
     r""" Compute exponential moving average(s) for each `X`' series.
+
+    Geometrically decaying weighted average that gives more importance
+    to recent observations. Reacts faster than :func:`sma` to regime
+    changes; smaller ``alpha`` (or smaller equivalent window ``w``)
+    increases reactivity at the cost of more noise. The recursive
+    formulation makes computation O(T) per series, with no need to
+    store the full window.
+
+    Either ``alpha`` (smoothing factor in ``[0, 1]``) or ``w`` (window
+    size mapped to ``alpha = 1 - 2 / (1 + w)``) can be specified.
 
     .. math::
 

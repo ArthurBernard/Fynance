@@ -12,5 +12,5 @@ Minimum and maximum
 .. autosummary::
    :toctree: generated/
 
-   fynance.features.roll_functions.roll_min
-   fynance.features.roll_functions.roll_max
+   roll_min
+   roll_max
