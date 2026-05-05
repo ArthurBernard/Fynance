@@ -1,5 +1,7 @@
-﻿fynance.features.indicators.bollinger\_band
-===========================================
+﻿bollinger_band
+==========================================
+
+*Defined in* :mod:`fynance.features.indicators`
 
 .. currentmodule:: fynance.features.indicators
 

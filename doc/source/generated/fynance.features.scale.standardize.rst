@@ -1,5 +1,7 @@
-﻿fynance.features.scale.standardize
+﻿standardize
 ==================================
+
+*Defined in* :mod:`fynance.features.scale`
 
 .. currentmodule:: fynance.features.scale
 

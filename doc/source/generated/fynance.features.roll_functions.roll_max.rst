@@ -1,5 +1,7 @@
-﻿fynance.features.roll\_functions.roll\_max
-==========================================
+﻿roll_max
+========================================
+
+*Defined in* :mod:`fynance.features.roll_functions`
 
 .. currentmodule:: fynance.features.roll_functions
 

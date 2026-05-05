@@ -1,5 +1,7 @@
-﻿fynance.features.metrics.accuracy
+﻿accuracy
 =================================
+
+*Defined in* :mod:`fynance.features.metrics`
 
 .. currentmodule:: fynance.features.metrics
 

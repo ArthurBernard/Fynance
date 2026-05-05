@@ -1,5 +1,7 @@
-﻿fynance.features.filters.kalman\_loglikelihood
-==============================================
+﻿kalman_loglikelihood
+=============================================
+
+*Defined in* :mod:`fynance.features.filters`
 
 .. currentmodule:: fynance.features.filters
 

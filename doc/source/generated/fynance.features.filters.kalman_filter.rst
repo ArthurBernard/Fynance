@@ -1,5 +1,7 @@
-﻿fynance.features.filters.kalman\_filter
-=======================================
+﻿kalman_filter
+======================================
+
+*Defined in* :mod:`fynance.features.filters`
 
 .. currentmodule:: fynance.features.filters
 

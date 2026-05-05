@@ -1,5 +1,7 @@
-﻿fynance.features.roll\_functions.roll\_min
-==========================================
+﻿roll_min
+========================================
+
+*Defined in* :mod:`fynance.features.roll_functions`
 
 .. currentmodule:: fynance.features.roll_functions
 

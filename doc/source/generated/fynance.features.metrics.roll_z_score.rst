@@ -1,5 +1,7 @@
-﻿fynance.features.metrics.roll\_z\_score
-=======================================
+﻿roll_z_score
+=====================================
+
+*Defined in* :mod:`fynance.features.metrics`
 
 .. currentmodule:: fynance.features.metrics
 

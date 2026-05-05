@@ -1,5 +1,7 @@
-﻿fynance.features.metrics.roll\_mdd
-==================================
+﻿roll_mdd
+=================================
+
+*Defined in* :mod:`fynance.features.metrics`
 
 .. currentmodule:: fynance.features.metrics
 

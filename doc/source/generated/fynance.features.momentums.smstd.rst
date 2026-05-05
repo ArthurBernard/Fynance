@@ -1,5 +1,7 @@
-﻿fynance.features.momentums.smstd
+﻿smstd
 ================================
+
+*Defined in* :mod:`fynance.features.momentums`
 
 .. currentmodule:: fynance.features.momentums
 

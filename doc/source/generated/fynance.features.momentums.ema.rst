@@ -1,5 +1,7 @@
-﻿fynance.features.momentums.ema
+﻿ema
 ==============================
+
+*Defined in* :mod:`fynance.features.momentums`
 
 .. currentmodule:: fynance.features.momentums
 

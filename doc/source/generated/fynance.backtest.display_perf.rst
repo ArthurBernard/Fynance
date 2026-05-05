@@ -1,5 +1,7 @@
-﻿fynance.backtest.display\_perf
-==============================
+﻿display_perf
+=============================
+
+*Defined in* :mod:`fynance.backtest`
 
 .. currentmodule:: fynance.backtest
 

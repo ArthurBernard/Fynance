@@ -1,5 +1,7 @@
-﻿fynance.features.filters.rts\_smoother
-======================================
+﻿rts_smoother
+=====================================
+
+*Defined in* :mod:`fynance.features.filters`
 
 .. currentmodule:: fynance.features.filters
 

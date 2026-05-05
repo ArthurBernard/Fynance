@@ -1,5 +1,7 @@
-﻿fynance.features.metrics.calmar
+﻿calmar
 ===============================
+
+*Defined in* :mod:`fynance.features.metrics`
 
 .. currentmodule:: fynance.features.metrics
 

@@ -1,5 +1,7 @@
-﻿fynance.features.metrics.mad
+﻿mad
 ============================
+
+*Defined in* :mod:`fynance.features.metrics`
 
 .. currentmodule:: fynance.features.metrics
 

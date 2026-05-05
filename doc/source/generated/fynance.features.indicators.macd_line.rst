@@ -1,5 +1,7 @@
-﻿fynance.features.indicators.macd\_line
-======================================
+﻿macd_line
+=====================================
+
+*Defined in* :mod:`fynance.features.indicators`
 
 .. currentmodule:: fynance.features.indicators
 

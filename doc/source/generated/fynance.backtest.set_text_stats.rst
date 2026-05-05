@@ -1,5 +1,7 @@
-﻿fynance.backtest.set\_text\_stats
-=================================
+﻿set_text_stats
+===============================
+
+*Defined in* :mod:`fynance.backtest`
 
 .. currentmodule:: fynance.backtest
 
