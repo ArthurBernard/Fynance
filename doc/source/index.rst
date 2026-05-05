@@ -22,14 +22,14 @@ active development.
    :margin: 0
    :padding: 0
 
-   .. grid-item-card:: :octicon:`graph;1.2em;sd-mr-1` Algorithms
+   .. grid-item-card:: :octicon:`goal;1.2em;sd-mr-1` Algorithms
       :link: algorithms
       :link-type: doc
 
       Portfolio allocation (ERC, HRP, IVP, MDP, MVP) and rolling
       walk-forward wrappers.
 
-   .. grid-item-card:: :octicon:`gear;1.2em;sd-mr-1` Backtest
+   .. grid-item-card:: :octicon:`rocket;1.2em;sd-mr-1` Backtest
       :link: backtest
       :link-type: doc
 
@@ -80,8 +80,33 @@ From source (GitHub)
  Contents
 ----------
 
+:doc:`Algorithms <algorithms>`
+   - :doc:`Portfolio allocation <algorithms.allocation>`
+
+:doc:`Backtest <backtest>`
+   - :doc:`Plotting backtest <backtest.plot_object>`
+   - :doc:`Backtesting tools <backtest.tools>`
+
+:doc:`Estimator <estimator>`
+
+:doc:`Features <features>`
+   - :doc:`Filters <features.filters>`
+   - :doc:`Indicators <features.indicators>`
+   - :doc:`Metrics <features.metrics>`
+   - :doc:`Momentums <features.momentums>`
+   - :doc:`Rolling functions <features.roll_functions>`
+   - :doc:`Scale <features.scale>`
+
+:doc:`Models <models>`
+   - :doc:`Attention <models.attention>`
+   - :doc:`Econometric models <models.econometric_models>`
+   - :doc:`Neural network models <models.neural_network>`
+   - :doc:`Recurrent neural networks <models.recurrent_neural_network>`
+   - :doc:`Rolling models <models.rolling>`
+
 .. toctree::
    :maxdepth: 2
+   :hidden:
 
    algorithms
    backtest

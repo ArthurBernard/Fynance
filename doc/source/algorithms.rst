@@ -9,7 +9,7 @@ Portfolio allocation algorithms and rolling walk-forward wrappers.
    :margin: 0
    :padding: 0
 
-   .. grid-item-card:: :octicon:`pie-chart;1.2em;sd-mr-1` Portfolio allocation
+   .. grid-item-card:: :octicon:`project;1.2em;sd-mr-1` Portfolio allocation
       :link: algorithms.allocation
       :link-type: doc
 

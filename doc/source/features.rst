@@ -30,7 +30,7 @@ moving standard deviations and rolling functions.
       Annualized return and volatility, Calmar ratio, Sharpe ratio,
       maximum drawdown, Z-score and more.
 
-   .. grid-item-card:: :octicon:`graph;1.2em;sd-mr-1` Momentums
+   .. grid-item-card:: :octicon:`arrow-up-right;1.2em;sd-mr-1` Momentums
       :link: features.momentums
       :link-type: doc
 

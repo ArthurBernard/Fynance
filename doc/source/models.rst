@@ -10,27 +10,27 @@ architectures.
    :margin: 0
    :padding: 0
 
-   .. grid-item-card:: :octicon:`broadcast;1.2em;sd-mr-1` Attention
+   .. grid-item-card:: :octicon:`eye;1.2em;sd-mr-1` Attention
       :link: models.attention
       :link-type: doc
 
       Scaled dot-product and multi-head attention modules for
       Transformer-based architectures.
 
-   .. grid-item-card:: :octicon:`pulse;1.2em;sd-mr-1` Econometric models
+   .. grid-item-card:: :octicon:`law;1.2em;sd-mr-1` Econometric models
       :link: models.econometric_models
       :link-type: doc
 
       Time-series models: MA, ARMA, ARMA-GARCH, ARMAX-GARCH.
 
-   .. grid-item-card:: :octicon:`workflow;1.2em;sd-mr-1` Neural network models
+   .. grid-item-card:: :octicon:`dependabot;1.2em;sd-mr-1` Neural network models
       :link: models.neural_network
       :link-type: doc
 
       Multi-layer perceptron and base class for PyTorch neural network
       models.
 
-   .. grid-item-card:: :octicon:`sync;1.2em;sd-mr-1` Recurrent neural networks
+   .. grid-item-card:: :octicon:`iterations;1.2em;sd-mr-1` Recurrent neural networks
       :link: models.recurrent_neural_network
       :link-type: doc
 
