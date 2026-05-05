@@ -1,10 +1,25 @@
 --------------------------------------------------
- Financial algorithms (:mod:`fynance.algorithms`) 
+ Financial algorithms (:mod:`fynance.algorithms`)
 --------------------------------------------------
 
-Several financial algorithms (portfolio allocation, etc.).
+Portfolio allocation algorithms and rolling walk-forward wrappers.
 
-.. automodule:: fynance.algorithms
-   :no-members:
-   :no-inherited-members:
-   :no-special-members:
+.. grid:: 1 1 1 1
+   :gutter: 3
+   :margin: 0
+   :padding: 0
+
+   .. grid-item-card:: :octicon:`pie-chart;1.2em;sd-mr-1` Portfolio allocation
+      :link: algorithms.allocation
+      :link-type: doc
+
+      Equal Risk Contribution (ERC), Hierarchical Risk Parity (HRP),
+      Inverse Variance Portfolio (IVP), Maximum Diversified Portfolio
+      (MDP), Minimum Variance Portfolio (MVP, MVP_uc) and a rolling
+      walk-forward wrapper.
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   algorithms.allocation

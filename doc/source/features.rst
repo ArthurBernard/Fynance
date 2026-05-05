@@ -1,26 +1,85 @@
 ------------------------------------
- Features (:mod:`fynance.features`) 
+ Features (:mod:`fynance.features`)
 ------------------------------------
 
-.. automodule:: fynance.features
-   :no-members:
-   :no-inherited-members:
-   :no-special-members:
+Financial features: metrics, indicators, scaling, moving averages,
+moving standard deviations and rolling functions.
 
-These modules contain several financial features such as metrics, indicators, scale transformation and also some statistical features as moving averages and moving standard deviations.
+.. grid:: 1 2 2 3
+   :gutter: 3
+   :margin: 0
+   :padding: 0
 
-Some precisions about parameters' notation in the following modules:
+   .. grid-item-card:: :octicon:`filter;1.2em;sd-mr-1` Filters
+      :link: features.filters
+      :link-type: doc
 
-- ``X`` is the time-series of returns, prices or indexed values. It can be one or two-dimensional array, if ``X`` is two-dimensional then you can precise the axis along wich make the computation. By default the compuatation is done along axis 0, i.e. each row is an observation at time t and each column is a different time-series.
+      Kalman filter with RTS smoother and maximum-likelihood
+      parameter estimation.
 
-- ``w`` is the size of the lagged window, e.g. a simple moving average of ``X`` is noted :math:`sma^w_t(X) = \frac{1}{w} \sum^{w-i}_{i=0} X_{t-i}`.
+   .. grid-item-card:: :octicon:`pulse;1.2em;sd-mr-1` Indicators
+      :link: features.indicators
+      :link-type: doc
 
-- ``kind`` means the method to compute moving average and/or standard deviation, simple ``'s'``, weighted ``'w'`` and exponential ``'e'`` are allowed.
+      Bollinger Band, CCI, Hull Moving Average, MACD, RSI.
 
-- ``slow_w`` and ``fast_w`` are the size of the lagged windows for respectively long and short moving averages/standard deviations.
+   .. grid-item-card:: :octicon:`meter;1.2em;sd-mr-1` Metrics
+      :link: features.metrics
+      :link-type: doc
 
-- ``period`` is the number of period per year of data, e.g in daily data ``period=252`` trading days per year or ``period=365`` days per year, it depends of data.
+      Annualized return and volatility, Calmar ratio, Sharpe ratio,
+      maximum drawdown, Z-score and more.
 
-- ``axis`` is the axis on which the computation is done. This parameter is relevant only for two-dimensional arrays. By default the compuatation is done along axis 0, i.e. each row is an observation at time t and each column is a different time-series.
+   .. grid-item-card:: :octicon:`graph;1.2em;sd-mr-1` Momentums
+      :link: features.momentums
+      :link-type: doc
 
-- ``dtype`` is the type of output data in the array, only 'numerical types' are allowed (e.g. ``float``, ``double``, ``int``, ``np.float16``, etc.). By default is None, it infer the data type from ``X`` input.
+      Simple, exponential and weighted moving averages and standard
+      deviations.
+
+   .. grid-item-card:: :octicon:`sync;1.2em;sd-mr-1` Rolling functions
+      :link: features.roll_functions
+      :link-type: doc
+
+      Rolling minimum and rolling maximum.
+
+   .. grid-item-card:: :octicon:`arrow-switch;1.2em;sd-mr-1` Scale
+      :link: features.scale
+      :link-type: doc
+
+      Standardization, normalization and their rolling versions.
+
+----------
+ Notation
+----------
+
+Common parameters across modules:
+
+- ``X`` — time-series of returns, prices or indexed values. One- or
+  two-dimensional. For 2D arrays, ``axis=0`` (default) means each row
+  is an observation at time ``t`` and each column is a different
+  time-series.
+- ``w`` — size of the lagged window, e.g. a simple moving average of
+  ``X`` is noted :math:`sma^w_t(X) = \frac{1}{w} \sum^{w-i}_{i=0} X_{t-i}`.
+- ``kind`` — method for moving average and/or standard deviation:
+  simple (``'s'``), weighted (``'w'``) or exponential (``'e'``).
+- ``slow_w``, ``fast_w`` — size of the lagged windows for long and
+  short moving averages/standard deviations.
+- ``period`` — number of periods per year (e.g. ``252`` for daily
+  trading days, ``365`` for daily calendar).
+- ``axis`` — axis along which the computation is performed (relevant
+  only for 2D arrays).
+- ``dtype`` — output data type. Only numerical types are allowed
+  (``float``, ``double``, ``int``, ``np.float16``, etc.). Default is
+  ``None`` (inferred from ``X``).
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   features.filters
+   features.indicators
+   features.metrics
+   features.momentums
+   features.roll_functions
+   features.scale
