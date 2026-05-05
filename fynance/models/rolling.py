@@ -55,10 +55,22 @@ class _RollingBasis:
     ``X[t:t+s]``.  Call :meth:`set_roll_period` (or :meth:`__call__`) to
     configure the window sizes, then iterate with :func:`run`.
 
+    The leading underscore signals that this class is **internal** —
+    its ``_train``, ``_get_loss_on`` and ``sub_predict`` hooks are
+    expected to be overridden by a concrete subclass mixed with a
+    :class:`~fynance.models.neural_network.BaseNeuralNet` descendant.
+    The public, stable entry point is
+    :class:`RollMultiLayerPerceptron`. Other ready-to-use combinations
+    can be added by following the same pattern (multiple inheritance
+    + ``set_roll_period`` instead of ``__call__``, since the latter is
+    captured by ``torch.nn.Module``).
+
     Parameters
     ----------
     X, y : array_like
-        Respectively input and output data.
+        Respectively input and output data, shaped ``(T, N)`` and
+        ``(T, M)``. Strict temporal ordering is required — no
+        shuffling, no future leakage.
     f : callable, optional
         Function to transform target, e.g. ``torch.sign``.
     index : array_like, optional
