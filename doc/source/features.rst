@@ -49,9 +49,8 @@ moving standard deviations and rolling functions.
 
       Standardization, normalization and their rolling versions.
 
-----------
- Notation
-----------
+Notation
+========
 
 Common parameters across modules:
 
