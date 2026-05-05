@@ -67,6 +67,17 @@ include = ["fynance*"]
 [tool.pytest.ini_options]
 addopts = "--doctest-modules --exitfirst -vv --capture=no --ignore=fynance/dev"
 testpaths = ["fynance"]
+filterwarnings = [
+    # Third-party deprecation noise (numpy, pandas, torch, etc.) is out of
+    # scope — keep it visible but non-fatal. Listed first because pytest
+    # prepends filters: the LAST entry is checked first, so fynance-internal
+    # rules below take precedence over these defaults.
+    "default::DeprecationWarning",
+    "default::PendingDeprecationWarning",
+    # Promote internal deprecations to errors so they cannot ship silently.
+    "error::DeprecationWarning:fynance\\..*",
+    "error::PendingDeprecationWarning:fynance\\..*",
+]
 
 [tool.ruff]
 target-version = "py310"

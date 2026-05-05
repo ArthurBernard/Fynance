@@ -97,6 +97,68 @@ Do not add new Cython files. New numerical code goes in the `.py` counterpart us
 ruff check fynance/
 ```
 
+## Stability and deprecations
+
+The symbols re-exported from `fynance.models`, `fynance.algorithms.allocation`,
+`fynance.features` and `fynance.estimator` form the **public API for the 1.x
+series**. Within 1.x:
+
+- public function and class signatures are frozen — no removals, no
+  backward-incompatible signature changes;
+- behavioural changes that would break user code go through **one
+  release** of `DeprecationWarning` before becoming the default;
+- internal helpers (names prefixed with `_`) and `fynance.backtest`
+  remain free to evolve without a deprecation cycle.
+
+Active deprecations are tracked in [CHANGELOG.md](CHANGELOG.md).
+
+### Emitting a deprecation (contributors)
+
+```python
+import warnings
+
+warnings.warn(
+    "old_function() is deprecated and will be removed in fynance 2.0; "
+    "use new_function() instead.",
+    category=DeprecationWarning,
+    stacklevel=2,
+)
+```
+
+The CI configuration (`pyproject.toml::tool.pytest.ini_options.filterwarnings`)
+promotes any `DeprecationWarning` raised from inside `fynance.*` to a
+test failure, so a new deprecation cannot land without the matching
+test being explicitly marked:
+
+```python
+import pytest
+
+@pytest.mark.filterwarnings(
+    "ignore:old_function:DeprecationWarning"
+)
+def test_old_function_still_works():
+    ...
+```
+
+### Silencing fynance deprecations (downstream users)
+
+If you depend on a deprecated path and need to stay on 1.x while you
+migrate, opt out **explicitly**:
+
+```python
+import warnings
+warnings.filterwarnings(
+    "ignore", category=DeprecationWarning, module=r"fynance\..*"
+)
+```
+
+To go the other way and have your own test suite fail on any fynance
+deprecation:
+
+```bash
+pytest -W "error::DeprecationWarning:fynance\\..*"
+```
+
 ## Release process (maintainer only)
 
 1. All planned features merged into `develop`, CI green.

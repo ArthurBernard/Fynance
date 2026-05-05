@@ -466,8 +466,12 @@ def drawdown(X: NDArray, raw: bool = False, axis: int = 0, dtype=None) -> NDArra
 def _drawdown(X, raw):
     if (X[0] == 0).any() and not raw:
 
-        warn('Cannot compute drawdown in percentage without initial values '
-             'X[0] strictly positive.')
+        warn(
+            'Cannot compute drawdown in percentage without initial values '
+            'X[0] strictly positive.',
+            category=UserWarning,
+            stacklevel=2,
+        )
         raw = True
 
     if len(X.shape) == 2:
@@ -1304,8 +1308,12 @@ def roll_drawdown(X: NDArray, w: int | None = None, raw: bool = False, axis: int
 def _roll_drawdown(X, w, raw):
     if (X[0] == 0).any() and not raw:
 
-        warn('Cannot compute drawdown in percentage without initial values '
-             'X[0] strictly positive.')
+        warn(
+            'Cannot compute drawdown in percentage without initial values '
+            'X[0] strictly positive.',
+            category=UserWarning,
+            stacklevel=2,
+        )
         raw = True
 
     if len(X.shape) == 2:

@@ -54,8 +54,12 @@ def wrap_axis(func):
     def check_axis(X, *args, axis=0, min_size=0, **kwargs):
         shape = X.shape
         if X.ndim > 2:
-            warn('currently, array of dimensions larger than 2 are not '
-                 'supported, it may lead to some issues')
+            warn(
+                'currently, array of dimensions larger than 2 are not '
+                'supported, it may lead to some issues',
+                category=UserWarning,
+                stacklevel=2,
+            )
 
         if shape[axis] < min_size:
 
@@ -83,9 +87,13 @@ def wrap_lags(func):
             raise ValueError('lag {} must be greater than 0.'.format(k))
 
         elif X.shape[axis] < k:
-            warn('{} lags is out of bounds for axis {} with size {}'.format(
-                k, axis, X.shape[axis]
-            ))
+            warn(
+                '{} lags is out of bounds for axis {} with size {}'.format(
+                    k, axis, X.shape[axis]
+                ),
+                category=UserWarning,
+                stacklevel=2,
+            )
             k = X.shape[axis]
 
         return func(X, k, *args, axis=axis, **kwargs)
@@ -111,8 +119,12 @@ def wrap_window(func):
                 must be positive.'.format(w))
 
         elif w > X.shape[0]:
-            warn('lagged window of size {} is out of bounds with time axis \
-                of size {}'.format(w, X.shape[0]))
+            warn(
+                'lagged window of size {} is out of bounds with time axis '
+                'of size {}'.format(w, X.shape[0]),
+                category=UserWarning,
+                stacklevel=2,
+            )
             w = X.shape[0]
 
         return func(X, w=int(w), **kwargs)
