@@ -6,7 +6,28 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2019-11-05 17:20:52
 
-""" Algorithms of portfolio allocation. """
+""" Algorithms of portfolio allocation.
+
+Risk-based and mean-variance methods that compute portfolio weights
+from a sample of asset returns. Each function takes a 2-D array where
+columns are asset price/return series and returns the optimal weights
+as a 1-D array summing to one.
+
+A walk-forward wrapper, :func:`rolling_allocation`, applies any of
+these methods on a rolling training window — useful for backtesting
+allocation strategies without lookahead bias.
+
+Main entry points
+-----------------
+- :func:`ERC` — Equal Risk Contribution (risk-parity).
+- :func:`HRP` — Hierarchical Risk Parity.
+- :func:`IVP` — Inverse Variance Portfolio.
+- :func:`MDP` — Maximum Diversified Portfolio.
+- :func:`MVP`, :func:`MVP_uc` — Minimum Variance Portfolio (constrained
+  / unconstrained).
+- :func:`rolling_allocation` — walk-forward wrapper.
+
+"""
 
 from __future__ import annotations
 

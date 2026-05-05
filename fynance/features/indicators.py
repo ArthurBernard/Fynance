@@ -6,7 +6,24 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2019-11-18 17:57:42
 
-""" Financial indicators. """
+""" Technical indicators for price-series analysis.
+
+Classical technical-analysis indicators — Bollinger Band, CCI, Hull
+moving average, MACD components, RSI — derived from rolling moving
+averages and standard deviations (see :mod:`fynance.features.momentums`).
+
+These indicators are commonly used to build trading signals or features
+for machine-learning models in finance.
+
+Main entry points
+-----------------
+- :func:`bollinger_band` — upper / lower volatility envelope.
+- :func:`cci` — Commodity Channel Index.
+- :func:`hma` — Hull Moving Average.
+- :func:`macd_line`, :func:`signal_line`, :func:`macd_hist` — MACD.
+- :func:`rsi` — Relative Strength Index.
+
+"""
 
 from __future__ import annotations
 

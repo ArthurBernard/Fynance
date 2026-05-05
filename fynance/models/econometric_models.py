@@ -6,7 +6,23 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2019-05-23 17:31:40
 
-""" Econometric models. """
+""" Classical econometric time-series models.
+
+Pure-NumPy implementations of moving-average, autoregressive and
+GARCH-family processes used to simulate or fit return series. Parameter
+estimation is delegated to the Cython routines in
+:mod:`fynance.estimator` via :func:`get_parameters`, a single
+maximum-likelihood entry point for all four model types.
+
+Main entry points
+-----------------
+- :func:`MA` — Moving Average process.
+- :func:`ARMA` — AutoRegressive Moving Average.
+- :func:`ARMA_GARCH` — ARMA with GARCH(p, q) conditional variance.
+- :func:`ARMAX_GARCH` — ARMA-GARCH with exogenous regressors.
+- :func:`get_parameters` — fit the parameters of any of the above.
+
+"""
 
 # Built-in packages
 

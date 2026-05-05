@@ -6,7 +6,24 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2019-11-05 15:55:19
 
-""" Statical momentum functions. """
+""" Statistical momentum functions.
+
+Rolling moving averages and moving standard deviations in three flavors
+— simple, weighted and exponential — used as building blocks for
+technical indicators, scaling and signal generation.
+
+Implementations are vectorized with NumPy and accept 1-D or 2-D inputs.
+The window size ``w`` defaults to the full length of the series; the
+``axis`` keyword controls the time axis on 2-D arrays.
+
+Main entry points
+-----------------
+- :func:`sma`, :func:`wma`, :func:`ema` — moving averages (simple,
+  weighted, exponential).
+- :func:`smstd`, :func:`wmstd`, :func:`emstd` — moving standard
+  deviations.
+
+"""
 
 from __future__ import annotations
 

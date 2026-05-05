@@ -1,7 +1,25 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-""" Attention mechanisms for sequential financial data. """
+""" Attention mechanisms for sequential financial data.
+
+PyTorch implementations of the building blocks introduced by
+Vaswani et al. (2017): scaled dot-product attention and multi-head
+attention. Used to build Transformer-style architectures for return
+series, order books and other sequential financial signals where
+long-range dependencies matter.
+
+Main entry points
+-----------------
+- :class:`ScaledDotProductAttention` — single-head scaled attention.
+- :class:`MultiHeadAttention` — parallel attention heads with
+  learnable projections.
+
+References
+----------
+.. [1] Vaswani, A. et al. (2017). Attention Is All You Need.
+
+"""
 
 import math
 

@@ -6,7 +6,23 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2020-01-24 15:57:17
 
-""" Metric functions used for financial analysis. """
+""" Performance and risk metrics for financial analysis.
+
+Compute risk-adjusted returns, drawdown statistics and other summary
+indicators commonly used to evaluate strategies and portfolios. All
+functions accept a 1-D or 2-D array of prices/returns and return the
+metric along the time axis.
+
+Main entry points
+-----------------
+- :func:`annual_return`, :func:`annual_volatility` — annualized
+  return and volatility from a price series.
+- :func:`sharpe`, :func:`calmar`, :func:`diversified_ratio` —
+  risk-adjusted performance ratios.
+- :func:`mdd`, :func:`drawdown` — maximum drawdown and drawdown path.
+- :func:`z_score`, :func:`accuracy` — statistical helpers.
+
+"""
 
 from __future__ import annotations
 

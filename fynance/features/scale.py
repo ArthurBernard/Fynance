@@ -6,7 +6,26 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2021-03-12 22:16:21
 
-""" Object to scale data. """
+""" Data scaling utilities.
+
+Functions and a fit/transform-style :class:`Scale` object to standardize
+or normalize one- and two-dimensional arrays before feeding them to a
+machine-learning model.
+
+Both global versions (whole-sample mean/std, min/max) and rolling
+versions (computed on a lagged window) are provided. Rolling variants
+are lookahead-safe and recommended for time-series ML pipelines where
+using a global statistic would leak future information into training
+windows.
+
+Main entry points
+-----------------
+- :func:`standardize` / :func:`roll_standardize` — z-score scaling.
+- :func:`normalize` / :func:`roll_normalize` — min-max scaling.
+- :class:`Scale` — fit/transform wrapper that stores parameters and
+  exposes a :meth:`Scale.revert` inverse.
+
+"""
 
 # Built-in packages
 

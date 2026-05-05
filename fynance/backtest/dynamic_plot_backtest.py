@@ -6,7 +6,20 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2023-02-10 10:45:49
 
-""" Module with some function plot backtest. """
+""" Live-updating plotting of backtest results during training.
+
+Provides :class:`BacktestNeuralNet`, a Matplotlib figure that updates
+its loss curves and cumulative-performance panel after each iteration
+of a walk-forward training loop (see :class:`fynance.models.rolling._RollingBasis`).
+Useful to monitor convergence and out-of-sample behavior in real time.
+
+Main entry points
+-----------------
+- :class:`BacktestNeuralNet` — dynamic figure with loss and
+  performance subplots refreshed via :meth:`plot_loss` and
+  :meth:`plot_perf`.
+
+"""
 
 # Built-in packages
 

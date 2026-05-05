@@ -6,7 +6,26 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2023-07-28 11:32:15
 
-""" Basis of neural networks models. """
+""" Base classes for PyTorch neural network models.
+
+Defines :class:`BaseNeuralNet`, a thin wrapper around
+``torch.nn.Module`` that adds higher-level training, prediction and
+serialization helpers, and :class:`MultiLayerPerceptron`, a
+configurable feed-forward MLP built on top of it.
+
+These classes are the foundation for the recurrent models in
+:mod:`fynance.models.recurrent_neural_network` and the walk-forward
+training wrappers in :mod:`fynance.models.rolling`.
+
+Main entry points
+-----------------
+- :class:`BaseNeuralNet` — base class with ``set_optimizer``,
+  ``train_on``, ``predict``, ``set_data``, ``save_model``,
+  ``load_model`` helpers.
+- :class:`MultiLayerPerceptron` — vanilla MLP with configurable
+  hidden layers, activation and dropout.
+
+"""
 
 from __future__ import annotations
 

@@ -1,7 +1,28 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-""" Basis of rolling models. """
+""" Walk-forward training wrappers for time-series models.
+
+Iterator-based base class :class:`_RollingBasis` that re-fits a model
+on a sliding training window and predicts on the next out-of-sample
+window. The pattern enforces strict temporal ordering, eliminating
+lookahead bias and matching how a strategy would actually be retrained
+in production.
+
+A concrete :class:`RollMultiLayerPerceptron` combines this iterator
+with :class:`fynance.models.neural_network.MultiLayerPerceptron`. The
+same pattern is applied to portfolio allocation in
+:func:`fynance.algorithms.allocation.rolling_allocation`.
+
+Main entry points
+-----------------
+- :class:`_RollingBasis` — iterator that yields ``(eval_set,
+  test_set)`` slices and tracks training/evaluation/test losses.
+- :class:`RollMultiLayerPerceptron` — walk-forward MLP, ready to use
+  via :meth:`RollMultiLayerPerceptron.set_roll_period` and
+  :meth:`RollMultiLayerPerceptron.run`.
+
+"""
 
 from __future__ import annotations
 

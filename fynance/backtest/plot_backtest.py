@@ -6,7 +6,19 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2020-07-31 19:42:35
 
-""" Module with some function plot backtest. """
+""" Static plotting of backtest results.
+
+Matplotlib- and Seaborn-based helpers to render strategy performance
+curves, drawdowns and rolling statistics from a return series. Suited
+to post-run analysis and reporting; see
+:mod:`fynance.backtest.dynamic_plot_backtest` for live-training plots.
+
+Main entry points
+-----------------
+- :class:`PlotBackTest` — figure object that draws cumulative
+  performance, underlying series and configurable annotations.
+
+"""
 
 # Built-in packages
 

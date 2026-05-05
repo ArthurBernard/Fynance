@@ -6,7 +6,30 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2023-07-31 17:30:04
 
-""" Recurrent Neural Network models. """
+""" Recurrent neural network models for sequential financial data.
+
+PyTorch implementations of vanilla RNN, GRU and LSTM cells exposed as
+training-ready modules. Designed for one-step-ahead prediction on
+return / price series, but accept any time-ordered tensor.
+
+All models follow the :class:`fynance.models.neural_network.BaseNeuralNet`
+contract (``train_on`` / ``predict``) and integrate with the
+walk-forward iterator in :mod:`fynance.models.rolling`.
+
+Main entry points
+-----------------
+- :class:`RecurrentNeuralNetwork` — vanilla RNN.
+- :class:`GatedRecurrentUnit` — GRU.
+- :class:`LongShortTermMemory` — LSTM.
+
+References
+----------
+.. [1] Hochreiter, S. & Schmidhuber, J. (1997). Long Short-Term
+       Memory.
+.. [2] Cho, K. et al. (2014). Learning Phrase Representations using
+       RNN Encoder-Decoder for Statistical Machine Translation.
+
+"""
 
 from __future__ import annotations
 
