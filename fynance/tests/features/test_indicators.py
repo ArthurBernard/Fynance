@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import numpy as np
+import pytest
 
 from fynance.features.indicators import (
     bollinger_band,
@@ -11,6 +12,13 @@ from fynance.features.indicators import (
     macd_line,
     rsi,
     signal_line,
+)
+
+# bollinger_band keeps a 1.1.0-era DeprecationWarning until v2.0; silence it
+# locally so the strict `error::DeprecationWarning` filter (pyproject.toml)
+# stays effective for genuinely new deprecations.
+pytestmark = pytest.mark.filterwarnings(
+    "ignore:Since version 1.1.0, bollinger_band:DeprecationWarning"
 )
 
 N = 100

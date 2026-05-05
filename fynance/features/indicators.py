@@ -116,8 +116,11 @@ def bollinger_band(
 
     Examples
     --------
+    >>> import warnings
     >>> X = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
-    >>> upper_band, lower_band = bollinger_band(X, w=3, n=2)
+    >>> with warnings.catch_warnings():
+    ...     warnings.simplefilter("ignore", DeprecationWarning)
+    ...     upper_band, lower_band = bollinger_band(X, w=3, n=2)
     >>> upper_band
     array([ 60.        , 120.        , 112.65986324, 132.65986324,
            185.31972647, 185.31972647])
@@ -139,7 +142,13 @@ def bollinger_band(
     if kind == 'e':
         w = 1 - 2 / (1 + w)
 
-    warn('Since version 1.1.0, bollinger_band returns upper and lower bands.')
+    warn(
+        'Since version 1.1.0, bollinger_band returns upper and lower bands. '
+        'The single-array return path is deprecated and will be removed in '
+        'fynance 2.0.',
+        category=DeprecationWarning,
+        stacklevel=2,
+    )
 
     if axis == 1:
         avg = _handler_ma[kind.lower()](X.T, w).T

@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- `bollinger_band` legacy single-array notice reclassified from
+  `UserWarning` to `DeprecationWarning`; the legacy return path is
+  scheduled for removal in fynance 2.0.
+- All other internal `warnings.warn(...)` calls now pass `category=` and
+  `stacklevel=` explicitly (no semantic change — same `UserWarning`).
+
+### Added
+
+- 1.x **API stability policy** declared in `fynance/__init__.py` and
+  `CONTRIBUTING.md`; public `__all__` of `fynance.models` is now
+  frozen and built from explicit imports.
+- Strict pytest `filterwarnings`: any `DeprecationWarning` /
+  `PendingDeprecationWarning` raised from inside `fynance.*` is
+  promoted to a test failure, so internal deprecations cannot ship
+  silently.
+
 ## [1.2.0] - 2026-05-03
 
 ### Breaking Changes
