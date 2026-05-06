@@ -1,5 +1,7 @@
-fynance\.models\.econometric\_models\.MA
-========================================
+﻿MA
+====================================
+
+*Defined in* :mod:`fynance.models.econometric_models`
 
 .. currentmodule:: fynance.models.econometric_models
 

@@ -15,6 +15,7 @@ features.
    :maxdepth: 1
    :caption: Contents:
 
+   features.filters
    features.indicators
    features.metrics
    features.momentums
@@ -24,28 +25,32 @@ features.
 """
 
 # Cython imports
-from . import metrics_cy
-from .metrics_cy import *
-from . import metrics
-from .metrics import *
-from . import momentums_cy
-from .momentums_cy import *
-from . import roll_functions_cy
-from .roll_functions_cy import *
-
 # Python imports
-from . import momentums
-from .momentums import *
-from . import indicators
+from . import (
+    filters,
+    indicators,
+    metrics,
+    metrics_cy,
+    momentums,
+    momentums_cy,
+    money_management,
+    roll_functions,
+    roll_functions_cy,
+    scale,
+)
+from .filters import *
 from .indicators import *
-from . import money_management
-from .money_management import * 
-from . import roll_functions
+from .metrics import *
+from .metrics_cy import *
+from .momentums import *
+from .momentums_cy import *
+from .money_management import *
 from .roll_functions import *
-from . import scale
+from .roll_functions_cy import *
 from .scale import *
 
-__all__ = metrics_cy.__all__
+__all__ = filters.__all__
+__all__ += metrics_cy.__all__
 __all__ += metrics.__all__
 __all__ += momentums_cy.__all__
 __all__ += momentums.__all__

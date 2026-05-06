@@ -1,25 +1,12 @@
-fynance.features.scale.Scale
+﻿Scale
 ============================
+
+*Defined in* :mod:`fynance.features.scale`
 
 .. currentmodule:: fynance.features.scale
 
 .. autoclass:: Scale
-   :no-members:
-   :no-inherited-members:
-   :no-special-members:
-
-  
-   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
-      .. autosummary::
-         :toctree:
-      
-         Scale.__call__
-         Scale.fit
-         Scale.revert
-         Scale.scale
-      
-  
-
-  
-  
-  
+   :members:
+   :inherited-members:
+   :special-members: __call__, __iter__, __next__
+   :show-inheritance:

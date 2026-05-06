@@ -6,7 +6,20 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2023-02-10 10:45:49
 
-""" Module with some function plot backtest. """
+""" Live-updating plotting of backtest results during training.
+
+Provides :class:`BacktestNeuralNet`, a Matplotlib figure that updates
+its loss curves and cumulative-performance panel after each iteration
+of a walk-forward training loop (see :class:`fynance.models.rolling._RollingBasis`).
+Useful to monitor convergence and out-of-sample behavior in real time.
+
+Main entry points
+-----------------
+- :class:`BacktestNeuralNet` — dynamic figure with loss and
+  performance subplots refreshed via :meth:`plot_loss` and
+  :meth:`plot_perf`.
+
+"""
 
 # Built-in packages
 
@@ -17,7 +30,7 @@ from matplotlib import pyplot as plt
 from fynance.backtest.plot_backtest import PlotBackTest
 
 # Set plot style
-plt.style.use('seaborn')
+plt.style.use('seaborn-v0_8')
 
 __all__ = ['DynaPlotBackTest']
 
@@ -25,6 +38,13 @@ __all__ = ['DynaPlotBackTest']
 # TODO : FINISH DOCSTRING
 class DynaPlotBackTest(PlotBackTest):
     """ Dynamic plot backtest object.
+
+    Subclass of :class:`PlotBackTest` configured for interactive
+    updates: ``plt.ion()`` is enabled so that the figure refreshes
+    on every call to :meth:`plot`. Includes default styling for
+    train / eval / test curves and a compact legend, suitable for
+    monitoring walk-forward training in real time alongside
+    :class:`fynance.models.rolling._RollingBasis`.
 
     Attributes
     ----------
@@ -81,7 +101,7 @@ class DynaPlotBackTest(PlotBackTest):
         .. [1] https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes
 
         """
-        super(DynaPlotBackTest, self).__init__(fig, ax, size, True, **kwargs)
+        super().__init__(fig, ax, size, True, **kwargs)
         self.ax_params = kwargs
 
     def set_axes(self, **kwargs):
@@ -103,12 +123,10 @@ class DynaPlotBackTest(PlotBackTest):
         ax_params.update(kwargs)
         self._set_axes(**ax_params)
 
-    def _set_axes(self, yscale='linear', xscale='linear', ylabel='',
+    def _set_axes(self, yscale='linear', xscale=None, ylabel='',
                   xlabel='', title='', tick_params={}):
         """ Set axes parameters. """
         self.ax.set_yscale(yscale)
-        # FIXME : the below line avoid to display date on x-axis
-        # self.ax.set_xscale(xscale)
         self.ax.set_ylabel(ylabel)
         self.ax.set_xlabel(xlabel, x=0.9)
         self.ax.set_title(title)
@@ -213,7 +231,7 @@ class DynaPlotAccuracy(DynaPlotBackTest):
         "tick_params": {"axis": "x", "labelsize": 10},
     }
     test_plot_kw = {
-        "label": "Test set", 
+        "label": "Test set",
         "color": "b",
         "lw": 1.7,
         "unit": 'perf',
@@ -584,7 +602,7 @@ class _BacktestNeuralNet:
     dyna_plots = {}
 
     def set_dyna_plot(self, name, klass, ax, **kwargs):
-        dyna_plots[name] = klass(self.f,  ax, **kwargs)
+        dyna_plots[name] = klass(self.f,  ax, **kwargs)  # noqa: F821
 
     def set_fig_and_axes(self, n_rows, n_cols, figsize):
         self.f, self.axes = plt.subplots(n_rows, n_cols, figsize=figsize)

@@ -6,16 +6,31 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2020-09-18 22:21:22
 
-""" Rolling functions. """
+""" Rolling extremum functions.
+
+Rolling minimum and maximum over a lagged window. Used directly as
+features (e.g. price-channel breakouts) and internally by
+:func:`fynance.features.scale.roll_normalize` to compute lookahead-safe
+min-max scaling parameters.
+
+Main entry points
+-----------------
+- :func:`roll_min` — rolling minimum over a window.
+- :func:`roll_max` — rolling maximum over a window.
+
+"""
+
+from __future__ import annotations
 
 # Built-in packages
-
 # Third party packages
 import numpy as np
+from numpy.typing import NDArray
+
+from fynance._wrappers import WrapperArray
 
 # Local packages
 from fynance.features.roll_functions_cy import *
-from fynance._wrappers import WrapperArray
 
 __all__ = ["roll_min", "roll_max"]
 
@@ -26,7 +41,7 @@ __all__ = ["roll_min", "roll_max"]
 
 
 @WrapperArray('dtype', 'axis', 'window')
-def roll_min(X, w=None, axis=0, dtype=None):
+def roll_min(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDArray:
     r""" Compute simple rolling minimum of size `w` for each `X`' series.
 
     .. math::
@@ -91,7 +106,7 @@ def _roll_min(X, w):
 
 
 @WrapperArray('dtype', 'axis', 'window')
-def roll_max(X, w=None, axis=0, dtype=None):
+def roll_max(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDArray:
     r""" Compute simple rolling maximum of size `w` for each `X`' series.
 
     .. math::

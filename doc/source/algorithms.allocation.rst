@@ -14,12 +14,12 @@ Allocation algorithms
 .. autosummary::
    :toctree: generated/
 
-   fynance.algorithms.allocation.ERC
-   fynance.algorithms.allocation.HRP
-   fynance.algorithms.allocation.IVP
-   fynance.algorithms.allocation.MDP
-   fynance.algorithms.allocation.MVP
-   fynance.algorithms.allocation.MVP_uc
+   ERC
+   HRP
+   IVP
+   MDP
+   MVP
+   MVP_uc
 
 Rolling object
 ==============
@@ -27,4 +27,4 @@ Rolling object
 .. autosummary::
    :toctree: generated/
 
-   fynance.algorithms.allocation.rolling_allocation
+   rolling_allocation

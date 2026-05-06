@@ -7,16 +7,16 @@
 
 # External packages
 import numpy as np
-from matplotlib import pyplot as plt
 import seaborn as sns
+from matplotlib import pyplot as plt
 
 # Internal packages
-from fynance.features.money_management import iso_vol
-from fynance.features.metrics import drawdown, roll_sharpe
 from fynance.backtest.print_stats import set_text_stats
+from fynance.features.metrics import drawdown, roll_sharpe
+from fynance.features.money_management import iso_vol
 
 # Set plot style
-plt.style.use('seaborn')
+plt.style.use('seaborn-v0_8')
 
 __all__ = ['display_perf']
 

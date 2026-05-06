@@ -6,19 +6,44 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2019-11-05 17:20:52
 
-""" Algorithms of portfolio allocation. """
+""" Algorithms of portfolio allocation.
+
+Risk-based and mean-variance methods that compute portfolio weights
+from a sample of asset returns. Each function takes a 2-D array where
+columns are asset price/return series and returns the optimal weights
+as a 1-D array summing to one.
+
+A walk-forward wrapper, :func:`rolling_allocation`, applies any of
+these methods on a rolling training window — useful for backtesting
+allocation strategies without lookahead bias.
+
+Main entry points
+-----------------
+- :func:`ERC` — Equal Risk Contribution (risk-parity).
+- :func:`HRP` — Hierarchical Risk Parity.
+- :func:`IVP` — Inverse Variance Portfolio.
+- :func:`MDP` — Maximum Diversified Portfolio.
+- :func:`MVP`, :func:`MVP_uc` — Minimum Variance Portfolio (constrained
+  / unconstrained).
+- :func:`rolling_allocation` — walk-forward wrapper.
+
+"""
+
+from __future__ import annotations
 
 # Built-in packages
+from typing import Callable
 
-# Third party packages
+# Third-party
 import numpy as np
 import pandas as pd
 import scipy.cluster.hierarchy as sch
-from scipy.spatial.distance import squareform
+from numpy.typing import NDArray
 from scipy.optimize import Bounds, LinearConstraint, minimize
 
 # Local packages
 from fynance.features.metrics import diversified_ratio
+
 from .rolling import _RollingMechanism
 
 # TODO : cython
@@ -31,8 +56,22 @@ __all__ = ['ERC', 'HRP', 'IVP', 'MDP', 'MVP', 'MVP_uc', 'rolling_allocation']
 # =========================================================================== #
 
 
-def ERC(X, w0=None, up_bound=1., low_bound=0.):
+def ERC(
+    X: NDArray[np.float64],
+    w0: NDArray[np.float64] | None = None,
+    up_bound: float = 1.,
+    low_bound: float = 0.,
+) -> NDArray[np.float64]:
     r""" Get weights of Equal Risk Contribution portfolio allocation.
+
+    Risk-parity allocation: each asset contributes the same amount of
+    total portfolio variance. ERC sits between the naive 1/N and the
+    minimum-variance portfolio — it requires only the covariance
+    matrix and is robust to noisy expected returns, which makes it a
+    common choice when return forecasts are unreliable.
+
+    The optimizer (SLSQP) minimizes a smooth surrogate of the
+    risk-contribution dispersion under sum-to-one and box constraints.
 
     Notes
     -----
@@ -106,24 +145,7 @@ def ERC(X, w0=None, up_bound=1., low_bound=0.):
 # =========================================================================== #
 
 
-def _corr_dist(mat_corr):
-    """ Compute a distance matrix based on correlation.
-
-    Parameters
-    ----------
-    mat_corr: np.ndarray[ndim=2, dtype=float] or pd.DataFrame
-        Matrix correlation.
-
-    Returns
-    -------
-    mat_dist_corr: np.ndarray[ndim=2, dtype=float] or pd.DataFrame
-        Matrix distance correlation.
-
-    """
-    return ((1 - mat_corr) / 2.) ** 0.5
-
-
-def _get_quasi_diag(link):
+def _get_quasi_diag(link: NDArray[np.float64]) -> list[int]:
     """ Compute quasi diagonal matrix.
 
     TODO : verify the efficiency
@@ -142,70 +164,73 @@ def _get_quasi_diag(link):
 
     """
     link = link.astype(int)
-    sortIx = pd.Series([link[-1, 0], link[-1, 1]])
-    numItems = link[-1, 3]  # number of original items
+    numItems = link[-1, 3]  # number of original leaf items
+    # Use a plain list to avoid pandas dtype coercion issues
+    items = [int(link[-1, 0]), int(link[-1, 1])]
 
-    while sortIx.max() >= numItems:
-        sortIx.index = range(0, sortIx.shape[0] * 2, 2)  # make space
-        df0 = sortIx[sortIx >= numItems]  # find clusters
-        i, j = df0.index, df0.values - numItems
-        sortIx[i] = link[j, 0]  # item 1
-        df0 = pd.Series(link[j, 1], index=i + 1)
-        sortIx = sortIx.append(df0)  # item 2
-        sortIx = sortIx.sort_index()  # re-sort
-        sortIx.index = range(sortIx.shape[0])  # re-index
+    while max(items) >= numItems:
+        expanded = []
+        for item in items:
+            if item >= numItems:
+                cluster_idx = item - numItems
+                expanded.append(int(link[cluster_idx, 0]))
+                expanded.append(int(link[cluster_idx, 1]))
+            else:
+                expanded.append(item)
+        items = expanded
 
-    return sortIx.tolist()
+    return items
 
 
-def _get_rec_bisec(mat_cov, sortIx):
-    """ Compute weights.
-
-    TODO : verify the efficiency /! must be not efficient /!
+def _get_rec_bisec(mat_cov: NDArray[np.float64], sortIx: list[int]) -> NDArray[np.float64]:
+    """ Compute weights via recursive bisection.
 
     Parameters
     ----------
-    mat_cov: pd.DataFrame
-        Matrix variance-covariance
-    sortIx: list
-        Sorted list of items.
+    mat_cov: np.ndarray
+        Matrix variance-covariance (N x N).
+    sortIx: list or np.ndarray of int
+        Sorted list of asset indices (0..N-1).
 
     Returns
     -------
-    pd.DataFrame
-       Weights.
+    np.ndarray
+        Weight vector of shape (N,) indexed by sortIx order.
 
     """
-    w = pd.Series(1, index=sortIx)
-    cItems = [sortIx]  # initialize all items in one cluster
+    n = len(sortIx)
+    w = np.ones(n)
+    cItems = [list(range(n))]
 
     while len(cItems) > 0:
         cItems = [i[j: k] for i in cItems for j, k in (
             (0, int(len(i) / 2)),
             (int(len(i) / 2), len(i))
-        ) if len(i) > 1]  # bi-section
+        ) if len(i) > 1]
 
-        for i in range(0, len(cItems), 2):  # parse in pairs
-            cItems0 = cItems[i]  # cluster 1
-            cItems1 = cItems[i + 1]  # cluster 2
+        for i in range(0, len(cItems), 2):
+            cItems0_idx = cItems[i]
+            cItems1_idx = cItems[i + 1]
+            cItems0 = [sortIx[j] for j in cItems0_idx]
+            cItems1 = [sortIx[j] for j in cItems1_idx]
             cVar0 = _get_cluster(mat_cov, cItems0)
             cVar1 = _get_cluster(mat_cov, cItems1)
             alpha = 1 - cVar0 / (cVar0 + cVar1)
-            w[cItems0] *= alpha  # weight 1
-            w[cItems1] *= 1 - alpha  # weight 2
+            w[cItems0_idx] *= alpha
+            w[cItems1_idx] *= 1 - alpha
 
     return w
 
 
-def _get_cluster(mat_cov, cItems):
+def _get_cluster(mat_cov: NDArray[np.float64], cItems: list[int]) -> float:
     """ Compute cluster for variance.
 
     Parameters
     ----------
-    mat_cov: pd.DataFrame
+    mat_cov: np.ndarray
         Covariance matrix.
-    cItems: list
-        Cluster.
+    cItems: list or np.ndarray of int
+        Cluster asset indices.
 
     Returns
     -------
@@ -213,25 +238,25 @@ def _get_cluster(mat_cov, cItems):
         Cluster variance
 
     """
-    cov_ = mat_cov.loc[cItems, cItems]  # matrix slice
+    cov_ = mat_cov[np.ix_(cItems, cItems)]
     w_ = _get_IVP(cov_).reshape(-1, 1)
-    cVar = ((w_.T @ cov_) @ w_)  # [0, 0]
+    cVar = (w_.T @ cov_) @ w_
 
-    return cVar.values[0, 0]
+    return float(cVar.item())
 
 
-def _get_IVP(mat_cov):
+def _get_IVP(mat_cov: NDArray[np.float64]) -> NDArray[np.float64]:
     """ Compute the inverse-variance matrix.
 
     Parameters
     ----------
-    mat_cov : array_like
+    mat_cov : NDArray[np.float64]
         Variance-covariance matrix.
 
     Returns
     -------
-    pd.DataFrame
-        Matrix of inverse-variance.
+    NDArray[np.float64]
+        Inverse-variance weights.
 
     """
     ivp = 1. / np.diag(mat_cov)
@@ -240,8 +265,25 @@ def _get_IVP(mat_cov):
     return ivp
 
 
-def HRP(X, method='single', metric='euclidean', low_bound=0., up_bound=1.0):
+def HRP(
+    X: NDArray[np.float64],
+    method: str = 'single',
+    metric: str = 'euclidean',
+    low_bound: float = 0.,
+    up_bound: float = 1.0,
+) -> NDArray[np.float64]:
     r""" Get weights of the Hierarchical Risk Parity allocation.
+
+    Cluster-based allocation that avoids inverting the full
+    covariance matrix. Compared with classical Markowitz solutions,
+    HRP is far more stable when ``N`` is large or assets are highly
+    correlated, because it groups similar assets first and only
+    allocates risk *within* and *between* clusters.
+
+    Three steps: (1) build a correlation distance and run hierarchical
+    linkage, (2) reorder the covariance matrix into quasi-diagonal
+    form, (3) recursively bisect the ordered tree, allocating weights
+    by inverse variance to each branch.
 
     Notes
     -----
@@ -263,35 +305,37 @@ def HRP(X, method='single', metric='euclidean', low_bound=0., up_bound=1.0):
     Returns
     -------
     np.ndarray
-        Vecotr of weights computed by HRP algorithm.
+        Vector of weights computed by HRP algorithm.
 
     References
     ----------
     .. [2] https://ssrn.com/abstract=2708678
 
     """
-    if not isinstance(X, pd.DataFrame):
-        X = pd.DataFrame(X)
+    X = np.asarray(X, dtype=np.float64)
+    T, N = X.shape
+    up_bound = max(up_bound, 1.0 / N)
+    low_bound = min(low_bound, 1.0 / N)
 
-    idx = X.columns
-    up_bound = max(up_bound, 1 / X.shape[1])
-    low_bound = min(low_bound, 1 / X.shape[1])
+    mat_cov = np.cov(X, rowvar=False)
+    diag_cov = np.sqrt(np.diag(mat_cov))
+    outer_diag = np.outer(diag_cov, diag_cov)
+    with np.errstate(invalid='ignore', divide='ignore'):
+        mat_corr = np.divide(mat_cov, outer_diag)
+    mat_corr = np.clip(np.nan_to_num(mat_corr, nan=0.0, posinf=0.0, neginf=0.0), -1.0, 1.0)
 
-    # Compute covariance and correlation matrix
-    mat_cov = X.cov()
-    mat_corr = X.corr().fillna(0)
-    # Compute distance matrix
-    # print(mat_corr)
-    mat_dist = _corr_dist(mat_corr).fillna(0)
-    mat_dist_corr = squareform(mat_dist)
-    link = sch.linkage(mat_dist_corr, method=method, metric=metric)
-    # Sort linked matrix
+    mat_dist = ((1.0 - mat_corr) / 2.0) ** 0.5
+
+    mat_dist_upper = mat_dist[np.triu_indices(N, k=1)]
+    link = sch.linkage(mat_dist_upper, method=method, metric=metric)
     sortIx = _get_quasi_diag(link)
-    sortIx = mat_corr.index[sortIx].tolist()
-    w = _get_rec_bisec(mat_cov, sortIx)
-    w = w.loc[idx].to_numpy(copy=True).reshape([w.size, 1])
+    w_sorted = _get_rec_bisec(mat_cov, sortIx)
 
-    return _normalize(w, up_bound=up_bound, low_bound=low_bound)
+    w = np.empty(N)
+    for i, col_idx in enumerate(sortIx):
+        w[col_idx] = w_sorted[i]
+
+    return _normalize(w.reshape([N, 1]), up_bound=up_bound, low_bound=low_bound)
 
 
 # =========================================================================== #
@@ -299,7 +343,12 @@ def HRP(X, method='single', metric='euclidean', low_bound=0., up_bound=1.0):
 # =========================================================================== #
 
 
-def IVP(X, normalize=False, low_bound=0., up_bound=1.0):
+def IVP(
+    X: NDArray[np.float64],
+    normalize: bool = False,
+    low_bound: float = 0.,
+    up_bound: float = 1.0,
+) -> NDArray[np.float64]:
     r""" Get weights of the Inverse Variance Portfolio allocation.
 
     Notes
@@ -353,8 +402,20 @@ def IVP(X, normalize=False, low_bound=0., up_bound=1.0):
 # =========================================================================== #
 
 
-def MVP(X, normalize=False):
+def MVP(
+    X: NDArray[np.float64],
+    normalize: bool = False,
+) -> NDArray[np.float64]:
     r""" Get weights of the Minimum Variance Portfolio allocation.
+
+    Closed-form Markowitz allocation that minimizes the portfolio
+    variance subject only to a sum-to-one constraint. Weights are not
+    constrained to be positive — short positions are allowed and the
+    weights returned by the analytical formula can be negative or
+    larger than one. Use :func:`MVP_uc` for a constrained variant.
+
+    The covariance matrix must be invertible; pseudo-inverse is used
+    as a fallback when ``X`` has linearly dependent columns.
 
     Notes
     -----
@@ -398,7 +459,7 @@ def MVP(X, normalize=False):
         try:
             iv = np.linalg.pinv(mat_cov)
         except np.linalg.LinAlgError:
-            display(mat_cov)
+            print(mat_cov)
             raise np.linalg.LinAlgError
 
     e = np.ones([iv.shape[0], 1])
@@ -412,8 +473,19 @@ def MVP(X, normalize=False):
     return w
 
 
-def MVP_uc(X, w0=None, up_bound=1., low_bound=0.):
+def MVP_uc(
+    X: NDArray[np.float64],
+    w0: NDArray[np.float64] | None = None,
+    up_bound: float = 1.,
+    low_bound: float = 0.,
+) -> NDArray[np.float64]:
     r""" Get weights of the Minimum Variance Portfolio under constraints.
+
+    Numerical (SLSQP) Markowitz allocation that minimizes portfolio
+    variance subject to box constraints on each weight, in addition
+    to the sum-to-one constraint. Use this variant whenever short
+    selling must be excluded or per-asset caps need to be enforced;
+    use :func:`MVP` for the unconstrained closed-form solution.
 
     Notes
     -----
@@ -475,7 +547,12 @@ def MVP_uc(X, w0=None, up_bound=1., low_bound=0.):
 # =========================================================================== #
 
 
-def MDP(X, w0=None, up_bound=1., low_bound=0.):
+def MDP(
+    X: NDArray[np.float64],
+    w0: NDArray[np.float64] | None = None,
+    up_bound: float = 1.,
+    low_bound: float = 0.,
+) -> NDArray[np.float64]:
     r""" Get weights of Maximum Diversified Portfolio allocation.
 
     Notes
@@ -521,7 +598,7 @@ def MDP(X, w0=None, up_bound=1., low_bound=0.):
 
     # Set function to minimze
     def f_max_divers_weights(w):
-        return - diversified_ratio(X, w=w).flatten()
+        return - diversified_ratio(X, W=w).flatten()
 
     # Set inital weights
     if w0 is None:
@@ -546,8 +623,28 @@ def MDP(X, w0=None, up_bound=1., low_bound=0.):
 # =========================================================================== #
 
 
-def rolling_allocation(f, X, n=252, s=63, ret=True, drift=True, **kwargs):
+def rolling_allocation(
+    f: Callable[..., NDArray[np.float64]],
+    X: NDArray[np.float64],
+    n: int = 252,
+    s: int = 63,
+    ret: bool = True,
+    drift: bool = True,
+    **kwargs,
+) -> NDArray[np.float64]:
     r""" Roll an algorithm of portfolio allocation.
+
+    Generic walk-forward backtester for any allocation function ``f``
+    (e.g. :func:`ERC`, :func:`HRP`, :func:`MVP`). At each step the
+    weights are estimated on a training window of length ``n`` and held
+    for the next ``s`` periods. By construction this respects strict
+    temporal ordering — no future data leaks into the weights — which
+    is the same no-lookahead pattern used in
+    :class:`fynance.models.rolling._RollingBasis` for ML models.
+
+    Assets that are constant on more than 50% of the training window
+    are dropped from that step's allocation; the remaining weight mass
+    is redistributed across the active assets.
 
     Notes
     -----
@@ -586,7 +683,7 @@ def rolling_allocation(f, X, n=252, s=63, ret=True, drift=True, **kwargs):
         Weights of the portfolio allocated following ``f`` algorithm.
 
     """
-    X = pd.DataFrame(X).fillna(method='ffill')
+    X = pd.DataFrame(X).ffill()
     idx = X.index
     w_mat = pd.DataFrame(index=idx, columns=X.columns)
     portfolio = pd.Series(100., index=idx, name='portfolio')
@@ -607,7 +704,7 @@ def rolling_allocation(f, X, n=252, s=63, ret=True, drift=True, **kwargs):
         # Select X
         sub_X = X_.loc[slice_n].copy()
         assets = list(X.columns[sub_X.apply(process)])
-        sub_X = sub_X.fillna(method='bfill')
+        sub_X = sub_X.bfill()
         # Compute weights
         if len(assets) == 1:
             w = np.array([[1.]])
@@ -619,13 +716,13 @@ def rolling_allocation(f, X, n=252, s=63, ret=True, drift=True, **kwargs):
         w_mat.loc[roll.d, :] = w_mat.loc[roll.d, :].fillna(0.)
         # Compute portfolio performance
         perf = _perf_alloc(
-            X.loc[slice_s, assets].fillna(method='bfill').values,
+            X.loc[slice_s, assets].bfill().values,
             w=w,
             drift=drift
         )
         portfolio.loc[slice_s] = portfolio.loc[roll.d] * perf.flatten()
 
-    w_mat = w_mat.fillna(method='ffill').fillna(0.)
+    w_mat = w_mat.ffill().fillna(0.)
 
     return portfolio, w_mat
 
@@ -635,7 +732,7 @@ def rolling_allocation(f, X, n=252, s=63, ret=True, drift=True, **kwargs):
 # =========================================================================== #
 
 
-def _perf_alloc(X, w, drift=True):
+def _perf_alloc(X: NDArray[np.float64], w: NDArray[np.float64], drift: bool = True) -> NDArray[np.float64]:
     # Compute portfolio performance following specified weights
     if w.ndim == 1 and not isinstance(w, pd.Series):
         w = w.reshape([w.size, 1])
@@ -649,7 +746,7 @@ def _perf_alloc(X, w, drift=True):
     return np.cumprod(perf @ w + 1)
 
 
-def _normalize(w, low_bound=0., up_bound=1., sum_w=1., max_iter=1000):
+def _normalize(w: NDArray[np.float64], low_bound: float = 0., up_bound: float = 1., sum_w: float = 1., max_iter: int = 1000) -> NDArray[np.float64]:
     # Iterative algorithm to set bounds
     if up_bound < sum_w / w.size or low_bound > sum_w / w.size:
 

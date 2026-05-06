@@ -6,25 +6,49 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2020-07-31 19:42:35
 
-""" Module with some function plot backtest. """
+""" Static plotting of backtest results.
+
+Matplotlib- and Seaborn-based helpers to render strategy performance
+curves, drawdowns and rolling statistics from a return series. Suited
+to post-run analysis and reporting; see
+:mod:`fynance.backtest.dynamic_plot_backtest` for live-training plots.
+
+Main entry points
+-----------------
+- :class:`PlotBackTest` — figure object that draws cumulative
+  performance, underlying series and configurable annotations.
+
+"""
 
 # Built-in packages
 
 # External packages
 import numpy as np
-from matplotlib import pyplot as plt
 import seaborn as sns
+from matplotlib import pyplot as plt
 
 # Local packages
 
 # Set plot style
-plt.style.use('seaborn')
+plt.style.use('seaborn-v0_8')
 
 __all__ = ['PlotBackTest']
 
 
 class PlotBackTest:
     """ Plot backtest object.
+
+    Lightweight wrapper around a Matplotlib ``Figure`` / ``Axes``
+    pair used to render the cumulative-performance curve of one or
+    several strategies. Reuse an existing figure by passing ``fig``
+    and ``ax``, or let the constructor create one. Axis labels,
+    scales, ticks and title are configured once at construction via
+    ``**kwargs``; subsequent calls to :meth:`plot` only add data.
+
+    For live updates during walk-forward training, use
+    :class:`fynance.backtest.dynamic_plot_backtest.BacktestNeuralNet`,
+    which builds on the same primitives but refreshes the canvas on
+    each iteration.
 
     Attributes
     ----------

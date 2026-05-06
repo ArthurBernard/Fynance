@@ -436,16 +436,16 @@ cpdef double [:] wmstd_cy_1d(double [:] X, int w):
             m = m * (m + <double>1) / <double>2
             while i <= t:
                 S += <double>(i + 1) * X[i]
-                S2 += <double>(i + 1) * X[i] ** <double>2
+                S2 += <double>(i + 1) * X[i] * X[i]
                 i += 1
 
         else:
             while i < w:
                 S += <double>(w - i) * X[t - i]
-                S2 += <double>(w - i) * X[t - i] ** <double>2
+                S2 += <double>(w - i) * X[t - i] * X[t - i]
                 i += 1
 
-        sd[t] = sqrt(S2 / m - (S / m) ** <double>2)
+        sd[t] = sqrt(S2 / m - (S / m) * (S / m))
         t += 1
 
     return sd
@@ -490,16 +490,16 @@ cpdef double [:, :] wmstd_cy_2d(double [:, :] X, int w):
                 m = m * (m + <double>1) / <double>2
                 while i <= t:
                     S += <double>(i + 1) * X[i, n]
-                    S2 += <double>(i + 1) * X[i, n] ** <double>2
+                    S2 += <double>(i + 1) * X[i, n] * X[i, n]
                     i += 1
 
             else:
                 while i < w:
                     S += <double>(w - i) * X[t - i, n]
-                    S2 += <double>(w - i) * X[t - i, n] ** <double>2
+                    S2 += <double>(w - i) * X[t - i, n] * X[t - i, n]
                     i += 1
 
-            sd[t, n] = sqrt(S2 / m - (S / m) ** <double>2)
+            sd[t, n] = sqrt(S2 / m - (S / m) * (S / m))
             t += 1
 
         n += 1
@@ -536,8 +536,8 @@ cpdef double [:] emstd_cy_1d(double [:] X, double alpha):
     sd[0] = <double>0
     while t < T:
         m = alpha * m + (1. - alpha) * X[t]
-        m2 = (1. - alpha) * (X[t] - m) ** <double>2
-        sd[t] = sqrt(alpha * sd[t - 1] ** <double>2 + m2)
+        m2 = (1. - alpha) * (X[t] - m) * (X[t] - m)
+        sd[t] = sqrt(alpha * sd[t - 1] * sd[t - 1] + m2)
         t += 1
 
     return sd
@@ -577,8 +577,8 @@ cpdef double [:, :] emstd_cy_2d(double [:, :] X, double alpha):
         sd[0, n] = <double>0
         while t < T:
             m = alpha * m + (1. - alpha) * X[t, n]
-            m2 = (1. - alpha) * (X[t, n] - m) ** <double>2
-            sd[t, n] = sqrt(alpha * sd[t - 1, n] ** <double>2 + m2)
+            m2 = (1. - alpha) * (X[t, n] - m) * (X[t, n] - m)
+            sd[t, n] = sqrt(alpha * sd[t - 1, n] * sd[t - 1, n] + m2)
             t += 1
 
         n += 1

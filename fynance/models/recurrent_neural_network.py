@@ -6,10 +6,34 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2023-07-31 17:30:04
 
-""" Recurrent Neural Network models. """
+""" Recurrent neural network models for sequential financial data.
+
+PyTorch implementations of vanilla RNN, GRU and LSTM cells exposed as
+training-ready modules. Designed for one-step-ahead prediction on
+return / price series, but accept any time-ordered tensor.
+
+All models follow the :class:`fynance.models.neural_network.BaseNeuralNet`
+contract (``train_on`` / ``predict``) and integrate with the
+walk-forward iterator in :mod:`fynance.models.rolling`.
+
+Main entry points
+-----------------
+- :class:`RecurrentNeuralNetwork` — vanilla RNN.
+- :class:`GatedRecurrentUnit` — GRU.
+- :class:`LongShortTermMemory` — LSTM.
+
+References
+----------
+.. [1] Hochreiter, S. & Schmidhuber, J. (1997). Long Short-Term
+       Memory.
+.. [2] Cho, K. et al. (2014). Learning Phrase Representations using
+       RNN Encoder-Decoder for Statistical Machine Translation.
+
+"""
+
+from __future__ import annotations
 
 # Built-in packages
-
 # Third party packages
 import torch
 from torch import nn
@@ -24,6 +48,14 @@ __all__ = ['RecurrentNeuralNetwork', 'GatedRecurrentUnit',
 class _RecurrentNeuralNetwork(BaseNeuralNet):
     """ Neural network with recurrent architecture.
 
+    Internal recurrent cell shared by all RNN-flavored models. At each
+    time step, the cell concatenates the input with the previous
+    hidden state and applies a single linear layer followed by an
+    activation. Subclasses (the public :class:`RecurrentNeuralNetwork`,
+    :class:`GatedRecurrentUnit`, :class:`LongShortTermMemory`) add a
+    forward output layer and the gating logic specific to each cell
+    type.
+
     Parameters
     ----------
     X, y : array-like or int
@@ -35,14 +67,6 @@ class _RecurrentNeuralNetwork(BaseNeuralNet):
         Activation functions, default is Tanh function.
     hidden_state_size : int, optional
         Size of hidden states, default is the same size than input.
-
-    Methods
-    -------
-    __call__
-    set_optimizer
-    train_on
-    predict
-    set_data
 
     Attributes
     ----------
@@ -62,8 +86,15 @@ class _RecurrentNeuralNetwork(BaseNeuralNet):
     """
 
     def __init__(
-        self, X, y, drop=None, x_type=None, y_type=None, bias=True,
-        hidden_activation=nn.Tanh, hidden_state_size=None,
+        self,
+        X: torch.Tensor | int,
+        y: torch.Tensor | int,
+        drop: float | None = None,
+        x_type=None,
+        y_type=None,
+        bias: bool = True,
+        hidden_activation: type[nn.Module] = nn.Tanh,
+        hidden_state_size: int | None = None,
     ):
         BaseNeuralNet.__init__(self)
 
@@ -81,7 +112,7 @@ class _RecurrentNeuralNetwork(BaseNeuralNet):
 
         self.drop = self._set_dropout(drop)
 
-    def forward(self, X, H):
+    def forward(self, X: torch.Tensor, H: torch.Tensor) -> torch.Tensor:
         C = torch.cat([X, H], dim=1)
 
         return self.f_h(self.W_h(self.drop(C)))
@@ -97,7 +128,7 @@ class _RecurrentNeuralNetwork(BaseNeuralNet):
             return lambda x: x
 
     @torch.enable_grad()
-    def train_on(self, X, y, H):
+    def train_on(self, X: torch.Tensor, y: torch.Tensor, H: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """ Trains the neural network model.
 
         Parameters
@@ -125,7 +156,7 @@ class _RecurrentNeuralNetwork(BaseNeuralNet):
         return loss, outputs.detach()
 
     @torch.no_grad()
-    def predict(self, X, H):
+    def predict(self, X: torch.Tensor, H: torch.Tensor) -> torch.Tensor:
         """ Predicts outputs of neural network model.
 
         Parameters
@@ -149,10 +180,10 @@ class _RecurrentNeuralNetwork(BaseNeuralNet):
 class _ForwardLayer:
     def __init__(self, forward_activation=nn.Softmax):
         self.W_y = nn.Linear(self.H, self.M)
-        self.f_y = forward_activation()
+        self.f_y = nn.Softmax(dim=-1) if forward_activation is nn.Softmax else forward_activation()
 
     @torch.enable_grad()
-    def train_on(self, X, y, H):
+    def train_on(self, X: torch.Tensor, y: torch.Tensor, H: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """ Trains the neural network model.
 
         Parameters
@@ -180,7 +211,7 @@ class _ForwardLayer:
         return loss, H.detach()
 
     @torch.no_grad()
-    def predict(self, X, H):
+    def predict(self, X: torch.Tensor, H: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """ Predicts outputs of neural network model.
 
         Parameters
@@ -206,6 +237,13 @@ class _ForwardLayer:
 class RecurrentNeuralNetwork(_ForwardLayer, _RecurrentNeuralNetwork):
     """ Neural network with recurrent architecture.
 
+    Vanilla Elman RNN: a single recurrent linear layer followed by a
+    forward output layer. Each call to :meth:`forward` updates the
+    hidden state ``H`` and emits a prediction ``Y``. Suitable as a
+    baseline for short-horizon sequence prediction; for longer
+    dependencies, use :class:`GatedRecurrentUnit` or
+    :class:`LongShortTermMemory` to mitigate vanishing gradients.
+
     Parameters
     ----------
     X, y : array-like or int
@@ -218,14 +256,6 @@ class RecurrentNeuralNetwork(_ForwardLayer, _RecurrentNeuralNetwork):
         function.
     hidden_state_size : int, optional
         Size of hidden states, default is the same size than input.
-
-    Methods
-    -------
-    __call__
-    set_optimizer
-    train_on
-    predict
-    set_data
 
     Attributes
     ----------
@@ -279,7 +309,7 @@ class RecurrentNeuralNetwork(_ForwardLayer, _RecurrentNeuralNetwork):
             Hidden state.
 
         """
-        H = super(RecurrentNeuralNetwork, self).forward(X, H)
+        H = super().forward(X, H)
         Y = self.f_y(self.W_y(self.drop(H)))
 
         return Y, H
@@ -302,14 +332,6 @@ class _GatedRecurrentUnit(_RecurrentNeuralNetwork):
     reset_activation, updated_activation : torch.nn.Module, optional
         Activation functions for reset and update gate, default are both
         Sigmoid function.
-
-    Methods
-    -------
-    __call__
-    set_optimizer
-    train_on
-    predict
-    set_data
 
     Attributes
     ----------
@@ -362,7 +384,7 @@ class _GatedRecurrentUnit(_RecurrentNeuralNetwork):
         # Reset gate
         G_r = self.f_r(self.W_r(self.drop(C)))
 
-        C_tild = torch.cat([X, G_r * H])
+        C_tild = torch.cat([X, G_r * H], dim=1)
         H_tild = self.f_h(self.W_h(self.drop(C_tild)))
 
         return G_u * H_tild + (1 - G_u) * H
@@ -386,14 +408,6 @@ class GatedRecurrentUnit(_ForwardLayer, _GatedRecurrentUnit):
     reset_activation, updated_activation : torch.nn.Module, optional
         Activation functions for reset and update gate, default are both
         Sigmoid function.
-
-    Methods
-    -------
-    __call__
-    set_optimizer
-    train_on
-    predict
-    set_data
 
     Attributes
     ----------
@@ -452,7 +466,7 @@ class GatedRecurrentUnit(_ForwardLayer, _GatedRecurrentUnit):
             Hidden state.
 
         """
-        H = super(_GatedRecurrentUnit, self).forward(X, H)
+        H = super().forward(X, H)
         Y = self.f_y(self.W_y(self.drop(H)))
 
         return Y, H
@@ -482,11 +496,8 @@ class _LongShortTermMemory(_RecurrentNeuralNetwork):
 
     Methods
     -------
-    __call__
-    set_optimizer
     train_on
     predict
-    set_data
 
     Attributes
     ----------
@@ -574,6 +585,15 @@ class _LongShortTermMemory(_RecurrentNeuralNetwork):
 class LongShortTermMemory(_ForwardLayer, _LongShortTermMemory):
     """ Long short term memory neural network.
 
+    LSTM cell (Hochreiter & Schmidhuber, 1997) with the four gates —
+    forget, input/update, candidate and output — followed by a forward
+    output layer. The cell state ``C`` and hidden state ``H`` are
+    threaded through the sequence, so the model can carry information
+    across many time steps without the vanishing-gradient pathology
+    that limits :class:`RecurrentNeuralNetwork`. Use it for sequence
+    modeling tasks where dependencies span dozens of steps (intraday
+    return series, multi-day momentum signals, regime detection).
+
     Parameters
     ----------
     X, y : array-like or int
@@ -597,11 +617,8 @@ class LongShortTermMemory(_ForwardLayer, _LongShortTermMemory):
 
     Methods
     -------
-    __call__
-    set_optimizer
     train_on
     predict
-    set_data
 
     Attributes
     ----------
@@ -668,13 +685,13 @@ class LongShortTermMemory(_ForwardLayer, _LongShortTermMemory):
             Memory state.
 
         """
-        H, C = super(LongShortTermMemory, self).forward(X, H, C)
+        H, C = super().forward(X, H, C)
         Y = self.f_y(self.W_y(self.drop(H)))
 
         return Y, H, C
 
     @torch.enable_grad()
-    def train_on(self, X, y, H, C):
+    def train_on(self, X: torch.Tensor, y: torch.Tensor, H: torch.Tensor, C: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """ Trains the neural network model.
 
         Parameters
@@ -705,7 +722,7 @@ class LongShortTermMemory(_ForwardLayer, _LongShortTermMemory):
         return loss, H.detach(), C.detach()
 
     @torch.no_grad()
-    def predict(self, X, H, C):
+    def predict(self, X: torch.Tensor, H: torch.Tensor, C: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """ Predicts outputs of neural network model.
 
         Parameters

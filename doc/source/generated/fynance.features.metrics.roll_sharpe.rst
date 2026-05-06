@@ -1,5 +1,7 @@
-fynance\.features\.metrics\.roll\_sharpe
-========================================
+﻿roll_sharpe
+====================================
+
+*Defined in* :mod:`fynance.features.metrics`
 
 .. currentmodule:: fynance.features.metrics
 

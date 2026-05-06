@@ -1,60 +1,12 @@
-fynance.models.neural_network.MultiLayerPerceptron
+﻿MultiLayerPerceptron
 ==================================================
+
+*Defined in* :mod:`fynance.models.neural_network`
 
 .. currentmodule:: fynance.models.neural_network
 
 .. autoclass:: MultiLayerPerceptron
-   :no-members:
-   :no-inherited-members:
-   :no-special-members:
-
-  
-   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
-      .. autosummary::
-         :toctree:
-      
-         MultiLayerPerceptron.__call__
-         MultiLayerPerceptron.add_module
-         MultiLayerPerceptron.apply
-         MultiLayerPerceptron.buffers
-         MultiLayerPerceptron.children
-         MultiLayerPerceptron.cpu
-         MultiLayerPerceptron.cuda
-         MultiLayerPerceptron.double
-         MultiLayerPerceptron.eval
-         MultiLayerPerceptron.extra_repr
-         MultiLayerPerceptron.float
-         MultiLayerPerceptron.forward
-         MultiLayerPerceptron.half
-         MultiLayerPerceptron.load_model
-         MultiLayerPerceptron.load_state_dict
-         MultiLayerPerceptron.modules
-         MultiLayerPerceptron.named_buffers
-         MultiLayerPerceptron.named_children
-         MultiLayerPerceptron.named_modules
-         MultiLayerPerceptron.named_parameters
-         MultiLayerPerceptron.parameters
-         MultiLayerPerceptron.predict
-         MultiLayerPerceptron.register_backward_hook
-         MultiLayerPerceptron.register_buffer
-         MultiLayerPerceptron.register_forward_hook
-         MultiLayerPerceptron.register_forward_pre_hook
-         MultiLayerPerceptron.register_parameter
-         MultiLayerPerceptron.save_model
-         MultiLayerPerceptron.set_data
-         MultiLayerPerceptron.set_lr_scheduler
-         MultiLayerPerceptron.set_optimizer
-         MultiLayerPerceptron.set_seed
-         MultiLayerPerceptron.share_memory
-         MultiLayerPerceptron.state_dict
-         MultiLayerPerceptron.to
-         MultiLayerPerceptron.train
-         MultiLayerPerceptron.train_on
-         MultiLayerPerceptron.type
-         MultiLayerPerceptron.zero_grad
-      
-  
-
-  
-  
-  
+   :members:
+   :inherited-members:
+   :special-members: __call__, __iter__, __next__
+   :show-inheritance:

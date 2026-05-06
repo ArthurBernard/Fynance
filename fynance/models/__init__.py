@@ -12,18 +12,68 @@
 
 .. toctree::
 
+    models.attention
     models.econometric_models
     models.neural_network
+    models.recurrent_neural_network
     models.rolling
 
 """
 
-from .econometric_models import *
-from .econometric_models_cy import *
-from .neural_network import *
-from .rolling import *
+from . import (
+    attention,
+    econometric_models,
+    econometric_models_cy,
+    neural_network,
+    recurrent_neural_network,
+    rolling,
+)
+from .attention import MultiHeadAttention, ScaledDotProductAttention
+from .econometric_models import ARMA, ARMA_GARCH, ARMAX_GARCH, MA, get_parameters
+from .econometric_models_cy import (
+    ARMA_cy,
+    ARMA_GARCH_cy,
+    ARMAX_GARCH_cy,
+    MA_cy,
+    get_parameters_cy,
+)
+from .neural_network import BaseNeuralNet, MultiLayerPerceptron
+from .recurrent_neural_network import (
+    GatedRecurrentUnit,
+    LongShortTermMemory,
+    RecurrentNeuralNetwork,
+)
+from .rolling import CVResult, RollMultiLayerPerceptron, _RollingBasis
 
-__all__ = econometric_models.__all__
-__all__ += econometric_models_cy.__all__
-__all__ += neural_network.__all__
-__all__ += rolling.__all__
+# Frozen public surface for the 1.x series — names listed here are
+# guaranteed to remain importable from ``fynance.models`` until the
+# next major version. New names may be appended (additive change), but
+# nothing in this list will be removed without a deprecation cycle.
+__all__ = [
+    # attention
+    'MultiHeadAttention',
+    'ScaledDotProductAttention',
+    # econometric_models
+    'ARMA',
+    'ARMA_GARCH',
+    'ARMAX_GARCH',
+    'MA',
+    'get_parameters',
+    # econometric_models_cy
+    'ARMA_cy',
+    'ARMA_GARCH_cy',
+    'ARMAX_GARCH_cy',
+    'MA_cy',
+    'get_parameters_cy',
+    # neural_network
+    'BaseNeuralNet',
+    'MultiLayerPerceptron',
+    # recurrent_neural_network
+    'GatedRecurrentUnit',
+    'LongShortTermMemory',
+    'RecurrentNeuralNetwork',
+    # rolling
+    'CVResult',
+    'RollMultiLayerPerceptron',
+    '_RollingBasis',
+]

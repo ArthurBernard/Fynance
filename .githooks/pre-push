@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Enforces Git Flow branch protection.
+# Install: git config core.hooksPath .githooks
+
+current_branch=$(git symbolic-ref HEAD 2>/dev/null | sed 's|refs/heads/||')
+
+# Hard block: never push directly to master
+if [ "$current_branch" = "master" ]; then
+    echo ""
+    echo "ERROR: Direct push to 'master' is not allowed."
+    echo "       Open a Pull Request from 'develop' -> 'master'."
+    echo "       See CONTRIBUTING.md for the full Git Flow."
+    echo ""
+    exit 1
+fi
+
+# Soft warning: develop should receive PRs, not direct commits
+if [ "$current_branch" = "develop" ]; then
+    echo ""
+    echo "WARNING: You are pushing directly to 'develop'."
+    echo "         Prefer a feat/ branch and a PR, except for merges or initial setup."
+    echo "         (push allowed -- press Ctrl+C within 5s to cancel)"
+    echo ""
+    sleep 5
+fi
+
+exit 0

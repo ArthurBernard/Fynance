@@ -6,18 +6,38 @@
 # @Last modified by: ArthurBernard
 # @Last modified time: 2019-11-18 17:57:42
 
-""" Financial indicators. """
+""" Technical indicators for price-series analysis.
+
+Classical technical-analysis indicators — Bollinger Band, CCI, Hull
+moving average, MACD components, RSI — derived from rolling moving
+averages and standard deviations (see :mod:`fynance.features.momentums`).
+
+These indicators are commonly used to build trading signals or features
+for machine-learning models in finance.
+
+Main entry points
+-----------------
+- :func:`bollinger_band` — upper / lower volatility envelope.
+- :func:`cci` — Commodity Channel Index.
+- :func:`hma` — Hull Moving Average.
+- :func:`macd_line`, :func:`signal_line`, :func:`macd_hist` — MACD.
+- :func:`rsi` — Relative Strength Index.
+
+"""
+
+from __future__ import annotations
 
 # Built-in packages
 from warnings import warn
 
 # External packages
 import numpy as np
+from numpy.typing import NDArray
 
 # Local packages
 from fynance._wrappers import WrapperArray
-from fynance.features.momentums import _smstd, _emstd, _wmstd, _sma, _ema, _wma
 from fynance.features.metrics import roll_mad
+from fynance.features.momentums import _ema, _emstd, _sma, _smstd, _wma, _wmstd
 
 __all__ = [
     'bollinger_band', 'cci', 'hma', 'macd_hist', 'macd_line',
@@ -33,7 +53,14 @@ _handler_mstd = {'s': _smstd, 'w': _wmstd, 'e': _emstd}
 
 
 @WrapperArray('window')
-def bollinger_band(X, w=20, n=2, kind='s', axis=0, dtype=None):
+def bollinger_band(
+    X: NDArray,
+    w: int = 20,
+    n: int | float = 2,
+    kind: str = 's',
+    axis: int = 0,
+    dtype=None,
+) -> tuple[NDArray, NDArray]:
     r""" Compute the bollinger bands of size `w` for each `X`' series'.
 
     Bollinger Bands are a type of statistical chart characterizing the prices
@@ -89,8 +116,11 @@ def bollinger_band(X, w=20, n=2, kind='s', axis=0, dtype=None):
 
     Examples
     --------
+    >>> import warnings
     >>> X = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
-    >>> upper_band, lower_band = bollinger_band(X, w=3, n=2)
+    >>> with warnings.catch_warnings():
+    ...     warnings.simplefilter("ignore", DeprecationWarning)
+    ...     upper_band, lower_band = bollinger_band(X, w=3, n=2)
     >>> upper_band
     array([ 60.        , 120.        , 112.65986324, 132.65986324,
            185.31972647, 185.31972647])
@@ -112,7 +142,13 @@ def bollinger_band(X, w=20, n=2, kind='s', axis=0, dtype=None):
     if kind == 'e':
         w = 1 - 2 / (1 + w)
 
-    warn('Since version 1.1.0, bollinger_band returns upper and lower bands.')
+    warn(
+        'Since version 1.1.0, bollinger_band returns upper and lower bands. '
+        'The single-array return path is deprecated and will be removed in '
+        'fynance 2.0.',
+        category=DeprecationWarning,
+        stacklevel=2,
+    )
 
     if axis == 1:
         avg = _handler_ma[kind.lower()](X.T, w).T
@@ -129,7 +165,14 @@ def bollinger_band(X, w=20, n=2, kind='s', axis=0, dtype=None):
 
 
 @WrapperArray('dtype', 'axis', 'window')
-def cci(X, high=None, low=None, w=20, axis=0, dtype=None):
+def cci(
+    X: NDArray,
+    high: NDArray | None = None,
+    low: NDArray | None = None,
+    w: int = 20,
+    axis: int = 0,
+    dtype=None,
+) -> NDArray:
     r""" Compute Commodity Channel Index of size `w` for each `X`' series'.
 
     CCI is an oscillator introduced by Donald Lamber in 1980 [2]_. It is
@@ -202,7 +245,7 @@ def cci(X, high=None, low=None, w=20, axis=0, dtype=None):
 
 
 @WrapperArray('dtype', 'axis', 'window')
-def hma(X, w=21, kind='w', axis=0, dtype=None):
+def hma(X: NDArray, w: int = 21, kind: str = 'w', axis: int = 0, dtype=None) -> NDArray:
     r""" Compute the Hull Moving Average of size `w` for each `X`' series'.
 
     The Hull Moving Average, developed by A. Hull [3]_, is a financial
@@ -272,7 +315,15 @@ def hma(X, w=21, kind='w', axis=0, dtype=None):
 
 
 @WrapperArray('dtype', 'axis')
-def macd_hist(X, w=9, fast_w=12, slow_w=26, kind='e', axis=0, dtype=None):
+def macd_hist(
+    X: NDArray,
+    w: int = 9,
+    fast_w: int = 12,
+    slow_w: int = 26,
+    kind: str = 'e',
+    axis: int = 0,
+    dtype=None,
+) -> NDArray:
     """ Compute Moving Average Convergence Divergence Histogram.
 
     MACD is a trading indicator used in technical analysis of stock prices,
@@ -345,7 +396,14 @@ def macd_hist(X, w=9, fast_w=12, slow_w=26, kind='e', axis=0, dtype=None):
 
 
 @WrapperArray('dtype', 'axis')
-def macd_line(X, fast_w=12, slow_w=26, kind='e', axis=0, dtype=None):
+def macd_line(
+    X: NDArray,
+    fast_w: int = 12,
+    slow_w: int = 26,
+    kind: str = 'e',
+    axis: int = 0,
+    dtype=None,
+) -> NDArray:
     """ Compute Moving Average Convergence Divergence Line.
 
     MACD is a trading indicator used in technical analysis of stock prices,
@@ -421,7 +479,7 @@ def _macd_line(X, fast_w, slow_w, kind):
 
 
 @WrapperArray('dtype', 'axis', 'window')
-def rsi(X, w=14, kind='e', axis=0, dtype=None):
+def rsi(X: NDArray, w: int = 14, kind: str = 'e', axis: int = 0, dtype=None) -> NDArray:
     r""" Compute Relative Strenght Index.
 
     The relative strength index, developed by J. Welles Wilder in 1978 [5]_, is
@@ -506,7 +564,15 @@ def rsi(X, w=14, kind='e', axis=0, dtype=None):
 
 
 @WrapperArray('dtype', 'axis', 'window')
-def signal_line(X, w=9, fast_w=12, slow_w=26, kind='e', axis=0, dtype=None):
+def signal_line(
+    X: NDArray,
+    w: int = 9,
+    fast_w: int = 12,
+    slow_w: int = 26,
+    kind: str = 'e',
+    axis: int = 0,
+    dtype=None,
+) -> NDArray:
     """ MACD Signal Line for window of size `w` with slow and fast lenght.
 
     MACD is a trading indicator used in technical analysis of stock prices,

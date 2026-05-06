@@ -8,18 +8,16 @@
     :target: https://pypi.org/project/fynance/
 .. image:: https://img.shields.io/pypi/status/fynance.svg?colorB=blue
     :target: https://pypi.org/project/fynance/
-.. image:: https://travis-ci.org/ArthurBernard/Fynance.svg?branch=master
-    :target: https://travis-ci.org/ArthurBernard/Fynance
+.. image:: https://github.com/ArthurBernard/Fynance/actions/workflows/ci.yml/badge.svg?branch=master
+    :target: https://github.com/ArthurBernard/Fynance/actions/workflows/ci.yml
+    :alt: CI
 .. image:: https://img.shields.io/github/license/ArthurBernard/fynance.svg
     :target: https://github.com/ArthurBernard/Fynance/blob/master/LICENSE.txt
-.. image:: https://pepy.tech/badge/fynance 
+.. image:: https://pepy.tech/badge/fynance
     :target: https://pepy.tech/project/fynance
 .. image:: https://readthedocs.org/projects/fynance/badge/?version=latest
     :target: https://fynance.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
-.. image:: https://img.shields.io/lgtm/grade/python/g/ArthurBernard/Fynance.svg?logo=lgtm&logoWidth=18
-    :target: https://lgtm.com/projects/g/ArthurBernard/Fynance/context:python)
-    :alt: Language grade: Python
 
 - **Documentation**: http://fynance.readthedocs.io/en/latest/index.html
 - **Source code**: http://github.com/ArthurBernard/Fynance
@@ -55,9 +53,6 @@ The ``fynance`` package contains currently five subpackages:
     - **Neural network models** with **PyTorch** (e.g. MultiLayerPerceptron, etc.).
     - **Rolling objects** for models, currently work only with neural network models (e.g. \_RollingBasis, RollMultiLayerPerceptron, etc.).
 
-- **Neural networks** (``fynance.neural_networks``) with **Keras** (backend **Tensorflow** or **Theano**) contains:
-    - Rolling neural network models.
-
 Please refer you to the `documentation`_ to see more details on different tools available in `fynance` package. Documentation contains some descriptions and examples for functions, classes and methods.    
 
 .. _documentation: https://fynance.readthedocs.io/en/latest/index.html
@@ -76,14 +71,12 @@ From PyPI
 From source (GitHub)
 ====================
 
-If you want to compile ``fynance`` package from cython files you must set ``USE_CYTHON=True`` in ``setup.py`` file. Otherwise set it to ``USE_CYTHON=False``. By default ``USE_CYTHON='auto'``.
-
 .. code-block:: console
 
    $ git clone https://github.com/ArthurBernard/Fynance.git
    $ cd Fynance
+   $ pip install -e ".[dev]"
    $ python setup.py build_ext --inplace
-   $ python setup.py install --user
 
 ------
  Demo 

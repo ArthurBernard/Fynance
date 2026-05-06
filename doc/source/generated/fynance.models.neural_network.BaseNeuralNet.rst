@@ -1,60 +1,12 @@
-fynance.models.neural_network.BaseNeuralNet
+﻿BaseNeuralNet
 ===========================================
+
+*Defined in* :mod:`fynance.models.neural_network`
 
 .. currentmodule:: fynance.models.neural_network
 
 .. autoclass:: BaseNeuralNet
-   :no-members:
-   :no-inherited-members:
-   :no-special-members:
-
-  
-   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
-      .. autosummary::
-         :toctree:
-      
-         BaseNeuralNet.__call__
-         BaseNeuralNet.add_module
-         BaseNeuralNet.apply
-         BaseNeuralNet.buffers
-         BaseNeuralNet.children
-         BaseNeuralNet.cpu
-         BaseNeuralNet.cuda
-         BaseNeuralNet.double
-         BaseNeuralNet.eval
-         BaseNeuralNet.extra_repr
-         BaseNeuralNet.float
-         BaseNeuralNet.forward
-         BaseNeuralNet.half
-         BaseNeuralNet.load_model
-         BaseNeuralNet.load_state_dict
-         BaseNeuralNet.modules
-         BaseNeuralNet.named_buffers
-         BaseNeuralNet.named_children
-         BaseNeuralNet.named_modules
-         BaseNeuralNet.named_parameters
-         BaseNeuralNet.parameters
-         BaseNeuralNet.predict
-         BaseNeuralNet.register_backward_hook
-         BaseNeuralNet.register_buffer
-         BaseNeuralNet.register_forward_hook
-         BaseNeuralNet.register_forward_pre_hook
-         BaseNeuralNet.register_parameter
-         BaseNeuralNet.save_model
-         BaseNeuralNet.set_data
-         BaseNeuralNet.set_lr_scheduler
-         BaseNeuralNet.set_optimizer
-         BaseNeuralNet.set_seed
-         BaseNeuralNet.share_memory
-         BaseNeuralNet.state_dict
-         BaseNeuralNet.to
-         BaseNeuralNet.train
-         BaseNeuralNet.train_on
-         BaseNeuralNet.type
-         BaseNeuralNet.zero_grad
-      
-  
-
-  
-  
-  
+   :members:
+   :inherited-members:
+   :special-members: __call__, __iter__, __next__
+   :show-inheritance:

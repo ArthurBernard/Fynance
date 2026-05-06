@@ -23,9 +23,9 @@ Subpackages
 -----------
 algorithms      --- Financial algorithms
 backtest        --- Backtest strategy tools
+estimator       --- Parameter estimation (Cython ARMA/GARCH)
 features        --- Features extraction
 models          --- Econometric and Neural Network models (using PyTorch)
-neural_networks --- Neural network models (using Keras)
 
 Utility tools
 -------------
@@ -33,22 +33,43 @@ _exceptions --- Fynance exceptions
 tests       --- Run fynance unittests
 _wrappers   --- Fynance wrapper functions
 
+API stability policy (1.x series)
+---------------------------------
+The symbols re-exported below from :mod:`fynance.models`,
+:mod:`fynance.algorithms.allocation`, :mod:`fynance.features` and
+:mod:`fynance.estimator` form the **public, stable API** for the 1.x
+release line. Within 1.x:
+
+- public function and class signatures are frozen — no removals, no
+  backward-incompatible signature changes;
+- behavioural changes that would break user code go through one
+  release of :class:`DeprecationWarning` before becoming the new
+  default (see ``CONTRIBUTING.md``);
+- :mod:`fynance.backtest` and :mod:`fynance.models` *internal* helpers
+  (names prefixed with ``_``) remain free to evolve.
+
+Breaking changes are reserved for the 2.x line and tracked in
+``CHANGELOG.md``.
+
 """
 
-from .version import version as __version__
+from importlib.metadata import PackageNotFoundError, version
+
+try:
+    __version__ = version("fynance")
+except PackageNotFoundError:
+    __version__ = "unknown"
 
 __all__ = ['__version__']
 
-from .models import *
+from .algorithms import *
+from .backtest import *
 from .estimator import *
 from .features import *
-from .neural_networks import *
-from .backtest import *
-from .algorithms import *
+from .models import *
 
 __all__ += models.__all__
 __all__ += estimator.__all__
 __all__ += features.__all__
-__all__ += neural_networks.__all__
 __all__ += backtest.__all__
 __all__ += algorithms.__all__

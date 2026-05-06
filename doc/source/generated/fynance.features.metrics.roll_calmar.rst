@@ -1,5 +1,7 @@
-fynance\.features\.metrics\.roll\_calmar
-========================================
+﻿roll_calmar
+====================================
+
+*Defined in* :mod:`fynance.features.metrics`
 
 .. currentmodule:: fynance.features.metrics
 

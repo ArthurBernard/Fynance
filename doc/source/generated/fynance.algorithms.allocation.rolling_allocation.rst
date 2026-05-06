@@ -1,5 +1,7 @@
-fynance\.algorithms\.allocation\.rolling\_allocation
-====================================================
+﻿rolling_allocation
+================================================
+
+*Defined in* :mod:`fynance.algorithms.allocation`
 
 .. currentmodule:: fynance.algorithms.allocation
 

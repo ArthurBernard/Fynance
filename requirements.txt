@@ -1,9 +1,10 @@
-Cython>=0.29.0
-matplotlib>=3.0.1
-numpy>=1.16.5
-numpydoc
-pandas>=0.23.4
-scipy>=1.2.0
-seaborn>=0.9.0
-xgboost>=0.81,<1.1
-torch>=1.0.0
+# Runtime dependencies — authoritative versions are defined in pyproject.toml.
+# This file is kept for legacy compatibility (e.g. pip install -r requirements.txt).
+matplotlib>=3.7
+numba>=0.59
+numpy>=2.0
+pandas>=2.0
+scipy>=1.11
+seaborn>=0.12
+torch>=2.0
+xgboost>=2.0

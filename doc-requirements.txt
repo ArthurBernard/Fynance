@@ -1,9 +1,10 @@
-Cython==0.29.0
-matplotlib==3.0.1
-numpy>=1.15.3
+# Documentation build dependencies.
+# Install with: pip install ".[doc]"
+-e .
+Cython>=3.0
+sphinx>=7.0
+furo
 numpydoc
-pandas==0.23.4
-scipy==1.11.1
-seaborn==0.9.0
-sphinx<1.7
-https://download.pytorch.org/whl/cpu/torch-1.0.1.post2-cp36-cp36m-linux_x86_64.whl
+nbsphinx
+sphinx-design
+sphinx-copybutton
