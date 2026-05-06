@@ -5,12 +5,11 @@ import pytest
 import torch
 import torch.nn as nn
 
+from fynance.models._base import _type_convert
 from fynance.models.attention import MultiHeadAttention, ScaledDotProductAttention
-from fynance.models.neural_network import MultiLayerPerceptron, _type_convert
-from fynance.models.recurrent_neural_network import (
-    GatedRecurrentUnit,
-    LongShortTermMemory,
-)
+from fynance.models.gru import GatedRecurrentUnit
+from fynance.models.lstm import LongShortTermMemory
+from fynance.models.mlp import MultiLayerPerceptron
 from fynance.models.rolling import RollMultiLayerPerceptron
 
 # ---------------------------------------------------------------------------
@@ -131,10 +130,26 @@ class TestGRU:
     def test_predict_shape(self):
         model = self._make_gru()
         H = torch.zeros(T, model.H)
-        out = model.predict(X_t, H)
-        # predict returns (Y, H) tuple because forward does
-        Y = out[0] if isinstance(out, tuple) else out
+        Y, H_out = model.predict(X_t, H)
         assert Y.shape == (T, N_OUT)
+        assert H_out.shape == (T, model.H)
+
+    def test_predict_no_grad(self):
+        model = self._make_gru()
+        H = torch.zeros(T, model.H)
+        Y, H_out = model.predict(X_t, H)
+        assert not Y.requires_grad
+        assert not H_out.requires_grad
+
+    def test_int_constructor(self):
+        model = GatedRecurrentUnit(N_IN, N_OUT, hidden_state_size=8)
+        H = torch.zeros(T, model.H)
+        Y, H_out = model(X_t, H)
+        assert Y.shape == (T, N_OUT)
+
+    def test_hidden_state_size_default(self):
+        model = GatedRecurrentUnit(X_t, y_t)
+        assert model.H == N_IN
 
 
 # ---------------------------------------------------------------------------
@@ -155,14 +170,44 @@ class TestLSTM:
         assert H_out.shape == (T, model.H)
         assert C_out.shape == (T, model.H)
 
+    def test_train_on_returns_loss_and_states(self):
+        model = self._make_lstm()
+        model.set_optimizer(nn.MSELoss, torch.optim.Adam, lr=1e-3)
+        H = torch.zeros(T, model.H)
+        C = torch.zeros(T, model.H)
+        loss, H_out, C_out = model.train_on(X_t, y_t, H, C)
+        assert loss.item() >= 0
+        assert H_out.shape == (T, model.H)
+        assert C_out.shape == (T, model.H)
+
     def test_predict_shape(self):
         model = self._make_lstm()
         H = torch.zeros(T, model.H)
         C = torch.zeros(T, model.H)
-        out = model.predict(X_t, H, C)
-        # predict returns (Y, H, C) tuple because forward does
-        Y = out[0] if isinstance(out, tuple) else out
+        Y, H_out, C_out = model.predict(X_t, H, C)
         assert Y.shape == (T, N_OUT)
+        assert H_out.shape == (T, model.H)
+        assert C_out.shape == (T, model.H)
+
+    def test_predict_no_grad(self):
+        model = self._make_lstm()
+        H = torch.zeros(T, model.H)
+        C = torch.zeros(T, model.H)
+        Y, H_out, C_out = model.predict(X_t, H, C)
+        assert not Y.requires_grad
+        assert not H_out.requires_grad
+        assert not C_out.requires_grad
+
+    def test_int_constructor(self):
+        model = LongShortTermMemory(N_IN, N_OUT, hidden_state_size=8)
+        H = torch.zeros(T, model.H)
+        C = torch.zeros(T, model.H)
+        Y, H_out, C_out = model(X_t, H, C)
+        assert Y.shape == (T, N_OUT)
+
+    def test_hidden_state_size_default(self):
+        model = LongShortTermMemory(X_t, y_t)
+        assert model.H == N_IN
 
 
 # ---------------------------------------------------------------------------

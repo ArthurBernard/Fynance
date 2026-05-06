@@ -10,7 +10,7 @@ lookahead bias and matching how a strategy would actually be retrained
 in production.
 
 A concrete :class:`RollMultiLayerPerceptron` combines this iterator
-with :class:`fynance.models.neural_network.MultiLayerPerceptron`. The
+with :class:`fynance.models.mlp.MultiLayerPerceptron`. The
 same pattern is applied to portfolio allocation in
 :func:`fynance.algorithms.allocation.rolling_allocation`.
 
@@ -41,7 +41,7 @@ from numpy.typing import NDArray
 from fynance.backtest.dynamic_plot_backtest import BacktestNeuralNet
 
 # Local packages
-from fynance.models.neural_network import MultiLayerPerceptron
+from fynance.models.mlp import MultiLayerPerceptron
 
 plt.style.use('seaborn-v0_8')
 
@@ -84,7 +84,7 @@ class _RollingBasis:
     The leading underscore signals that this class is **internal** —
     its ``_train``, ``_get_loss_on`` and ``sub_predict`` hooks are
     expected to be overridden by a concrete subclass mixed with a
-    :class:`~fynance.models.neural_network.BaseNeuralNet` descendant.
+    :class:`~fynance.models._base.BaseNeuralNet` descendant.
     The public, stable entry point is
     :class:`RollMultiLayerPerceptron`. Other ready-to-use combinations
     can be added by following the same pattern (multiple inheritance
@@ -247,7 +247,7 @@ class _RollingBasis:
             Called with no arguments before every fold.  Must return an
             object that exposes ``train_on(X, y)`` and
             ``predict(X) -> NDArray | Tensor`` (the
-            :class:`~fynance.models.neural_network.BaseNeuralNet`
+            :class:`~fynance.models._base.BaseNeuralNet`
             interface).
         X, y : array_like
             Input and target arrays shaped ``(T, N)`` and ``(T, M)``.
@@ -266,7 +266,7 @@ class _RollingBasis:
         --------
         >>> import numpy as np
         >>> import torch, torch.nn as nn
-        >>> from fynance.models.neural_network import MultiLayerPerceptron
+        >>> from fynance.models.mlp import MultiLayerPerceptron
         >>> from fynance.models.rolling import _RollingBasis
         >>> rng = np.random.default_rng(0)
         >>> X = rng.standard_normal((80, 4)).astype(np.float32)

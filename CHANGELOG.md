@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Split `fynance/models/` into one-file-per-class: `neural_network.py` →
+  `_base.py` + `mlp.py`; `recurrent_neural_network.py` → `rnn.py`, `gru.py`,
+  `lstm.py` + `_recurrent_base.py`. Private cell classes renamed to `_GRUCell`,
+  `_LSTMCell`, `_RecurrentBase`; `_ForwardLayer` → `_OutputLayerMixin`. Public
+  API (`fynance.models.*`) unchanged. (#XX)
+
 ### Fixed
 
 ### Deprecated

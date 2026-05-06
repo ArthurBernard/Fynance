@@ -5,7 +5,7 @@ import pytest
 import torch
 import torch.nn as nn
 
-from fynance.models.neural_network import MultiLayerPerceptron
+from fynance.models.mlp import MultiLayerPerceptron
 from fynance.models.rolling import CVResult, _RollingBasis
 
 # ---------------------------------------------------------------------------

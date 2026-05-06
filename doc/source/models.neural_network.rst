@@ -2,16 +2,25 @@
 Neural network models
 *********************
 
-Multi-Layer Perceptron and base class for neural network models. See also :mod:`fynance.models.recurrent_neural_network` for GRU, LSTM and RNN models.
+Multi-Layer Perceptron and base class for neural network models.
+See also :doc:`models.recurrent_neural_network` for GRU, LSTM and RNN models.
 
-.. currentmodule:: fynance.models.neural_network
+Base class
+==========
 
-Neural networks
-===============
+.. currentmodule:: fynance.models._base
 
 .. autosummary::
    :toctree: generated/
 
    BaseNeuralNet
-   MultiLayerPerceptron
 
+Multi-Layer Perceptron
+======================
+
+.. currentmodule:: fynance.models.mlp
+
+.. autosummary::
+   :toctree: generated/
+
+   MultiLayerPerceptron
