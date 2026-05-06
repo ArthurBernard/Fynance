@@ -16,6 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [1.3.1] - 2026-05-06
+
+### Changed
+
+- Set PyPI development status classifier to `Production/Stable`
+- Update README to reflect stable subpackages
+
 ## [1.3.0] - 2026-05-06
 
 ### Changed
