@@ -13,7 +13,7 @@
 
 **Fynance** is Python (and Cython) package, it provides **machine learning**, **econometric** and **statistical** tools designed for **financial analysis** and **backtest of trading strategy**. The [**documentation**](https://fynance.readthedocs.io/en/latest/index.html) is available with some **examples** of the use of functions and objects.
 
-*Currently the project is always at a **beta level**. Some parts of the project can be considered as stable, such that ``fynance.features`` (this subpackage is already coded in **Cython** to be time-efficient), ``fynance.algorithms.allocation`` (this subpackage seems stable but have to be cleaned and write in Cython), and the other subpackages are always in progress (subject to deep modifications).*
+The ``fynance.features`` and ``fynance.algorithms.allocation`` subpackages are stable. Other subpackages (``fynance.models``, ``fynance.backtest``) are actively developed and may evolve.
 
 ## Presentation
 
