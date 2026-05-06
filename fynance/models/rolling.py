@@ -27,6 +27,7 @@ Main entry points
 from __future__ import annotations
 
 # Built-in packages
+from dataclasses import dataclass
 from multiprocessing import Process
 from typing import Callable
 
@@ -45,7 +46,32 @@ from fynance.models.neural_network import MultiLayerPerceptron
 plt.style.use('seaborn-v0_8')
 
 
-__all__ = ['_RollingBasis', 'RollMultiLayerPerceptron']
+__all__ = ['CVResult', '_RollingBasis', 'RollMultiLayerPerceptron']
+
+
+@dataclass
+class CVResult:
+    """ Results from :meth:`_RollingBasis.cross_validate`.
+
+    Attributes
+    ----------
+    oof_predictions : np.ndarray
+        Out-of-fold predictions, shape ``(T, n_out)``.  Positions that
+        fall before the first test fold are filled with ``NaN``.
+    fold_metrics : list of float
+        Per-fold metric values (empty list when ``metric_fn`` is None).
+    mean_metric : float or None
+        Mean of ``fold_metrics``, or None when no metric was provided.
+    std_metric : float or None
+        Standard deviation of ``fold_metrics``, or None when no metric
+        was provided.
+
+    """
+
+    oof_predictions: np.ndarray
+    fold_metrics: list
+    mean_metric: float | None
+    std_metric: float | None
 
 
 class _RollingBasis:
@@ -182,6 +208,100 @@ class _RollingBasis:
         test_set = slice(self.t, self.t + self.s)
 
         return eval_set, test_set
+
+    def _fold_slices(self):
+        """ Yield ``(train_slice, test_slice)`` for every walk-forward fold.
+
+        Unlike :meth:`__next__`, this generator has no epoch loop and
+        allocates nothing — it is a pure windowing helper shared by
+        :meth:`cross_validate` and any future CV utilities.
+
+        Yields
+        ------
+        train_slice : slice
+            Window ``[t - n, t)`` used for training.
+        test_slice : slice
+            Window ``[t, t + s)`` used for out-of-sample evaluation.
+
+        """
+        t = self.t0 + self.r
+        while t + self.s <= self.T:
+            yield slice(t - self.n, t), slice(t, t + self.s)
+            t += self.r
+
+    def cross_validate(self, model_factory, X, y, metric_fn=None, epochs=1):
+        """ Walk-forward cross-validation with out-of-fold predictions.
+
+        At each fold a **fresh** model is created via ``model_factory()``,
+        trained on the rolling training window, and used to predict the
+        next out-of-sample window.  Results are accumulated across all
+        folds without any state leaking between them.
+
+        Call :meth:`__call__` (or :meth:`set_roll_period` for
+        ``RollMultiLayerPerceptron``) to configure ``train_period``,
+        ``test_period``, and ``roll_period`` before calling this method.
+
+        Parameters
+        ----------
+        model_factory : callable
+            Called with no arguments before every fold.  Must return an
+            object that exposes ``train_on(X, y)`` and
+            ``predict(X) -> NDArray | Tensor`` (the
+            :class:`~fynance.models.neural_network.BaseNeuralNet`
+            interface).
+        X, y : array_like
+            Input and target arrays shaped ``(T, N)`` and ``(T, M)``.
+        metric_fn : callable, optional
+            ``metric_fn(y_true, y_pred) -> float`` evaluated on the test
+            window of each fold.  If None, :attr:`CVResult.fold_metrics`
+            is an empty list and the mean/std fields are None.
+        epochs : int, optional
+            Number of full training passes per fold, default 1.
+
+        Returns
+        -------
+        CVResult
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> import torch, torch.nn as nn
+        >>> from fynance.models.neural_network import MultiLayerPerceptron
+        >>> from fynance.models.rolling import _RollingBasis
+        >>> rng = np.random.default_rng(0)
+        >>> X = rng.standard_normal((80, 4)).astype(np.float32)
+        >>> y = rng.standard_normal((80, 1)).astype(np.float32)
+        >>> Xt, yt = torch.from_numpy(X), torch.from_numpy(y)
+        >>> def factory():
+        ...     m = MultiLayerPerceptron(4, 1, layers=[8])
+        ...     m.set_optimizer(nn.MSELoss, torch.optim.Adam, lr=1e-3)
+        ...     return m
+        >>> rb = _RollingBasis(Xt, yt)
+        >>> _ = rb(train_period=40, test_period=10, roll_period=10)
+        >>> result = rb.cross_validate(factory, Xt, yt)
+        >>> result.oof_predictions.shape
+        (80, 1)
+
+        """
+        n_out = y.shape[1] if y.ndim > 1 else 1
+        oof = np.full((X.shape[0], n_out), np.nan)
+        fold_metrics = []
+
+        for train_sl, test_sl in self._fold_slices():
+            model = model_factory()
+            X_tr, y_tr = X[train_sl], y[train_sl]
+            for _ in range(epochs):
+                model.train_on(X_tr, y_tr)
+            pred = model.predict(X[test_sl])
+            if hasattr(pred, 'numpy'):
+                pred = pred.numpy()
+            oof[test_sl] = pred.reshape(-1, n_out)
+            if metric_fn is not None:
+                fold_metrics.append(float(metric_fn(y[test_sl], pred)))
+
+        mean_m = float(np.mean(fold_metrics)) if fold_metrics else None
+        std_m = float(np.std(fold_metrics)) if fold_metrics else None
+        return CVResult(oof, fold_metrics, mean_m, std_m)
 
     def get_stats(self):
         """ Return per-step loss history as a DataFrame.

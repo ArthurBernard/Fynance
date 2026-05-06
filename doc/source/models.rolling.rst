@@ -9,5 +9,6 @@ Tools and objects to roll a model over time-series data, for walk-forward evalua
 .. autosummary::
    :toctree: generated/
 
+   CVResult
    _RollingBasis
    RollMultiLayerPerceptron
