@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `_base.py` + `mlp.py`; `recurrent_neural_network.py` → `rnn.py`, `gru.py`,
   `lstm.py` + `_recurrent_base.py`. Private cell classes renamed to `_GRUCell`,
   `_LSTMCell`, `_RecurrentBase`; `_ForwardLayer` → `_OutputLayerMixin`. Public
-  API (`fynance.models.*`) unchanged. (#XX)
+  API (`fynance.models.*`) unchanged. (#38)
 
 ### Fixed
 
