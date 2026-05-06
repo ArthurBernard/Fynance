@@ -26,7 +26,7 @@
 
 .. _documentation: https://fynance.readthedocs.io/en/latest/index.html
 
-Currently the project is always at a **beta level**. But some parts of the project can be considered as stable, such as ``fynance.features`` (this subpackage is already coded in **Cython** to be time-efficient), ``fynance.algorithms.allocation`` (this subpackage seems stable but have to be cleaned and write in Cython), and the other subpackages are always in progress (subject to deep modification).
+The ``fynance.features`` and ``fynance.algorithms.allocation`` subpackages are stable. Other subpackages (``fynance.models``, ``fynance.backtest``) are actively developed and may evolve.
 
 --------------
  Presentation 
