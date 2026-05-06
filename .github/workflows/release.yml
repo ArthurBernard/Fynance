@@ -6,8 +6,26 @@ on:
       - "v*"
 
 jobs:
-  build:
-    name: Build distributions
+  build_wheels:
+    name: Build wheels
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build manylinux wheels
+        uses: pypa/cibuildwheel@v2.22
+        env:
+          CIBW_BUILD: cp310-manylinux_x86_64 cp311-manylinux_x86_64 cp312-manylinux_x86_64
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels
+          path: ./wheelhouse/*.whl
+
+  build_sdist:
+    name: Build sdist
     runs-on: ubuntu-latest
 
     steps:
@@ -19,37 +37,36 @@ jobs:
           python-version: "3.12"
           cache: pip
 
-      - name: Install build dependencies
-        run: pip install --upgrade pip build
+      - name: Build sdist
+        run: |
+          pip install build
+          python -m build --sdist
 
-      - name: Install package dependencies (for Cython)
-        run: pip install -e ".[dev]"
-
-      - name: Build Cython extensions
-        run: python setup.py build_ext --inplace
-
-      - name: Build wheel and sdist
-        run: python -m build
-
-      - name: Upload distributions
+      - name: Upload sdist
         uses: actions/upload-artifact@v4
         with:
-          name: dist
-          path: dist/
+          name: sdist
+          path: dist/*.tar.gz
 
   publish:
     name: Publish to PyPI
-    needs: build
+    needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
       id-token: write
 
     steps:
-      - name: Download distributions
+      - name: Download wheels
         uses: actions/download-artifact@v4
         with:
-          name: dist
+          name: wheels
+          path: dist/
+
+      - name: Download sdist
+        uses: actions/download-artifact@v4
+        with:
+          name: sdist
           path: dist/
 
       - name: Publish to PyPI
