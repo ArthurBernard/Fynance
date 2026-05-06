@@ -43,7 +43,7 @@ from .recurrent_neural_network import (
     LongShortTermMemory,
     RecurrentNeuralNetwork,
 )
-from .rolling import RollMultiLayerPerceptron, _RollingBasis
+from .rolling import CVResult, RollMultiLayerPerceptron, _RollingBasis
 
 # Frozen public surface for the 1.x series — names listed here are
 # guaranteed to remain importable from ``fynance.models`` until the
@@ -73,6 +73,7 @@ __all__ = [
     'LongShortTermMemory',
     'RecurrentNeuralNetwork',
     # rolling
+    'CVResult',
     'RollMultiLayerPerceptron',
     '_RollingBasis',
 ]
