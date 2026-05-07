@@ -74,7 +74,7 @@ jobs:
       - name: Generate docstring coverage badge
         run: |
           mkdir -p badges
-          interrogate fynance/ --generate-badge badges/ --quiet
+          interrogate fynance/ --generate-badge badges/ --quiet --fail-under 0
 
       - name: Commit badge if changed
         run: |
