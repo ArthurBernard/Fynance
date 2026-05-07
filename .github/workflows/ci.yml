@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [master, develop]
 
+concurrency:
+  group: ci-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: Test — Python ${{ matrix.python-version }}
