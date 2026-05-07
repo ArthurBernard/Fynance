@@ -1,9 +1,9 @@
 ﻿BaseNeuralNet
-===========================================
+==================================
 
-*Defined in* :mod:`fynance.models.neural_network`
+*Defined in* :mod:`fynance.models._base`
 
-.. currentmodule:: fynance.models.neural_network
+.. currentmodule:: fynance.models._base
 
 .. autoclass:: BaseNeuralNet
    :members:
