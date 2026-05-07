@@ -1,47 +1,37 @@
 #!/usr/bin/env python3
 # coding: utf-8
-# @Author: ArthurBernard
-# @Email: arthur.bernard.92@gmail.com
-# @Date: 2019-05-06 20:16:31
-# @Last modified by: ArthurBernard
-# @Last modified time: 2023-07-28 11:32:15
 
 """ Base classes for PyTorch neural network models.
 
 Defines :class:`BaseNeuralNet`, a thin wrapper around
 ``torch.nn.Module`` that adds higher-level training, prediction and
-serialization helpers, and :class:`MultiLayerPerceptron`, a
-configurable feed-forward MLP built on top of it.
+serialization helpers, and the internal :func:`_type_convert` utility.
 
-These classes are the foundation for the recurrent models in
-:mod:`fynance.models.recurrent_neural_network` and the walk-forward
-training wrappers in :mod:`fynance.models.rolling`.
+These classes are the foundation for all models in :mod:`fynance.models`:
+the feed-forward :class:`~fynance.models.mlp.MultiLayerPerceptron`, the
+recurrent variants in :mod:`fynance.models.rnn`,
+:mod:`fynance.models.gru`, :mod:`fynance.models.lstm`, and the
+walk-forward wrappers in :mod:`fynance.models.rolling`.
 
 Main entry points
 -----------------
 - :class:`BaseNeuralNet` — base class with ``set_optimizer``,
   ``train_on``, ``predict``, ``set_data``, ``save_model``,
   ``load_model`` helpers.
-- :class:`MultiLayerPerceptron` — vanilla MLP with configurable
-  hidden layers, activation and dropout.
 
 """
 
 from __future__ import annotations
 
 # Built-in packages
-from typing import Any
-
-# External packages
+# Third-party packages
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn
 from numpy.typing import NDArray
 
-# Local packages
-
-__all__ = ['BaseNeuralNet', 'MultiLayerPerceptron']
+__all__ = ['BaseNeuralNet']
 
 
 _TYPE_HANDLER = {
@@ -65,18 +55,21 @@ class BaseNeuralNet(torch.nn.Module):
     one-batch ``train_on`` step, gradient-free ``predict``, data
     coercion from NumPy / pandas / tensor, and weight serialization.
     Subclass it (or one of the higher-level subclasses such as
-    :class:`MultiLayerPerceptron`) and implement the ``forward`` method
-    to define a new architecture; everything else is inherited.
+    :class:`~fynance.models.mlp.MultiLayerPerceptron`) and implement the
+    ``forward`` method to define a new architecture; everything else is
+    inherited.
 
     Inherits of torch.nn.Module object with some higher level methods.
 
-    Public API contract (stable for the 1.x series)
-    ------------------------------------------------
-    - **Shapes** — feed-forward subclasses (e.g. :class:`MultiLayerPerceptron`)
+    **Public API contract (stable for the 1.x series)**
+
+    - **Shapes** — feed-forward subclasses (e.g.
+      :class:`~fynance.models.mlp.MultiLayerPerceptron`)
       expect ``X`` of shape ``(T, N)`` and ``y`` of shape ``(T, M)``,
       where ``T`` is the number of observations, ``N`` the number of
       input features and ``M`` the number of targets. Recurrent
-      subclasses in :mod:`fynance.models.recurrent_neural_network`
+      subclasses in :mod:`fynance.models.rnn`,
+      :mod:`fynance.models.gru`, :mod:`fynance.models.lstm`
       consume ``X`` of shape ``(T, S, N)``, where ``S`` is the sequence
       length.
     - **Dtypes** — :meth:`set_data` coerces inputs through
@@ -119,7 +112,8 @@ class BaseNeuralNet(torch.nn.Module):
 
     See Also
     --------
-    MultiLayerPerceptron, RollingBasis
+    fynance.models.mlp.MultiLayerPerceptron,
+    fynance.models.rolling.RollMultiLayerPerceptron
 
     """
 
@@ -394,178 +388,6 @@ class BaseNeuralNet(torch.nn.Module):
                                  'see `set_optimizer` method.')
 
             self.optimizer.load_state_dict(state_dict['optimizer'])
-
-    # def _run(self, epochs, batch_size=64):
-    #    loss = []
-    #    for e in tqdm(range(epochs), desc="Training", total=epochs):
-    #        loss.append(self._run_one_epoch())
-    #
-    #    return loss
-
-    # def _run_one_epoch(batch_size):
-    #    loss = 0
-    #    for t in range(0, self.T, batch_size):
-    #        loss += self._run_one_batch(t, batch_size)
-    #
-    #     return loss
-
-
-    #        s = mi(t + batch_size, self.T)
-    #        loss += self.train_on(X=self.X[t: s], y=self.y[t: s]).item()
-
-    # def _run_one_batch(self, t, batch_size):
-    #    s = min(t + batch_size, self.T)
-    #    return self.train_on(X=self.X[t: s], y=self.y[t: s]).item()
-
-
-class MultiLayerPerceptron(BaseNeuralNet):
-    r""" Neural network with MultiLayer Perceptron architecture.
-
-    Refered as vanilla neural network model, with `n` hidden layers s.t
-    n :math:`\geq` 1, with each one a specified number of neurons.
-
-    Each hidden layer is a ``torch.nn.Linear`` followed by an optional
-    dropout and the configured activation function. The MLP is the
-    standard baseline for tabular and sliding-window features in
-    finance — useful for non-linear regression on engineered features
-    (technical indicators, volatility, sentiment scores). For
-    time-ordered sequence input, prefer
-    :class:`fynance.models.recurrent_neural_network.LongShortTermMemory`
-    or attention-based architectures.
-
-    Configure the optimizer with :meth:`BaseNeuralNet.set_optimizer`
-    and wrap with :class:`fynance.models.rolling.RollMultiLayerPerceptron`
-    for walk-forward training.
-
-    Parameters
-    ----------
-    X, y : array-like or int
-        - If it's an array-like, respectively inputs and outputs data.
-        - If it's an integer, respectively dimension of inputs and outputs.
-    layers : list of int
-        List of number of neurons in each hidden layer.
-    activation : torch.nn.Module
-        Activation function of layers.
-    drop : float, optional
-        Probability of an element to be zeroed.
-
-    Attributes
-    ----------
-    criterion : torch.nn.modules.loss
-        A loss function.
-    optimizer : torch.optim
-        An optimizer algorithm.
-    n : int
-        Number of hidden layers.
-    layers : list of int
-        List with the number of neurons for each hidden layer.
-    f : torch.nn.Module
-        Activation function.
-
-    See Also
-    --------
-    BaseNeuralNet, RollMultiLayerPerceptron
-
-    """
-
-    def __init__(
-        self,
-        X: NDArray | torch.Tensor | pd.DataFrame | int,
-        y: NDArray | torch.Tensor | pd.DataFrame | int,
-        layers: list[int] = [],
-        activation: type[torch.nn.Module] | None = None,
-        drop: float | None = None,
-        x_type=None,
-        y_type=None,
-        bias: bool = True,
-        activation_kwargs: dict[str, Any] = {},
-    ):
-        """ Initialize object. """
-        BaseNeuralNet.__init__(self)
-
-        if isinstance(X, int) and isinstance(y, int):
-            self.N, self.M = X, y
-
-        else:
-            self.set_data(X=X, y=y, x_type=x_type, y_type=y_type)
-
-        self.n_layers = len(layers) + 1
-
-        self.layers = self._set_layer_list(layers, bias)
-        self.activation = self._set_activation(activation, **activation_kwargs)
-        self.drop = self._set_dropout(drop)
-
-    def _set_layer_list(self, layers, bias, input_dim=None, output_dim=None):
-        layers_list = []
-        # Set input layer
-        input_size = self.N if input_dim is None else input_dim
-        for output_size in layers:
-            # Set hidden layers
-            layers_list += [torch.nn.Linear(
-                input_size,
-                output_size,
-                bias=bias
-            )]
-            input_size = output_size
-
-        # Set output layer
-        output_size = self.M if output_dim is None else output_dim
-        layers_list += [torch.nn.Linear(input_size, output_size, bias=bias)]
-
-        return torch.nn.ModuleList(layers_list)
-
-    def _set_activation(self, activation, n_layers=None, **kwargs):
-        # Set activation functions
-        if isinstance(activation, list):
-            n_layers = len(self.layers) if n_layers is None else n_layers
-
-            if len(activation) != n_layers:
-
-                raise ValueError('if you pass a list of activation functions '
-                                 'this one must be of size of layers list + 1')
-
-            return [a(**kwargs) for a in activation]
-
-        elif activation is not None:
-
-            return activation(**kwargs)
-
-        else:
-
-            return lambda x: x
-
-    def _set_dropout(self, drop):
-        # Set dropout parameters
-        if isinstance(drop, list):
-
-            if len(drop) != self.n_layers:
-
-                raise ValueError('if you pass a list of drop parameters '
-                                 'this one must be of size of layers list + 1')
-
-            return [torch.nn.Dropout(p=p) for p in drop]
-
-        elif drop is not None:
-
-            return [torch.nn.Dropout(p=drop) for _ in range(self.n_layers)]
-
-        else:
-
-            return [lambda x: x for _ in range(self.n_layers)]
-
-    def forward(self, x):
-        """ Forward computation. """
-        for name, layer in enumerate(self.layers):
-            x = self.drop[name](x)
-            x = layer(x)
-
-            if isinstance(self.activation, list):
-                x = self.activation[name](x)
-
-            else:
-                x = self.activation(x)
-
-        return x
 
 
 def _type_convert(dtype):

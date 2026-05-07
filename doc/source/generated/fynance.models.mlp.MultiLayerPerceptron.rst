@@ -1,9 +1,9 @@
 ﻿MultiLayerPerceptron
-==================================================
+=======================================
 
-*Defined in* :mod:`fynance.models.neural_network`
+*Defined in* :mod:`fynance.models.mlp`
 
-.. currentmodule:: fynance.models.neural_network
+.. currentmodule:: fynance.models.mlp
 
 .. autoclass:: MultiLayerPerceptron
    :members:

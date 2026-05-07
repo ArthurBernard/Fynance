@@ -16,6 +16,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [1.3.2] - 2026-05-07
+
+### Added
+
+- Python 3.13 added to the CI test matrix
+- Read the Docs configuration (`.readthedocs.yaml`) for versioned doc deployment (stable/latest)
+- Test coverage badge via Codecov and docstring coverage badge via interrogate
+
+### Changed
+
+- CI now triggers on push and pull_request to both `master` and `develop`; concurrency group added to cancel redundant runs on `develop → master` PR
+- README reorganised: badges split onto two lines (package / quality), content updated to reflect current subpackages (Kalman filter, LSTM, MultiHeadAttention)
+- Split `fynance/models/` into one-file-per-class: `neural_network.py` →
+  `_base.py` + `mlp.py`; `recurrent_neural_network.py` → `rnn.py`, `gru.py`,
+  `lstm.py` + `_recurrent_base.py`. Private cell classes renamed to `_GRUCell`,
+  `_LSTMCell`, `_RecurrentBase`; `_ForwardLayer` → `_OutputLayerMixin`. Public
+  API (`fynance.models.*`) unchanged. (#38)
+- Expose `GRUCell` and `LSTMCell` as public composable building blocks
+  (mirrors PyTorch's `nn.GRUCell` / `nn.GRU` pattern). Both raise
+  `NotImplementedError` on `train_on` / `predict`; use
+  `GatedRecurrentUnit` / `LongShortTermMemory` for standalone training.
+  `_RecurrentBase` now accepts `y=None` so cells can be constructed
+  with an input dimension alone: `GRUCell(8, hidden_state_size=16)`. (#38)
+
 ## [1.3.1] - 2026-05-06
 
 ### Changed
@@ -58,7 +82,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Numba `@njit` optimization on Kalman filter and RTS smoother
 - Type annotations on all public APIs (`NDArray[np.float64]`, return types)
 - Type annotations on private helpers in `fynance/algorithms/allocation.py`
-- GitHub Actions CI matrix (Python 3.10 / 3.11 / 3.12, Linux)
+- GitHub Actions CI matrix (Python 3.10 / 3.11 / 3.12 / 3.13, Linux)
 - `ruff` and `pre-commit` configuration
 
 ### Changed
