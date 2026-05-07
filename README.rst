@@ -2,29 +2,32 @@
  Fynance - Machine learning tools designed for finance 
 =======================================================
 
-.. image:: https://img.shields.io/pypi/pyversions/fynance
+.. |pyversions| image:: https://img.shields.io/pypi/pyversions/fynance
     :alt: PyPI - Python Version
-.. image:: https://img.shields.io/pypi/v/fynance.svg
+.. |pypi| image:: https://img.shields.io/pypi/v/fynance.svg
     :target: https://pypi.org/project/fynance/
-.. image:: https://img.shields.io/pypi/status/fynance.svg?colorB=blue
+.. |status| image:: https://img.shields.io/pypi/status/fynance.svg?colorB=blue
     :target: https://pypi.org/project/fynance/
-.. image:: https://img.shields.io/github/license/ArthurBernard/fynance.svg
+.. |licence| image:: https://img.shields.io/github/license/ArthurBernard/fynance.svg
     :target: https://github.com/ArthurBernard/Fynance/blob/master/LICENSE.txt
-
-.. image:: https://github.com/ArthurBernard/Fynance/actions/workflows/ci.yml/badge.svg?branch=master
+.. |ci| image:: https://github.com/ArthurBernard/Fynance/actions/workflows/ci.yml/badge.svg?branch=master
     :target: https://github.com/ArthurBernard/Fynance/actions/workflows/ci.yml
     :alt: CI
-.. image:: https://readthedocs.org/projects/fynance/badge/?version=latest
+.. |docs| image:: https://readthedocs.org/projects/fynance/badge/?version=latest
     :target: https://fynance.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
-.. image:: https://codecov.io/gh/ArthurBernard/Fynance/branch/develop/graph/badge.svg
+.. |coverage| image:: https://codecov.io/gh/ArthurBernard/Fynance/branch/develop/graph/badge.svg
     :target: https://codecov.io/gh/ArthurBernard/Fynance
     :alt: Test Coverage
-.. image:: https://raw.githubusercontent.com/ArthurBernard/Fynance/develop/badges/interrogate.svg
+.. |docstring| image:: https://raw.githubusercontent.com/ArthurBernard/Fynance/develop/badges/interrogate.svg
     :target: https://github.com/ArthurBernard/Fynance
     :alt: Docstring Coverage
-.. image:: https://pepy.tech/badge/fynance
+.. |downloads| image:: https://pepy.tech/badge/fynance
     :target: https://pepy.tech/project/fynance
+
+|pyversions| |pypi| |status| |licence|
+
+|ci| |docs| |coverage| |docstring| |downloads|
 
 - **Documentation**: http://fynance.readthedocs.io/en/latest/index.html
 - **Source code**: http://github.com/ArthurBernard/Fynance
