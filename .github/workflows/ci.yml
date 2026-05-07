@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [master, develop]
   pull_request:
-    branches: [master]
+    branches: [master, develop]
 
 jobs:
   test:
@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +33,54 @@ jobs:
         run: python setup.py build_ext --inplace
 
       - name: Run tests
-        run: pytest --cov=fynance --cov-report=term-missing
+        run: pytest --cov=fynance --cov-report=term-missing --cov-report=xml
+
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.xml
+          fail_ci_if_error: false
+
+  badges:
+    name: Update badges
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -e ".[dev]"
+          pip install interrogate
+
+      - name: Build Cython extensions
+        run: python setup.py build_ext --inplace
+
+      - name: Generate docstring coverage badge
+        run: |
+          mkdir -p badges
+          interrogate fynance/ --generate-badge badges/ --quiet
+
+      - name: Commit badge if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add badges/
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: update docstring coverage badge [skip ci]"
+            git push
+          fi
 
   lint:
     name: Lint

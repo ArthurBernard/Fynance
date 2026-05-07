@@ -22,6 +22,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Office/Business :: Financial",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
@@ -41,6 +42,7 @@ dev = [
     "Cython>=3.0",
     "pytest>=7.4",
     "pytest-benchmark>=4.0",
+    "interrogate>=1.5",
     "pytest-cov>=4.1",
     "ruff>=0.4",
     "mypy>=1.8",

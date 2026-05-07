@@ -2,37 +2,47 @@
  Fynance - Machine learning tools designed for finance 
 =======================================================
 
-.. image:: https://img.shields.io/pypi/pyversions/fynance
+.. |pyversions| image:: https://img.shields.io/pypi/pyversions/fynance
     :alt: PyPI - Python Version
-.. image:: https://img.shields.io/pypi/v/fynance.svg
+.. |pypi| image:: https://img.shields.io/pypi/v/fynance.svg
     :target: https://pypi.org/project/fynance/
-.. image:: https://img.shields.io/pypi/status/fynance.svg?colorB=blue
+.. |status| image:: https://img.shields.io/pypi/status/fynance.svg?colorB=blue
     :target: https://pypi.org/project/fynance/
-.. image:: https://github.com/ArthurBernard/Fynance/actions/workflows/ci.yml/badge.svg?branch=master
+.. |licence| image:: https://img.shields.io/github/license/ArthurBernard/fynance.svg
+    :target: https://github.com/ArthurBernard/Fynance/blob/master/LICENSE.txt
+.. |ci| image:: https://github.com/ArthurBernard/Fynance/actions/workflows/ci.yml/badge.svg?branch=master
     :target: https://github.com/ArthurBernard/Fynance/actions/workflows/ci.yml
     :alt: CI
-.. image:: https://img.shields.io/github/license/ArthurBernard/fynance.svg
-    :target: https://github.com/ArthurBernard/Fynance/blob/master/LICENSE.txt
-.. image:: https://pepy.tech/badge/fynance
-    :target: https://pepy.tech/project/fynance
-.. image:: https://readthedocs.org/projects/fynance/badge/?version=latest
+.. |docs| image:: https://readthedocs.org/projects/fynance/badge/?version=latest
     :target: https://fynance.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
+.. |coverage| image:: https://codecov.io/gh/ArthurBernard/Fynance/branch/develop/graph/badge.svg
+    :target: https://codecov.io/gh/ArthurBernard/Fynance
+    :alt: Test Coverage
+.. |docstring| image:: https://raw.githubusercontent.com/ArthurBernard/Fynance/develop/badges/interrogate.svg
+    :target: https://github.com/ArthurBernard/Fynance
+    :alt: Docstring Coverage
+.. |downloads| image:: https://pepy.tech/badge/fynance
+    :target: https://pepy.tech/project/fynance
+
+|pyversions| |pypi| |status| |licence|
+
+|ci| |docs| |coverage| |docstring| |downloads|
 
 - **Documentation**: http://fynance.readthedocs.io/en/latest/index.html
 - **Source code**: http://github.com/ArthurBernard/Fynance
 
-**Fynance** is Python (and Cython) package, it provides **machine learning**, **econometric** and **statistical** tools designed for **financial analysis** and **backtest of trading strategy**. The `documentation`_ is available with some **examples** of the use of functions and objects.
+**Fynance** is a Python (and Cython) package providing **machine learning**, **econometric** and **statistical** tools designed for **financial analysis** and **backtesting of trading strategies**. The `documentation`_ is available with descriptions and examples for all public APIs.
 
 .. _documentation: https://fynance.readthedocs.io/en/latest/index.html
 
 The ``fynance.features`` and ``fynance.algorithms.allocation`` subpackages are stable. Other subpackages (``fynance.models``, ``fynance.backtest``) are actively developed and may evolve.
 
 --------------
- Presentation 
+ Presentation
 --------------
 
-The ``fynance`` package contains currently five subpackages:
+The ``fynance`` package contains five subpackages:
 
 - **Algorithms** (``fynance.algorithms``) contains:
     - **Portfolio allocations** (e.g. ERC, HRP, IVP, MDP, MVP, etc.).
@@ -43,19 +53,18 @@ The ``fynance`` package contains currently five subpackages:
 
 - **Feature** tools (``fynance.features``) contains:
     - **Financial indicators** (e.g. bollinger_band, cci, hma, macd_hist, macd_line, rsi, etc.).
-    - **Statistical momentums** (e.g. sma, ema, wma, smstd, emstd wmstd, etc.).
+    - **Statistical momentums** (e.g. sma, ema, wma, smstd, emstd, wmstd, etc.).
     - **Metrics** (e.g. annual_return, annual_volatility, calmar, diversified_ratio, mdd, sharpe, z_score, etc.).
     - **Scale** (e.g. Scale object, normalize, standardize, roll_normalize, roll_standardize, etc.).
     - **Rolling functions** (e.g. roll_min, roll_max).
+    - **Filters** (e.g. Kalman filter with RTS smoother and MLE parameter estimation).
 
 - **Time-series models** (``fynance.models``) contains:
-    - **Econometric models** (e.g. MA, ARMA, ARMA_GARCH and ARMAX_GARCH, etc.).
-    - **Neural network models** with **PyTorch** (e.g. MultiLayerPerceptron, etc.).
-    - **Rolling objects** for models, currently work only with neural network models (e.g. \_RollingBasis, RollMultiLayerPerceptron, etc.).
+    - **Econometric models** (e.g. MA, ARMA, ARMA_GARCH, ARMAX_GARCH, etc.).
+    - **Neural network models** with **PyTorch** (e.g. MultiLayerPerceptron, LSTM, MultiHeadAttention, etc.).
+    - **Rolling walk-forward evaluation** for models (e.g. RollMultiLayerPerceptron, etc.).
 
-Please refer you to the `documentation`_ to see more details on different tools available in `fynance` package. Documentation contains some descriptions and examples for functions, classes and methods.    
-
-.. _documentation: https://fynance.readthedocs.io/en/latest/index.html
+Please refer to the `documentation`_ for more details on the tools available in the ``fynance`` package.
 
 --------------
  Installation 
@@ -90,4 +99,3 @@ From source (GitHub)
 
 .. image:: https://github.com/ArthurBernard/Fynance/blob/master/pictures/loss_RollNeuralNet.png
 
-.. [*] Package not achieved, always in progress. All advice is welcome.

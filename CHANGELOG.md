@@ -70,7 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Numba `@njit` optimization on Kalman filter and RTS smoother
 - Type annotations on all public APIs (`NDArray[np.float64]`, return types)
 - Type annotations on private helpers in `fynance/algorithms/allocation.py`
-- GitHub Actions CI matrix (Python 3.10 / 3.11 / 3.12, Linux)
+- GitHub Actions CI matrix (Python 3.10 / 3.11 / 3.12 / 3.13, Linux)
 - `ruff` and `pre-commit` configuration
 
 ### Changed
