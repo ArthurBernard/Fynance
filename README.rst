@@ -19,7 +19,7 @@
 .. |coverage| image:: https://codecov.io/gh/ArthurBernard/Fynance/branch/develop/graph/badge.svg
     :target: https://codecov.io/gh/ArthurBernard/Fynance
     :alt: Test Coverage
-.. |docstring| image:: https://raw.githubusercontent.com/ArthurBernard/Fynance/develop/badges/interrogate.svg
+.. |docstring| image:: https://raw.githubusercontent.com/ArthurBernard/Fynance/develop/badges/interrogate_badge.svg
     :target: https://github.com/ArthurBernard/Fynance
     :alt: Docstring Coverage
 .. |downloads| image:: https://pepy.tech/badge/fynance
