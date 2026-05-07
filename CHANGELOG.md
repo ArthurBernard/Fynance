@@ -10,6 +10,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [1.3.2] - 2026-05-07
+
+### Added
+
+- Python 3.13 added to the CI test matrix
+- Read the Docs configuration (`.readthedocs.yaml`) for versioned doc deployment (stable/latest)
+- Test coverage badge via Codecov and docstring coverage badge via interrogate
+
+### Changed
+
+- CI now triggers on push and pull_request to both `master` and `develop`
+- README reorganised: badges split onto two lines (package / quality), content updated to reflect current subpackages (Kalman filter, LSTM, MultiHeadAttention)
 - Split `fynance/models/` into one-file-per-class: `neural_network.py` →
   `_base.py` + `mlp.py`; `recurrent_neural_network.py` → `rnn.py`, `gru.py`,
   `lstm.py` + `_recurrent_base.py`. Private cell classes renamed to `_GRUCell`,
@@ -21,12 +39,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `GatedRecurrentUnit` / `LongShortTermMemory` for standalone training.
   `_RecurrentBase` now accepts `y=None` so cells can be constructed
   with an input dimension alone: `GRUCell(8, hidden_state_size=16)`. (#38)
-
-### Fixed
-
-### Deprecated
-
-### Removed
 
 ## [1.3.1] - 2026-05-06
 
