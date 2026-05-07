@@ -2,36 +2,45 @@
 Recurrent neural networks
 *************************
 
-Recurrent neural network models (RNN, GRU, LSTM) with walk-forward training support.
+This page documents two categories of recurrent objects:
 
-Vanilla RNN
-===========
+- **Composable cells** — raw recurrent units with no output projection, designed
+  to be embedded inside larger architectures (TCN, Transformers, encoder-decoders).
+  They expose only a ``forward`` method; calling ``train_on`` or ``predict``
+  raises ``NotImplementedError``.
 
-.. currentmodule:: fynance.models.rnn
+- **Complete models** — cells wrapped with an output projection layer and the full
+  :class:`~fynance.models._base.BaseNeuralNet` training API (``set_optimizer``,
+  ``train_on``, ``predict``). Use these directly for walk-forward financial
+  forecasting.
 
-.. autosummary::
-   :toctree: generated/
+The three architectures follow a complexity ladder: vanilla Elman
+:class:`~fynance.models.rnn.RecurrentNeuralNetwork` → gated
+:class:`~fynance.models.gru.GatedRecurrentUnit` (reset + update gates) →
+:class:`~fynance.models.lstm.LongShortTermMemory` (explicit cell state for long
+dependencies).
 
-   RecurrentNeuralNetwork
+.. currentmodule:: fynance.models
 
-Gated Recurrent Unit (GRU)
-==========================
+.. rubric:: Composable cells
 
-.. currentmodule:: fynance.models.gru
-
-.. autosummary::
-   :toctree: generated/
-
-   GRUCell
-   GatedRecurrentUnit
-
-Long Short-Term Memory (LSTM)
-==============================
-
-.. currentmodule:: fynance.models.lstm
+Raw GRU and LSTM cells without output projection. Pass them as sub-modules to
+build custom architectures.
 
 .. autosummary::
    :toctree: generated/
 
-   LSTMCell
-   LongShortTermMemory
+   gru.GRUCell
+   lstm.LSTMCell
+
+.. rubric:: Complete models
+
+Ready-to-train models with output projection and the full
+:class:`~fynance.models._base.BaseNeuralNet` API.
+
+.. autosummary::
+   :toctree: generated/
+
+   rnn.RecurrentNeuralNetwork
+   gru.GatedRecurrentUnit
+   lstm.LongShortTermMemory
