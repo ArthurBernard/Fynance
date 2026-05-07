@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `lstm.py` + `_recurrent_base.py`. Private cell classes renamed to `_GRUCell`,
   `_LSTMCell`, `_RecurrentBase`; `_ForwardLayer` → `_OutputLayerMixin`. Public
   API (`fynance.models.*`) unchanged. (#38)
+- Expose `GRUCell` and `LSTMCell` as public composable building blocks
+  (mirrors PyTorch's `nn.GRUCell` / `nn.GRU` pattern). Both raise
+  `NotImplementedError` on `train_on` / `predict`; use
+  `GatedRecurrentUnit` / `LongShortTermMemory` for standalone training.
+  `_RecurrentBase` now accepts `y=None` so cells can be constructed
+  with an input dimension alone: `GRUCell(8, hidden_state_size=16)`. (#38)
 
 ### Fixed
 
