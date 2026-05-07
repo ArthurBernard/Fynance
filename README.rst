@@ -18,6 +18,12 @@
 .. image:: https://readthedocs.org/projects/fynance/badge/?version=latest
     :target: https://fynance.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
+.. image:: https://codecov.io/gh/ArthurBernard/Fynance/branch/develop/graph/badge.svg
+    :target: https://codecov.io/gh/ArthurBernard/Fynance
+    :alt: Test Coverage
+.. image:: https://raw.githubusercontent.com/ArthurBernard/Fynance/develop/badges/interrogate.svg
+    :target: https://github.com/ArthurBernard/Fynance
+    :alt: Docstring Coverage
 
 - **Documentation**: http://fynance.readthedocs.io/en/latest/index.html
 - **Source code**: http://github.com/ArthurBernard/Fynance
