@@ -3,18 +3,20 @@
 
 """ Long Short-Term Memory (LSTM) model.
 
-Defines :class:`LongShortTermMemory`, a full LSTM model with output
-projection, and the internal :class:`_LSTMCell` that implements the
-four LSTM gates (forget, input/update, candidate, output) without an
-output layer.
+Defines :class:`LSTMCell`, a composable LSTM building block, and
+:class:`LongShortTermMemory`, a full LSTM model with output projection.
+The internal :class:`_LSTMCell` holds the four LSTM gates (forget,
+input/update, candidate, output) and is the common base for both.
 
 The distinction mirrors PyTorch's own ``torch.nn.LSTMCell`` vs
-``torch.nn.LSTM``: :class:`_LSTMCell` is the raw cell (useful for
-composing larger architectures), while :class:`LongShortTermMemory`
-wraps it with an output projection and training helpers.
+``torch.nn.LSTM``: :class:`LSTMCell` is the raw cell (useful for
+composing larger architectures such as TCN or Transformer encoders),
+while :class:`LongShortTermMemory` wraps it with an output projection
+and training helpers.
 
 Main entry points
 -----------------
+- :class:`LSTMCell` — composable LSTM cell without output projection.
 - :class:`LongShortTermMemory` — LSTM model ready for walk-forward
   training via :meth:`~fynance.models._base.BaseNeuralNet.set_optimizer`.
 
@@ -34,7 +36,7 @@ from torch import nn
 # Local packages
 from fynance.models._recurrent_base import _OutputLayerMixin, _RecurrentBase
 
-__all__ = ['LongShortTermMemory']
+__all__ = ['LSTMCell', 'LongShortTermMemory']
 
 
 class _LSTMCell(_RecurrentBase):
@@ -84,7 +86,7 @@ class _LSTMCell(_RecurrentBase):
     """
 
     def __init__(
-        self, X, y, drop=None, x_type=None, y_type=None, bias=True,
+        self, X, y=None, drop=None, x_type=None, y_type=None, bias=True,
         hidden_activation=nn.Tanh, hidden_state_size=None,
         memory_activation=nn.Tanh, memory_state_size=None,
         forget_activation=nn.Sigmoid, update_activation=nn.Sigmoid,
@@ -146,7 +148,68 @@ class _LSTMCell(_RecurrentBase):
         return H, C
 
 
-class LongShortTermMemory(_OutputLayerMixin, _LSTMCell):
+class LSTMCell(_LSTMCell):
+    """ LSTM cell — public composable building block.
+
+    Implements the four LSTM gates (forget, input, candidate, output)
+    without an output projection layer. Designed to be composed inside
+    larger architectures (TCN, Transformers, encoder-decoders). For a
+    standalone trainable model with output projection, use
+    :class:`LongShortTermMemory`.
+
+    Parameters
+    ----------
+    X : int or array-like
+        Input dimension (int) or input data. When passing an int, ``y``
+        may be omitted.
+    y : array-like or int, optional
+        Output data or output dimension. Not required when using the
+        cell as a building block.
+    hidden_state_size : int, optional
+        Size of the hidden state. Defaults to the input size.
+    memory_state_size : int, optional
+        Size of the cell state. Defaults to hidden state size.
+    drop : float, optional
+        Dropout probability applied before each gate.
+    hidden_activation, memory_activation : torch.nn.Module, optional
+        Activations for hidden and cell state (default: Tanh for both).
+    forget_activation, update_activation, output_activation :
+    torch.nn.Module, optional
+        Gate activations (default: Sigmoid for all three).
+
+    Examples
+    --------
+    >>> import torch
+    >>> from fynance.models.lstm import LSTMCell
+    >>> cell = LSTMCell(8, hidden_state_size=16)
+    >>> H = torch.zeros(4, 16)
+    >>> C = torch.zeros(4, 16)
+    >>> X = torch.randn(4, 8)
+    >>> H_new, C_new = cell(X, H, C)
+    >>> H_new.shape
+    torch.Size([4, 16])
+
+    See Also
+    --------
+    LongShortTermMemory : full model with output projection and training.
+    fynance.models.gru.GRUCell : GRU variant.
+
+    """
+
+    def train_on(self, *args, **kwargs):
+        raise NotImplementedError(
+            "LSTMCell is a composable building block with no output projection. "
+            "Use LongShortTermMemory for a standalone trainable model."
+        )
+
+    def predict(self, *args, **kwargs):
+        raise NotImplementedError(
+            "LSTMCell is a composable building block with no output projection. "
+            "Use LongShortTermMemory for a standalone trainable model."
+        )
+
+
+class LongShortTermMemory(_OutputLayerMixin, LSTMCell):
     """ Long Short-Term Memory neural network.
 
     Full LSTM model: :class:`_LSTMCell` four-gate architecture followed
@@ -209,7 +272,7 @@ class LongShortTermMemory(_OutputLayerMixin, _LSTMCell):
         update_activation=nn.Sigmoid, output_activation=nn.Sigmoid,
     ):
 
-        _LSTMCell.__init__(
+        LSTMCell.__init__(
             self,
             X,
             y,

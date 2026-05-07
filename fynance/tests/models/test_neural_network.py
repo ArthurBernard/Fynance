@@ -7,8 +7,8 @@ import torch.nn as nn
 
 from fynance.models._base import _type_convert
 from fynance.models.attention import MultiHeadAttention, ScaledDotProductAttention
-from fynance.models.gru import GatedRecurrentUnit
-from fynance.models.lstm import LongShortTermMemory
+from fynance.models.gru import GatedRecurrentUnit, GRUCell
+from fynance.models.lstm import LongShortTermMemory, LSTMCell
 from fynance.models.mlp import MultiLayerPerceptron
 from fynance.models.rolling import RollMultiLayerPerceptron
 
@@ -208,6 +208,68 @@ class TestLSTM:
     def test_hidden_state_size_default(self):
         model = LongShortTermMemory(X_t, y_t)
         assert model.H == N_IN
+
+
+# ---------------------------------------------------------------------------
+# GRUCell
+# ---------------------------------------------------------------------------
+
+class TestGRUCell:
+
+    def test_forward_shape(self):
+        cell = GRUCell(N_IN, hidden_state_size=16)
+        H = torch.zeros(T, 16)
+        H_new = cell(X_t, H)
+        assert H_new.shape == (T, 16)
+
+    def test_forward_shape_int_only(self):
+        cell = GRUCell(8, hidden_state_size=16)
+        H = torch.zeros(T, 16)
+        X = torch.randn(T, 8)
+        H_new = cell(X, H)
+        assert H_new.shape == (T, 16)
+
+    def test_train_on_raises(self):
+        cell = GRUCell(N_IN, hidden_state_size=16)
+        with pytest.raises(NotImplementedError):
+            cell.train_on(X_t, y_t, torch.zeros(T, 16))
+
+    def test_predict_raises(self):
+        cell = GRUCell(N_IN, hidden_state_size=16)
+        with pytest.raises(NotImplementedError):
+            cell.predict(X_t, torch.zeros(T, 16))
+
+    def test_full_model_train_still_works(self):
+        model = GatedRecurrentUnit(X_t, y_t, hidden_state_size=16)
+        model.set_optimizer(nn.MSELoss, torch.optim.Adam, lr=1e-3)
+        H = torch.zeros(T, model.H)
+        loss, _ = model.train_on(X_t, y_t, H)
+        assert loss.item() >= 0
+
+
+# ---------------------------------------------------------------------------
+# LSTMCell
+# ---------------------------------------------------------------------------
+
+class TestLSTMCell:
+
+    def test_forward_shape(self):
+        cell = LSTMCell(N_IN, hidden_state_size=16)
+        H = torch.zeros(T, 16)
+        C = torch.zeros(T, 16)
+        H_new, C_new = cell(X_t, H, C)
+        assert H_new.shape == (T, 16)
+        assert C_new.shape == (T, 16)
+
+    def test_train_on_raises(self):
+        cell = LSTMCell(N_IN, hidden_state_size=16)
+        with pytest.raises(NotImplementedError):
+            cell.train_on(X_t, y_t, torch.zeros(T, 16), torch.zeros(T, 16))
+
+    def test_predict_raises(self):
+        cell = LSTMCell(N_IN, hidden_state_size=16)
+        with pytest.raises(NotImplementedError):
+            cell.predict(X_t, torch.zeros(T, 16), torch.zeros(T, 16))
 
 
 # ---------------------------------------------------------------------------

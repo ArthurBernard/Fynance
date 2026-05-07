@@ -3,17 +3,20 @@
 
 """ Gated Recurrent Unit (GRU) model.
 
-Defines :class:`GatedRecurrentUnit`, a full GRU model with output
-projection, and the internal :class:`_GRUCell` that implements the GRU
-gating logic (reset + update gates) without an output layer.
+Defines :class:`GRUCell`, a composable GRU building block, and
+:class:`GatedRecurrentUnit`, a full GRU model with output projection.
+The internal :class:`_GRUCell` holds the GRU gating logic (reset +
+update gates) and is the common base for both.
 
 The distinction mirrors PyTorch's own ``torch.nn.GRUCell`` vs
-``torch.nn.GRU``: :class:`_GRUCell` is the raw cell (useful for
-composing larger architectures), while :class:`GatedRecurrentUnit`
-wraps it with an output projection and training helpers.
+``torch.nn.GRU``: :class:`GRUCell` is the raw cell (useful for
+composing larger architectures such as TCN or Transformer encoders),
+while :class:`GatedRecurrentUnit` wraps it with an output projection
+and training helpers.
 
 Main entry points
 -----------------
+- :class:`GRUCell` — composable GRU cell without output projection.
 - :class:`GatedRecurrentUnit` — GRU model ready for walk-forward
   training via :meth:`~fynance.models._base.BaseNeuralNet.set_optimizer`.
 
@@ -33,7 +36,7 @@ from torch import nn
 # Local packages
 from fynance.models._recurrent_base import _OutputLayerMixin, _RecurrentBase
 
-__all__ = ['GatedRecurrentUnit']
+__all__ = ['GRUCell', 'GatedRecurrentUnit']
 
 
 class _GRUCell(_RecurrentBase):
@@ -74,7 +77,7 @@ class _GRUCell(_RecurrentBase):
     """
 
     def __init__(
-        self, X, y, drop=None, x_type=None, y_type=None, bias=True,
+        self, X, y=None, drop=None, x_type=None, y_type=None, bias=True,
         hidden_activation=nn.Tanh, hidden_state_size=None,
         reset_activation=nn.Sigmoid, update_activation=nn.Sigmoid,
     ):
@@ -112,7 +115,64 @@ class _GRUCell(_RecurrentBase):
         return G_u * H_tild + (1 - G_u) * H
 
 
-class GatedRecurrentUnit(_OutputLayerMixin, _GRUCell):
+class GRUCell(_GRUCell):
+    """ GRU cell — public composable building block.
+
+    Implements the GRU gating logic (reset + update gates) without an
+    output projection layer. Designed to be composed inside larger
+    architectures (TCN, Transformers, encoder-decoders). For a
+    standalone trainable model with output projection, use
+    :class:`GatedRecurrentUnit`.
+
+    Parameters
+    ----------
+    X : int or array-like
+        Input dimension (int) or input data. When passing an int, ``y``
+        may be omitted.
+    y : array-like or int, optional
+        Output data or output dimension. Not required when using the
+        cell as a building block.
+    hidden_state_size : int, optional
+        Size of the hidden state. Defaults to the input size.
+    drop : float, optional
+        Dropout probability applied before each gate.
+    hidden_activation : torch.nn.Module, optional
+        Activation for the candidate hidden state (default: Tanh).
+    reset_activation, update_activation : torch.nn.Module, optional
+        Gate activations (default: Sigmoid for both).
+
+    Examples
+    --------
+    >>> import torch
+    >>> from fynance.models.gru import GRUCell
+    >>> cell = GRUCell(8, hidden_state_size=16)
+    >>> H = torch.zeros(4, 16)
+    >>> X = torch.randn(4, 8)
+    >>> H_new = cell(X, H)
+    >>> H_new.shape
+    torch.Size([4, 16])
+
+    See Also
+    --------
+    GatedRecurrentUnit : full model with output projection and training.
+    fynance.models.lstm.LSTMCell : LSTM variant.
+
+    """
+
+    def train_on(self, *args, **kwargs):
+        raise NotImplementedError(
+            "GRUCell is a composable building block with no output projection. "
+            "Use GatedRecurrentUnit for a standalone trainable model."
+        )
+
+    def predict(self, *args, **kwargs):
+        raise NotImplementedError(
+            "GRUCell is a composable building block with no output projection. "
+            "Use GatedRecurrentUnit for a standalone trainable model."
+        )
+
+
+class GatedRecurrentUnit(_OutputLayerMixin, GRUCell):
     """ Gated Recurrent Unit neural network.
 
     Full GRU model: :class:`_GRUCell` gating logic followed by a
@@ -162,7 +222,7 @@ class GatedRecurrentUnit(_OutputLayerMixin, _GRUCell):
         update_activation=nn.Sigmoid,
     ):
 
-        _GRUCell.__init__(
+        GRUCell.__init__(
             self,
             X,
             y,

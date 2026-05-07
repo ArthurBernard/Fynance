@@ -44,8 +44,8 @@ from .econometric_models_cy import (
     MA_cy,
     get_parameters_cy,
 )
-from .gru import GatedRecurrentUnit
-from .lstm import LongShortTermMemory
+from .gru import GatedRecurrentUnit, GRUCell
+from .lstm import LongShortTermMemory, LSTMCell
 from .mlp import MultiLayerPerceptron
 from .rnn import RecurrentNeuralNetwork
 from .rolling import CVResult, RollMultiLayerPerceptron, _RollingBasis
@@ -74,7 +74,9 @@ __all__ = [
     'BaseNeuralNet',
     'MultiLayerPerceptron',
     # rnn / gru / lstm
+    'GRUCell',
     'GatedRecurrentUnit',
+    'LSTMCell',
     'LongShortTermMemory',
     'RecurrentNeuralNetwork',
     # rolling

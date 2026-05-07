@@ -22,6 +22,7 @@ Gated Recurrent Unit (GRU)
 .. autosummary::
    :toctree: generated/
 
+   GRUCell
    GatedRecurrentUnit
 
 Long Short-Term Memory (LSTM)
@@ -32,4 +33,5 @@ Long Short-Term Memory (LSTM)
 .. autosummary::
    :toctree: generated/
 
+   LSTMCell
    LongShortTermMemory

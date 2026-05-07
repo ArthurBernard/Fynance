@@ -53,9 +53,12 @@ class _RecurrentBase(BaseNeuralNet):
 
     Parameters
     ----------
-    X, y : array-like or int
-        - If it's an array-like, respectively inputs and outputs data.
-        - If it's an integer, respectively dimension of inputs and outputs.
+    X : array-like or int
+        Input data (array-like) or input dimension (int).
+    y : array-like or int, optional
+        Output data (array-like) or output dimension (int). Pass ``None``
+        when instantiating a cell-only building block that has no output
+        projection (e.g. :class:`~fynance.models.gru.GRUCell`).
     drop : float, optional
         Probability of an element to be zeroed.
     hidden_activation : torch.nn.Module, optional
@@ -86,7 +89,7 @@ class _RecurrentBase(BaseNeuralNet):
     def __init__(
         self,
         X: torch.Tensor | int,
-        y: torch.Tensor | int,
+        y: torch.Tensor | int | None = None,
         drop: float | None = None,
         x_type=None,
         y_type=None,
@@ -96,9 +99,11 @@ class _RecurrentBase(BaseNeuralNet):
     ):
         BaseNeuralNet.__init__(self)
 
-        if isinstance(X, int) and isinstance(y, int):
+        if y is None:
+            self.N = X if isinstance(X, int) else X.shape[1]
+            self.M = None
+        elif isinstance(X, int) and isinstance(y, int):
             self.N, self.M = X, y
-
         else:
             self.set_data(X=X, y=y, x_type=x_type, y_type=y_type)
 
