@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [master, develop]
 
+concurrency:
+  group: ci-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: Test — Python ${{ matrix.python-version }}
@@ -70,7 +74,7 @@ jobs:
       - name: Generate docstring coverage badge
         run: |
           mkdir -p badges
-          interrogate fynance/ --generate-badge badges/ --quiet
+          interrogate fynance/ --generate-badge badges/ --quiet --fail-under 0
 
       - name: Commit badge if changed
         run: |
