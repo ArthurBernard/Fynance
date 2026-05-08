@@ -103,6 +103,110 @@ class TestMLP:
         out = model(X_t)
         assert out.shape == (T, N_OUT)
 
+    def test_single_activation(self):
+        model = MultiLayerPerceptron(N_IN, N_OUT, layers=[16], activation=nn.ReLU)
+        out = model(X_t)
+        assert out.shape == (T, N_OUT)
+
+    def test_list_activation_valid(self):
+        model = MultiLayerPerceptron(
+            N_IN, N_OUT, layers=[16, 8],
+            activation=[nn.ReLU, nn.ReLU, nn.ReLU],
+        )
+        out = model(X_t)
+        assert out.shape == (T, N_OUT)
+
+    def test_list_activation_wrong_length_raises(self):
+        with pytest.raises(ValueError):
+            MultiLayerPerceptron(
+                N_IN, N_OUT, layers=[16],
+                activation=[nn.ReLU, nn.ReLU, nn.ReLU],
+            )
+
+    def test_scalar_drop(self):
+        model = MultiLayerPerceptron(N_IN, N_OUT, layers=[16], drop=0.1)
+        out = model(X_t)
+        assert out.shape == (T, N_OUT)
+
+    def test_list_drop_valid(self):
+        model = MultiLayerPerceptron(N_IN, N_OUT, layers=[16], drop=[0.1, 0.2])
+        out = model(X_t)
+        assert out.shape == (T, N_OUT)
+
+    def test_list_drop_wrong_length_raises(self):
+        with pytest.raises(ValueError):
+            MultiLayerPerceptron(N_IN, N_OUT, layers=[16], drop=[0.1, 0.2, 0.3])
+
+    def test_set_lr_scheduler(self):
+        model = self._make_mlp()
+        model.set_lr_scheduler(torch.optim.lr_scheduler.StepLR, step_size=10)
+        assert model.lr_scheduler is not None
+
+    def test_set_lr_scheduler_no_optimizer_raises(self):
+        model = MultiLayerPerceptron(N_IN, N_OUT, layers=[16])
+        with pytest.raises(ValueError):
+            model.set_lr_scheduler(torch.optim.lr_scheduler.StepLR, step_size=10)
+
+    def test_train_on_with_lr_scheduler(self):
+        model = self._make_mlp()
+        model.set_lr_scheduler(torch.optim.lr_scheduler.StepLR, step_size=10)
+        loss = model.train_on(X_t, y_t)
+        assert loss.item() >= 0
+
+    def test_set_data_wrong_m_raises(self):
+        model = self._make_mlp()
+        bad_y = torch.randn(T, N_OUT + 1)
+        with pytest.raises(ValueError):
+            model.set_data(X_t, bad_y)
+
+    def test_set_data_mismatched_length_raises(self):
+        model = MultiLayerPerceptron(N_IN, N_OUT, layers=[16])
+        bad_X = torch.randn(T + 5, N_IN)
+        with pytest.raises(ValueError):
+            model.set_data(bad_X, y_t)
+
+    def test_set_seed_with_int(self):
+        model = self._make_mlp()
+        model.set_seed(seed_torch=42, seed_numpy=7)
+        assert model.seed_torch == 42
+        assert model.seed_numpy == 7
+
+    def test_set_data_from_dataframe(self):
+        import pandas as pd
+        model = MultiLayerPerceptron(N_IN, N_OUT, layers=[16])
+        X_df = pd.DataFrame(X_np)
+        t = model._set_data(X_df)
+        assert isinstance(t, torch.Tensor)
+        assert t.shape == (T, N_IN)
+
+    def test_set_data_unknown_type_raises(self):
+        model = MultiLayerPerceptron(N_IN, N_OUT, layers=[16])
+        with pytest.raises(ValueError, match="Unkwnown data type"):
+            model._set_data([1, 2, 3])
+
+    def test_save_load_model_with_optimizer(self, tmp_path):
+        model = self._make_mlp()
+        path = tmp_path / "model.pt"
+        model.save_model(path, save_optimizer=True)
+        model2 = MultiLayerPerceptron(N_IN, N_OUT, layers=[16, 8])
+        model2.set_optimizer(nn.MSELoss, torch.optim.Adam, lr=1e-3)
+        model2.load_model(path, load_optimizer=True)
+        assert model2.N == N_IN
+
+    def test_load_model_no_optimizer_in_file_raises(self, tmp_path):
+        model = self._make_mlp()
+        path = tmp_path / "model_no_opt.pt"
+        model.save_model(path, save_optimizer=False)
+        model2 = MultiLayerPerceptron(N_IN, N_OUT, layers=[16, 8])
+        model2.set_optimizer(nn.MSELoss, torch.optim.Adam, lr=1e-3)
+        with pytest.raises(ValueError, match="No optimizer available"):
+            model2.load_model(path, load_optimizer=True)
+
+    def test_set_optimizer_with_module_list(self):
+        model = MultiLayerPerceptron(N_IN, N_OUT, layers=[16, 8])
+        model.set_optimizer(nn.MSELoss, torch.optim.Adam, params=[model], lr=1e-3)
+        assert model.optimizer is not None
+
 
 # ---------------------------------------------------------------------------
 # GatedRecurrentUnit
