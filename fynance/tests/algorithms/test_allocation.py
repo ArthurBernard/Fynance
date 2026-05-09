@@ -3,7 +3,16 @@
 import numpy as np
 import pytest
 
-from fynance.algorithms.allocation import ERC, HRP, IVP, MDP, MVP, MVP_uc, _normalize, _perf_alloc
+from fynance.algorithms.allocation import (
+    ERC,
+    HRP,
+    IVP,
+    MDP,
+    MVP,
+    MVP_uc,
+    _normalize,
+    _perf_alloc,
+)
 
 # ---------------------------------------------------------------------------
 # Fixtures
