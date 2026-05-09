@@ -119,3 +119,12 @@ ignore_errors = true
 [[tool.mypy.overrides]]
 module = ["fynance"]
 ignore_errors = true
+
+[tool.interrogate]
+ignore-init-method = true
+ignore-magic = true
+ignore-semiprivate = true
+ignore-private = true
+ignore-module = false
+fail-under = 80
+exclude = ["fynance/tests"]

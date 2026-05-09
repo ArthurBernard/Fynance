@@ -3,7 +3,16 @@
 import numpy as np
 import pytest
 
-from fynance.algorithms.allocation import ERC, HRP, IVP, MDP, MVP, MVP_uc
+from fynance.algorithms.allocation import (
+    ERC,
+    HRP,
+    IVP,
+    MDP,
+    MVP,
+    MVP_uc,
+    _normalize,
+    _perf_alloc,
+)
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -154,3 +163,55 @@ def test_hrp_correlated(correlated_returns):
     w = HRP(correlated_returns)
     assert w.shape == (N, 1)
     assert abs(w.sum() - 1.0) < 1e-6
+
+
+# ---------------------------------------------------------------------------
+# IVP normalize branch
+# ---------------------------------------------------------------------------
+
+def test_ivp_normalize(returns):
+    w = IVP(returns, normalize=True).flatten()
+    assert np.all(w >= -1e-8)
+    assert abs(w.sum() - 1.0) < 1e-6
+
+
+# ---------------------------------------------------------------------------
+# _perf_alloc
+# ---------------------------------------------------------------------------
+
+def test_perf_alloc_drift_true():
+    X = np.cumprod(1 + RNG.normal(0., 0.01, size=(50, 3)), axis=0)
+    w = np.array([0.3, 0.3, 0.4])
+    perf = _perf_alloc(X, w, drift=True)
+    assert perf.shape[0] == 50
+
+
+def test_perf_alloc_drift_false():
+    X = np.cumprod(1 + RNG.normal(0., 0.01, size=(50, 3)), axis=0)
+    w = np.array([0.3, 0.3, 0.4])
+    perf = _perf_alloc(X, w, drift=False)
+    assert perf.shape[0] == 50
+
+
+# ---------------------------------------------------------------------------
+# _normalize
+# ---------------------------------------------------------------------------
+
+def test_normalize_raises_on_bad_bounds():
+    w = np.array([0.25, 0.25, 0.25, 0.25])
+    with pytest.raises(ValueError):
+        _normalize(w, low_bound=0.4, up_bound=0.9)
+
+
+def test_normalize_clamps_weights():
+    w = np.array([0.5, 0.3, 0.15, 0.05])
+    w_norm = _normalize(w.copy(), low_bound=0.1, up_bound=0.4)
+    assert np.all(w_norm >= 0.1 - 1e-9)
+    assert np.all(w_norm <= 0.4 + 1e-9)
+
+
+def test_normalize_max_iter_warning(capsys):
+    w = np.array([0.99, 0.005, 0.003, 0.002])
+    _normalize(w.copy(), low_bound=0.0, up_bound=0.3, max_iter=2)
+    captured = capsys.readouterr()
+    assert "exceeded max iterations" in captured.out

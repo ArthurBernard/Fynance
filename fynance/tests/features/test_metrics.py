@@ -17,6 +17,7 @@ import pytest
 # Local packages
 import fynance as fy
 from fynance._exceptions import ArraySizeError
+from fynance.features.metrics import perf_strat
 
 
 @pytest.fixture()
@@ -57,6 +58,15 @@ def test_annual_return(set_variables):
         f(x_2d, axis=0, ddof=7)
     execinfo.match(r'7.*6')
 
+    with pytest.raises(ValueError, match="degree of freedom"):
+        f(x_1d, ddof=len(x_1d))
+
+    with pytest.raises(ValueError, match="initial value"):
+        f(np.array([0., 100., 200.]))
+
+    with pytest.raises(ValueError, match="same sign"):
+        f(np.array([100., 80., -20.]))
+
 
 def test_annual_volatility(set_variables):
     x_1d, x_2d = set_variables
@@ -91,8 +101,15 @@ def test_calmar(set_variables):
 
 
 def test_diversified_ratio():
-    # TODO: test
-    pass
+    X = np.random.default_rng(0).normal(0., 0.01, (100, 3))
+    w = np.array([0.4, 0.3, 0.3])
+    result = fy.diversified_ratio(X, W=w)
+    assert result > 0
+
+
+def test_drawdown_zero_initial_warns():
+    with pytest.warns(UserWarning, match="Cannot compute drawdown"):
+        fy.drawdown(np.array([0., 10., 5., 8.]))
 
 
 def test_drawdown(set_variables):
@@ -165,13 +182,32 @@ def test_perf_index():
 
 
 def test_perf_returns():
-    # TODO : test
-    pass
+    R = np.array([0.2, 0.25, -1/15, 2/21, 1/8])
+    result_pct = fy.perf_returns(R, base=100., kind='pct')
+    np.testing.assert_allclose(result_pct[0], 100., atol=1e-6)
+
+    result_raw = fy.perf_returns(R, base=100., kind='raw')
+    assert result_raw.shape == R.shape
+
+    result_log = fy.perf_returns(np.log(np.array([1.2, 1.25, 1.1])), base=100., kind='log')
+    assert result_log.shape == (3,)
+
+    with pytest.raises((ValueError, KeyError)):
+        fy.perf_returns(R, kind='bad')
 
 
 def test_perf_strat():
-    # TODO : test
-    pass
+    X = np.array([100., 120., 150., 150., 160., 180., 200.])
+    S = np.ones(X.shape)
+    result = perf_strat(X, S)
+    assert result.shape == X.shape
+
+    S2d = S.reshape(-1, 1)
+    result2 = perf_strat(X.reshape(-1, 1), S2d)
+    assert result2.shape == X.reshape(-1, 1).shape
+
+    with pytest.raises(ValueError):
+        perf_strat(X, np.ones((3, 2)))
 
 
 def test_sharpe(set_variables):
