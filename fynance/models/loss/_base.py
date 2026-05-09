@@ -41,6 +41,7 @@ class BaseLoss(torch.nn.Module):
         self.rf = rf
         self.period = period
         self.eps = eps
+        self._rf_per_period: float = rf / period
 
     def _check_tensor(self, x: object) -> None:
         """ Raise TypeError if *x* is not a :class:`torch.Tensor`. """

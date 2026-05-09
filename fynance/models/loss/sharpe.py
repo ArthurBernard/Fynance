@@ -31,8 +31,9 @@ class SharpeLoss(BaseLoss):
 
     where :math:`r` is ``y_pred``, :math:`rf_p = rf / period` is the
     per-period risk-free rate, :math:`\mu` and :math:`\sigma` are the
-    sample mean and standard deviation, and :math:`\varepsilon` is the
-    numerical stabilizer (``eps``).
+    mean and population standard deviation (``correction=0``, consistent
+    with :func:`~fynance.features.metrics.sharpe`), and :math:`\varepsilon`
+    is the numerical stabilizer (``eps``).
 
     **This is a training proxy** — the value is not comparable to the
     numpy :func:`~fynance.features.metrics.sharpe` evaluation metric,
@@ -103,6 +104,5 @@ class SharpeLoss(BaseLoss):
 
         """
         self._check_tensor(y_pred)
-        rf_per_period = self.rf / self.period
-        excess = y_pred - rf_per_period
-        return -(excess.mean() / (excess.std() + self.eps))
+        excess = y_pred - self._rf_per_period
+        return -(excess.mean() / (excess.std(correction=0) + self.eps))

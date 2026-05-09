@@ -87,7 +87,6 @@ class SortinoLoss(BaseLoss):
 
         """
         self._check_tensor(y_pred)
-        rf_per_period = self.rf / self.period
-        excess = y_pred - rf_per_period
+        excess = y_pred - self._rf_per_period
         downside = torch.sqrt(torch.mean(F.relu(-excess) ** 2) + self.eps)
         return -(excess.mean() / downside)
