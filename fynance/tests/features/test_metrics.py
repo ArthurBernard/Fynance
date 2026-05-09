@@ -472,3 +472,54 @@ def test_roll_sharpe(set_variables):
     with pytest.raises(ValueError) as execinfo:
         roll_f(x_1d, period=12, w=3, ddof=4, dtype=np.float32)
     execinfo.match(r'w=3.*ddof=4')
+
+
+def test_sortino(set_variables):
+    x_1d, x_2d = set_variables
+    f = fy.sortino
+    a_1d = f(x_1d, period=12, dtype=np.float32)
+    a_2d = f(x_2d, period=12, dtype=np.float32)
+
+    assert a_1d.dtype == np.float32
+    assert (a_1d == a_2d.flatten()).all()
+    assert a_1d.shape == ()
+    assert a_2d.shape == (1,)
+
+    with pytest.raises(ArraySizeError) as execinfo:
+        f(x_2d, axis=1)
+    execinfo.match(r'1 .* 1 .* 2')
+
+    with pytest.raises(ArraySizeError) as execinfo:
+        f(x_2d, axis=0, ddof=7)
+    execinfo.match(r'7.*6')
+
+    # All positive returns → downside vol == 0 → inf (tested on 2D; 1D scalar
+    # path shares the same pre-existing limitation as sharpe)
+    x_up_2d = np.array([100., 110., 120., 130., 140., 150.]).reshape(6, 1)
+    assert f(x_up_2d, period=12) == np.array([np.inf])
+
+    # Numeric check: sortino >= sharpe (downside vol <= total vol)
+    s_sharpe = fy.sharpe(x_1d.astype(np.float64), period=12)
+    s_sortino = f(x_1d.astype(np.float64), period=12)
+    assert float(s_sortino) >= float(s_sharpe)
+
+
+def test_directional_accuracy(set_variables):
+    f = fy.directional_accuracy
+
+    y_all_correct = np.array([1., 2., -1., -2., 3.])
+    y_pred_correct = np.array([0.5, 1., -0.1, -3., 0.1])
+    assert f(y_all_correct, y_pred_correct) == 1.0
+
+    y_all_wrong = np.array([1., 2., -1., -2., 3.])
+    y_pred_wrong = np.array([-0.5, -1., 0.1, 3., -0.1])
+    assert f(y_all_wrong, y_pred_wrong) == 0.0
+
+    y_half = np.array([1., -1., 1., -1.])
+    y_pred_half = np.array([1., 1., -1., -1.])
+    assert f(y_half, y_pred_half) == 0.5
+
+    # 2D input
+    y_2d = y_all_correct.reshape([5, 1])
+    p_2d = y_pred_correct.reshape([5, 1])
+    assert f(y_2d, p_2d) == np.array([1.0])
