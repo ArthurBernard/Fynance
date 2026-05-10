@@ -152,3 +152,33 @@ Candidats : `DynaPlotBackTest`, `DynaPlotAccuracy`, `DynaPlotLoss`,
 
 - [ ] Un fichier par classe publique substantielle
 - [ ] Mettre à jour `backtest/__init__.py`
+
+## 6. Optimisations et nettoyage
+
+### 6.1 Supprimer code obsolète dans models/ et backtest/
+
+- [ ] Supprimer `fynance/models/basis.py` — `SignalModel` (stub, `self.y_pred`
+  jamais assigné) et `MagnitudeModel` (juste `pass`). Aucune référence ailleurs.
+- [ ] Supprimer `class __BacktestNeuralNet` dans `dynamic_plot_backtest.py`
+  (marqué "OLD VERSION => DEPRECIATED")
+- [ ] Décider du sort de `class _BacktestNeuralNet` (stub TODO, jamais utilisé)
+
+### 6.2 Optimisations allocation.py
+
+- [ ] `HRP()` : remplacer le loop Python de réordonnancement par du fancy indexing
+  NumPy (`w[np.array(sortIx)] = w_sorted`)
+- [ ] `rolling_allocation()` : nettoyer le double `.bfill()` (lignes ~705, 719)
+- [ ] Évaluer cache de la matrice de covariance entre steps consécutifs dans
+  `rolling_allocation()` (O(N²) par step, 100 steps × 250 assets = coûteux)
+
+### 6.3 Optimisations rolling.py / _base.py
+
+- [ ] `rolling.py _training()` : supprimer les `print` de debug dans le hot loop
+- [ ] `_base.py _set_data()` : utiliser `X.to_numpy(dtype=np.float64, copy=False)`
+  pour les DataFrames afin d'éviter les copies accidentelles
+
+### 6.4 Migrer les TODO inline
+
+- [ ] Passer en revue les ~15 commentaires `# TODO` / `# FIXME` dans le code
+  (metrics.py, _base.py, allocation.py, _wrappers.py, backtest/) et fermer
+  ou migrer vers TODO.md ceux qui restent pertinents
