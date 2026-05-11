@@ -61,12 +61,6 @@ class LossSeries:
         """ Drop the stored values in the loss series. """
         self.values = np.array([])
 
-    # def __add__(self, other):
-    #    return self.append(other)
-
-    # def __iadd__(self, other):
-    #    return self.append(other)
-
     def __repr__(self):
         """ Represent the loss series. """
         return f"{self.__class__.__name__}({str(self.values)})"

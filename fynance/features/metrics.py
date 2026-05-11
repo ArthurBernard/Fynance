@@ -48,10 +48,10 @@ from fynance.features.momentums import _ema, _emstd, _sma, _smstd, _wma, _wmstd
 
 __all__ = [
     'accuracy', 'annual_return', 'annual_volatility', 'calmar',
-    'diversified_ratio', 'drawdown', 'mad', 'mdd', 'roll_annual_return',
-    'roll_annual_volatility', 'roll_calmar', 'roll_drawdown', 'roll_mad',
-    'roll_mdd', 'roll_sharpe', 'roll_z_score', 'sharpe', 'perf_index',
-    'perf_returns', 'z_score',
+    'directional_accuracy', 'diversified_ratio', 'drawdown', 'mad', 'mdd',
+    'roll_annual_return', 'roll_annual_volatility', 'roll_calmar',
+    'roll_drawdown', 'roll_mad', 'roll_mdd', 'roll_sharpe', 'roll_z_score',
+    'sharpe', 'sortino', 'perf_index', 'perf_returns', 'z_score',
 ]
 
 _handler_ma = {'s': _sma, 'w': _wma, 'e': _ema}
@@ -107,13 +107,7 @@ def accuracy(y_true: NDArray, y_pred: NDArray, sign: bool = True, axis: int = 0)
         y_true = np.sign(y_true)
         y_pred = np.sign(y_pred)
 
-    # Check right answeres
-    R = np.sum(y_true == y_pred, axis=axis)
-
-    # Check wrong answeres
-    W = np.sum(y_true != y_pred, axis=axis)
-
-    return R / (R + W)
+    return np.sum(y_true == y_pred, axis=axis) / y_true.shape[axis]
 
 
 @WrapperArray('dtype', 'axis', 'ddof', min_size=2)
@@ -266,16 +260,22 @@ def annual_volatility(X: NDArray, period: int = 252, log: bool = True, axis: int
     return _annual_volatility(X, period, log, axis, ddof)
 
 
-def _annual_volatility(X, period, log, axis, ddof):
+def _compute_returns(X, log):
     R = np.zeros(X.shape)
-
     if log:
         R[1:] = np.log(X[1:] / X[:-1])
-
     else:
         R[1:] = X[1:] / X[:-1] - 1.
+    return R
 
-    return np.sqrt(period) * np.std(R, axis=axis, ddof=ddof)
+
+def _annual_volatility(X, period, log, axis, ddof):
+    return np.sqrt(period) * np.std(_compute_returns(X, log), axis=axis, ddof=ddof)
+
+
+def _annual_downside_volatility(X, period, log, axis, ddof):
+    R = _compute_returns(X, log)
+    return np.sqrt(period) * np.std(np.where(R < 0, R, 0.), axis=axis, ddof=ddof)
 
 
 @WrapperArray('dtype', 'axis', 'ddof', min_size=2)
@@ -909,6 +909,128 @@ def sharpe(X: NDArray, rf: float = 0, period: int = 252, log: bool = False, axis
         return res
 
     return (ret - rf) / vol
+
+
+@WrapperArray('dtype', 'axis', 'null', 'ddof', min_size=2)
+def sortino(
+    X: NDArray, rf: float = 0, period: int = 252, log: bool = False,
+    axis: int = 0, dtype=None, ddof: int = 0,
+) -> NDArray:
+    r""" Compute the Sortino ratio for each `X`' series.
+
+    Annualized excess return per unit of *downside* volatility. Unlike the
+    Sharpe ratio (:func:`sharpe`), only negative returns contribute to the
+    denominator, so strategies that generate frequent large gains are not
+    penalized for their upside variance.
+
+    Notes
+    -----
+    The Sortino ratio is computed as the annualized expected return minus
+    the risk-free rate divided by the annualized downside deviation:
+
+    .. math::
+
+        sortinoRatio = \frac{E(R) - rf}{\sqrt{period \times Var(R^{-})}}
+
+    where :math:`R^{-}_t = \min(R_t, 0)` and :math:`R` is defined as for
+    :func:`sharpe`.
+
+    Parameters
+    ----------
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Time-series of prices, performances or index.
+    rf : float, optional
+        Annualized risk-free rate. Default is 0.
+    period : int, optional
+        Number of periods per year. Default is 252 (trading days).
+    log : bool, optional
+        If True, compute returns as log-returns. Default is False.
+    axis : {0, 1}, optional
+        Axis along which the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        Output array dtype. Inferred from ``X`` if not given.
+    ddof : int, optional
+        Delta Degrees of Freedom. Default is 0.
+
+    Returns
+    -------
+    dtype or np.ndarray[dtype, ndim=1]
+        Sortino ratio for each series. Returns ``inf`` when downside
+        volatility is zero (all returns are non-negative).
+
+    Examples
+    --------
+    Assume a series X of monthly prices:
+
+    >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
+    >>> sortino(X, period=12)
+    0.4742428587192754
+    >>> sortino(X.reshape([6, 1]), period=12)
+    array([0.47424286])
+
+    See Also
+    --------
+    sharpe, calmar, mdd
+
+    """
+    R = _compute_returns(X, log)
+    ret = _annual_return(X, period, ddof)
+    downside_vol = np.sqrt(period) * np.std(np.where(R < 0, R, 0.), axis=axis, ddof=ddof)
+
+    if (downside_vol == 0.).any():
+        res = ret - rf
+        res[downside_vol == 0.] = np.inf
+        res[downside_vol != 0.] = res[downside_vol != 0.] / downside_vol[downside_vol != 0.]
+
+        return res
+
+    return (ret - rf) / downside_vol
+
+
+@WrapperArray('axis')
+def directional_accuracy(
+    y_true: NDArray, y_pred: NDArray, axis: int = 0,
+) -> float:
+    r""" Compute the directional accuracy of a prediction.
+
+    Fraction of periods where the predicted direction (sign) matches the
+    true direction. A value of 1.0 means perfect directional alignment;
+    0.5 is random; 0.0 means systematically wrong direction.
+
+    Notes
+    -----
+    .. math::
+
+        directionalAccuracy = \frac{1}{T} \sum_{t=1}^{T}
+            \mathbf{1}[\text{sign}(\hat{y}_t) = \text{sign}(y_t)]
+
+    Parameters
+    ----------
+    y_true : np.ndarray[ndim=1 or 2, dtype]
+        Vector of true values (returns or price changes).
+    y_pred : np.ndarray[ndim=1 or 2, dtype]
+        Vector of predicted values.
+    axis : {0, 1}, optional
+        Axis along which the computation is done. Default is 0.
+
+    Returns
+    -------
+    float or np.ndarray[ndim=1, float]
+        Directional accuracy between 0 and 1.
+
+    Examples
+    --------
+    >>> y_true = np.array([1., .5, -.5, .8, -.2])
+    >>> y_pred = np.array([.5, .2, -.5, .1, .0])
+    >>> directional_accuracy(y_true, y_pred)
+    0.8
+
+    See Also
+    --------
+    accuracy
+
+    """
+    return np.mean(np.sign(y_true) == np.sign(y_pred), axis=axis)
 
 
 @WrapperArray('dtype', 'axis', 'window')

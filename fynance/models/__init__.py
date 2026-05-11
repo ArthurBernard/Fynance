@@ -19,6 +19,7 @@
     models.attention
     models.econometric_models
     models.rolling
+    models.loss
 
 """
 
@@ -29,6 +30,7 @@ from . import (
     econometric_models,
     econometric_models_cy,
     gru,
+    loss,
     lstm,
     mlp,
     rnn,
@@ -45,6 +47,7 @@ from .econometric_models_cy import (
     get_parameters_cy,
 )
 from .gru import GatedRecurrentUnit, GRUCell
+from .loss import BaseLoss, DirectionalAccuracyLoss, SharpeLoss, SortinoLoss
 from .lstm import LongShortTermMemory, LSTMCell
 from .mlp import MultiLayerPerceptron
 from .rnn import RecurrentNeuralNetwork
@@ -83,4 +86,9 @@ __all__ = [
     'CVResult',
     'RollMultiLayerPerceptron',
     '_RollingBasis',
+    # loss
+    'BaseLoss',
+    'DirectionalAccuracyLoss',
+    'SharpeLoss',
+    'SortinoLoss',
 ]
