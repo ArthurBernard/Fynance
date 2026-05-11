@@ -107,13 +107,7 @@ def accuracy(y_true: NDArray, y_pred: NDArray, sign: bool = True, axis: int = 0)
         y_true = np.sign(y_true)
         y_pred = np.sign(y_pred)
 
-    # Check right answeres
-    R = np.sum(y_true == y_pred, axis=axis)
-
-    # Check wrong answeres
-    W = np.sum(y_true != y_pred, axis=axis)
-
-    return R / (R + W)
+    return np.sum(y_true == y_pred, axis=axis) / y_true.shape[axis]
 
 
 @WrapperArray('dtype', 'axis', 'ddof', min_size=2)
@@ -266,30 +260,22 @@ def annual_volatility(X: NDArray, period: int = 252, log: bool = True, axis: int
     return _annual_volatility(X, period, log, axis, ddof)
 
 
-def _annual_volatility(X, period, log, axis, ddof):
+def _compute_returns(X, log):
     R = np.zeros(X.shape)
-
     if log:
         R[1:] = np.log(X[1:] / X[:-1])
-
     else:
         R[1:] = X[1:] / X[:-1] - 1.
+    return R
 
-    return np.sqrt(period) * np.std(R, axis=axis, ddof=ddof)
+
+def _annual_volatility(X, period, log, axis, ddof):
+    return np.sqrt(period) * np.std(_compute_returns(X, log), axis=axis, ddof=ddof)
 
 
 def _annual_downside_volatility(X, period, log, axis, ddof):
-    R = np.zeros(X.shape)
-
-    if log:
-        R[1:] = np.log(X[1:] / X[:-1])
-
-    else:
-        R[1:] = X[1:] / X[:-1] - 1.
-
-    R_neg = np.where(R < 0, R, 0.)
-
-    return np.sqrt(period) * np.std(R_neg, axis=axis, ddof=ddof)
+    R = _compute_returns(X, log)
+    return np.sqrt(period) * np.std(np.where(R < 0, R, 0.), axis=axis, ddof=ddof)
 
 
 @WrapperArray('dtype', 'axis', 'ddof', min_size=2)
@@ -987,8 +973,9 @@ def sortino(
     sharpe, calmar, mdd
 
     """
+    R = _compute_returns(X, log)
     ret = _annual_return(X, period, ddof)
-    downside_vol = _annual_downside_volatility(X, period, log, axis, ddof)
+    downside_vol = np.sqrt(period) * np.std(np.where(R < 0, R, 0.), axis=axis, ddof=ddof)
 
     if (downside_vol == 0.).any():
         res = ret - rf
