@@ -16,6 +16,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [1.3.3] - 2026-05-11
+
+### Added
+
+- `sortino(X, rf, period, ...)` evaluation metric in `fynance.features.metrics`, symmetric to `sharpe`
+- `directional_accuracy(y_true, y_pred)` evaluation metric — percentage of correctly predicted return signs
+- `fynance.models.loss` submodule with differentiable PyTorch loss functions: `SharpeLoss`, `SortinoLoss`,
+  `DirectionalAccuracyLoss`, and base class `BaseLoss`
+- Tests for new metrics and loss functions; overall test and docstring coverage above 80%
+
+### Changed
+
+- `_compute_returns` factorised as a shared helper; `_annual_volatility` and `_annual_downside_volatility`
+  use it — removes duplicated logic and double allocation in `sortino()`
+- `accuracy()` simplified to a single numpy pass
+- `BaseLoss.__init__` precomputes `rf / period` to avoid per-forward division
+- `SharpeLoss` uses `std(correction=0)` for consistency with the numpy `sharpe` metric
+
+### Fixed
+
+- Reformat long import in `test_allocation.py` (ruff I001)
+
+### Removed
+
+- Dead commented-out `__add__` / `__iadd__` stubs from `LossSeries`
+- `TODO.md` untracked from git (already declared in `.gitignore`)
+
 ## [1.3.2] - 2026-05-07
 
 ### Added
