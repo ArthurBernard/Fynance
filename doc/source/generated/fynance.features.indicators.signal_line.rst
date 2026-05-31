@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.features.indicators
 
 .. autofunction:: signal_line
+   :no-index:

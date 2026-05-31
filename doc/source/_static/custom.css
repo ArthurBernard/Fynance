@@ -2,6 +2,184 @@
 /*                       FYNANCE — Custom Furo styling                        */
 /* ========================================================================== */
 
+/* === Page logo header (top navbar) ======================================== */
+:root { --navbar-height: 3.5rem; }
+
+.page-logo-header {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 1.5rem;
+    height: var(--navbar-height);
+    background: var(--color-sidebar-background);
+    border-bottom: 1px solid var(--color-sidebar-background-border);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+.page-logo-header__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+.page-logo-header img {
+    height: 2rem;
+    width: auto;
+}
+.page-logo-header__name {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-foreground-primary);
+    letter-spacing: -0.01em;
+}
+.page-logo-header__nav {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: auto;
+}
+.page-logo-header__nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-foreground-secondary);
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+.page-logo-header__nav-link:hover {
+    background: var(--color-background-hover);
+    color: var(--color-foreground-primary);
+}
+.page-logo-header__icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+/* Offset Furo's sticky sidebar and TOC to sit below the header */
+.sidebar-sticky { top: var(--navbar-height) !important; }
+.toc-sticky     { top: var(--navbar-height) !important; }
+
+/* === Responsive: compact header on small screens ========================= */
+@media (max-width: 700px) {
+    :root { --navbar-height: 5.5rem; }
+    .page-logo-header {
+        flex-wrap: wrap;
+        align-content: center;
+        height: auto;
+        min-height: var(--navbar-height);
+        padding: 0.35rem 1rem;
+        row-gap: 0.1rem;
+    }
+    /* Brand takes full width → nav wraps to second row */
+    .page-logo-header__brand { flex: 0 0 100%; }
+    .page-logo-header__nav {
+        margin-left: 0;
+        width: 100%;
+        justify-content: flex-start;
+    }
+    .page-logo-header__nav-link {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.8rem;
+    }
+    .page-logo-header img { height: 1.5rem; }
+    .page-logo-header__name { font-size: 1rem; }
+}
+
+/* Divider between nav groups */
+.page-logo-header__divider {
+    display: inline-block;
+    width: 1px;
+    height: 1.25rem;
+    background: var(--color-sidebar-background-border);
+    margin: 0 0.25rem;
+}
+
+/* === Homepage hero header ================================================= */
+.hero-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin: 0.5rem 0 1.5rem;
+}
+.hero-header img {
+    height: 180px;
+    width: auto;
+    flex-shrink: 0;
+}
+
+/* === Badge row ============================================================ */
+.badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    align-items: center;
+    margin: 0.75rem 0 1.25rem;
+    padding: 0;
+}
+.badge-row img { vertical-align: middle; }
+.hero-title {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 2rem !important;
+    font-weight: 700;
+    color: var(--color-foreground-primary);
+    border: none !important;
+}
+/* Hide the RST-generated duplicate h1 on the homepage */
+section.hidden-rst-title > h1 {
+    display: none;
+}
+
+/* ========================================================================== */
+/*                       AXE 4 — Sidebar: related projects                    */
+/* ========================================================================== */
+
+.sidebar-related-projects {
+    padding: 0.6rem 1rem 0.8rem;
+    border-top: 1px solid var(--color-background-border);
+    margin-top: 0.5rem;
+}
+
+.sidebar-related-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-foreground-muted);
+    margin: 0 0 0.5rem;
+}
+
+.sidebar-related-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-related-list li {
+    margin: 0.2rem 0;
+}
+
+.sidebar-related-list a {
+    font-size: 0.84rem;
+    color: var(--color-foreground-primary);
+    text-decoration: none;
+    display: block;
+    padding: 0.1rem 0;
+}
+
+.sidebar-related-list a:hover {
+    color: var(--color-brand-primary);
+}
+
 /* === Web fonts ============================================================ */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 

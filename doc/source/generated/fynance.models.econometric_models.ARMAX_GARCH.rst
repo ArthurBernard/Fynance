@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.models.econometric_models
 
 .. autofunction:: ARMAX_GARCH
+   :no-index:

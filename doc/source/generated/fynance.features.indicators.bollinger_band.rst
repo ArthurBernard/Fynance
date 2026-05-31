@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.features.indicators
 
 .. autofunction:: bollinger_band
+   :no-index:

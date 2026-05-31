@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.algorithms.allocation
 
 .. autofunction:: ERC
+   :no-index:

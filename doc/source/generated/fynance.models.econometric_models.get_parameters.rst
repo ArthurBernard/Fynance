@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.models.econometric_models
 
 .. autofunction:: get_parameters
+   :no-index:

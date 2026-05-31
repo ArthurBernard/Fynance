@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="322 288 380 380">
+<defs>
+  <linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#2ec45f"/>
+    <stop offset="100%" stop-color="#15923a"/>
+  </linearGradient>
+  <linearGradient id="gRed" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#ff463b"/>
+    <stop offset="100%" stop-color="#cf1410"/>
+  </linearGradient>
+</defs>
+<path fill="#353d47" d="M 506 304 A 168 174 0 0 0 506 652 A 92 174 0 0 1 506 304 Z"/>
+<path fill="#353d47" d="M 518 304 A 168 174 0 0 1 518 652 A 92 174 0 0 0 518 304 Z"/>
+<line stroke="#353d47" stroke-width="5" stroke-linecap="round" x1="460" y1="455" x2="460" y2="512"/>
+<line stroke="#353d47" stroke-width="5" stroke-linecap="round" x1="494" y1="492" x2="494" y2="535"/>
+<line stroke="#353d47" stroke-width="5" stroke-linecap="round" x1="528" y1="462" x2="528" y2="532"/>
+<line stroke="#353d47" stroke-width="5" stroke-linecap="round" x1="562" y1="388" x2="562" y2="482"/>
+<rect fill="url(#gRed)"   stroke="#353d47" stroke-width="3" x="449" y="470" width="22" height="30" rx="2"/>
+<rect fill="url(#gRed)"   stroke="#353d47" stroke-width="3" x="483" y="500" width="22" height="20" rx="2"/>
+<rect fill="url(#gGreen)" stroke="#353d47" stroke-width="3" x="517" y="470" width="22" height="50" rx="2"/>
+<rect fill="url(#gGreen)" stroke="#353d47" stroke-width="3" x="551" y="400" width="22" height="70" rx="2"/>
+</svg>
