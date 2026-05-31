@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.features.roll_functions
 
 .. autofunction:: roll_max
+   :no-index:

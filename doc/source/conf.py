@@ -21,6 +21,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.coverage',
+    'sphinx.ext.viewcode',
     'sphinx.ext.mathjax',
     'sphinx.ext.intersphinx',
     'numpydoc',
@@ -57,10 +58,23 @@ html_theme_options = {
     "source_repository": "https://github.com/ArthurBernard/Fynance/",
     "source_branch": "master",
     "source_directory": "doc/source/",
+    "light_logo": "logo-light-transparent.svg",
+    "dark_logo": "logo-dark-transparent.svg",
 }
 html_title = '{} v{} Reference Guide'.format(project, version)
 html_static_path = ['_static']
 html_css_files = ['custom.css']
+
+html_sidebars = {
+    "**": [
+        "sidebar/scroll-start.html",
+        "sidebar/search.html",
+        "sidebar/navigation.html",
+        "sidebar/ethical-ads.html",
+        "sidebar/related-projects.html",
+        "sidebar/scroll-end.html",
+    ]
+}
 
 html_context = {
     "display_github": True,
@@ -116,7 +130,7 @@ autodoc_preserve_defaults = True
 autodoc_typehints = 'none'
 
 # Suppress RST formatting warnings from third-party docstrings (torch.nn.Module)
-suppress_warnings = ['docutils']
+suppress_warnings = ['docutils', 'ref.citation']
 
 # --------------------------------------------------------------------------- #
 #                          Autodoc skip-member hook                           #

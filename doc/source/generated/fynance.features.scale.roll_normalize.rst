@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.features.scale
 
 .. autofunction:: roll_normalize
+   :no-index:
