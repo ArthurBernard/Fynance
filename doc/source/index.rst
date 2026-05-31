@@ -77,6 +77,7 @@
    :caption: Getting Started
 
    installation
+   quickstart
    changelog
 
 .. toctree::
