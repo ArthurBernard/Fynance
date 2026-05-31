@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Harmonise Sphinx doc with DCCD: sticky header with logo, hero on homepage, badge
   row, `installation.rst`, `changelog.rst`, `sidebar/related-projects`, favicons,
-  light/dark logos, `sphinx.ext.viewcode`, toctrees with captions (#XX)
+  light/dark logos, `sphinx.ext.viewcode`, toctrees with captions (#52)
 
 ### Changed
 
