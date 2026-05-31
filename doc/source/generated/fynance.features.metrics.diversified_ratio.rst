@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.features.metrics
 
 .. autofunction:: diversified_ratio
+   :no-index:

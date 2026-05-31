@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.features.metrics
 
 .. autofunction:: roll_z_score
+   :no-index:

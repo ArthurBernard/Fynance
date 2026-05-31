@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.features.filters
 
 .. autofunction:: kalman_loglikelihood
+   :no-index:

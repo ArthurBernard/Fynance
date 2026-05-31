@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.features.scale
 
 .. autofunction:: normalize
+   :no-index:

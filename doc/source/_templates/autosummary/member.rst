@@ -7,4 +7,5 @@
 member
 
 .. auto{{ objtype }}:: {{ objname }}
+   :no-index:
 

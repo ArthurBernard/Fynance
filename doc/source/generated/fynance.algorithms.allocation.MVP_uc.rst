@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.algorithms.allocation
 
 .. autofunction:: MVP_uc
+   :no-index:

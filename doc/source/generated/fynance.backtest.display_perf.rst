@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.backtest
 
 .. autofunction:: display_perf
+   :no-index:

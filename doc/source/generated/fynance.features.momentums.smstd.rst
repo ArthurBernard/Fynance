@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.features.momentums
 
 .. autofunction:: smstd
+   :no-index:

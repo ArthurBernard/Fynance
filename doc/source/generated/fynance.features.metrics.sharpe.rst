@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.features.metrics
 
 .. autofunction:: sharpe
+   :no-index:

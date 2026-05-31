@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.features.filters
 
 .. autofunction:: rts_smoother
+   :no-index:

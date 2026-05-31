@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.features.indicators
 
 .. autofunction:: cci
+   :no-index:

@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.backtest
 
 .. autofunction:: set_text_stats
+   :no-index:

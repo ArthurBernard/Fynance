@@ -1,0 +1,37 @@
+{% extends "!page.html" %}
+{% block extrahead %}
+  {{ super() }}
+  <link rel="icon" href="{{ pathto('_static/favicon-light.svg', 1) }}" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="{{ pathto('_static/favicon-dark.svg',  1) }}" media="(prefers-color-scheme: dark)">
+{% endblock %}
+{% block body %}
+  <header class="page-logo-header">
+    <a class="page-logo-header__brand" href="{{ pathto(master_doc) }}">
+      <img class="only-light" src="{{ pathto('_static/logo-light-transparent.svg', 1) }}" alt="Fynance logo">
+      <img class="only-dark"  src="{{ pathto('_static/logo-dark-transparent.svg',  1) }}" alt="Fynance logo">
+      <span class="page-logo-header__name">Fynance</span>
+    </a>
+    <nav class="page-logo-header__nav">
+      <a class="page-logo-header__nav-link page-logo-header__nav-link--text" href="{{ pathto('index') }}">
+        API Reference
+      </a>
+      <a class="page-logo-header__nav-link page-logo-header__nav-link--text" href="https://download-crypto-currencies-data.readthedocs.io/en/latest/" target="_blank" rel="noopener noreferrer">
+        DCCD
+      </a>
+      <span class="page-logo-header__divider" aria-hidden="true"></span>
+      <a class="page-logo-header__nav-link" href="https://pypi.org/project/fynance/" target="_blank" rel="noopener noreferrer" aria-label="Fynance on PyPI">
+        <svg class="page-logo-header__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12.001 2C6.477 2 2 6.477 2 12s4.477 10 10.001 10C17.523 22 22 17.523 22 12S17.523 2 12.001 2zm.002 2c4.41 0 7.998 3.587 8 7.997 0 2.17-.868 4.14-2.278 5.584L7.42 6.277A7.96 7.96 0 0 1 12.003 4zM4 12.003c0-2.17.868-4.14 2.278-5.584l10.303 10.304A7.96 7.96 0 0 1 12 20c-4.41 0-8-3.588-8-7.997z"/>
+        </svg>
+        <span class="page-logo-header__label">PyPI</span>
+      </a>
+      <a class="page-logo-header__nav-link" href="{{ theme_source_repository }}" target="_blank" rel="noopener noreferrer" aria-label="Source on GitHub">
+        <svg class="page-logo-header__icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+        <span class="page-logo-header__label">GitHub</span>
+      </a>
+    </nav>
+  </header>
+  {{ super() }}
+{% endblock %}

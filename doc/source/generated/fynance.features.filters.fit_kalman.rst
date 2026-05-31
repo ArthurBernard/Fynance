@@ -6,3 +6,4 @@
 .. currentmodule:: fynance.features.filters
 
 .. autofunction:: fit_kalman
+   :no-index:

@@ -16,6 +16,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [1.3.4] - 2026-05-31
+
+### Added
+
+- Harmonise Sphinx doc with DCCD: sticky header with logo, hero on homepage, badge
+  row, `installation.rst`, `changelog.rst`, `sidebar/related-projects`, favicons,
+  light/dark logos, `sphinx.ext.viewcode`, toctrees with captions (#52)
+- `quickstart.rst` — new Getting Started page covering metrics, indicators,
+  portfolio allocation, rolling neural network, and custom loss functions (#53)
+
 ## [1.3.3] - 2026-05-11
 
 ### Added
