@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Release workflow now creates a **GitHub Release** on a `v*` tag (a
   `github-release` job that extracts the matching `CHANGELOG.md` section and
   publishes it via `softprops/action-gh-release`, `make_latest`), alongside the
-  existing PyPI publish.
+  existing PyPI publish. (#57)
 
 ### Changed
 
