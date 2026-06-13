@@ -139,64 +139,6 @@ class DynaPlotBackTest(PlotBackTest):
         self.ax.clear()
 
 
-class __BacktestNeuralNet:
-    # OLD VERSION => DEPRECIATED
-
-    def __init__(self, figsize=(9, 6)):
-        # Set dynamic plot object
-        self.f, (ax_1, ax_2) = plt.subplots(2, 1, figsize=figsize)
-        plt.ion()
-        self.dp_loss = DynaPlotBackTest(
-            self.f, ax_1, title='Model loss', ylabel='Loss', xlabel='Epochs',
-            yscale='log', tick_params={'axis': 'x', 'labelsize': 10}
-        )
-        self.dp_perf = DynaPlotBackTest(
-            self.f, ax_2, title='Model perf.', ylabel='Perf.',
-            xlabel='Date', yscale='log',
-            tick_params={'axis': 'x', 'rotation': 30, 'labelsize': 10}
-        )
-
-    def plot_loss(self, test, eval, train=None, clear=True):
-        """ Plot loss function values for test and evaluate set. """
-        if clear:
-            self.dp_loss.clear()
-
-        # Plot loss
-        self.dp_loss.plot(test, label='Test', color='BuGn', lw=2.)
-        if train is not None:
-            self.dp_loss.plot(train, label='Train', color='RdPu', lw=1.)
-
-        self.dp_loss.plot(eval, label='Eval', color='YlOrBr', loc='upper right',
-                          ncol=2, fontsize=10, handlelength=0.8,
-                          columnspacing=0.5, frameon=True, lw=1.)
-        self.dp_loss.set_axes()
-
-    def plot_perf(self, test, eval, underlying=None, index=None, clear=True):
-        """ Plot performance values for test and eval set. """
-        if clear:
-            self.dp_perf.clear()
-        if index is not None:
-            idx_test = index[-test.shape[0]:]
-            idx_eval = index[: eval.shape[0]]
-
-        else:
-            idx_test = idx_eval = None
-
-        # Plot perf of the test set
-        self.dp_perf.plot(test, x=idx_test, label='Test set', color='GnBu',
-                          lw=1.7, unit='perf')
-        # Plot perf of the eval set
-        self.dp_perf.plot(eval, x=idx_eval, label='Eval set', color='OrRd',
-                          lw=1.2, unit='perf')
-        # Plot perf of the underlying
-        if underlying is not None:
-            self.dp_perf.plot(underlying, x=idx_eval, label='Underlying',
-                              color='RdPu', lw=1.2, unit='perf')
-        self.dp_perf.set_axes()
-        self.dp_perf.ax.legend(loc='upper left', fontsize=10, frameon=True,
-                               handlelength=0.8, ncol=2, columnspacing=0.5)
-
-
 class DynaPlotAccuracy(DynaPlotBackTest):
     """ Plot dynamically the accuracy scores.
 
@@ -594,18 +536,6 @@ class DynaPlotPerf(DynaPlotBackTest):
         # rescale
         self.ax.relim()
         self.ax.autoscale_view()
-
-
-class _BacktestNeuralNet:
-    # TODO : to implement base class
-
-    dyna_plots = {}
-
-    def set_dyna_plot(self, name, klass, ax, **kwargs):
-        dyna_plots[name] = klass(self.f,  ax, **kwargs)  # noqa: F821
-
-    def set_fig_and_axes(self, n_rows, n_cols, figsize):
-        self.f, self.axes = plt.subplots(n_rows, n_cols, figsize=figsize)
 
 
 class BacktestNeuralNet:

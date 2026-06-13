@@ -17,9 +17,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `estimator.estimation`/`target_function` now raise `ValueError(f"Unknown model: {model!r}")` instead of printing a typo'd message and raising a bare `ValueError`
+- Removed leftover debug `print` statements from `models.rolling._RollingBasis._training`; training errors now propagate with their original traceback
+
 ### Deprecated
 
 ### Removed
+
+- Dead code: `models/basis.py` (`SignalModel` referencing an unset `self.y_pred`, empty `MagnitudeModel`) and the deprecated `__BacktestNeuralNet` / unused `_BacktestNeuralNet` stubs in `backtest/dynamic_plot_backtest.py`
 
 ## [1.3.4] - 2026-05-31
 
