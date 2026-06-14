@@ -68,16 +68,12 @@ Couvert : rolling z-score (`roll_standardize`/`roll_z_score`), vol-targeting
 
 ### 5.6 Protocole d'entraînement robuste
 
-Construction causale des features (protection primaire contre la fuite) : toute
-feature à `t` doit s'écrire `f(data[t-window:t])`. Garantie côté kernels par les
-tests de propriété (parité + non-lookahead) ; à étendre aux nouvelles features.
+Fait (PR #90) : purged walk-forward CV (`cross_validate(..., purge=)`),
+`exp_sample_weights` (décroissance exponentielle), `EarlyStopping` (sur métrique).
+La construction causale des features reste garantie par les property tests
+(parité + non-lookahead) — convention continue, pas de code dédié.
 
-- [ ] **Audit causal de chaque feature** (pas de `rolling(center=True)`, pas de
-  normalisation globale, pas de z-score incluant la fenêtre test).
-- [ ] **Purged walk-forward CV** : exclure la zone de bordure train/test quand le
-  nombre de folds est grand ou la fenêtre feature >> horizon.
-- [ ] **Pondération des échantillons** : decay exponentiel / down-weight basse vol.
-- [ ] **Early stopping sur métrique financière** (maximiser le Sharpe de validation).
+- [ ] (optionnel) down-weight basse vol dans `exp_sample_weights` (variante).
 
 ### 5.7 R&D rolling — features multi-résolution et efficacité
 

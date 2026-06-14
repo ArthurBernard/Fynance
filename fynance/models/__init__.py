@@ -36,6 +36,7 @@ from . import (
     rnn,
     rolling,
     tcn,
+    training,
     transformer,
 )
 from ._base import BaseNeuralNet
@@ -63,6 +64,7 @@ from .mlp import MultiLayerPerceptron
 from .rnn import RecurrentNeuralNetwork
 from .rolling import CVResult, RollMultiLayerPerceptron, _RollingBasis
 from .tcn import TemporalConvNet
+from .training import EarlyStopping, exp_sample_weights
 from .transformer import PositionalEncoding, Transformer
 
 # Frozen public surface for the 1.x series — names listed here are
@@ -96,6 +98,9 @@ __all__ = [
     'RecurrentNeuralNetwork',
     # tcn
     'TemporalConvNet',
+    # training
+    'EarlyStopping',
+    'exp_sample_weights',
     # transformer
     'PositionalEncoding',
     'Transformer',
