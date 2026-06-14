@@ -35,6 +35,8 @@ from . import (
     mlp,
     rnn,
     rolling,
+    tcn,
+    transformer,
 )
 from ._base import BaseNeuralNet
 from .attention import MultiHeadAttention, ScaledDotProductAttention
@@ -52,6 +54,8 @@ from .lstm import LongShortTermMemory, LSTMCell
 from .mlp import MultiLayerPerceptron
 from .rnn import RecurrentNeuralNetwork
 from .rolling import CVResult, RollMultiLayerPerceptron, _RollingBasis
+from .tcn import TemporalConvNet
+from .transformer import PositionalEncoding, Transformer
 
 # Frozen public surface for the 1.x series — names listed here are
 # guaranteed to remain importable from ``fynance.models`` until the
@@ -82,6 +86,11 @@ __all__ = [
     'LSTMCell',
     'LongShortTermMemory',
     'RecurrentNeuralNetwork',
+    # tcn
+    'TemporalConvNet',
+    # transformer
+    'PositionalEncoding',
+    'Transformer',
     # rolling
     'CVResult',
     'RollMultiLayerPerceptron',

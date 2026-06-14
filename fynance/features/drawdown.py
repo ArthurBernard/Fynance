@@ -178,7 +178,6 @@ def mad(X: NDArray, axis: int = 0, dtype=None) -> NDArray:
     roll_mad
 
     """
-    # TODO : make cython function or not ?
     return np.mean(np.abs(X.T - np.mean(X, axis=axis)).T, axis=axis)
 
 

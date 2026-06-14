@@ -166,7 +166,6 @@ def z_score(X: NDArray, w: int = 0, kind: str = 's', axis: int = 0, dtype=None) 
     roll_z_score, mdd, calmar, drawdown, sharpe
 
     """
-    # TODO : make a more efficient function
     if kind == 'e':
         w = 1 - 2 / (1 + w)  # type: ignore[assignment]
 

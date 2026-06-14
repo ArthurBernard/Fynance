@@ -31,7 +31,7 @@ library's core invariant, enforced in tests.
   the suite and must stay runnable. `ruff` + `mypy` configured; Sphinx docs build
   (furo).
 - **Core stack**: NumPy 2, pandas 2, SciPy, Numba (`@njit`), **PyTorch** (the ML
-  backend — Keras/TensorFlow is being retired), XGBoost, matplotlib/seaborn.
+  backend — Keras/TensorFlow is being retired), matplotlib/seaborn.
 
 ## Repo map
 

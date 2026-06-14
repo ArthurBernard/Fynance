@@ -40,7 +40,6 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
   (the Cython-backed authoritative path).
 - **Notebooks** (`Notebooks/`) still carry Keras examples — to be rewritten in
   PyTorch (roadmap §3.2).
-- **Docs hosting**: GitHub Pages today; RTD migration is an open question (§3.1).
 - **`# type: ignore`** markers exist for genuinely-unmodellable cases (torch
   multiple-inheritance mixins, decorator-filled `w`, star-imported Cython names);
   `warn_return_any` is off (numpy/Cython return `Any` pervasively).

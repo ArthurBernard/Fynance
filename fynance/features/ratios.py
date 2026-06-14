@@ -360,7 +360,6 @@ def diversified_ratio(X: NDArray, W: NDArray | None = None, std_method: str = 's
     TOBAM-JoPM-Maximum-Div-2008.pdf>`_
 
     """
-    # TODO : check efficiency
     #        append examples
     T, N = X.shape
 

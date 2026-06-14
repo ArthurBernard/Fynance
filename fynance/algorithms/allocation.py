@@ -43,8 +43,6 @@ from scipy.optimize import Bounds, LinearConstraint, minimize
 # Local packages
 from fynance.features.metrics import diversified_ratio
 
-# TODO : cython
-
 __all__ = ['ERC', 'HRP', 'IVP', 'MDP', 'MVP', 'MVP_uc', 'rolling_allocation']
 
 
@@ -144,8 +142,6 @@ def ERC(
 
 def _get_quasi_diag(link: NDArray[np.float64]) -> list[int]:
     """ Compute quasi diagonal matrix.
-
-    TODO : verify the efficiency
 
     Parameter
     ---------
@@ -328,9 +324,9 @@ def HRP(
     sortIx = _get_quasi_diag(link)
     w_sorted = _get_rec_bisec(mat_cov, sortIx)
 
+    # Scatter the cluster-ordered weights back to original asset order.
     w = np.empty(N)
-    for i, col_idx in enumerate(sortIx):
-        w[col_idx] = w_sorted[i]
+    w[np.asarray(sortIx)] = w_sorted
 
     return _normalize(w.reshape([N, 1]), up_bound=up_bound, low_bound=low_bound)
 

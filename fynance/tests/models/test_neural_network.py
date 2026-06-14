@@ -8,6 +8,7 @@ import torch.nn as nn
 from fynance.models._base import _type_convert
 from fynance.models.attention import MultiHeadAttention, ScaledDotProductAttention
 from fynance.models.gru import GatedRecurrentUnit, GRUCell
+from fynance.models.loss import SharpeLoss
 from fynance.models.lstm import LongShortTermMemory, LSTMCell
 from fynance.models.mlp import MultiLayerPerceptron
 from fynance.models.rolling import RollMultiLayerPerceptron
@@ -477,3 +478,43 @@ class TestRollMLP:
         next(it)
         model._training()
         assert np.isfinite(model.loss_train[model.i])
+
+
+class TestRollMLPWithSharpeLoss:
+    """ Integration: train a RollMLP with the differentiable SharpeLoss. """
+
+    def _make(self):
+        model = RollMultiLayerPerceptron(X_t, y_t, layers=[16])
+        # SharpeLoss is passed as the criterion class; set_optimizer does
+        # criterion() and the training loop calls criterion(outputs, y).
+        model.set_optimizer(SharpeLoss, torch.optim.Adam, lr=1e-2)
+        model.set_roll_period(
+            train_period=40, test_period=10, roll_period=10, epochs=1
+        )
+        return model
+
+    def test_training_step_runs_and_is_finite(self):
+        model = self._make()
+        it = iter(model)
+        next(it)
+        model._training()
+        assert np.isfinite(model.loss_train[model.i])
+
+    def test_optimizer_updates_weights(self):
+        model = self._make()
+        before = [p.detach().clone() for p in model.parameters()]
+        it = iter(model)
+        next(it)
+        for _ in range(3):  # a few epochs on the first train window
+            model._training()
+        after = list(model.parameters())
+        # at least one parameter tensor must have moved under SharpeLoss grads
+        assert any(not torch.allclose(b, a) for b, a in zip(before, after))
+
+    def test_prediction_shape_after_training(self):
+        model = self._make()
+        it = iter(model)
+        eval_set, _ = next(it)
+        model._training()
+        pred = model.sub_predict(model.X[eval_set])
+        assert pred.shape[1] == N_OUT
