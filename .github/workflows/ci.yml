@@ -55,8 +55,58 @@ jobs:
           python-version: "3.12"
           cache: pip
 
-      - name: Install ruff
-        run: pip install ruff>=0.4
+      - name: Install ruff + interrogate
+        run: pip install "ruff>=0.4" "interrogate>=1.5"
 
       - name: Run ruff
         run: ruff check fynance/
+
+      - name: Check docstring coverage (interrogate, fail-under 80)
+        run: interrogate fynance/
+
+
+  docs:
+    name: Docs (Sphinx, warnings as errors)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -e ".[doc]"
+
+      - name: Build Cython extensions
+        run: python setup.py build_ext --inplace
+
+      - name: Build HTML docs
+        run: sphinx-build -W --keep-going -b html doc/source doc/build/html
+
+
+  typecheck:
+    name: Type check (mypy)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run mypy
+        run: mypy fynance/

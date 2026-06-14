@@ -23,6 +23,7 @@
 # Third party packages
 
 # Local packages
+from . import allocation
 from .allocation import *
 
 __all__ = allocation.__all__

@@ -315,7 +315,7 @@ class LongShortTermMemory(_OutputLayerMixin, LSTMCell):
         return Y, H, C
 
     @torch.enable_grad()
-    def train_on(self, X: torch.Tensor, y: torch.Tensor, H: torch.Tensor, C: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def train_on(self, X: torch.Tensor, y: torch.Tensor, H: torch.Tensor, C: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:  # type: ignore[override]
         """ Trains the neural network model.
 
         Parameters
@@ -334,11 +334,11 @@ class LongShortTermMemory(_OutputLayerMixin, LSTMCell):
             Cell memory of the model.
 
         """
-        self.optimizer.zero_grad()
+        self.optimizer.zero_grad()  # type: ignore[attr-defined]
         outputs, H, C = self(X, H, C)
         loss = self.criterion(outputs, y)
         loss.backward()
-        self.optimizer.step()
+        self.optimizer.step()  # type: ignore[attr-defined]
 
         if self.lr_scheduler:
             self.lr_scheduler.step()
@@ -346,7 +346,7 @@ class LongShortTermMemory(_OutputLayerMixin, LSTMCell):
         return loss, H.detach(), C.detach()
 
     @torch.no_grad()
-    def predict(self, X: torch.Tensor, H: torch.Tensor, C: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def predict(self, X: torch.Tensor, H: torch.Tensor, C: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:  # type: ignore[override]
         """ Predicts outputs of neural network model.
 
         Parameters

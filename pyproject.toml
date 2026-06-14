@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fynance"
-version = "1.3.4"
+version = "1.4.0"
 description = "Python and Cython scripts of machine learning, econometrics and statistical features for financial analysis"
 readme = "README.md"
 license = { text = "MIT" }
@@ -30,7 +30,7 @@ dependencies = [
     "matplotlib>=3.7",
     "numba>=0.59",
     "numpy>=2.0",
-    "pandas>=2.0",
+    "polars>=1.0",
     "scipy>=1.11",
     "seaborn>=0.12",
     "torch>=2.0",
@@ -96,6 +96,11 @@ ignore = ["E501"]
 # Dual Cython/Python files use star imports to pull Cython symbols
 "fynance/algorithms/browsers.py" = ["F403", "F405"]
 "fynance/features/metrics.py" = ["F403", "F405"]
+"fynance/features/returns.py" = ["F403", "F405"]
+"fynance/features/ratios.py" = ["F403", "F405"]
+"fynance/features/drawdown.py" = ["F403", "F405"]
+"fynance/features/stats.py" = ["F403", "F405"]
+"fynance/features/_metrics_helpers.py" = ["F403", "F405"]
 "fynance/features/momentums.py" = ["F403", "F405"]
 "fynance/features/roll_functions.py" = ["F403", "F405"]
 "fynance/features/scale.py" = ["F403", "F405"]
@@ -104,7 +109,9 @@ ignore = ["E501"]
 [tool.mypy]
 python_version = "3.10"
 ignore_missing_imports = true
-warn_return_any = true
+# numpy / Cython kernels pervasively return Any; we still declare
+# concrete return annotations but don't fail the build on their Any-returns
+warn_return_any = false
 warn_unused_configs = true
 
 [[tool.mypy.overrides]]

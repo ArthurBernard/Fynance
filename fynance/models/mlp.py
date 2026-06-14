@@ -25,7 +25,7 @@ from __future__ import annotations
 from typing import Any
 
 # Third-party packages
-import pandas as pd
+import polars as pl
 import torch
 from numpy.typing import NDArray
 
@@ -88,8 +88,8 @@ class MultiLayerPerceptron(BaseNeuralNet):
 
     def __init__(
         self,
-        X: NDArray | torch.Tensor | pd.DataFrame | int,
-        y: NDArray | torch.Tensor | pd.DataFrame | int,
+        X: NDArray | torch.Tensor | pl.DataFrame | int,
+        y: NDArray | torch.Tensor | pl.DataFrame | int,
         layers: list[int] = [],
         activation: type[torch.nn.Module] | None = None,
         drop: float | None = None,
@@ -105,7 +105,7 @@ class MultiLayerPerceptron(BaseNeuralNet):
             self.N, self.M = X, y
 
         else:
-            self.set_data(X=X, y=y, x_type=x_type, y_type=y_type)
+            self.set_data(X=X, y=y, x_type=x_type, y_type=y_type)  # type: ignore[arg-type]
 
         self.n_layers = len(layers) + 1
 

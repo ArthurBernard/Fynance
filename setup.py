@@ -56,11 +56,6 @@ extensions = [
         ['fynance/features/roll_functions_cy' + ext],
         include_dirs=include_dirs,
     ),
-    Extension(
-        'fynance.algorithms.browsers_cy',
-        ['fynance/algorithms/browsers_cy' + ext],
-        include_dirs=include_dirs,
-    ),
 ]
 
 if USE_CYTHON:

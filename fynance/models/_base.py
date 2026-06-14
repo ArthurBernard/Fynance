@@ -26,7 +26,7 @@ from __future__ import annotations
 # Built-in packages
 # Third-party packages
 import numpy as np
-import pandas as pd
+import polars as pl
 import torch
 import torch.nn
 from numpy.typing import NDArray
@@ -53,7 +53,7 @@ class BaseNeuralNet(torch.nn.Module):
     Thin wrapper around ``torch.nn.Module`` that bundles the boilerplate
     of training a financial model: criterion + optimizer setup, a
     one-batch ``train_on`` step, gradient-free ``predict``, data
-    coercion from NumPy / pandas / tensor, and weight serialization.
+    coercion from NumPy / polars / tensor, and weight serialization.
     Subclass it (or one of the higher-level subclasses such as
     :class:`~fynance.models.mlp.MultiLayerPerceptron`) and implement the
     ``forward`` method to define a new architecture; everything else is
@@ -225,11 +225,11 @@ class BaseNeuralNet(torch.nn.Module):
             If :meth:`set_optimizer` has not been called yet.
 
         """
-        self.optimizer.zero_grad()
+        self.optimizer.zero_grad()  # type: ignore[attr-defined]
         outputs = self(X)
         loss = self.criterion(outputs, y)
         loss.backward()
-        self.optimizer.step()
+        self.optimizer.step()  # type: ignore[attr-defined]
 
         if self.lr_scheduler:
             self.lr_scheduler.step()
@@ -258,7 +258,7 @@ class BaseNeuralNet(torch.nn.Module):
         """
         return self(X).detach()
 
-    def set_data(self, X: NDArray | torch.Tensor | pd.DataFrame, y: NDArray | torch.Tensor | pd.DataFrame, x_type=None, y_type=None):
+    def set_data(self, X: NDArray | torch.Tensor | pl.DataFrame, y: NDArray | torch.Tensor | pl.DataFrame, x_type=None, y_type=None):
         """ Set data inputs and outputs.
 
         Coerces ``X`` and ``y`` to :class:`torch.Tensor` and caches them
@@ -271,7 +271,7 @@ class BaseNeuralNet(torch.nn.Module):
         X, y : array-like
             Respectively input and output data. Accepted types:
             :class:`numpy.ndarray`, :class:`torch.Tensor`,
-            :class:`pandas.DataFrame`. Shapes must be ``(T, N)`` and
+            :class:`polars.DataFrame`. Shapes must be ``(T, N)`` and
             ``(T, M)`` respectively.
         x_type, y_type : torch.dtype, optional
             Target dtypes for the resulting tensors. Default is `None`,
@@ -289,11 +289,11 @@ class BaseNeuralNet(torch.nn.Module):
             do not match, or if ``X`` and ``y`` have different lengths.
 
         """
-        if hasattr(self, 'N') and self.N != X.size(1):
-            raise ValueError('X must have {} input columns'.format(self.N))
+        if hasattr(self, 'N') and self.N != X.shape[1]:  # type: ignore[has-type]
+            raise ValueError('X must have {} input columns'.format(self.N))  # type: ignore[has-type]
 
-        if hasattr(self, 'M') and self.M != y.size(1):
-            raise ValueError('y must have {} output columns'.format(self.M))
+        if hasattr(self, 'M') and self.M != y.shape[1]:  # type: ignore[has-type]
+            raise ValueError('y must have {} output columns'.format(self.M))  # type: ignore[has-type]
 
         self.X = self._set_data(X, dtype=x_type)
         self.y = self._set_data(y, dtype=y_type)
@@ -336,9 +336,8 @@ class BaseNeuralNet(torch.nn.Module):
 
             return torch.from_numpy(X)
 
-        elif isinstance(X, pd.DataFrame):
-            # TODO : Verify memory efficiancy
-            return torch.from_numpy(X.values)
+        elif isinstance(X, pl.DataFrame):
+            return torch.from_numpy(X.to_numpy())
 
         elif isinstance(X, torch.Tensor):
 

@@ -16,6 +16,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [1.4.0] - 2026-06-14
+
+### Added
+
+- Tests for the causal core: econometric `MA`/`ARMA` recurrences and `ARMAX_GARCH` properties; `RollMultiLayerPerceptron._training` (loss update) and `get_stats` (populated structured array)
+- Property test suite `tests/features/test_property.py`: independent NumPy-reference parity for the rolling kernels (`sma`/`wma`/`smstd`/`ema`/`roll_min`/`roll_max`) and a generic no-lookahead (causality) check
+- `polars` is now accepted as an input frame wherever pandas was (`BaseNeuralNet.set_data`, `econometric_models.MA`), alongside numpy/torch
+- Golden-value regression test for `rolling_allocation` (previously untested)
+- Release workflow now creates a **GitHub Release** on a `v*` tag (a
+  `github-release` job that extracts the matching `CHANGELOG.md` section and
+  publishes it via `softprops/action-gh-release`, `make_latest`), alongside the
+  existing PyPI publish. (#57)
+
+### Changed
+
+- `mypy` is now clean (0 errors, was 103) and **enforced in CI** (new `typecheck` job). Real fixes: `print_stats` no longer reuses the `perf` flag as an array; `BaseNeuralNet.set_data` uses `X.shape[1]` (works for numpy/torch/polars, not just tensors); `perf_returns` error message fixed. `warn_return_any` disabled (numpy/Cython pervasively return `Any`); remaining structural cases (torch multiple-inheritance mixins, decorator-filled `w`, star-imported Cython names) carry targeted `# type: ignore`
+- `features/metrics.py` (1782 lines) split by concern into `returns.py`, `ratios.py`, `drawdown.py`, `stats.py` + `_metrics_helpers.py`. `metrics.py` is kept as a thin re-export aggregator, so the public API (`fynance.*`, `fynance.features.metrics.*`), all import paths and the Sphinx docs are unchanged
+- `models/rolling.py` slimmed: the `CVResult` dataclass moved to `models/cv_result.py` (re-exported; imports preserved) and the dead `get_perf` helper removed. The coupled `_RollingBasis`/`RollMultiLayerPerceptron` hierarchy is kept together by design
+- `backtest/dynamic_plot_backtest.py` split: the orchestrator `BacktestNeuralNet` moved to a new `backtest/backtest_neural_net.py` (re-exported from `fynance.backtest`; existing imports preserved). The tightly-coupled `DynaPlot*` plot family stays together
+- `estimator.estimation()` now raises `NotImplementedError` (it was an experimental, non-functional placeholder marked "NOT YET WORKING") and points to `models.econometric_models.get_parameters` (the Cython-backed authoritative path); unused `fmin`/`target_function_cy` imports removed
+- **BREAKING**: pandas is replaced by polars at the input edges and by numpy at the output edges. `rolling_allocation` now returns `(numpy.ndarray, numpy.ndarray)` instead of `(pandas.Series, pandas.DataFrame)`, and `RollMultiLayerPerceptron.get_stats` returns a structured `numpy.ndarray` instead of a `pandas.DataFrame` (field access `stats["train_loss"]` is preserved; use `stats.size` instead of `.empty`). `rolling_allocation` was rewritten pandas-free in numpy with exact parity verified against the old implementation
+- CI now enforces two extra gates on every PR: docstring coverage (`interrogate`, fail-under 80%) in the lint job, and a Sphinx HTML build with warnings-as-errors (`sphinx-build -W`) in a new `docs` job
+
+### Fixed
+
+- `tests/core/series.py` renamed to `test_series.py` so pytest collects it — `core.series` (the `Series` ndarray subclass) was previously untested (0% coverage) despite having a 6-test suite
+- `estimator.estimation`/`target_function` now raise `ValueError(f"Unknown model: {model!r}")` instead of printing a typo'd message and raising a bare `ValueError`
+- Removed leftover debug `print` statements from `models.rolling._RollingBasis._training`; training errors now propagate with their original traceback
+
+### Deprecated
+
+### Removed
+
+- Dead code: `algorithms/browsers.py` (unused `BrowserData`, empty `RollingBasis` stub) + its `browsers_cy` Cython extension, and `algorithms/rolling.py` (`_RollingMechanism`, unused since `rolling_allocation` was rewritten pandas-free)
+- `pandas` dependency (replaced by `polars` for input, `numpy` for output)
+- Dead code: `models/basis.py` (`SignalModel` referencing an unset `self.y_pred`, empty `MagnitudeModel`) and the deprecated `__BacktestNeuralNet` / unused `_BacktestNeuralNet` stubs in `backtest/dynamic_plot_backtest.py`
+
 ## [1.3.4] - 2026-05-31
 
 ### Added

@@ -85,30 +85,30 @@ def set_text_stats(
         txt += '+=============================+\n'
         txt += '|         Performance         |\n'
         txt += '+----------------+------------+\n'
-        perf = np.exp(np.cumsum(underly))
-        perf_targ = np.sign(perf[-1] / perf[0]) * np.float_power(
-            np.abs(perf[-1] / perf[0]), period / perf.size) - 1.
+        cum_perf = np.exp(np.cumsum(underly))
+        perf_targ = np.sign(cum_perf[-1] / cum_perf[0]) * np.float_power(
+            np.abs(cum_perf[-1] / cum_perf[0]), period / cum_perf.size) - 1.
         txt += '| {:14} | {:10.2%} |\n'.format(underlying, perf_targ)
         for key, pred in kwpred.items():
             vect_fee = np.zeros(pred.shape)
             vect_fee[1:] += (pred[1:] - pred[:-1]) * fees
-            perf = np.cumprod((np.exp(underly) - 1 - vect_fee) * pred + 1)
-            perf_pred = np.sign(perf[-1] / perf[0]) * np.float_power(
-                np.abs(perf[-1] / perf[0]), period / perf.size) - 1.
+            cum_perf = np.cumprod((np.exp(underly) - 1 - vect_fee) * pred + 1)
+            perf_pred = np.sign(cum_perf[-1] / cum_perf[0]) * np.float_power(
+                np.abs(cum_perf[-1] / cum_perf[0]), period / cum_perf.size) - 1.
             txt += '| {:14} | {:10.2%} |\n'.format(key, perf_pred)
     # Compute volatility
     if vol:
         txt += '+=============================+\n'
         txt += '|          Volatility         |\n'
         txt += '+----------------+------------+\n'
-        perf = np.exp(np.cumsum(underly))
-        vol_targ = np.sqrt(period) * np.std(perf[1:] / perf[:-1] - 1)
+        cum_perf = np.exp(np.cumsum(underly))
+        vol_targ = np.sqrt(period) * np.std(cum_perf[1:] / cum_perf[:-1] - 1)
         txt += '| {:14} | {:10.2%} |\n'.format(underlying, vol_targ)
         for key, pred in kwpred.items():
             vect_fee = np.zeros(pred.shape)
             vect_fee[1:] += (pred[1:] - pred[:-1]) * fees
-            perf = np.cumprod((np.exp(underly) - 1 - vect_fee) * pred + 1)
-            vol_pred = np.sqrt(period) * np.std(perf[1:] / perf[:-1] - 1)
+            cum_perf = np.cumprod((np.exp(underly) - 1 - vect_fee) * pred + 1)
+            vol_pred = np.sqrt(period) * np.std(cum_perf[1:] / cum_perf[:-1] - 1)
             txt += '| {:14} | {:10.2%} |\n'.format(key, vol_pred)
     # Compute sharpe Ratio
     if sharp:
@@ -120,8 +120,8 @@ def set_text_stats(
         for key, pred in kwpred.items():
             vect_fee = np.zeros(pred.shape)
             vect_fee[1:] += (pred[1:] - pred[:-1]) * fees
-            perf = np.cumprod((np.exp(underly) - 1 - vect_fee) * pred + 1)
-            sharpe_pred = sharpe(perf, period=period)
+            cum_perf = np.cumprod((np.exp(underly) - 1 - vect_fee) * pred + 1)
+            sharpe_pred = sharpe(cum_perf, period=period)
             txt += '| {:14} | {:10.2f} |\n'.format(key, sharpe_pred)
     # Compute calmar
     if calma:
@@ -133,8 +133,8 @@ def set_text_stats(
         for key, pred in kwpred.items():
             vect_fee = np.zeros(pred.shape)
             vect_fee[1:] += (pred[1:] - pred[:-1]) * fees
-            perf = np.cumprod((np.exp(underly) - 1 - vect_fee) * pred + 1)
-            calmar_pred = calmar(perf, period=period)
+            cum_perf = np.cumprod((np.exp(underly) - 1 - vect_fee) * pred + 1)
+            calmar_pred = calmar(cum_perf, period=period)
             txt += '| {:14} | {:10.2f} |\n'.format(key, calmar_pred)
     txt += '+=============================+\n'
     return txt

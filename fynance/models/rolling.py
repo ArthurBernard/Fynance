@@ -27,51 +27,25 @@ Main entry points
 from __future__ import annotations
 
 # Built-in packages
-from dataclasses import dataclass
 from multiprocessing import Process
 from typing import Callable
 
 # External packages
 import numpy as np
-import pandas as pd
 import torch
 from matplotlib import pyplot as plt
 from numpy.typing import NDArray
 
-from fynance.backtest.dynamic_plot_backtest import BacktestNeuralNet
+from fynance.backtest.backtest_neural_net import BacktestNeuralNet
 
 # Local packages
+from fynance.models.cv_result import CVResult
 from fynance.models.mlp import MultiLayerPerceptron
 
 plt.style.use('seaborn-v0_8')
 
 
 __all__ = ['CVResult', '_RollingBasis', 'RollMultiLayerPerceptron']
-
-
-@dataclass
-class CVResult:
-    """ Results from :meth:`_RollingBasis.cross_validate`.
-
-    Attributes
-    ----------
-    oof_predictions : np.ndarray
-        Out-of-fold predictions, shape ``(T, n_out)``.  Positions that
-        fall before the first test fold are filled with ``NaN``.
-    fold_metrics : list of float
-        Per-fold metric values (empty list when ``metric_fn`` is None).
-    mean_metric : float or None
-        Mean of ``fold_metrics``, or None when no metric was provided.
-    std_metric : float or None
-        Standard deviation of ``fold_metrics``, or None when no metric
-        was provided.
-
-    """
-
-    oof_predictions: np.ndarray
-    fold_metrics: list
-    mean_metric: float | None
-    std_metric: float | None
 
 
 class _RollingBasis:
@@ -117,7 +91,7 @@ class _RollingBasis:
         Respectively evaluating and testing predictions.
     log : list of dict
         Per-step record of ``{step, train_loss, eval_loss, test_loss}``,
-        populated by :meth:`run`.  Use :meth:`get_stats` to get a DataFrame.
+        populated by :meth:`run`.  Use :meth:`get_stats` for a structured array.
 
     """
 
@@ -304,19 +278,22 @@ class _RollingBasis:
         return CVResult(oof, fold_metrics, mean_m, std_m)
 
     def get_stats(self):
-        """ Return per-step loss history as a DataFrame.
+        """ Return per-step loss history as a structured array.
 
         Returns
         -------
-        pd.DataFrame
-            Columns: ``step``, ``train_loss``, ``eval_loss``, ``test_loss``.
+        numpy.ndarray
+            Structured array with fields ``step`` (int) and ``train_loss``,
+            ``eval_loss``, ``test_loss`` (float). Access a column by name,
+            e.g. ``stats["train_loss"]``; ``stats.size`` is the step count.
 
         """
-        if not self.log:
-            return pd.DataFrame(
-                columns=['step', 'train_loss', 'eval_loss', 'test_loss']
-            )
-        return pd.DataFrame(self.log)
+        dtype = [('step', np.int64), ('train_loss', np.float64),
+                 ('eval_loss', np.float64), ('test_loss', np.float64)]
+        rows = [(r['step'], r['train_loss'], r['eval_loss'], r['test_loss'])
+                for r in self.log]
+
+        return np.array(rows, dtype=dtype)
 
     def plot_loss(self, figsize=(9, 4)):
         """ Plot train / eval / test loss curves.
@@ -331,7 +308,7 @@ class _RollingBasis:
 
         """
         df = self.get_stats()
-        if df.empty:
+        if df.size == 0:
             raise RuntimeError('No log data — run the model first.')
 
         fig, ax = plt.subplots(figsize=figsize)
@@ -351,16 +328,10 @@ class _RollingBasis:
         for t in range(0, self.n, self.b):
             s = min(t + self.b, self.n)
             train_slice = self.t_idx[t: s]
-            try:
-                lo = self._train(
-                    X=self.X[train_slice],
-                    y=self.f(self.y[train_slice]),
-                )
-            except Exception as e:
-                print(train_slice)
-                print(self.X[train_slice])
-                print(self.f(self.y[train_slice]))
-                raise e
+            lo = self._train(
+                X=self.X[train_slice],
+                y=self.f(self.y[train_slice]),
+            )
             loss_epoch += lo.item()
 
         self.loss_train[self.i] = loss_epoch / s
@@ -473,10 +444,6 @@ def get_perf2(ret, signal, v0=100):
     return v0 * np.cumprod(ret * signal + 1, axis=0)
 
 
-def get_perf(signal, underlying, v0=100):
-    return v0 * np.exp(np.cumsum(signal * underlying, axis=0))
-
-
 class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
     """ Rolling version of the multi-layer perceptron model.
 
@@ -489,7 +456,7 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
 
     Use :meth:`set_roll_period` to configure window sizes and batch
     options, then :meth:`run` to execute the loop. ``run`` can also
-    drive a live :class:`fynance.backtest.dynamic_plot_backtest.BacktestNeuralNet`
+    drive a live :class:`fynance.backtest.backtest_neural_net.BacktestNeuralNet`
     figure to monitor convergence.
 
     Combines :class:`MultiLayerPerceptron` with the walk-forward iterator
