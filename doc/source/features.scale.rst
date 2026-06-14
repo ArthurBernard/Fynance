@@ -17,6 +17,7 @@ Scale functions
    normalize
    standardize
    roll_normalize
+   roll_rank
    roll_standardize
 
 Scale object

@@ -13,8 +13,11 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
   re-export aggregator (public API + import paths unchanged).
 - **Walk-forward base**: `_RollingBasis` iterator + `RollMultiLayerPerceptron` and
   `rolling_allocation()` — the causal windowing used everywhere.
-- **Models**: econometric (ARMA/GARCH) + neural (MLP, RNN/GRU/LSTM, attention) on
-  PyTorch; custom financial losses (Sharpe/Sortino/directional) in `models/loss/`.
+- **Models**: econometric (ARMA/GARCH) + neural (MLP, RNN/GRU/LSTM, attention,
+  **TCN**, **Transformer**) on PyTorch; a **StackingEnsemble** (direction+magnitude
+  OOF meta-model); custom losses (Sharpe/Sortino/Calmar/Omega/directional/hybrid)
+  in `models/loss/`; robust-training utils (purged CV, early stopping, sample
+  weighting) in `models/training.py`.
 - **Data frames**: **polars** at the input edges (`set_data`, `MA`), **numpy** at
   the output edges (`rolling_allocation`, `get_stats`); pandas removed.
 - **Backtest**: static + dynamic plotting (orchestrator `BacktestNeuralNet` split
