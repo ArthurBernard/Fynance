@@ -106,6 +106,11 @@ fichiers (+ `metrics_cy`). Supprimer `metrics.py`.
 
 ### 5.2 Éclater les fichiers multi-classes de `fynance/models/`
 
+> Décision (audit) : split **léger et sensé** seulement. `attention.py` (174 l,
+> 2 classes couplées), `econometric_models.py` (fonctions cohérentes) et la
+> hiérarchie couplée `_RollingBasis`/`RollMLP` sont **gardés intacts** ; seul
+> `CVResult` (dataclass distincte) a été détaché de `rolling.py`. ✅ PR #69.
+
 Candidats identifiés :
 
 - `attention.py` → `scaled_dot_product_attention.py` + `multi_head_attention.py`
@@ -116,10 +121,11 @@ Candidats identifiés :
 - `lstm.py` et `gru.py` — les hiérarchies internes (`_LSTMCell → LSTMCell →
   LongShortTermMemory`) sont trop couplées pour être séparées : laisser en l'état
 
-- [ ] Éclater `attention.py`
-- [ ] Éclater `econometric_models.py`
-- [ ] Éclater `rolling.py`
-- [ ] Mettre à jour `models/__init__.py` pour chaque éclatement
+- [x] `attention.py` — gardé (174 l, 2 classes couplées). ✅ PR #69
+- [x] `econometric_models.py` — gardé (fonctions cohérentes, pas un god-file). ✅ PR #69
+- [x] `rolling.py` — `CVResult` → `cv_result.py` ; `get_perf` mort retiré ;
+  hiérarchie `_RollingBasis`/`RollMLP` gardée couplée. ✅ PR #69
+- [x] `models/__init__.py` — CVResult re-exporté via `rolling`, imports préservés. ✅ PR #69
 
 ### 5.3 Éclater `fynance/backtest/dynamic_plot_backtest.py` (708 lignes, 6 classes)
 
