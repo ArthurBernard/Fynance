@@ -71,6 +71,18 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-06-14 — Read the Docs is the canonical docs host (roadmap §3.1)  [accepted]
+- **Choice**: keep **Read the Docs** as the single documentation host. `.readthedocs.yaml`
+  already builds the site (compiles the Cython ext, installs `.[doc]`, runs the
+  Sphinx config), the README badge + links point to `fynance.readthedocs.io`, and
+  there is **no** GitHub Pages deploy workflow. RTD now also builds with
+  `fail_on_warning: true`, matching the CI `sphinx-build -W` gate.
+- **Why**: RTD was already the de-facto host; the earlier "GitHub Pages today /
+  RTD migration open" note was stale. No migration needed — just confirm RTD and
+  align the warning policy.
+- **Rejected alternatives**: GitHub Pages (never actually wired up); a custom
+  domain (not needed).
+
 ### 2026-06-14 — Track doc/dev + CLAUDE.md publicly, mirroring dccd (PR #62)  [accepted]
 - **Choice**: stop gitignoring `doc/dev`. The descriptive pack `01–07` (including
   the roadmap), `README.md`, `plans/README.md` **and `CLAUDE.md`** are now tracked,

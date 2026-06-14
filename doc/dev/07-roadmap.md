@@ -15,14 +15,6 @@ shipped, `03-decisions.md` for *why*. Keep it short and true.
 ---
 
 
-## 3. Documentation & notebooks
-
-### 3.1 URL de la documentation
-
-- [ ] Évaluer remplacement de GitHub Pages par RTD (URL `fynance.readthedocs.io`)
-  via trigger manuel de build RTD depuis le workflow GitHub Actions à chaque merge
-  sur `master` (API RTD webhook), ou custom domain sur GitHub Pages.
-
 ## 4. Performance & dépendances
 
 - [ ] Audit versions et alternatives modernes des dépendances restantes.
