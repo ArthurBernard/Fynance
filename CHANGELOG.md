@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `polars` is now accepted as an input frame wherever pandas was (`BaseNeuralNet.set_data`, `econometric_models.MA`), alongside numpy/torch
+- Golden-value regression test for `rolling_allocation` (previously untested)
 - Release workflow now creates a **GitHub Release** on a `v*` tag (a
   `github-release` job that extracts the matching `CHANGELOG.md` section and
   publishes it via `softprops/action-gh-release`, `make_latest`), alongside the
@@ -15,11 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **BREAKING**: pandas is replaced by polars at the input edges and by numpy at the output edges. `rolling_allocation` now returns `(numpy.ndarray, numpy.ndarray)` instead of `(pandas.Series, pandas.DataFrame)`, and `RollMultiLayerPerceptron.get_stats` returns a structured `numpy.ndarray` instead of a `pandas.DataFrame` (field access `stats["train_loss"]` is preserved; use `stats.size` instead of `.empty`). `rolling_allocation` was rewritten pandas-free in numpy with exact parity verified against the old implementation
+
 ### Fixed
 
 ### Deprecated
 
 ### Removed
+
+- `pandas` dependency (replaced by `polars` for input, `numpy` for output)
 
 ## [1.3.4] - 2026-05-31
 

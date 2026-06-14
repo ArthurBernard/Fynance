@@ -171,10 +171,10 @@ class TestMLP:
         assert model.seed_torch == 42
         assert model.seed_numpy == 7
 
-    def test_set_data_from_dataframe(self):
-        import pandas as pd
+    def test_set_data_from_polars(self):
+        import polars as pl
         model = MultiLayerPerceptron(N_IN, N_OUT, layers=[16])
-        X_df = pd.DataFrame(X_np)
+        X_df = pl.DataFrame(X_np)
         t = model._set_data(X_df)
         assert isinstance(t, torch.Tensor)
         assert t.shape == (T, N_IN)
@@ -444,8 +444,8 @@ class TestRollMLP:
 
     def test_get_stats_empty_before_run(self):
         model = self._make_roll_mlp()
-        df = model.get_stats()
-        assert df.empty
+        stats = model.get_stats()
+        assert stats.size == 0
 
     def test_one_training_step(self):
         """ One manual step: training should not raise and update weights. """

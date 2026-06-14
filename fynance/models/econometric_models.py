@@ -28,7 +28,7 @@ Main entry points
 
 # External packages
 import numpy as np
-import pandas as pd
+import polars as pl
 
 # Local packages
 from fynance.models.econometric_models_cy import *
@@ -156,8 +156,8 @@ def MA(y, theta, c, q):
 
     """
     # Set type of variables
-    if isinstance(y, pd.DataFrame) or isinstance(y, pd.Series):
-        y = np.asarray(y)
+    if isinstance(y, (pl.DataFrame, pl.Series)):
+        y = y.to_numpy()
 
     elif isinstance(y, list):
         y = np.asarray(y)

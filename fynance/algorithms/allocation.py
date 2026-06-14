@@ -36,15 +36,12 @@ from typing import Callable
 
 # Third-party
 import numpy as np
-import pandas as pd
 import scipy.cluster.hierarchy as sch
 from numpy.typing import NDArray
 from scipy.optimize import Bounds, LinearConstraint, minimize
 
 # Local packages
 from fynance.features.metrics import diversified_ratio
-
-from .rolling import _RollingMechanism
 
 # TODO : cython
 
@@ -165,7 +162,7 @@ def _get_quasi_diag(link: NDArray[np.float64]) -> list[int]:
     """
     link = link.astype(int)
     numItems = link[-1, 3]  # number of original leaf items
-    # Use a plain list to avoid pandas dtype coercion issues
+    # Use a plain Python list for cheap appends/inserts
     items = [int(link[-1, 0]), int(link[-1, 1])]
 
     while max(items) >= numItems:
@@ -631,7 +628,7 @@ def rolling_allocation(
     ret: bool = True,
     drift: bool = True,
     **kwargs,
-) -> NDArray[np.float64]:
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     r""" Roll an algorithm of portfolio allocation.
 
     Generic walk-forward backtester for any allocation function ``f``
@@ -677,52 +674,57 @@ def rolling_allocation(
 
     Returns
     -------
-    pd.Series
-        Performance of the portfolio allocated following ``f`` algorithm.
-    pd.DataFrame
-        Weights of the portfolio allocated following ``f`` algorithm.
+    numpy.ndarray
+        Performance of the portfolio allocated following ``f``, shape
+        ``(T,)``. The first ``n`` observations are held at the initial
+        value ``100.``.
+    numpy.ndarray
+        Weights of the portfolio per period, shape ``(T, n_assets)``.
 
     """
-    X = pd.DataFrame(X).ffill()
-    idx = X.index
-    w_mat = pd.DataFrame(index=idx, columns=X.columns)
-    portfolio = pd.Series(100., index=idx, name='portfolio')
+    X = np.asarray(X, dtype=np.float64)
+    if X.ndim == 1:
+        X = X.reshape(-1, 1)
+
+    X = _ffill(X)
+    T, K = X.shape
+    w_mat = np.full((T, K), np.nan)
+    portfolio = np.full(T, 100.)
 
     if ret:
-        X_ = X.pct_change()
+        X_ = np.empty_like(X)
+        X_[0] = np.nan
+        X_[1:] = X[1:] / X[:-1] - 1.
 
     else:
         X_ = X
 
-    roll = _RollingMechanism(idx, n=n, s=s)
-
-    def process(series):
-        # True if less than 50% of obs. are constant
-        return series.value_counts(dropna=False).max() < 0.5 * n
-
-    for slice_n, slice_s in roll():
-        # Select X
-        sub_X = X_.loc[slice_n].copy()
-        assets = list(X.columns[sub_X.apply(process)])
-        sub_X = sub_X.bfill()
+    # Walk-forward: weights computed on X[t - n:t], held over X[t:t + s].
+    t = n
+    while t < T - 1:
+        # Training window: rows [t - n, t - 1].
+        sub_X = X_[max(t - n, 0):t]
+        # Drop assets that are constant on more than 50% of the window.
+        assets = np.flatnonzero(_active_assets(sub_X, n))
+        sub_X = _bfill(sub_X)
         # Compute weights
-        if len(assets) == 1:
+        if assets.size == 1:
             w = np.array([[1.]])
 
         else:
-            w = f(sub_X.loc[:, assets].values, **kwargs)
+            w = np.asarray(f(sub_X[:, assets], **kwargs), dtype=np.float64)
 
-        w_mat.loc[roll.d, assets] = w.flatten()
-        w_mat.loc[roll.d, :] = w_mat.loc[roll.d, :].fillna(0.)
-        # Compute portfolio performance
-        perf = _perf_alloc(
-            X.loc[slice_s, assets].bfill().values,
-            w=w,
-            drift=drift
-        )
-        portfolio.loc[slice_s] = portfolio.loc[roll.d] * perf.flatten()
+        row = np.zeros(K)
+        row[assets] = w.flatten()
+        w_mat[t] = row
+        # Compute portfolio performance over the test window [t, t + s].
+        t_end = min(t + s, T - 1)
+        perf = _perf_alloc(_bfill(X[t:t_end + 1][:, assets]), w=w, drift=drift)
+        portfolio[t:t_end + 1] = portfolio[t] * perf.flatten()
+        t += s
 
-    w_mat = w_mat.ffill().fillna(0.)
+    w_mat = _ffill(w_mat)
+    w_mat[np.isnan(w_mat)] = 0.
 
     return portfolio, w_mat
 
@@ -732,9 +734,45 @@ def rolling_allocation(
 # =========================================================================== #
 
 
+def _ffill(a: NDArray[np.float64]) -> NDArray[np.float64]:
+    # Forward-fill NaNs along axis 0, column by column (no pandas needed).
+    a = a.copy()
+    for k in range(a.shape[1]):
+        col = a[:, k]
+        mask = np.isnan(col)
+        if not mask.any():
+            continue
+        idx = np.where(~mask, np.arange(col.size), 0)
+        np.maximum.accumulate(idx, out=idx)
+        col[mask] = col[idx[mask]]
+
+    return a
+
+
+def _bfill(a: NDArray[np.float64]) -> NDArray[np.float64]:
+    # Backward-fill NaNs along axis 0 (mirror of :func:`_ffill`).
+    return _ffill(a[::-1])[::-1]
+
+
+def _active_assets(sub_X: NDArray[np.float64], n: int) -> NDArray[np.bool_]:
+    # True for columns with less than 50% of identical observations (NaN
+    # counted as a value), matching the original value-counts filter.
+    thr = 0.5 * n
+    K = sub_X.shape[1]
+    keep = np.empty(K, dtype=bool)
+    for k in range(K):
+        col = sub_X[:, k]
+        nan_count = int(np.isnan(col).sum())
+        vals = col[~np.isnan(col)]
+        max_freq = int(np.unique(vals, return_counts=True)[1].max()) if vals.size else 0
+        keep[k] = max(max_freq, nan_count) < thr
+
+    return keep
+
+
 def _perf_alloc(X: NDArray[np.float64], w: NDArray[np.float64], drift: bool = True) -> NDArray[np.float64]:
     # Compute portfolio performance following specified weights
-    if w.ndim == 1 and not isinstance(w, pd.Series):
+    if w.ndim == 1:
         w = w.reshape([w.size, 1])
 
     if drift:
