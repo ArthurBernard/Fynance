@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `Notebooks/pytorch_examples.ipynb` — a runnable PyTorch tour (metrics, allocation, MLP/TCN/Transformer with `SharpeLoss`, walk-forward CV, custom losses), replacing the old Keras/dev notebooks
+
 - `Transformer` (`fynance.models.transformer`) — a causal Transformer encoder on `BaseNeuralNet` (sinusoidal `PositionalEncoding`, reuses `MultiHeadAttention`, lower-triangular causal mask = no lookahead), with 10 tests incl. a causality check; works with MSE and `SharpeLoss`
 
 - `TemporalConvNet` (`fynance.models.tcn`) — a causal dilated Temporal Convolutional Network on `BaseNeuralNet` (residual blocks, dilation 1/2/4…, strictly no-lookahead), with 8 tests incl. a causality check; works with MSE and `SharpeLoss`
@@ -20,11 +22,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- README quickstart: `fy.ERC(cov)()` → `fy.ERC(cov)` (ERC returns an array, not a callable) and the rolling example now uses the real `model(train_period=…, test_period=…, roll_period=…)` signature
+
 - Swept stale/decided inline `# TODO`/`# FIXME` markers; in particular the `momentums_cy` "window is w+1" FIXME was verified stale (window size is correct, proven by the property tests) and removed
 
 ### Deprecated
 
 ### Removed
+
+- Legacy notebooks: the Keras `Exemple_Rolling_NeuralNetwork.ipynb` and the stale dev notebooks `test_roll_NN_test.ipynb` / `Test_various_NN_models_with_simulated_data.ipynb`
 
 ## [1.4.0] - 2026-06-14
 

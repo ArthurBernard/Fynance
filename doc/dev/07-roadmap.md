@@ -23,13 +23,6 @@ shipped, `03-decisions.md` for *why*. Keep it short and true.
   via trigger manuel de build RTD depuis le workflow GitHub Actions à chaque merge
   sur `master` (API RTD webhook), ou custom domain sur GitHub Pages.
 
-### 3.2 Réécrire les notebooks `Notebooks/`
-
-- [ ] Remplacer exemples Keras par PyTorch
-- [ ] Ajouter exemples TCN, Transformer, custom loss functions
-- [ ] Montrer rolling walk-forward pour backtest
-- [ ] Vérifier que les notebooks tournent (nbval ou papermill)
-
 ## 4. Performance & dépendances
 
 - [ ] Audit versions et alternatives modernes des dépendances restantes.
