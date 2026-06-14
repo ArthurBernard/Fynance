@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `mypy` is now clean (0 errors, was 103) and **enforced in CI** (new `typecheck` job). Real fixes: `print_stats` no longer reuses the `perf` flag as an array; `BaseNeuralNet.set_data` uses `X.shape[1]` (works for numpy/torch/polars, not just tensors); `perf_returns` error message fixed. `warn_return_any` disabled (numpy/Cython pervasively return `Any`); remaining structural cases (torch multiple-inheritance mixins, decorator-filled `w`, star-imported Cython names) carry targeted `# type: ignore`
 - `features/metrics.py` (1782 lines) split by concern into `returns.py`, `ratios.py`, `drawdown.py`, `stats.py` + `_metrics_helpers.py`. `metrics.py` is kept as a thin re-export aggregator, so the public API (`fynance.*`, `fynance.features.metrics.*`), all import paths and the Sphinx docs are unchanged
 - `models/rolling.py` slimmed: the `CVResult` dataclass moved to `models/cv_result.py` (re-exported; imports preserved) and the dead `get_perf` helper removed. The coupled `_RollingBasis`/`RollMultiLayerPerceptron` hierarchy is kept together by design
 - `backtest/dynamic_plot_backtest.py` split: the orchestrator `BacktestNeuralNet` moved to a new `backtest/backtest_neural_net.py` (re-exported from `fynance.backtest`; existing imports preserved). The tightly-coupled `DynaPlot*` plot family stays together

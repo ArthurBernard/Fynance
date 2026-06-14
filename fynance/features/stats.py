@@ -168,7 +168,7 @@ def z_score(X: NDArray, w: int = 0, kind: str = 's', axis: int = 0, dtype=None) 
     """
     # TODO : make a more efficient function
     if kind == 'e':
-        w = 1 - 2 / (1 + w)
+        w = 1 - 2 / (1 + w)  # type: ignore[assignment]
 
     avg = _handler_ma[kind.lower()](X, w)
     std = _handler_mstd[kind.lower()](X, w)
@@ -236,7 +236,7 @@ def roll_z_score(X: NDArray, w: int | None = None, kind: str = 's', axis: int = 
 
     """
     if kind == 'e':
-        w = 1 - 2 / (1 + w)
+        w = 1 - 2 / (1 + w)  # type: ignore[assignment, operator]
 
     avg = _handler_ma[kind.lower()](X, w)
     std = _handler_mstd[kind.lower()](X, w)

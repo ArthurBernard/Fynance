@@ -105,7 +105,7 @@ class _RecurrentBase(BaseNeuralNet):
         elif isinstance(X, int) and isinstance(y, int):
             self.N, self.M = X, y
         else:
-            self.set_data(X=X, y=y, x_type=x_type, y_type=y_type)
+            self.set_data(X=X, y=y, x_type=x_type, y_type=y_type)  # type: ignore[arg-type]
 
         self.H = self.N if hidden_state_size is None else hidden_state_size
 
@@ -182,14 +182,14 @@ class _OutputLayerMixin:
             Updated states of the model.
 
         """
-        self.optimizer.zero_grad()
-        outputs, H = self(X, H)
-        loss = self.criterion(outputs, y)
+        self.optimizer.zero_grad()  # type: ignore[attr-defined]
+        outputs, H = self(X, H)  # type: ignore[operator]
+        loss = self.criterion(outputs, y)  # type: ignore[attr-defined]
         loss.backward()
-        self.optimizer.step()
+        self.optimizer.step()  # type: ignore[attr-defined]
 
-        if self.lr_scheduler:
-            self.lr_scheduler.step()
+        if self.lr_scheduler:  # type: ignore[attr-defined]
+            self.lr_scheduler.step()  # type: ignore[attr-defined]
 
         return loss, H.detach()
 
@@ -212,6 +212,6 @@ class _OutputLayerMixin:
            Updated states of the model.
 
         """
-        Y, H = self(X, H)
+        Y, H = self(X, H)  # type: ignore[operator]
 
         return Y.detach(), H.detach()

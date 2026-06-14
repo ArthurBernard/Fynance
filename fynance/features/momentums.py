@@ -308,7 +308,7 @@ def smstd(X: NDArray, w: int | None = None, ddof: int = 0, axis: int = 0, dtype=
     sma, wmstd, emstd
 
     """
-    if ddof >= w:
+    if ddof >= w:  # type: ignore[operator]
 
         raise ValueError(
             'size of the lagged window (w={}) must be strictly greater than '

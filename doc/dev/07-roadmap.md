@@ -294,11 +294,11 @@ sections 3, 5 et 6 ci-dessus.
   docstring « experimental », pointe vers `get_parameters`. ✅ PR #63.
 
 ### 8.2 Typage : résorber les 104 erreurs mypy puis ajouter le gate CI
-- [ ] `mypy fynance/` = 104 erreurs (bruit numpy-2 `Returning Any`, hiérarchies
+- [x] `mypy fynance/` = **0 erreur** (était 103). ✅ PR #71. Détail : 104 erreurs (bruit numpy-2 `Returning Any`, hiérarchies
   torch `predict`/`train_on` incompatibles, `print_stats.py` variable `bool`
-  réassignée en `ndarray`). Les corriger par lots.
-- [ ] Une fois à 0, ajouter un job `mypy` dans `ci.yml` (à côté de
-  ruff / interrogate / docs).
+  réassignée en `ndarray`). → vrais bugs corrigés ; bruit numpy via
+  `warn_return_any=false` ; reste en `# type: ignore` ciblés. ✅ PR #71
+- [x] Job `typecheck` (mypy) ajouté à `ci.yml`. ✅ PR #71
 
 ### 8.3 Couverture du cœur causal
 - [x] `models/rolling.py` — `_training` (loss update) + `get_stats` couverts. ✅ PR #67.

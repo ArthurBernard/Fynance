@@ -164,12 +164,14 @@ def perf_returns(R: NDArray, kind: str = 'raw', base: float = 100., axis: int = 
         X = base * np.cumprod(np.exp(R), axis=axis)
 
     elif kind.lower() == 'pct':
-        X = base * np.cumprod(R + 1., axis=axis)
+        X = base * np.cumprod(R + 1., axis=axis)  # type: ignore[assignment]
 
     else:
 
-        raise ValueError("unkwnown kind {} of returns, only {'raw', 'log',"  # noqa: F524
-                         "'pct'} are supported".format(kind))
+        raise ValueError(
+            f"unknown kind {kind!r} of returns, only 'raw', 'log', 'pct' "
+            "are supported"
+        )
 
     return perf_index(X, base=base, axis=axis, dtype=dtype)
 

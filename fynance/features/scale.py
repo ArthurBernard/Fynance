@@ -184,7 +184,7 @@ class Scale:
         "roll_norm": _normalize,
         "roll_std": _standardize,
     }
-    handle_params = {
+    handle_params: dict = {
         "raw": lambda x: {},
         "norm": _get_norm_params,
         "std": _get_std_params,

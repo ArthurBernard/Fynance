@@ -225,11 +225,11 @@ class BaseNeuralNet(torch.nn.Module):
             If :meth:`set_optimizer` has not been called yet.
 
         """
-        self.optimizer.zero_grad()
+        self.optimizer.zero_grad()  # type: ignore[attr-defined]
         outputs = self(X)
         loss = self.criterion(outputs, y)
         loss.backward()
-        self.optimizer.step()
+        self.optimizer.step()  # type: ignore[attr-defined]
 
         if self.lr_scheduler:
             self.lr_scheduler.step()
@@ -289,11 +289,11 @@ class BaseNeuralNet(torch.nn.Module):
             do not match, or if ``X`` and ``y`` have different lengths.
 
         """
-        if hasattr(self, 'N') and self.N != X.size(1):
-            raise ValueError('X must have {} input columns'.format(self.N))
+        if hasattr(self, 'N') and self.N != X.shape[1]:  # type: ignore[has-type]
+            raise ValueError('X must have {} input columns'.format(self.N))  # type: ignore[has-type]
 
-        if hasattr(self, 'M') and self.M != y.size(1):
-            raise ValueError('y must have {} output columns'.format(self.M))
+        if hasattr(self, 'M') and self.M != y.shape[1]:  # type: ignore[has-type]
+            raise ValueError('y must have {} output columns'.format(self.M))  # type: ignore[has-type]
 
         self.X = self._set_data(X, dtype=x_type)
         self.y = self._set_data(y, dtype=y_type)
