@@ -280,9 +280,9 @@ roadmap. Le reste de l'audit a déjà été traité (PRs #58–#62) ou figure da
 sections 3, 5 et 6 ci-dessus.
 
 ### 8.1 `estimator/estimator.py` — décider du sort
-- [ ] `estimation()` est annoncée « NOT YET WORKING ! » / « NEED TO FIND AN
-  OPTIMIZER » mais reste exposée. La finir (brancher un optimiseur correct) **ou**
-  la marquer explicitement expérimentale / la retirer.
+- [x] `estimation()` est annoncée « NOT YET WORKING ! » / « NEED TO FIND AN
+  OPTIMIZER » mais reste exposée. → lève désormais `NotImplementedError` +
+  docstring « experimental », pointe vers `get_parameters`. ✅ PR #63.
 
 ### 8.2 Typage : résorber les 104 erreurs mypy puis ajouter le gate CI
 - [ ] `mypy fynance/` = 104 erreurs (bruit numpy-2 `Returning Any`, hiérarchies

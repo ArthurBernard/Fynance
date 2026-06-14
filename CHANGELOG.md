@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `estimator.estimation()` now raises `NotImplementedError` (it was an experimental, non-functional placeholder marked "NOT YET WORKING") and points to `models.econometric_models.get_parameters` (the Cython-backed authoritative path); unused `fmin`/`target_function_cy` imports removed
 - **BREAKING**: pandas is replaced by polars at the input edges and by numpy at the output edges. `rolling_allocation` now returns `(numpy.ndarray, numpy.ndarray)` instead of `(pandas.Series, pandas.DataFrame)`, and `RollMultiLayerPerceptron.get_stats` returns a structured `numpy.ndarray` instead of a `pandas.DataFrame` (field access `stats["train_loss"]` is preserved; use `stats.size` instead of `.empty`). `rolling_allocation` was rewritten pandas-free in numpy with exact parity verified against the old implementation
 - CI now enforces two extra gates on every PR: docstring coverage (`interrogate`, fail-under 80%) in the lint job, and a Sphinx HTML build with warnings-as-errors (`sphinx-build -W`) in a new `docs` job
 
