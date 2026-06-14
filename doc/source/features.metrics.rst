@@ -22,10 +22,12 @@ Classical version of metrics
    drawdown
    mad
    mdd
+   percent_positive
    perf_index
    perf_returns
    perf_strat
    sharpe
+   tail_ratio
    z_score
 
 Rolling version of metrics

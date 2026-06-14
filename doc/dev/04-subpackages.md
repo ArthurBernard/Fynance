@@ -22,11 +22,14 @@ modernisation).
   `roll_*` rolling variants, `z_score`, `accuracy`, momentums (EMA/SMA…),
   filters, `scale`, `roll_functions`, `money_management`. Re-exported from
   `features/__init__.py` (which pulls both the Python and `_cy` implementations).
-- **`algorithms`** — portfolio allocation: `ERC`, `HRP`, `IVP`, `MDP`, `MVP`, and
-  `rolling_allocation()` for walk-forward application.
+- **`algorithms`** — portfolio allocation (`ERC`, `HRP`, `IVP`, `MDP`, `MVP`,
+  `rolling_allocation()`) and position sizing (`sizing.py`: `kelly_fraction`,
+  `vol_target`, `transaction_cost`).
 - **`models`** — econometric (`ARMA`/`GARCH` family via `get_parameters`) and
   neural (`MultiLayerPerceptron`, `RollMultiLayerPerceptron`, RNN/`GRU`/`LSTM`,
-  attention); custom losses under `models/loss/`.
+  attention, `TemporalConvNet`, `Transformer`), `StackingEnsemble`; custom losses
+  under `models/loss/` (Sharpe/Sortino/Calmar/Omega/directional/hybrid); training
+  utils in `models/training.py`.
 - **`backtest`** — `BackTest`/plotting objects (`PlotBackTest`,
   `DynaPlotBackTest`, …), `print_stats`.
 
