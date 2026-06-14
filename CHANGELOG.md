@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [1.6.0] - 2026-06-14
+
+### Added
+
 - Sphinx API docs now cover every new feature: pages for TCN, Transformer, the stacking ensemble, all loss functions, training utilities, position sizing, feature engineering and market-regime detection; README updated accordingly
 
 - `StackingEnsemble` (`fynance.models.ensemble`) — direction + magnitude base models combined by a meta-model trained on their out-of-fold predictions (leak-free stacking)
