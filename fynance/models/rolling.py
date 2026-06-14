@@ -351,16 +351,10 @@ class _RollingBasis:
         for t in range(0, self.n, self.b):
             s = min(t + self.b, self.n)
             train_slice = self.t_idx[t: s]
-            try:
-                lo = self._train(
-                    X=self.X[train_slice],
-                    y=self.f(self.y[train_slice]),
-                )
-            except Exception as e:
-                print(train_slice)
-                print(self.X[train_slice])
-                print(self.f(self.y[train_slice]))
-                raise e
+            lo = self._train(
+                X=self.X[train_slice],
+                y=self.f(self.y[train_slice]),
+            )
             loss_epoch += lo.item()
 
         self.loss_train[self.i] = loss_epoch / s

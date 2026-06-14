@@ -49,8 +49,7 @@ def estimation(y, x0, p=0, q=0, Q=0, P=0, cons=True, model='arch'):
         h = np.ones([u.size], dtype=np.float64)
 
     else:
-        print('Unknow model.')
-        raise ValueError
+        raise ValueError(f"Unknown model: {model!r}")
 
     L = loglikelihood_cy(u, h)
 
@@ -73,8 +72,7 @@ def target_function(params, y, p=0, q=0, Q=0, P=0, cons=True, model='arch'):
         h = np.ones([u.size], dtype=np.float64)
 
     else:
-        print('Unknow model.')
-        raise ValueError
+        raise ValueError(f"Unknown model: {model!r}")
 
     L = loglikelihood_cy(u, h)
 
