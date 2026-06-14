@@ -183,27 +183,34 @@ class _RollingBasis:
 
         return eval_set, test_set
 
-    def _fold_slices(self):
+    def _fold_slices(self, purge: int = 0):
         """ Yield ``(train_slice, test_slice)`` for every walk-forward fold.
 
         Unlike :meth:`__next__`, this generator has no epoch loop and
         allocates nothing — it is a pure windowing helper shared by
         :meth:`cross_validate` and any future CV utilities.
 
+        Parameters
+        ----------
+        purge : int, optional
+            Number of training observations to drop at the train/test border
+            (Lopez de Prado *purging*) to avoid leakage from overlapping
+            feature windows. Default 0 (no purge).
+
         Yields
         ------
         train_slice : slice
-            Window ``[t - n, t)`` used for training.
+            Window ``[t - n, t - purge)`` used for training.
         test_slice : slice
             Window ``[t, t + s)`` used for out-of-sample evaluation.
 
         """
         t = self.t0 + self.r
         while t + self.s <= self.T:
-            yield slice(t - self.n, t), slice(t, t + self.s)
+            yield slice(t - self.n, t - purge), slice(t, t + self.s)
             t += self.r
 
-    def cross_validate(self, model_factory, X, y, metric_fn=None, epochs=1):
+    def cross_validate(self, model_factory, X, y, metric_fn=None, epochs=1, purge=0):
         """ Walk-forward cross-validation with out-of-fold predictions.
 
         At each fold a **fresh** model is created via ``model_factory()``,
@@ -231,6 +238,9 @@ class _RollingBasis:
             is an empty list and the mean/std fields are None.
         epochs : int, optional
             Number of full training passes per fold, default 1.
+        purge : int, optional
+            Training observations to drop at the train/test border (purging).
+            Default 0.
 
         Returns
         -------
@@ -261,7 +271,7 @@ class _RollingBasis:
         oof = np.full((X.shape[0], n_out), np.nan)
         fold_metrics = []
 
-        for train_sl, test_sl in self._fold_slices():
+        for train_sl, test_sl in self._fold_slices(purge=purge):
             model = model_factory()
             X_tr, y_tr = X[train_sl], y[train_sl]
             for _ in range(epochs):

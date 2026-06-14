@@ -110,3 +110,20 @@ class TestCrossValidate:
     def test_std_metric_consistent(self):
         result = self._run(metric_fn=mse)
         assert result.std_metric == pytest.approx(np.std(result.fold_metrics))
+
+
+# §5.6 purged walk-forward CV
+
+class TestPurge:
+    def test_fold_slices_purge_shrinks_train_end(self):
+        rb = make_rb()
+        purge = 5
+        for (tr, te), (tr_p, te_p) in zip(rb._fold_slices(), rb._fold_slices(purge=purge)):
+            assert tr_p.stop == tr.stop - purge
+            assert tr_p.start == tr.start
+            assert te_p == te  # test window unchanged
+
+    def test_cross_validate_with_purge_runs(self):
+        rb = make_rb()
+        result = rb.cross_validate(model_factory, X_t, y_t, purge=3)
+        assert result.oof_predictions.shape == (T, N_OUT)
