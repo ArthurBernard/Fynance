@@ -298,11 +298,11 @@ sections 3, 5 et 6 ci-dessus.
 - [ ] `algorithms/browsers.py` (0 %) — clarifier le rôle puis tester ou retirer.
 
 ### 8.4 Tests de propriété (transformer des conventions en garde-fous)
-- [ ] **Parité py ↔ cy** : suite paramétrée
+- [x] **Parité py ↔ cy** (vs référence numpy indépendante). ✅ PR #65. Suite paramétrée
   `assert np.allclose(py_impl(x), cy_impl(x))` pour chaque paire
   `metrics` / `momentums` / `roll_functions` (aurait attrapé le faux-FIXME
   `momentums_cy.pyx:26`).
-- [ ] **Non-lookahead générique** : perturber `X[t+1:]` et vérifier que `f(X)[t]`
+- [x] **Non-lookahead générique** ✅ PR #65 : perturber `X[t+1:]` et vérifier que `f(X)[t]`
   est inchangé, pour chaque feature rolling.
 
 ### 8.5 Compléter les inventaires de doc/dev
