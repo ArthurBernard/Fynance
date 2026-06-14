@@ -27,7 +27,6 @@ Main entry points
 from __future__ import annotations
 
 # Built-in packages
-from dataclasses import dataclass
 from multiprocessing import Process
 from typing import Callable
 
@@ -40,37 +39,13 @@ from numpy.typing import NDArray
 from fynance.backtest.backtest_neural_net import BacktestNeuralNet
 
 # Local packages
+from fynance.models.cv_result import CVResult
 from fynance.models.mlp import MultiLayerPerceptron
 
 plt.style.use('seaborn-v0_8')
 
 
 __all__ = ['CVResult', '_RollingBasis', 'RollMultiLayerPerceptron']
-
-
-@dataclass
-class CVResult:
-    """ Results from :meth:`_RollingBasis.cross_validate`.
-
-    Attributes
-    ----------
-    oof_predictions : np.ndarray
-        Out-of-fold predictions, shape ``(T, n_out)``.  Positions that
-        fall before the first test fold are filled with ``NaN``.
-    fold_metrics : list of float
-        Per-fold metric values (empty list when ``metric_fn`` is None).
-    mean_metric : float or None
-        Mean of ``fold_metrics``, or None when no metric was provided.
-    std_metric : float or None
-        Standard deviation of ``fold_metrics``, or None when no metric
-        was provided.
-
-    """
-
-    oof_predictions: np.ndarray
-    fold_metrics: list
-    mean_metric: float | None
-    std_metric: float | None
 
 
 class _RollingBasis:
@@ -467,10 +442,6 @@ class _RollingBasis:
 
 def get_perf2(ret, signal, v0=100):
     return v0 * np.cumprod(ret * signal + 1, axis=0)
-
-
-def get_perf(signal, underlying, v0=100):
-    return v0 * np.exp(np.cumsum(signal * underlying, axis=0))
 
 
 class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
