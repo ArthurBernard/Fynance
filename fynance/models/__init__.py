@@ -29,6 +29,7 @@ from . import (
     attention,
     econometric_models,
     econometric_models_cy,
+    ensemble,
     gru,
     loss,
     lstm,
@@ -49,6 +50,7 @@ from .econometric_models_cy import (
     MA_cy,
     get_parameters_cy,
 )
+from .ensemble import StackingEnsemble
 from .gru import GatedRecurrentUnit, GRUCell
 from .loss import (
     BaseLoss,
@@ -89,6 +91,7 @@ __all__ = [
     'get_parameters_cy',
     # _base / mlp
     'BaseNeuralNet',
+    'StackingEnsemble',
     'MultiLayerPerceptron',
     # rnn / gru / lstm
     'GRUCell',
