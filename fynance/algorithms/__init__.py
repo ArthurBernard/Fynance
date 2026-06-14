@@ -23,7 +23,9 @@
 # Third party packages
 
 # Local packages
-from . import allocation
+from . import allocation, sizing
 from .allocation import *
+from .sizing import *
 
 __all__ = allocation.__all__
+__all__ += sizing.__all__

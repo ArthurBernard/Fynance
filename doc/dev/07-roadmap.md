@@ -95,6 +95,8 @@ tests de propriété (parité + non-lookahead) ; à étendre aux nouvelles featu
 
 ### 5.8 Backtest réaliste
 
-- [ ] **Coûts de transaction** : spread bid-ask + slippage dans le P&L (BPS/trade, impact linéaire).
-- [ ] **Position sizing** : Kelly fractionnel + vol-targeting dans `fynance/algorithms/`.
-- [ ] **Métriques de robustesse** : tail ratio, % de mois positifs, etc. — compléter `fynance/features/`.
+Fait (PR #87) : `algorithms/sizing.py` (`kelly_fraction`, causal `vol_target`,
+`transaction_cost` turnover-based) ; métriques `percent_positive`, `tail_ratio`.
+Reste optionnel :
+
+- [ ] Slippage / impact de marché non-linéaire au-delà du coût proportionnel.

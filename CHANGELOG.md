@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Realistic-backtest primitives: robustness metrics `percent_positive` / `tail_ratio` (`fynance.features`), and `fynance.algorithms.sizing` with `kelly_fraction`, causal `vol_target`, and turnover-based `transaction_cost`
+
 - Technical indicators in `fynance.features.indicators`: `roc`, `realized_volatility`, `rolling_skewness`, `rolling_kurtosis`, `rolling_autocorr` — single-series, strictly causal, with parity + no-lookahead tests
 
 ### Changed

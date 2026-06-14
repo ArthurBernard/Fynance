@@ -15,7 +15,8 @@ from fynance._wrappers import WrapperArray
 from fynance.features._metrics_helpers import *  # noqa: F401,F403
 from fynance.features.metrics_cy import *
 
-__all__ = ['accuracy', 'directional_accuracy', 'z_score', 'roll_z_score']
+__all__ = ['accuracy', 'directional_accuracy', 'percent_positive',
+           'tail_ratio', 'z_score', 'roll_z_score']
 
 
 @WrapperArray('axis')
@@ -245,3 +246,60 @@ def roll_z_score(X: NDArray, w: int | None = None, kind: str = 's', axis: int = 
 
     return z
 
+
+@WrapperArray('axis')
+def percent_positive(X: NDArray, axis: int = 0) -> NDArray:
+    r""" Fraction of strictly positive observations.
+
+    A simple robustness statistic: the share of periods with a positive
+    return (the "hit rate" / percentage of winning periods).
+
+    Parameters
+    ----------
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Series of returns.
+    axis : {0, 1}, optional
+        Axis of computation. Default 0.
+
+    Returns
+    -------
+    float or np.ndarray
+        Fraction in ``[0, 1]`` of strictly positive values.
+
+    Examples
+    --------
+    >>> X = np.array([0.1, -0.2, 0.3, 0.0, 0.4])
+    >>> float(percent_positive(X))
+    0.6
+
+    """
+    return np.mean(X > 0, axis=0)
+
+
+@WrapperArray('axis')
+def tail_ratio(X: NDArray, alpha: float = 0.05, axis: int = 0) -> NDArray:
+    r""" Tail ratio of a return series.
+
+    Ratio of the magnitude of the right tail to the left tail:
+    :math:`|q_{1-\alpha}| / |q_{\alpha}|`. A value above 1 means the
+    upside tail is larger than the downside tail.
+
+    Parameters
+    ----------
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Series of returns.
+    alpha : float, optional
+        Tail quantile level. Default 0.05 (95th vs 5th percentile).
+    axis : {0, 1}, optional
+        Axis of computation. Default 0.
+
+    Returns
+    -------
+    float or np.ndarray
+        Tail ratio (0 when the left tail is exactly 0).
+
+    """
+    hi = np.abs(np.quantile(X, 1.0 - alpha, axis=0))
+    lo = np.abs(np.quantile(X, alpha, axis=0))
+
+    return np.where(lo > 0, hi / np.where(lo > 0, lo, 1.0), 0.0)
