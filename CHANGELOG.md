@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- Dead code: `algorithms/browsers.py` (unused `BrowserData`, empty `RollingBasis` stub) + its `browsers_cy` Cython extension, and `algorithms/rolling.py` (`_RollingMechanism`, unused since `rolling_allocation` was rewritten pandas-free)
 - `pandas` dependency (replaced by `polars` for input, `numpy` for output)
 - Dead code: `models/basis.py` (`SignalModel` referencing an unset `self.y_pred`, empty `MagnitudeModel`) and the deprecated `__BacktestNeuralNet` / unused `_BacktestNeuralNet` stubs in `backtest/dynamic_plot_backtest.py`
 

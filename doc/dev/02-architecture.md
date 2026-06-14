@@ -27,9 +27,9 @@ stability policy per package.)
   drawdowns, accuracy, z-score…), `momentums` (EMA/SMA/…), `indicators`,
   `filters`, `roll_functions`, `scale`, `money_management`. The heavy ones ship a
   `.py` *and* a compiled `*_cy.pyx` twin (see below).
-- **`algorithms/`** — `allocation.py` (ERC, HRP, IVP, MDP, MVP portfolio methods;
-  stable public API), `rolling.py` / `rolling_allocation()` (walk-forward driver
-  for allocation), `browsers` (+ `browsers_cy.pyx`).
+- **`algorithms/`** — `allocation.py`: ERC, HRP, IVP, MDP, MVP portfolio methods
+  plus `rolling_allocation()` (walk-forward driver for allocation). Stable
+  public API.
 - **`estimator/`** — `estimator_cy.pyx`: the Cython ARMA/GARCH parameter
   estimator. **Authoritative** — parameter logic lives here, not duplicated in
   Python.

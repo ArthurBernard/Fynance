@@ -40,7 +40,7 @@ fynance/
   features/      # indicators, metrics, momentums, filters, scale,
                  #   roll_functions, money_management
                  #   (each hot path has a .py + a compiled *_cy.pyx twin)
-  algorithms/    # allocation (ERC/HRP/IVP/MDP/MVP), rolling_allocation, browsers
+  algorithms/    # allocation (ERC/HRP/IVP/MDP/MVP), rolling_allocation
   models/        # econometric_models (ARMA/GARCH) + neural (mlp/rnn/gru/lstm/
                  #   attention) on a rolling/walk-forward base; loss/ (torch losses)
   estimator/     # estimator_cy.pyx — ARMA/GARCH parameter estimation (Cython)
