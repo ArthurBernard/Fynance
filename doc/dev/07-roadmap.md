@@ -34,14 +34,6 @@ Compléter `fynance/models/transformer.py`.
 - [ ] Tester multi-head attention avec données réelles
 - [ ] Tests : 6–10 tests
 
-## 2. Loss functions custom pour optimisation
-
-Architecture retenue (Option C) : formules numpy dans `fynance/features/` (métriques
-d'évaluation/backtest), réimplémentées en ops torch pures dans `fynance/models/loss/`
-(entraînement). Les deux paths sont indépendantes — pas de conversion numpy↔torch.
-
-- [ ] `RollMLP` entraîné avec `SharpeLoss` à la place de MSE (test ou notebook)
-
 ## 3. Documentation & notebooks
 
 ### 3.1 URL de la documentation

@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Integration test training `RollMultiLayerPerceptron` with the differentiable `SharpeLoss` (instead of MSE) — demonstrates the custom financial losses end-to-end
+
 ### Changed
 
 - `HRP()` scatters cluster-ordered weights via NumPy fancy-indexing instead of a Python loop
