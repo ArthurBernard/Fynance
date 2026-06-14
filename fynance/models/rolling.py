@@ -33,7 +33,6 @@ from typing import Callable
 
 # External packages
 import numpy as np
-import pandas as pd
 import torch
 from matplotlib import pyplot as plt
 from numpy.typing import NDArray
@@ -117,7 +116,7 @@ class _RollingBasis:
         Respectively evaluating and testing predictions.
     log : list of dict
         Per-step record of ``{step, train_loss, eval_loss, test_loss}``,
-        populated by :meth:`run`.  Use :meth:`get_stats` to get a DataFrame.
+        populated by :meth:`run`.  Use :meth:`get_stats` for a structured array.
 
     """
 
@@ -304,19 +303,22 @@ class _RollingBasis:
         return CVResult(oof, fold_metrics, mean_m, std_m)
 
     def get_stats(self):
-        """ Return per-step loss history as a DataFrame.
+        """ Return per-step loss history as a structured array.
 
         Returns
         -------
-        pd.DataFrame
-            Columns: ``step``, ``train_loss``, ``eval_loss``, ``test_loss``.
+        numpy.ndarray
+            Structured array with fields ``step`` (int) and ``train_loss``,
+            ``eval_loss``, ``test_loss`` (float). Access a column by name,
+            e.g. ``stats["train_loss"]``; ``stats.size`` is the step count.
 
         """
-        if not self.log:
-            return pd.DataFrame(
-                columns=['step', 'train_loss', 'eval_loss', 'test_loss']
-            )
-        return pd.DataFrame(self.log)
+        dtype = [('step', np.int64), ('train_loss', np.float64),
+                 ('eval_loss', np.float64), ('test_loss', np.float64)]
+        rows = [(r['step'], r['train_loss'], r['eval_loss'], r['test_loss'])
+                for r in self.log]
+
+        return np.array(rows, dtype=dtype)
 
     def plot_loss(self, figsize=(9, 4)):
         """ Plot train / eval / test loss curves.
@@ -331,7 +333,7 @@ class _RollingBasis:
 
         """
         df = self.get_stats()
-        if df.empty:
+        if df.size == 0:
             raise RuntimeError('No log data — run the model first.')
 
         fig, ax = plt.subplots(figsize=figsize)

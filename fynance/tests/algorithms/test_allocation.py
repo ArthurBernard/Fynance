@@ -12,6 +12,7 @@ from fynance.algorithms.allocation import (
     MVP_uc,
     _normalize,
     _perf_alloc,
+    rolling_allocation,
 )
 
 # ---------------------------------------------------------------------------
@@ -215,3 +216,34 @@ def test_normalize_max_iter_warning(capsys):
     _normalize(w.copy(), low_bound=0.0, up_bound=0.3, max_iter=2)
     captured = capsys.readouterr()
     assert "exceeded max iterations" in captured.out
+
+
+def test_rolling_allocation_regression():
+    """ rolling_allocation: pandas-free numpy output, golden regression.
+
+    Values captured from the previous pandas implementation (parity
+    verified across MVP/ERC/IVP/HRP) before the polars/numpy migration.
+    """
+    rng = np.random.RandomState(7)
+    fac = rng.randn(130, 1)
+    vols = np.linspace(0.005, 0.03, 4)
+    prices = 100 * np.cumprod(1 + (0.5 * fac + rng.randn(130, 4)) * vols, axis=0)
+
+    portfolio, w_mat = rolling_allocation(MVP, prices, n=50, s=15)
+
+    # numpy outputs, not pandas
+    assert isinstance(portfolio, np.ndarray)
+    assert isinstance(w_mat, np.ndarray)
+    assert portfolio.shape == (130,)
+    assert w_mat.shape == (130, 4)
+    # first n observations held at the initial value
+    assert np.allclose(portfolio[:50], 100.)
+    # each active weight row sums to 1 (MVP); 80 active rows here
+    active = np.flatnonzero(np.abs(w_mat).sum(axis=1) > 1e-9)
+    assert active.size == 80
+    assert np.allclose(w_mat[active].sum(axis=1), 1.)
+    # golden values
+    assert np.allclose(portfolio[-3:],
+                       [100.12393727, 99.78491062, 100.0663682])
+    assert np.allclose(w_mat[-1],
+                       [0.89803244, 0.09117386, 0.02558488, -0.01479118])
