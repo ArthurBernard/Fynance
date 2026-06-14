@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [1.5.0] - 2026-06-14
+
+### Added
+
 - `Notebooks/pytorch_examples.ipynb` — a runnable PyTorch tour (metrics, allocation, MLP/TCN/Transformer with `SharpeLoss`, walk-forward CV, custom losses), replacing the old Keras/dev notebooks
 
 - `Transformer` (`fynance.models.transformer`) — a causal Transformer encoder on `BaseNeuralNet` (sinusoidal `PositionalEncoding`, reuses `MultiHeadAttention`, lower-triangular causal mask = no lookahead), with 10 tests incl. a causality check; works with MSE and `SharpeLoss`
