@@ -37,7 +37,7 @@ import torch
 from matplotlib import pyplot as plt
 from numpy.typing import NDArray
 
-from fynance.backtest.dynamic_plot_backtest import BacktestNeuralNet
+from fynance.backtest.backtest_neural_net import BacktestNeuralNet
 
 # Local packages
 from fynance.models.mlp import MultiLayerPerceptron
@@ -485,7 +485,7 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
 
     Use :meth:`set_roll_period` to configure window sizes and batch
     options, then :meth:`run` to execute the loop. ``run`` can also
-    drive a live :class:`fynance.backtest.dynamic_plot_backtest.BacktestNeuralNet`
+    drive a live :class:`fynance.backtest.backtest_neural_net.BacktestNeuralNet`
     figure to monitor convergence.
 
     Combines :class:`MultiLayerPerceptron` with the walk-forward iterator
