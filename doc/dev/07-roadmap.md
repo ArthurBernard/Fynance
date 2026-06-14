@@ -14,16 +14,6 @@ shipped, `03-decisions.md` for *why*. Keep it short and true.
 
 ---
 
-## 1. Nouvelles architectures ML
-
-### 1.2 Transformer financier
-
-Compléter `fynance/models/transformer.py`.
-
-- [ ] Positional encoding pour séries temporelles (relatif vs absolu)
-- [ ] Masking causal (pas de lookahead)
-- [ ] Tester multi-head attention avec données réelles
-- [ ] Tests : 6–10 tests
 
 ## 3. Documentation & notebooks
 
