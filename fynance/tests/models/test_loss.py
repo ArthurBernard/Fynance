@@ -131,3 +131,82 @@ class TestDirectionalAccuracyLoss:
     def test_type_error_y_true(self):
         with pytest.raises(TypeError, match="torch.Tensor"):
             DirectionalAccuracyLoss()(Y_PRED, np.array([1., -1.]))
+
+
+# ---------------------------------------------------------------------------
+# §5.1 new losses: Calmar, Omega, Hybrid
+# ---------------------------------------------------------------------------
+
+class TestCalmarLoss:
+    def test_scalar_and_grad(self):
+        from fynance.models.loss import CalmarLoss
+        r = torch.randn(120, 1, requires_grad=True)
+        loss = CalmarLoss()(r)
+        assert loss.ndim == 0
+        loss.backward()
+        assert r.grad is not None and torch.any(r.grad != 0)
+
+    def test_rejects_non_tensor(self):
+        from fynance.models.loss import CalmarLoss
+        with pytest.raises(TypeError):
+            CalmarLoss()(np.zeros(10))
+
+
+class TestOmegaLoss:
+    def test_known_value(self):
+        from fynance.models.loss import OmegaLoss
+        # gains mean = (1+3)/4 = 1 ; losses mean = (2+0+0+0... ) -> compute
+        r = torch.tensor([1.0, -2.0, 3.0, -1.0])
+        gains = torch.relu(r).mean()
+        losses = torch.relu(-r).mean()
+        expected = -(gains / (losses + 1e-8))
+        assert torch.isclose(OmegaLoss()(r), expected)
+
+    def test_threshold_and_grad(self):
+        from fynance.models.loss import OmegaLoss
+        r = torch.randn(100, 1, requires_grad=True)
+        loss = OmegaLoss(threshold=0.01)(r)
+        loss.backward()
+        assert r.grad is not None
+
+
+class TestHybridLoss:
+    def test_weighted_sum(self):
+        from fynance.models.loss import HybridLoss, SharpeLoss, SortinoLoss
+        r = torch.randn(100, 1)
+        a, b = SharpeLoss(), SortinoLoss()
+        h = HybridLoss(a, b, alpha=0.3)
+        expected = 0.3 * a(r) + 0.7 * b(r)
+        assert torch.isclose(h(r), expected)
+
+    def test_forwards_y_true(self):
+        from fynance.models.loss import DirectionalAccuracyLoss, HybridLoss, SharpeLoss
+        r = torch.randn(100, 1)
+        y = torch.randn(100, 1)
+        h = HybridLoss(SharpeLoss(), DirectionalAccuracyLoss(), alpha=0.5)
+        assert torch.isfinite(h(r, y))
+
+    def test_learnable_alpha_is_parameter(self):
+        from fynance.models.loss import HybridLoss, SharpeLoss, SortinoLoss
+        h = HybridLoss(SharpeLoss(), SortinoLoss(), alpha=0.5, learnable=True)
+        params = list(h.parameters())
+        assert len(params) == 1 and params[0].requires_grad
+        r = torch.randn(80, 1)
+        before = h._alpha_raw.detach().clone()
+        opt = torch.optim.SGD(h.parameters(), lr=1.0)
+        for _ in range(5):
+            opt.zero_grad()
+            h(r).backward()
+            opt.step()
+        assert not torch.allclose(before, h._alpha_raw)
+
+
+def test_train_model_with_calmar_loss():
+    from fynance.models.loss import CalmarLoss
+    from fynance.models.mlp import MultiLayerPerceptron
+    X = torch.randn(60, 3)
+    y = torch.randn(60, 1)
+    model = MultiLayerPerceptron(X, y, layers=[8])
+    model.set_optimizer(CalmarLoss, torch.optim.Adam, lr=1e-2)
+    loss = model.train_on(model.X, model.y)
+    assert torch.isfinite(loss)

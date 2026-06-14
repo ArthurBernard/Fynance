@@ -49,7 +49,15 @@ from .econometric_models_cy import (
     get_parameters_cy,
 )
 from .gru import GatedRecurrentUnit, GRUCell
-from .loss import BaseLoss, DirectionalAccuracyLoss, SharpeLoss, SortinoLoss
+from .loss import (
+    BaseLoss,
+    CalmarLoss,
+    DirectionalAccuracyLoss,
+    HybridLoss,
+    OmegaLoss,
+    SharpeLoss,
+    SortinoLoss,
+)
 from .lstm import LongShortTermMemory, LSTMCell
 from .mlp import MultiLayerPerceptron
 from .rnn import RecurrentNeuralNetwork
@@ -98,6 +106,9 @@ __all__ = [
     # loss
     'BaseLoss',
     'DirectionalAccuracyLoss',
+    'CalmarLoss',
+    'HybridLoss',
+    'OmegaLoss',
     'SharpeLoss',
     'SortinoLoss',
 ]

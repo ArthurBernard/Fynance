@@ -30,8 +30,12 @@ from __future__ import annotations
 
 # Local packages
 from ._base import BaseLoss
+from .calmar import CalmarLoss
 from .directional import DirectionalAccuracyLoss
+from .hybrid import HybridLoss
+from .omega import OmegaLoss
 from .sharpe import SharpeLoss
 from .sortino import SortinoLoss
 
-__all__ = ['BaseLoss', 'DirectionalAccuracyLoss', 'SharpeLoss', 'SortinoLoss']
+__all__ = ['BaseLoss', 'CalmarLoss', 'DirectionalAccuracyLoss', 'HybridLoss',
+           'OmegaLoss', 'SharpeLoss', 'SortinoLoss']
