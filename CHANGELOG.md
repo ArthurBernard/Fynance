@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- CI now enforces two extra gates on every PR: docstring coverage (`interrogate`, fail-under 80%) in the lint job, and a Sphinx HTML build with warnings-as-errors (`sphinx-build -W`) in a new `docs` job
+
 ### Fixed
 
 - `tests/core/series.py` renamed to `test_series.py` so pytest collects it — `core.series` (the `Series` ndarray subclass) was previously untested (0% coverage) despite having a 6-test suite
