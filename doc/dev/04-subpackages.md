@@ -20,8 +20,8 @@ modernisation).
 
 - **`features`** — `sharpe`, `sortino`, `calmar`, `drawdown`/`mdd`,
   `roll_*` rolling variants, `z_score`, `accuracy`, momentums (EMA/SMA…),
-  filters, `scale`, `roll_functions`. Re-exported from `features/__init__.py`
-  (which pulls both the Python and `_cy` implementations).
+  filters, `scale`, `roll_functions`, `money_management`. Re-exported from
+  `features/__init__.py` (which pulls both the Python and `_cy` implementations).
 - **`algorithms`** — portfolio allocation: `ERC`, `HRP`, `IVP`, `MDP`, `MVP`, and
   `rolling_allocation()` for walk-forward application.
 - **`models`** — econometric (`ARMA`/`GARCH` family via `get_parameters`) and

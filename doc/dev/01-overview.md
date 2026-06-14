@@ -37,7 +37,8 @@ library's core invariant, enforced in tests.
 
 ```
 fynance/
-  features/      # indicators, metrics, momentums, filters, scale, roll_functions
+  features/      # indicators, metrics, momentums, filters, scale,
+                 #   roll_functions, money_management
                  #   (each hot path has a .py + a compiled *_cy.pyx twin)
   algorithms/    # allocation (ERC/HRP/IVP/MDP/MVP), rolling_allocation, browsers
   models/        # econometric_models (ARMA/GARCH) + neural (mlp/rnn/gru/lstm/
@@ -45,6 +46,7 @@ fynance/
   estimator/     # estimator_cy.pyx — ARMA/GARCH parameter estimation (Cython)
   backtest/      # plotting (static + dynamic), loss, print_stats
   core/          # series helpers
+  _exceptions.py # ArraySizeError and friends (shared error types)
   tests/         # mirrors the package; pytest + doctests
 doc/
   source/        # Sphinx (furo) end-user docs

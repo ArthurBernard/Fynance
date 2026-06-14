@@ -306,5 +306,5 @@ sections 3, 5 et 6 ci-dessus.
   est inchangé, pour chaque feature rolling.
 
 ### 8.5 Compléter les inventaires de doc/dev
-- [ ] Ajouter `features/money_management.py`, `_exceptions.py` et le sous-package
-  `models/loss/` aux inventaires de `01-overview.md` / `04-subpackages.md`.
+- [x] Ajouter `features/money_management.py`, `_exceptions.py` et le sous-package
+  `models/loss/` aux inventaires de `01-overview.md` / `04-subpackages.md`. ✅ PR #64.
