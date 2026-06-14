@@ -17,5 +17,10 @@ Financial indicators
    hma
    macd_hist
    macd_line
+   realized_volatility
+   roc
+   rolling_autocorr
+   rolling_kurtosis
+   rolling_skewness
    rsi
    signal_line

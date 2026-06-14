@@ -26,5 +26,7 @@ from fynance.features.returns import *
 # non-__all__ public helpers still imported directly by some callers/tests
 from fynance.features.returns import perf_strat, returns_strat  # noqa: F401
 from fynance.features.stats import *
+from fynance.features.stats import percent_positive, tail_ratio  # noqa: F401
 
-__all__ = ['accuracy', 'annual_return', 'annual_volatility', 'calmar', 'directional_accuracy', 'diversified_ratio', 'drawdown', 'mad', 'mdd', 'roll_annual_return', 'roll_annual_volatility', 'roll_calmar', 'roll_drawdown', 'roll_mad', 'roll_mdd', 'roll_sharpe', 'roll_z_score', 'sharpe', 'sortino', 'perf_index', 'perf_returns', 'z_score']
+__all__ = ['accuracy', 'annual_return', 'annual_volatility', 'calmar', 'directional_accuracy', 'diversified_ratio', 'drawdown', 'mad', 'mdd', 'roll_annual_return', 'roll_annual_volatility', 'roll_calmar', 'roll_drawdown', 'roll_mad', 'roll_mdd', 'roll_sharpe', 'roll_z_score', 'sharpe', 'sortino', 'perf_index', 'perf_returns', 'z_score',
+           'percent_positive', 'tail_ratio']

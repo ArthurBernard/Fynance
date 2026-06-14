@@ -36,6 +36,36 @@ architectures.
 
       RNN, GRU and LSTM models with walk-forward training support.
 
+   .. grid-item-card:: :octicon:`stack;1.2em;sd-mr-1` Temporal Convolutional Network
+      :link: models.tcn
+      :link-type: doc
+
+      Causal dilated convolutional network for sequences.
+
+   .. grid-item-card:: :octicon:`eye;1.2em;sd-mr-1` Transformer
+      :link: models.transformer
+      :link-type: doc
+
+      Causal Transformer encoder with positional encoding.
+
+   .. grid-item-card:: :octicon:`git-merge;1.2em;sd-mr-1` Ensemble
+      :link: models.ensemble
+      :link-type: doc
+
+      Direction + magnitude stacking with an out-of-fold meta-model.
+
+   .. grid-item-card:: :octicon:`flame;1.2em;sd-mr-1` Loss functions
+      :link: models.loss
+      :link-type: doc
+
+      Differentiable Sharpe/Sortino/Calmar/Omega/directional losses.
+
+   .. grid-item-card:: :octicon:`gear;1.2em;sd-mr-1` Training utilities
+      :link: models.training
+      :link-type: doc
+
+      Sample weighting and early stopping.
+
    .. grid-item-card:: :octicon:`history;1.2em;sd-mr-1` Rolling models
       :link: models.rolling
       :link-type: doc
@@ -48,6 +78,11 @@ architectures.
 
    models.attention
    models.econometric_models
+   models.ensemble
+   models.loss
    models.neural_network
    models.recurrent_neural_network
    models.rolling
+   models.tcn
+   models.training
+   models.transformer

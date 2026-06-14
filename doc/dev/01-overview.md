@@ -12,8 +12,9 @@ that usually live in separate packages:
 - **Algorithms** — portfolio allocation (ERC, HRP, IVP, MDP, MVP) and a generic
   rolling/walk-forward driver.
 - **Models** — econometric (ARMA/GARCH via a Cython estimator) and neural
-  (MLP, RNN/GRU/LSTM, attention) with a walk-forward training base, plus custom
-  financial loss functions (Sharpe/Sortino/directional) in PyTorch.
+  (MLP, RNN/GRU/LSTM, attention, TCN, Transformer, stacking ensemble) with a
+  walk-forward training base, plus custom PyTorch losses (Sharpe/Sortino/Calmar/
+  Omega/directional/hybrid).
 - **Backtest** — evaluation, P&L/perf plotting (static + dynamic), stat printing.
 
 The throughline is **strict temporal causality**: every rolling feature and every

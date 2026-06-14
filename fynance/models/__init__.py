@@ -29,6 +29,7 @@ from . import (
     attention,
     econometric_models,
     econometric_models_cy,
+    ensemble,
     gru,
     loss,
     lstm,
@@ -36,6 +37,7 @@ from . import (
     rnn,
     rolling,
     tcn,
+    training,
     transformer,
 )
 from ._base import BaseNeuralNet
@@ -48,13 +50,23 @@ from .econometric_models_cy import (
     MA_cy,
     get_parameters_cy,
 )
+from .ensemble import StackingEnsemble
 from .gru import GatedRecurrentUnit, GRUCell
-from .loss import BaseLoss, DirectionalAccuracyLoss, SharpeLoss, SortinoLoss
+from .loss import (
+    BaseLoss,
+    CalmarLoss,
+    DirectionalAccuracyLoss,
+    HybridLoss,
+    OmegaLoss,
+    SharpeLoss,
+    SortinoLoss,
+)
 from .lstm import LongShortTermMemory, LSTMCell
 from .mlp import MultiLayerPerceptron
 from .rnn import RecurrentNeuralNetwork
 from .rolling import CVResult, RollMultiLayerPerceptron, _RollingBasis
 from .tcn import TemporalConvNet
+from .training import EarlyStopping, exp_sample_weights
 from .transformer import PositionalEncoding, Transformer
 
 # Frozen public surface for the 1.x series — names listed here are
@@ -79,6 +91,7 @@ __all__ = [
     'get_parameters_cy',
     # _base / mlp
     'BaseNeuralNet',
+    'StackingEnsemble',
     'MultiLayerPerceptron',
     # rnn / gru / lstm
     'GRUCell',
@@ -88,6 +101,9 @@ __all__ = [
     'RecurrentNeuralNetwork',
     # tcn
     'TemporalConvNet',
+    # training
+    'EarlyStopping',
+    'exp_sample_weights',
     # transformer
     'PositionalEncoding',
     'Transformer',
@@ -98,6 +114,9 @@ __all__ = [
     # loss
     'BaseLoss',
     'DirectionalAccuracyLoss',
+    'CalmarLoss',
+    'HybridLoss',
+    'OmegaLoss',
     'SharpeLoss',
     'SortinoLoss',
 ]

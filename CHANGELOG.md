@@ -16,6 +16,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [1.6.0] - 2026-06-14
+
+### Added
+
+- Sphinx API docs now cover every new feature: pages for TCN, Transformer, the stacking ensemble, all loss functions, training utilities, position sizing, feature engineering and market-regime detection; README updated accordingly
+
+- `StackingEnsemble` (`fynance.models.ensemble`) — direction + magnitude base models combined by a meta-model trained on their out-of-fold predictions (leak-free stacking)
+
+- `detect_regimes` (`fynance.features.regime`) — k-means market-regime labelling on rolling vol/return features, ordered by volatility
+
+- `fynance.features.engineering`: `multi_resolution` (stack a feature across windows), `granger_causality` (F-test feature filter), `IncrementalMoments` (O(1) online mean/variance)
+
+- Robust-training utilities: `purge` parameter on `_RollingBasis._fold_slices`/`cross_validate` (purged walk-forward CV), and `fynance.models.training` with `exp_sample_weights` and `EarlyStopping`
+
+- `roll_rank` (`fynance.features.scale`) — rolling percentile-rank feature normalization (causal, outlier-robust)
+
+- New differentiable losses in `fynance.models.loss`: `CalmarLoss` (Calmar via `torch.cummax` drawdown), `OmegaLoss` (gain/loss ratio over a threshold), and `HybridLoss` (convex combo of two losses, with an optional learnable weight)
+
+- Realistic-backtest primitives: robustness metrics `percent_positive` / `tail_ratio` (`fynance.features`), and `fynance.algorithms.sizing` with `kelly_fraction`, causal `vol_target`, and turnover-based `transaction_cost`
+
+- Technical indicators in `fynance.features.indicators`: `roc`, `realized_volatility`, `rolling_skewness`, `rolling_kurtosis`, `rolling_autocorr` — single-series, strictly causal, with parity + no-lookahead tests
+
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
 ## [1.5.0] - 2026-06-14
 
 ### Added

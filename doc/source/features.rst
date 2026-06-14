@@ -43,6 +43,18 @@ moving standard deviations and rolling functions.
 
       Rolling minimum and rolling maximum.
 
+   .. grid-item-card:: :octicon:`beaker;1.2em;sd-mr-1` Feature engineering
+      :link: features.engineering
+      :link-type: doc
+
+      Multi-resolution stacking, Granger-causality filter, incremental moments.
+
+   .. grid-item-card:: :octicon:`broadcast;1.2em;sd-mr-1` Market regime
+      :link: features.regime
+      :link-type: doc
+
+      Unsupervised regime labelling by clustering volatility/return features.
+
    .. grid-item-card:: :octicon:`arrow-switch;1.2em;sd-mr-1` Scale
       :link: features.scale
       :link-type: doc
@@ -76,9 +88,11 @@ Common parameters across modules:
    :maxdepth: 1
    :hidden:
 
+   features.engineering
    features.filters
    features.indicators
    features.metrics
    features.momentums
+   features.regime
    features.roll_functions
    features.scale

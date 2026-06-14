@@ -27,6 +27,7 @@ features.
 # Cython imports
 # Python imports
 from . import (
+    engineering,
     filters,
     indicators,
     metrics,
@@ -34,10 +35,12 @@ from . import (
     momentums,
     momentums_cy,
     money_management,
+    regime,
     roll_functions,
     roll_functions_cy,
     scale,
 )
+from .engineering import *
 from .filters import *
 from .indicators import *
 from .metrics import *
@@ -45,11 +48,14 @@ from .metrics_cy import *
 from .momentums import *
 from .momentums_cy import *
 from .money_management import *
+from .regime import *
 from .roll_functions import *
 from .roll_functions_cy import *
 from .scale import *
 
-__all__ = filters.__all__
+__all__ = engineering.__all__
+__all__ += regime.__all__
+__all__ += filters.__all__
 __all__ += metrics_cy.__all__
 __all__ += metrics.__all__
 __all__ += momentums_cy.__all__

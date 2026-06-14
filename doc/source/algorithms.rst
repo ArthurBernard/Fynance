@@ -18,8 +18,15 @@ Portfolio allocation algorithms and rolling walk-forward wrappers.
       (MDP), Minimum Variance Portfolio (MVP, MVP_uc) and a rolling
       walk-forward wrapper.
 
+   .. grid-item-card:: :octicon:`pin;1.2em;sd-mr-1` Position sizing
+      :link: algorithms.sizing
+      :link-type: doc
+
+      Fractional Kelly, volatility targeting and transaction costs.
+
 .. toctree::
    :maxdepth: 1
    :hidden:
 
    algorithms.allocation
+   algorithms.sizing

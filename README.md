@@ -38,7 +38,7 @@ python setup.py build_ext --inplace
 ## Subpackages
 
 **Algorithms** `fynance.algorithms`  
-Portfolio allocation methods (ERC, HRP, IVP, MDP, MVP) and rolling walk-forward wrappers.
+Portfolio allocation methods (ERC, HRP, IVP, MDP, MVP), walk-forward wrappers, and position sizing (fractional Kelly, volatility targeting, transaction costs).
 
 **Backtest** `fynance.backtest`  
 Profit-and-loss plotting and performance measurement.
@@ -47,13 +47,15 @@ Profit-and-loss plotting and performance measurement.
 Cython ARMA / GARCH parameter estimation.
 
 **Features** `fynance.features`  
-Kalman filter, financial indicators (Bollinger, RSI, MACD, …), statistical momentums (SMA, EMA, WMA, …),
-metrics (Sharpe, Sortino, Calmar, drawdown, …), scaling, and rolling functions.
+Kalman filter, technical indicators (Bollinger, RSI, MACD, ROC, realized volatility, rolling skew/kurtosis/autocorr, …),
+statistical momentums (SMA, EMA, WMA, …), metrics (Sharpe, Sortino, Calmar, drawdown, tail ratio, …), scaling
+(incl. rolling rank), feature-engineering tools (multi-resolution, Granger causality), and market-regime detection.
 
 **Models** `fynance.models`  
 Econometric models (MA, ARMA, ARMA-GARCH), neural networks with PyTorch (MLP, RNN, GRU, LSTM,
-MultiHeadAttention), differentiable loss functions (SharpeLoss, SortinoLoss,
-DirectionalAccuracyLoss), and walk-forward rolling evaluation.
+MultiHeadAttention, **TCN**, **Transformer**), a **direction+magnitude stacking ensemble**,
+differentiable loss functions (Sharpe, Sortino, Calmar, Omega, directional, hybrid),
+robust-training utilities (purged CV, early stopping, sample weighting), and walk-forward rolling evaluation.
 
 ## Quick start
 
