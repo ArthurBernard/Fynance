@@ -4,11 +4,12 @@
 
 | Layer | Command | Catches |
 |-------|---------|---------|
-| **Unit** | `pytest` | logic, shapes, regressions (~250 tests under `fynance/tests/`) |
+| **Unit** | `pytest` | logic, shapes, regressions (~300 tests under `fynance/tests/`) |
 | **Doctests** | `pytest --doctest-modules` (on by default in `pyproject.toml`) | every docstring `>>>` example — they are part of the suite |
 | **Benchmarks** | `pytest-benchmark` (e.g. `test_filters_benchmark.py`) | perf regressions on hot paths |
 | **Coverage** | `pytest --cov=fynance --cov-report=term-missing` | untested branches |
-| **Type** | `mypy` | type drift |
+| **Property** | `pytest tests/features/test_property.py` | kernel parity vs NumPy refs + no-lookahead |
+| **Type** | `mypy` | type drift (0 errors, enforced) |
 | **Lint** | `ruff check fynance/` | style, dead imports |
 | **Docs** | `cd doc && make html` | Sphinx (furo) builds |
 
@@ -38,6 +39,9 @@ existing doctests.
 
 ## CI
 
-GitHub Actions (`.github/workflows/ci.yml`) runs the suite across the Python
-matrix; `release.yml` builds `cibuildwheel` manylinux wheels + sdist, publishes
-to PyPI, and creates the GitHub Release on a `v*` tag. Badges via `badges.yml`.
+GitHub Actions (`.github/workflows/ci.yml`) runs **four gates** on every PR:
+the test suite across the Python matrix (`test`), `ruff` + `interrogate`
+(docstring coverage ≥ 80%) in `lint`, a Sphinx build with warnings-as-errors
+(`docs`, `sphinx-build -W`), and `mypy` (`typecheck`, 0 errors). `release.yml`
+builds `cibuildwheel` manylinux wheels + sdist, publishes to PyPI, and creates
+the GitHub Release on a `v*` tag. Badges via `badges.yml`.

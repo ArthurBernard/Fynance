@@ -36,19 +36,26 @@ stability policy per package.)
 - **`models/`** — econometric (`econometric_models.py` wrapping the estimator) and
   neural (`mlp`, `rnn`, `gru`, `lstm`, `attention`) on a rolling/walk-forward
   base; `loss/` holds custom PyTorch losses.
-- **`backtest/`** — `plot_backtest`, `dynamic_plot_backtest`, `print_stats`,
-  `loss`; evaluation and visualisation. Improve freely.
+- **`backtest/`** — `plot_backtest`, `dynamic_plot_backtest`,
+  `backtest_neural_net`, `print_stats`, `loss`; evaluation and visualisation.
+  Improve freely.
 - **`core/`** — `series.py` array/series helpers shared across packages.
 
 ## Three cross-cutting patterns
 
 ### 1. Cython / Python dual implementation (`features/`)
 
-Each performance-critical computation exists twice: `metrics_cy.pyx` (Cython,
-compiled to a `.so`) and `metrics.py` (pure Python). `features/__init__.py`
-imports both. `setup.py`'s `USE_CYTHON='auto'` guard compiles the `.pyx` if Cython
+Each performance-critical kernel exists twice: a compiled `*_cy.pyx` (e.g.
+`momentums_cy`, `roll_functions_cy`, `metrics_cy`) and a thin Python wrapper that
+calls it (`momentums.py`, `roll_functions.py`, …). `features/__init__.py` imports
+both layers. `setup.py`'s `USE_CYTHON='auto'` guard compiles the `.pyx` if Cython
 is available, else falls back to pre-compiled `.c` files — **do not break this
-fallback**.
+fallback**. Kernel correctness is cross-checked against independent NumPy
+references by the property tests (`tests/features/test_property.py`).
+
+> The metrics surface is now split across `returns.py`, `ratios.py`,
+> `drawdown.py`, `stats.py` + `_metrics_helpers.py`, with `metrics.py` kept as a
+> thin re-export aggregator (public API unchanged).
 
 > **Going forward**: new performance-critical code uses **Numba `@njit`** in the
 > Python file, *not* new Cython. The Cython twins are kept (extend-only), not

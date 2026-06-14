@@ -30,17 +30,19 @@ modernisation).
 - **`backtest`** — `BackTest`/plotting objects (`PlotBackTest`,
   `DynaPlotBackTest`, …), `print_stats`.
 
-## Known sharp edges (by design or pending)
+## Known sharp edges (by design)
 
-- **`models/basis.py`** — `SignalModel`/`MagnitudeModel` are stubs (`pass` /
-  `y_pred` never assigned), unreferenced. Slated for removal (see roadmap §6.1).
-- **`backtest/dynamic_plot_backtest.py`** — carries a deprecated
-  `__BacktestNeuralNet` ("OLD VERSION") and an unused `_BacktestNeuralNet` stub.
-- **Large modules pending a split** — `features/metrics.py` (~1 800 lines),
-  `models/{attention,econometric_models,rolling}.py`,
-  `backtest/dynamic_plot_backtest.py` (~708 lines, 6 classes). See roadmap §5.
+- **`features/metrics.py`** is a thin **re-export aggregator** — the
+  implementations live in `returns.py`, `ratios.py`, `drawdown.py`, `stats.py`
+  and `_metrics_helpers.py`. Import from `fynance.features` (or
+  `fynance.features.metrics`) as before; the split is transparent.
+- **`estimator.estimation()`** is an experimental stub that raises
+  `NotImplementedError` — use `models.econometric_models.get_parameters`
+  (Cython-backed) for ARMA/GARCH estimation.
 - **`lstm.py`/`gru.py` internal hierarchies** (`_LSTMCell → LSTMCell →
-  LongShortTermMemory`) are intentionally **not** split — too tightly coupled.
+  LongShortTermMemory`) and `_RollingBasis`/`RollMultiLayerPerceptron` are
+  intentionally **not** split — too tightly coupled.
+- **Inputs** accept numpy / torch / **polars**; **outputs** are numpy (no pandas).
 
-> The "pending" items above live in the (local) `07-roadmap.md`; this file only
-> notes them so an agent doesn't mistake a known stub for a bug.
+> Open work lives in `07-roadmap.md`; this file only notes settled design points
+> so an agent doesn't mistake one for a bug.
