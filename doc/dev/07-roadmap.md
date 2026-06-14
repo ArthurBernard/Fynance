@@ -295,7 +295,8 @@ sections 3, 5 et 6 ci-dessus.
 - [ ] `models/rolling.py` (64 %) — couvrir la boucle d'entraînement `_training`.
 - [ ] `algorithms/rolling.py` (22 %) — walk-forward allocation.
 - [ ] `models/econometric_models.py` (54 %) — chemins ARMA/GARCH.
-- [ ] `algorithms/browsers.py` (0 %) — clarifier le rôle puis tester ou retirer.
+- [x] `algorithms/browsers.py` (0 %) — code mort, **supprimé** (+ `browsers_cy`,
+  + `algorithms/rolling.py`/`_RollingMechanism` orphelin). ✅ PR #66.
 
 ### 8.4 Tests de propriété (transformer des conventions en garde-fous)
 - [x] **Parité py ↔ cy** (vs référence numpy indépendante). ✅ PR #65. Suite paramétrée
