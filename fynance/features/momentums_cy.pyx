@@ -23,8 +23,6 @@ __all__ = [
     'wmstd_cy_1d', 'wmstd_cy_2d', 'emstd_cy_1d', 'emstd_cy_2d',
 ]
 
-# FIXME : problem with window size => window is w + 1 instead of w
-
 # =========================================================================== #
 #                               Moving Averages                               #
 # =========================================================================== #

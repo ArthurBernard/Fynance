@@ -20,7 +20,7 @@ from matplotlib import pyplot as plt
 __all__ = ["PlotSeries"]
 
 
-# TODO : Allow Pandas and PyTorch objects
+# TODO : accept polars and torch objects as plot inputs
 
 
 class PlotSeries:

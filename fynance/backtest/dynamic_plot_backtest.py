@@ -35,7 +35,6 @@ plt.style.use('seaborn-v0_8')
 __all__ = ['DynaPlotBackTest']
 
 
-# TODO : FINISH DOCSTRING
 class DynaPlotBackTest(PlotBackTest):
     """ Dynamic plot backtest object.
 
@@ -118,7 +117,6 @@ class DynaPlotBackTest(PlotBackTest):
         .. [1] https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes
 
         """
-        # FIXME : not explicitly defined and not saved updated parameters
         ax_params = self.ax_params.copy()
         ax_params.update(kwargs)
         self._set_axes(**ax_params)

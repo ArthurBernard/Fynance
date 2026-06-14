@@ -41,10 +41,6 @@ __all__ = [
     'sma', 'wma', 'ema', 'smstd', 'wmstd', 'emstd',
 ]
 
-# TODO : - Momentums of order 3
-#        - Momentums of order 4
-#        - Momentums of order w
-
 # =========================================================================== #
 #                               Moving Averages                               #
 # =========================================================================== #

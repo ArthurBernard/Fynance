@@ -331,7 +331,6 @@ class BaseNeuralNet(torch.nn.Module):
 
     def _set_data(self, X, dtype=None):
         """ Convert array-like data to tensor. """
-        # TODO : Verify dtype of data torch tensor
         if isinstance(X, np.ndarray):
 
             return torch.from_numpy(X)

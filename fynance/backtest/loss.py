@@ -18,9 +18,6 @@ from numpy.typing import NDArray
 # Local packages
 from fynance.backtest.plot import PlotSeries
 
-# TODO : Inherits of methods and properties of numpy ndarray ?
-
-
 __all__ = ['LossSeries']
 
 

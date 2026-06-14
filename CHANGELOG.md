@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Swept stale/decided inline `# TODO`/`# FIXME` markers; in particular the `momentums_cy` "window is w+1" FIXME was verified stale (window size is correct, proven by the property tests) and removed
+
 ### Deprecated
 
 ### Removed

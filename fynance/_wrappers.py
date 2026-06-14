@@ -178,7 +178,6 @@ def wrap_ddof(func):
 
 def wrap_keepdims(func):
     """ Check that output have same dimensions as input. """
-    # TODO :  check if it's working
     @wraps(func)
     def check_keepdims(X, *args, keepdims=False, **kwargs):
         if keepdims:
