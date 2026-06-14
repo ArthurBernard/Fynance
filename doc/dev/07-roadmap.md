@@ -31,14 +31,10 @@ Fait (PR #88) : `CalmarLoss`, `OmegaLoss`, `HybridLoss` (α fixe ou learnable).
 
 ### 5.2 Architecture : ensemble direction + magnitude avec meta-modèle
 
-- [ ] **Modèle 1 (direction)** : entraîné avec `DirectionalAccuracyLoss`,
-  sortie = probabilité de signe positif (sigmoid).
-- [ ] **Modèle 2 (magnitude)** : entraîné avec MSE ou `SortinoLoss`,
-  sortie = estimation du return.
-- [ ] **Meta-modèle** : prend `[signal_1, magnitude_2]` en entrée,
-  entraîné avec `SharpeLoss` ou `SortinoLoss`, sur les prédictions out-of-fold
-  (walk-forward OOF) pour éviter la fuite de données.
-- [ ] Comparer vs. modèle unique entraîné directement avec `SharpeLoss`.
+Fait (PR #93) : `StackingEnsemble` — bases direction/magnitude + méta-modèle
+entraîné sur les prédictions **out-of-fold** (leak-free).
+
+- [ ] 🟡 Comparer empiriquement vs modèle unique `SharpeLoss` (besoin de données).
 
 ### 5.3 Régimes de marché
 
