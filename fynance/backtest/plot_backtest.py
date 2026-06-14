@@ -46,7 +46,7 @@ class PlotBackTest:
     ``**kwargs``; subsequent calls to :meth:`plot` only add data.
 
     For live updates during walk-forward training, use
-    :class:`fynance.backtest.dynamic_plot_backtest.BacktestNeuralNet`,
+    :class:`fynance.backtest.backtest_neural_net.BacktestNeuralNet`,
     which builds on the same primitives but refreshes the canvas on
     each iteration.
 

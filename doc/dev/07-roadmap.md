@@ -126,8 +126,9 @@ Candidats identifiés :
 Candidats : `DynaPlotBackTest`, `DynaPlotAccuracy`, `DynaPlotLoss`,
 `DynaPlotPerf`, `BacktestNeuralNet` (+ `_BacktestNeuralNet` privé).
 
-- [ ] Un fichier par classe publique substantielle
-- [ ] Mettre à jour `backtest/__init__.py`
+- [x] Séparé l'orchestrateur `BacktestNeuralNet` (→ `backtest_neural_net.py`)
+  des primitives `DynaPlot*` (famille couplée gardée ensemble). ✅ PR #68
+- [x] `backtest/__init__.py` mis à jour (re-export). ✅ PR #68
 
 ## 7. R&D — Loss, architecture, données
 
