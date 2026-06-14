@@ -105,7 +105,7 @@ class MultiLayerPerceptron(BaseNeuralNet):
             self.N, self.M = X, y
 
         else:
-            self.set_data(X=X, y=y, x_type=x_type, y_type=y_type)
+            self.set_data(X=X, y=y, x_type=x_type, y_type=y_type)  # type: ignore[arg-type]
 
         self.n_layers = len(layers) + 1
 

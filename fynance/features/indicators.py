@@ -140,7 +140,7 @@ def bollinger_band(
         X = X.astype(np.float64)
 
     if kind == 'e':
-        w = 1 - 2 / (1 + w)
+        w = 1 - 2 / (1 + w)  # type: ignore[assignment]
 
     warn(
         'Since version 1.1.0, bollinger_band returns upper and lower bands. '
@@ -303,7 +303,7 @@ def hma(X: NDArray, w: int = 21, kind: str = 'w', axis: int = 0, dtype=None) -> 
 
     """
     if kind == 'e':
-        w = 1 - 2 / (1 + w)
+        w = 1 - 2 / (1 + w)  # type: ignore[assignment]
 
     f = _handler_ma[kind.lower()]
 
@@ -385,7 +385,7 @@ def macd_hist(
             must be positive.'.format(fast_w, slow_w))
 
     elif kind == 'e':
-        w = 1 - 2 / (1 + w)
+        w = 1 - 2 / (1 + w)  # type: ignore[assignment]
 
     macd_lin = _macd_line(X, fast_w, slow_w, kind)
     sig_lin = _signal_line(X, w, fast_w, slow_w, kind)
@@ -540,7 +540,7 @@ def rsi(X: NDArray, w: int = 14, kind: str = 'e', axis: int = 0, dtype=None) -> 
 
     """
     if kind == 'e':
-        w = 1 - 2 / (1 + w)
+        w = 1 - 2 / (1 + w)  # type: ignore[assignment]
 
     # Compute first diff
     delta = np.log(X[1:] / X[:-1])
@@ -634,7 +634,7 @@ def signal_line(
             must be positive.'.format(fast_w, slow_w))
 
     elif kind == 'e':
-        w = 1 - 2 / (1 + w)
+        w = 1 - 2 / (1 + w)  # type: ignore[assignment]
 
     return _signal_line(X, w, fast_w, slow_w, kind)
 

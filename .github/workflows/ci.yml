@@ -88,3 +88,25 @@ jobs:
 
       - name: Build HTML docs
         run: sphinx-build -W --keep-going -b html doc/source doc/build/html
+
+
+  typecheck:
+    name: Type check (mypy)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run mypy
+        run: mypy fynance/

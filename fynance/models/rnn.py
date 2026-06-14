@@ -32,7 +32,7 @@ from fynance.models._recurrent_base import _OutputLayerMixin, _RecurrentBase
 __all__ = ['RecurrentNeuralNetwork']
 
 
-class RecurrentNeuralNetwork(_OutputLayerMixin, _RecurrentBase):
+class RecurrentNeuralNetwork(_OutputLayerMixin, _RecurrentBase):  # type: ignore[misc]
     """ Neural network with vanilla Elman recurrent architecture.
 
     A single recurrent linear layer followed by a forward output layer.

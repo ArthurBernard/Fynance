@@ -346,7 +346,7 @@ def roll_mad(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDA
     """
     if len(X.shape) == 2:
 
-        return np.asarray(roll_mad_cy_2d(X, w))
+        return np.asarray(roll_mad_cy_2d(X, w))  # type: ignore[name-defined]
 
-    return np.asarray(roll_mad_cy_1d(X, w))
+    return np.asarray(roll_mad_cy_1d(X, w))  # type: ignore[name-defined]
 

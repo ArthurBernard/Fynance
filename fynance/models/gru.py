@@ -172,7 +172,7 @@ class GRUCell(_GRUCell):
         )
 
 
-class GatedRecurrentUnit(_OutputLayerMixin, GRUCell):
+class GatedRecurrentUnit(_OutputLayerMixin, GRUCell):  # type: ignore[misc]
     """ Gated Recurrent Unit neural network.
 
     Full GRU model: :class:`_GRUCell` gating logic followed by a

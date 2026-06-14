@@ -781,7 +781,7 @@ def _perf_alloc(X: NDArray[np.float64], w: NDArray[np.float64], drift: bool = Tr
     perf = np.zeros(X.shape)
     perf[1:] = (X[1:] / X[:-1] - 1)
 
-    return np.cumprod(perf @ w + 1)
+    return np.cumprod(perf @ w + 1)  # type: ignore[return-value]
 
 
 def _normalize(w: NDArray[np.float64], low_bound: float = 0., up_bound: float = 1., sum_w: float = 1., max_iter: int = 1000) -> NDArray[np.float64]:
