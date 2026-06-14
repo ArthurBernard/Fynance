@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `fynance.features.engineering`: `multi_resolution` (stack a feature across windows), `granger_causality` (F-test feature filter), `IncrementalMoments` (O(1) online mean/variance)
+
 - Robust-training utilities: `purge` parameter on `_RollingBasis._fold_slices`/`cross_validate` (purged walk-forward CV), and `fynance.models.training` with `exp_sample_weights` and `EarlyStopping`
 
 - `roll_rank` (`fynance.features.scale`) — rolling percentile-rank feature normalization (causal, outlier-robust)
