@@ -77,11 +77,11 @@ La construction causale des features reste garantie par les property tests
 
 ### 5.7 R&D rolling — features multi-résolution et efficacité
 
-- [ ] **Multi-résolution** : mêmes features sur plusieurs fenêtres (5/10/21/63) concaténées.
-- [ ] **Streaming / mises à jour incrémentales** : prototype `IncrementalFeature`
-  (formule récursive O(1) par pas pour GARCH, corrélations).
-- [ ] **Fenêtres adaptatives** : `window` variable selon le régime de vol.
-- [ ] **Test de causalité de Granger** : filtrer les features sans signal prédictif.
+Fait (PR #91) : `multi_resolution`, `granger_causality`, `IncrementalMoments`
+(Welford O(1)) dans `features/engineering.py`.
+
+- [ ] **Fenêtres adaptatives** : `window` variable selon le régime de vol
+  (dépend de §5.3 détection de régime).
 
 ### 5.8 Backtest réaliste
 
