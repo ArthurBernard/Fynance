@@ -113,3 +113,47 @@ def test_scale_roll_norm(set_variables):
     assert (s.params["s"] == std).all()
     assert (s(x_2d) == ((2 - 1) * scaled + 1).T).all()
     assert (s.revert(s(x_2d)) == x_2d).all()
+
+
+# §5.5 rank-based normalization
+
+def test_roll_rank_values():
+    import numpy as np
+
+    from fynance.features.scale import roll_rank
+    X = np.array([1., 3., 2., 5., 4.])
+    assert np.allclose(roll_rank(X, w=3), [0.5, 1., 0.5, 1., 0.5])
+
+
+def test_roll_rank_in_unit_interval():
+    import numpy as np
+
+    from fynance.features.scale import roll_rank
+    rng = np.random.RandomState(0)
+    out = np.asarray(roll_rank(rng.standard_normal(200), w=20))
+    assert out.min() >= 0.0 and out.max() <= 1.0
+
+
+def test_roll_rank_no_lookahead():
+    import numpy as np
+
+    from fynance.features.scale import roll_rank
+    rng = np.random.RandomState(1)
+    X = rng.standard_normal(100)
+    t = 60
+    base = np.asarray(roll_rank(X, w=20))
+    X2 = X.copy()
+    X2[t:] += 10.0
+    pert = np.asarray(roll_rank(X2, w=20))
+    assert np.allclose(base[:t], pert[:t])
+
+
+def test_roll_rank_2d_columnwise():
+    import numpy as np
+
+    from fynance.features.scale import roll_rank
+    X = np.array([1., 3., 2., 5., 4.])
+    X2 = np.column_stack([X, X[::-1]])
+    out = np.asarray(roll_rank(X2, w=3))
+    assert out.shape == (5, 2)
+    assert np.allclose(out[:, 0], roll_rank(X, w=3))

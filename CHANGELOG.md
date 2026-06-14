@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `roll_rank` (`fynance.features.scale`) — rolling percentile-rank feature normalization (causal, outlier-robust)
+
 - New differentiable losses in `fynance.models.loss`: `CalmarLoss` (Calmar via `torch.cummax` drawdown), `OmegaLoss` (gain/loss ratio over a threshold), and `HybridLoss` (convex combo of two losses, with an optional learnable weight)
 
 - Realistic-backtest primitives: robustness metrics `percent_positive` / `tail_ratio` (`fynance.features`), and `fynance.algorithms.sizing` with `kelly_fraction`, causal `vol_target`, and turnover-based `transaction_cost`

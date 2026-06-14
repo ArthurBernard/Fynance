@@ -60,10 +60,11 @@ Bollinger/CCI/HMA. Reste **différé** (nécessite une API multi-séries OHLCV) 
 
 ### 5.5 Normalisation des features
 
-- [ ] **Rolling z-score** : `(x − μ_t) / σ_t` avec fenêtre strictement passée.
-- [ ] **Rank-based normalization** : rangs percentiles sur la fenêtre passée.
-- [ ] **Vol-targeting** : normaliser les returns par la vol réalisée passée.
-- [ ] Comparer empiriquement les trois approches sur le Sharpe out-of-sample.
+Couvert : rolling z-score (`roll_standardize`/`roll_z_score`), vol-targeting
+(`sizing.vol_target`), rank-based (`scale.roll_rank`, PR #89).
+
+- [ ] 🟡 Comparer empiriquement les trois approches sur le Sharpe out-of-sample
+  (nécessite des données).
 
 ### 5.6 Protocole d'entraînement robuste
 
