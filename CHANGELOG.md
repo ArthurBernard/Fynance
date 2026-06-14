@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Tests for the causal core: econometric `MA`/`ARMA` recurrences and `ARMAX_GARCH` properties; `RollMultiLayerPerceptron._training` (loss update) and `get_stats` (populated structured array)
 - Property test suite `tests/features/test_property.py`: independent NumPy-reference parity for the rolling kernels (`sma`/`wma`/`smstd`/`ema`/`roll_min`/`roll_max`) and a generic no-lookahead (causality) check
 - `polars` is now accepted as an input frame wherever pandas was (`BaseNeuralNet.set_data`, `econometric_models.MA`), alongside numpy/torch
 - Golden-value regression test for `rolling_allocation` (previously untested)

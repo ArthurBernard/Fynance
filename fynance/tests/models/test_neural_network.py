@@ -456,3 +456,24 @@ class TestRollMLP:
         # Prediction on eval window should work
         pred = model.sub_predict(model.X[eval_set])
         assert pred.shape[1] == N_OUT
+
+    def test_get_stats_populated(self):
+        model = self._make_roll_mlp()
+        model.log = [
+            {"step": 0, "train_loss": 1.0, "eval_loss": 2.0, "test_loss": 3.0},
+            {"step": 1, "train_loss": 0.5, "eval_loss": 1.5, "test_loss": 2.5},
+        ]
+        stats = model.get_stats()
+        assert stats.dtype.names == (
+            "step", "train_loss", "eval_loss", "test_loss"
+        )
+        assert stats.size == 2
+        assert stats["step"].tolist() == [0, 1]
+        assert np.isclose(stats["train_loss"][1], 0.5)
+
+    def test_training_updates_loss_train(self):
+        model = self._make_roll_mlp()
+        it = iter(model)
+        next(it)
+        model._training()
+        assert np.isfinite(model.loss_train[model.i])
