@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `detect_regimes` (`fynance.features.regime`) — k-means market-regime labelling on rolling vol/return features, ordered by volatility
+
 - `fynance.features.engineering`: `multi_resolution` (stack a feature across windows), `granger_causality` (F-test feature filter), `IncrementalMoments` (O(1) online mean/variance)
 
 - Robust-training utilities: `purge` parameter on `_RollingBasis._fold_slices`/`cross_validate` (purged walk-forward CV), and `fynance.models.training` with `exp_sample_weights` and `EarlyStopping`
