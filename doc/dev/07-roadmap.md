@@ -15,12 +15,6 @@ shipped, `03-decisions.md` for *why*. Keep it short and true.
 ---
 
 
-## 4. Performance & dépendances
-
-- [ ] Audit versions et alternatives modernes des dépendances restantes.
-  (pandas a été remplacé par polars en entrée + numpy en sortie ; le cœur
-  algébrique reste NumPy natif.)
-
 ## 5. R&D — Loss, architecture, données
 
 Objectif : identifier empiriquement la meilleure combinaison loss / architecture / features
