@@ -37,8 +37,8 @@ from fynance.features.momentums import *
 # Local packages
 from fynance.features.roll_functions import roll_max, roll_min
 
-__all__ = ["normalize", "roll_normalize", "roll_standardize", "Scale",
-           "standardize"]
+__all__ = ["normalize", "roll_normalize", "roll_rank", "roll_standardize",
+           "Scale", "standardize"]
 
 
 _HANDLER_MOMENTUM = {
@@ -480,6 +480,65 @@ def roll_normalize(X, w=None, a=0, b=1, axis=0):
         return _normalize(X.T, m, s, a, b).T
 
     return _normalize(X, m, s, a, b)
+
+
+def _roll_rank(X, w):
+    X = np.asarray(X, dtype=np.float64)
+    is1d = X.ndim == 1
+    if is1d:
+        X = X.reshape(-1, 1)
+    out = np.full(X.shape, 0.5)
+    for t in range(X.shape[0]):
+        win = X[max(0, t - w + 1):t + 1]
+        n = win.shape[0]
+        if n > 1:
+            out[t] = (win < X[t]).sum(axis=0) / (n - 1)
+
+    return out[:, 0] if is1d else out
+
+
+def roll_rank(X, w=None, axis=0):
+    r""" Rolling percentile rank of each observation within its past window.
+
+    For each ``t`` returns the fraction of the strictly-past window
+    ``[t-w+1, t]`` that is below ``X_t``, in ``[0, 1]`` (0 = lowest, 1 =
+    highest). Robust to outliers and strictly causal — useful as a feature
+    normalisation that ignores the scale/distribution of the raw series.
+
+    Parameters
+    ----------
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Data to rank.
+    w : int, optional
+        Size of the lagged window. If ``None`` or ``0``, ``w = X.shape[axis]``.
+        Default None.
+    axis : int, optional
+        Axis along which to compute the rank. Default 0.
+
+    Returns
+    -------
+    np.ndarray[dtype, ndim=1 or 2]
+        Rolling percentile ranks in ``[0, 1]`` (0.5 for a single observation).
+
+    See Also
+    --------
+    roll_normalize, roll_standardize
+
+    Examples
+    --------
+    >>> X = np.array([1., 3., 2., 5., 4.])
+    >>> roll_rank(X, w=3)
+    array([0.5, 1. , 0.5, 1. , 0.5])
+
+    """
+    if w is None or w == 0:
+        w = X.shape[axis]
+
+    if axis == 1:
+
+        return _roll_rank(X.T, w).T
+
+    return _roll_rank(X, w)
 
 
 if __name__ == "__main__":
