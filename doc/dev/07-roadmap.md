@@ -16,15 +16,6 @@ shipped, `03-decisions.md` for *why*. Keep it short and true.
 
 ## 1. Nouvelles architectures ML
 
-### 1.1 Temporal Convolutional Network (TCN)
-
-Implémenter dans `fynance/models/tcn.py`.
-
-- [ ] Base `BaseNeuralNet` avec walk-forward iterator
-- [ ] Couches dilated 1D convolutions + residual blocks
-- [ ] Architecture similaire à `recurrent_neural_network.py` (MLP, GRU, LSTM)
-- [ ] Tests : 5–8 tests (forward pass, gradient flow, rolling, edge cases)
-
 ### 1.2 Transformer financier
 
 Compléter `fynance/models/transformer.py`.
