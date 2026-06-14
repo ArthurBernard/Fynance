@@ -33,6 +33,7 @@ from warnings import warn
 # External packages
 import numpy as np
 from numpy.typing import NDArray
+from scipy import stats as _sp_stats
 
 # Local packages
 from fynance._wrappers import WrapperArray
@@ -41,7 +42,8 @@ from fynance.features.momentums import _ema, _emstd, _sma, _smstd, _wma, _wmstd
 
 __all__ = [
     'bollinger_band', 'cci', 'hma', 'macd_hist', 'macd_line',
-    'rsi', 'signal_line',
+    'realized_volatility', 'roc', 'rolling_autocorr', 'rolling_kurtosis',
+    'rolling_skewness', 'rsi', 'signal_line',
 ]
 
 _handler_ma = {'s': _sma, 'w': _wma, 'e': _ema}
@@ -654,3 +656,175 @@ if __name__ == '__main__':
     import doctest
 
     doctest.testmod()
+
+
+@WrapperArray('dtype', 'axis', 'window')
+def roc(X: NDArray, w: int = 14, axis: int = 0, dtype=None) -> NDArray:
+    r""" Rate of Change momentum indicator.
+
+    Percentage change of the series over a lagged window ``w``:
+    :math:`ROC^w_t = 100 \cdot (X_t / X_{t-w} - 1)`. Strictly causal —
+    the first ``w`` points use the first observation as the base (expanding).
+
+    Parameters
+    ----------
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Price/level series.
+    w : int, optional
+        Lag window. Default 14.
+    axis : {0, 1}, optional
+        Axis of computation. Default 0.
+    dtype : np.dtype, optional
+        Output dtype.
+
+    Returns
+    -------
+    np.ndarray[dtype, ndim=1 or 2]
+        Rate of change in percent.
+
+    Examples
+    --------
+    >>> X = np.array([10., 11., 12., 13., 14.])
+    >>> roc(X, w=2)
+    array([ 0.        , 10.        , 20.        , 18.18181818, 16.66666667])
+
+    """
+    out = np.zeros(X.shape)
+    out[1:w] = (X[1:w] / X[0] - 1.) * 100.
+    out[w:] = (X[w:] / X[:-w] - 1.) * 100.
+
+    return out
+
+
+@WrapperArray('dtype', 'axis', 'window')
+def realized_volatility(X: NDArray, w: int = 21, period: int = 252, axis: int = 0, dtype=None) -> NDArray:
+    r""" Annualized realized volatility from a price series.
+
+    Rolling standard deviation of log-returns, annualized by
+    :math:`\sqrt{period}`. Causal: returns are strictly past, the window
+    expands over the first observations.
+
+    Parameters
+    ----------
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Price/level series.
+    w : int, optional
+        Rolling window over returns. Default 21.
+    period : int, optional
+        Annualization factor (e.g. 252 daily). Default 252.
+    axis : {0, 1}, optional
+        Axis of computation. Default 0.
+    dtype : np.dtype, optional
+        Output dtype.
+
+    Returns
+    -------
+    np.ndarray[dtype, ndim=1 or 2]
+        Annualized realized volatility, aligned to ``X`` (first entry 0).
+
+    """
+    r = np.log(X[1:] / X[:-1])
+    std = np.asarray(_smstd(r, w))
+    out = np.zeros(X.shape)
+    out[1:] = np.sqrt(period) * std
+
+    return out
+
+
+def _rolling_apply(X, w, fn, min_obs):
+    # Causal rolling reduction: window [max(0, t-w+1), t], expanding at start.
+    out = np.zeros(X.shape)
+    n = X.shape[0]
+    for t in range(n):
+        lo = max(0, t - w + 1)
+        win = X[lo:t + 1]
+        if win.shape[0] >= min_obs:
+            out[t] = fn(win)
+
+    return out
+
+
+@WrapperArray('dtype', 'axis', 'window')
+def rolling_skewness(X: NDArray, w: int = 21, axis: int = 0, dtype=None) -> NDArray:
+    """ Rolling sample skewness over a strictly-past window ``w``.
+
+    Parameters
+    ----------
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Input series.
+    w : int, optional
+        Rolling window. Default 21.
+    axis : {0, 1}, optional
+        Axis of computation. Default 0.
+    dtype : np.dtype, optional
+        Output dtype.
+
+    Returns
+    -------
+    np.ndarray[dtype, ndim=1 or 2]
+        Rolling skewness (0 where fewer than 3 observations are available).
+
+    """
+    return np.nan_to_num(
+        _rolling_apply(X, w, lambda win: _sp_stats.skew(win, axis=0), min_obs=3)
+    )
+
+
+@WrapperArray('dtype', 'axis', 'window')
+def rolling_kurtosis(X: NDArray, w: int = 21, axis: int = 0, dtype=None) -> NDArray:
+    """ Rolling excess kurtosis over a strictly-past window ``w``.
+
+    Parameters
+    ----------
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Input series.
+    w : int, optional
+        Rolling window. Default 21.
+    axis : {0, 1}, optional
+        Axis of computation. Default 0.
+    dtype : np.dtype, optional
+        Output dtype.
+
+    Returns
+    -------
+    np.ndarray[dtype, ndim=1 or 2]
+        Rolling excess kurtosis (0 where fewer than 4 observations).
+
+    """
+    return np.nan_to_num(
+        _rolling_apply(X, w, lambda win: _sp_stats.kurtosis(win, axis=0), min_obs=4)
+    )
+
+
+@WrapperArray('dtype', 'axis', 'window')
+def rolling_autocorr(X: NDArray, w: int = 21, lag: int = 1, axis: int = 0, dtype=None) -> NDArray:
+    """ Rolling lag-``lag`` autocorrelation over a strictly-past window ``w``.
+
+    Parameters
+    ----------
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Input series.
+    w : int, optional
+        Rolling window. Default 21.
+    lag : int, optional
+        Autocorrelation lag. Default 1.
+    axis : {0, 1}, optional
+        Axis of computation. Default 0.
+    dtype : np.dtype, optional
+        Output dtype.
+
+    Returns
+    -------
+    np.ndarray[dtype, ndim=1 or 2]
+        Rolling autocorrelation (0 where the window is too short).
+
+    """
+    def _ac(win):
+        a, b = win[:-lag], win[lag:]
+        a = a - a.mean(axis=0)
+        b = b - b.mean(axis=0)
+        denom = np.sqrt((a ** 2).sum(axis=0) * (b ** 2).sum(axis=0))
+        with np.errstate(invalid='ignore', divide='ignore'):
+            return np.where(denom > 0, (a * b).sum(axis=0) / denom, 0.)
+
+    return np.nan_to_num(_rolling_apply(X, w, _ac, min_obs=lag + 2))
