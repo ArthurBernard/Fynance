@@ -12,9 +12,8 @@
 
 # External packages
 import numpy as np
-from scipy.optimize import fmin
 
-from fynance.estimator.estimator_cy import loglikelihood_cy, target_function_cy
+from fynance.estimator.estimator_cy import loglikelihood_cy
 from fynance.models.econometric_models import get_parameters
 
 # Internal packages
@@ -28,32 +27,30 @@ __all__ = ['estimation', 'target_function', 'loglikelihood']
 
 
 def estimation(y, x0, p=0, q=0, Q=0, P=0, cons=True, model='arch'):
+    """ Estimate ARMA/GARCH parameters by maximum likelihood.
+
+    .. warning::
+
+       **Experimental — not implemented.** This pure-Python optimisation
+       driver never reached a working optimiser. It is kept as a placeholder
+       only; calling it raises :class:`NotImplementedError`.
+
+       For ARMA/GARCH parameter estimation use the Cython-backed path exposed
+       through :func:`fynance.models.econometric_models.get_parameters`, which
+       is the authoritative implementation (the Python layer must not duplicate
+       it — see the estimator stability policy).
+
+    Raises
+    ------
+    NotImplementedError
+        Always — see the warning above.
+
     """
-    NOT YET WORKING !
-    Estimator
-    """
-    params = fmin(target_function_cy, x0,
-                  args=(y, p, q, Q, P, cons, model), disp=0)
-    # NEED TO FIND AN OPTIMIZER #
-    phi, theta, alpha, beta, c, omega = get_parameters(
-        params, p, q, Q, P, cons
+    raise NotImplementedError(
+        "fynance.estimator.estimation is experimental and not implemented; "
+        "use fynance.models.econometric_models.get_parameters for ARMA/GARCH "
+        "parameter estimation (the Cython-backed, authoritative path)."
     )
-
-    if model.lower() == 'arch' or model.lower() == 'garch':
-        u, h = ARMA_GARCH_cy(
-            y, phi, theta, alpha, beta, c, omega, p, q, Q, P
-        )
-
-    elif model.lower() == 'arma':
-        u = ARMA_cy(y, phi, theta, c, p, q)
-        h = np.ones([u.size], dtype=np.float64)
-
-    else:
-        raise ValueError(f"Unknown model: {model!r}")
-
-    L = loglikelihood_cy(u, h)
-
-    return u, h, phi, theta, alpha, beta, c, omega, L
 
 
 def target_function(params, y, p=0, q=0, Q=0, P=0, cons=True, model='arch'):
