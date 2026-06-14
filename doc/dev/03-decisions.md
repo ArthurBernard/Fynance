@@ -1,0 +1,120 @@
+# 3 — Design decisions & rationale
+
+The *why* behind the structure. Each entry is a choice that shapes the code; if
+you're about to change one, read the rationale first. The prose below is the
+*settled* rationale (standing decisions); the **Decision journal** at the bottom
+is the running, dated ADR log.
+
+## Numerical core
+
+- **Cython for the existing hot paths, kept extend-only.** `features/` and
+  `estimator/` ship compiled `*_cy.pyx` kernels with pure-Python twins and a `.c`
+  fallback. They're fast and correct; we don't rewrite them.
+- **Numba `@njit` for *new* numerical code, not new Cython.** New kernels live in
+  the Python file alongside the existing implementation. Rationale: `@njit` gives
+  near-C speed without a compile step, a `.pyx`/`.c` pair to maintain, or breaking
+  the build fallback. New Cython is only acceptable when wrapping a C library.
+- **NumPy at the core; polars only at the I/O edges (pandas removed).** The
+  linear-algebra-heavy core (allocation, rolling windows) is raw NumPy — fastest
+  and the natural input for torch. Array-like *inputs* are accepted as
+  numpy / torch / **polars** and immediately coerced to numpy/torch; table-shaped
+  *outputs* are plain numpy (e.g. a structured array for the training log). See
+  the dated ADR entry below — this reverses an earlier polars rejection.
+
+## ML modernisation
+
+- **PyTorch is the only ML backend.** Keras/TensorFlow code is retired, not
+  extended. New architectures (LSTM/TCN/Transformer over the rolling MLP) and all
+  training target `torch`.
+- **Loss functions: two independent paths (the "Option C" split).** Evaluation/
+  backtest metrics (Sharpe/Sortino/…) stay as NumPy formulas in
+  `features/metrics.py`; the *training* losses are re-implemented as pure torch
+  ops in `models/loss/`. The two paths never convert numpy↔torch — each is native
+  to its context. Cost: the formula exists twice; benefit: no autograd-breaking
+  conversions, no numpy in the training graph.
+
+## Causality (the core invariant)
+
+- **No lookahead, structurally.** Every feature at `t` is `f(data[..t])`; every
+  training window trains on the strict past via the `_RollingBasis` iterator. This
+  isn't a style preference — a single leaked future value invalidates a backtest.
+  New features get a causal audit; tests forbid shuffling / future leakage.
+
+## Build & packaging
+
+- **`pyproject.toml` is the authoritative build config; `setup.py` only compiles
+  Cython.** Single static `version` in `pyproject.toml` (one source of truth for
+  `/release`). Wheels are built with `cibuildwheel` (manylinux) + an sdist, then
+  trusted-published to PyPI on a `v*` tag.
+
+## Decision journal (ADR)
+
+Append-only, dated log of choices made since the dev-loop was set up — fed by
+`/finish-task` (accepted) and `/abandon-task` (rejected / tombstone). The prose
+above is the *settled* rationale; this journal is the *running* one. **Newest
+first.**
+
+Conventions:
+- One entry per significant choice; skip the trivial (those live in
+  git/`CHANGELOG.md`).
+- `[tombstone]` = a feature was removed. Keep one line on *why it's gone* here and
+  **purge its implementation rationale from the prose above** — negative knowledge
+  so it isn't silently re-added later.
+
+Template:
+```
+### YYYY-MM-DD — <short title> (PR #NN)  [accepted|rejected|tombstone]
+- **Choice**: …
+- **Why**: …
+- **Rejected alternatives**: …
+```
+
+<!-- new entries below, newest first -->
+
+### 2026-06-14 — Track doc/dev + CLAUDE.md publicly, mirroring dccd (PR #62)  [accepted]
+- **Choice**: stop gitignoring `doc/dev`. The descriptive pack `01–07` (including
+  the roadmap), `README.md`, `plans/README.md` **and `CLAUDE.md`** are now tracked,
+  mirroring dccd. Only the plan trees (`doc/dev/plans/<epic>/`), any `_archive`
+  snapshot and the Claude harness settings (`.claude/`) stay local.
+- **Why**: the `.gitignore` `dev/` rule (meant for a scratch dir) was accidentally
+  swallowing **all** of `doc/dev/`, so the "docs of record" the dev loop writes to
+  (this ADR journal, the status file) were never actually shared — directly
+  contradicting CLAUDE.md, which claimed `01–06` were tracked. dccd publishes the
+  full pack + roadmap + `CLAUDE.md`; the roadmap was reviewed and holds only
+  engineering tasks (TCN / Transformer / refactors), no secrets or proprietary
+  strategy, so the earlier privacy concern does not apply.
+- **Reverses**: the 2026-06-13 decision to keep the roadmap private and reject full
+  dccd parity — superseded; full dccd parity adopted at maintainer request.
+
+### 2026-06-14 — Replace pandas with polars at the edges, numpy at the core (PR #61)  [accepted]
+- **Choice**: drop the `pandas` dependency. Inputs that accepted pandas
+  (`BaseNeuralNet.set_data` / `_set_data`, `econometric_models.MA`) now accept
+  **polars** (plus numpy/torch), coerced via `to_numpy()`. Outputs that returned
+  pandas now return plain **numpy**: `rolling_allocation` → `(ndarray, ndarray)`,
+  `RollMultiLayerPerceptron.get_stats` → a structured `ndarray`. Core computation
+  stays numpy.
+- **Why**: a single torch/numpy-native data path; pandas only ever lived at the
+  I/O edges. polars is lighter and the maintainer's preferred frame. The risky
+  piece — `rolling_allocation` (previously untested) — was rewritten pandas-free
+  in numpy and verified for **exact parity** against the old pandas implementation
+  across MVP/ERC/IVP/HRP (various `ret`/`drift`) before pandas was removed; a
+  golden-value regression test now guards it.
+- **Reverses**: the earlier "polars POC evaluated and rejected; pandas at the
+  edges" rationale (purged from the prose above).
+- **Note**: technically API-breaking for the 1.x frozen API (return types
+  pandas → numpy) — flagged in `CHANGELOG.md`; accepted per maintainer direction.
+
+### 2026-06-13 — Adopt the tracked dev-loop docs (doc/dev) with a private roadmap  [accepted]
+- **Choice**: mirror the dccd tooled loop — `doc/dev/{01..06}` descriptive docs +
+  an ADR journal + a `06-status` + plan trees, wired through
+  `.claude/workflow.json` (`decisions`/`status`/`plans_dir`). The **roadmap
+  (`07-roadmap.md`) and the plan trees stay gitignored** (local only), continuing
+  the existing choice to keep `TODO.md` out of git.
+- **Why**: `/finish-task` and `/groom-docs` need real target docs (an ADR journal
+  and a status file) to write to; without them the loop ran half-blind. Keeping
+  the roadmap private preserves the prior posture — the R&D section holds strategy
+  ideas not meant for a public repo. The descriptive docs carry no secrets, so
+  they're tracked.
+- **Rejected alternatives**: full public parity with dccd (would publish the R&D
+  roadmap — rejected on privacy); doing nothing (leaves `/finish-task`'s ADR/status
+  steps with nowhere to write).

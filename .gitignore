@@ -17,7 +17,6 @@ build/
 fynance.egg-info/
 dist/
 old_scripts/
-dev/
 
 # Cache to ignore
 __pycache__/
@@ -28,11 +27,15 @@ __pycache__/
 .coverage
 htmlcov/
 
-# Claude Code (local only, not pushed)
+# Claude Code harness settings stay local; CLAUDE.md is tracked (mirrors dccd)
 .claude/
-CLAUDE.md
 
 # Task tracking (local only)
 todo/
 done/
 TODO.md
+
+# Developer docs: descriptive pack + roadmap are tracked (mirrors dccd);
+# only the plan trees and archived snapshots stay local
+doc/dev/plans/*/
+doc/dev/_archive/
