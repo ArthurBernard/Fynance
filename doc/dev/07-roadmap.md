@@ -292,9 +292,9 @@ sections 3, 5 et 6 ci-dessus.
   ruff / interrogate / docs).
 
 ### 8.3 Couverture du cœur causal
-- [ ] `models/rolling.py` (64 %) — couvrir la boucle d'entraînement `_training`.
-- [ ] `algorithms/rolling.py` (22 %) — walk-forward allocation.
-- [ ] `models/econometric_models.py` (54 %) — chemins ARMA/GARCH.
+- [x] `models/rolling.py` — `_training` (loss update) + `get_stats` couverts. ✅ PR #67.
+- [x] `algorithms/rolling.py` — supprimé (code mort `_RollingMechanism`). ✅ PR #66.
+- [x] `models/econometric_models.py` — `MA`/`ARMA`/`ARMAX_GARCH` testés. ✅ PR #67.
 - [x] `algorithms/browsers.py` (0 %) — code mort, **supprimé** (+ `browsers_cy`,
   + `algorithms/rolling.py`/`_RollingMechanism` orphelin). ✅ PR #66.
 
