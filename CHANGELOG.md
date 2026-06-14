@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `Transformer` (`fynance.models.transformer`) — a causal Transformer encoder on `BaseNeuralNet` (sinusoidal `PositionalEncoding`, reuses `MultiHeadAttention`, lower-triangular causal mask = no lookahead), with 10 tests incl. a causality check; works with MSE and `SharpeLoss`
+
 - `TemporalConvNet` (`fynance.models.tcn`) — a causal dilated Temporal Convolutional Network on `BaseNeuralNet` (residual blocks, dilation 1/2/4…, strictly no-lookahead), with 8 tests incl. a causality check; works with MSE and `SharpeLoss`
 
 - Integration test training `RollMultiLayerPerceptron` with the differentiable `SharpeLoss` (instead of MSE) — demonstrates the custom financial losses end-to-end
