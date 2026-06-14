@@ -24,17 +24,10 @@ notebook/rapport.
 
 ### 5.1 Nouvelles loss functions
 
-- [ ] **Calmar loss** — proxy différentiable du max drawdown
-  (`max_drawdown ≈ max(cumsum(-r)) − min(cumsum(-r))` via `torch.cumsum` + `torch.max`).
-  Valeur à annualiser pour comparer avec la métrique d'évaluation.
-- [ ] **Omega loss** — ratio gains/pertes pondérés au-delà d'un seuil `L` :
-  `Ω = E[max(r−L, 0)] / E[max(L−r, 0) + ε]`, entièrement différentiable avec `F.relu`.
-- [ ] **Loss hybride multi-objectif** — combiner deux objectifs avec un poids `α` :
-  `L = α·SharpeLoss + (1−α)·DirectionalAccuracyLoss`. Chercher `α` optimal
-  par grid-search ou en le rendant learnable (paramètre `nn.Parameter`).
-- [ ] **Benchmark empirique** : comparer les loss sur un jeu de données réel
-  (même walk-forward, mêmes features) — métriques out-of-sample : Sharpe, Sortino,
-  Calmar, accuracy directionnelle, drawdown max.
+Fait (PR #88) : `CalmarLoss`, `OmegaLoss`, `HybridLoss` (α fixe ou learnable).
+
+- [ ] 🟡 **Benchmark empirique** : comparer les loss sur un jeu de données réel
+  (out-of-sample Sharpe/Sortino/Calmar/accuracy/drawdown) — nécessite des données.
 
 ### 5.2 Architecture : ensemble direction + magnitude avec meta-modèle
 
