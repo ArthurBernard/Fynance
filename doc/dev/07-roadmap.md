@@ -150,14 +150,7 @@ tests de propriété (parité + non-lookahead) ; à étendre aux nouvelles featu
 
 ## 6. Optimisations & nettoyage
 
-### 6.1 Optimisations allocation.py
-
-- [ ] `HRP()` : remplacer le loop Python de réordonnancement par du fancy indexing
-  NumPy (`w[np.array(sortIx)] = w_sorted`).
-- [ ] Évaluer un cache de la matrice de covariance entre steps consécutifs dans
-  `rolling_allocation()` (O(N²) par step, coûteux à grande échelle).
-
-### 6.2 Migrer les TODO inline
+### 6.1 Migrer les TODO inline
 
 - [ ] Revue des `# TODO` / `# FIXME` restants dans le code (metrics submodules,
   `_base.py`, `allocation.py`, `_wrappers.py`, `backtest/`) — fermer ou tracer.
