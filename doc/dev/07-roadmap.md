@@ -42,11 +42,11 @@ Fait (PR #88) : `CalmarLoss`, `OmegaLoss`, `HybridLoss` (α fixe ou learnable).
 
 ### 5.3 Régimes de marché
 
-- [ ] Identifier des régimes (bull/bear/sideways/high-vol) via HMM ou k-means
-  sur les features de volatilité réalisée.
-- [ ] Conditionner l'architecture : un modèle par régime (mixture of experts),
-  ou un embedding de régime concaténé aux features d'entrée.
-- [ ] Évaluer si la détection de régime améliore le Sharpe out-of-sample.
+Fait (PR #92) : `detect_regimes` (k-means in-sample sur vol/return, labels
+ordonnés par vol). Reste 🟡 (besoin de données / orchestration) :
+
+- [ ] Conditionner l'architecture (mixture-of-experts / embedding de régime).
+- [ ] Assignation online causale + évaluer l'impact sur le Sharpe out-of-sample.
 
 ### 5.4 Features / indicateurs techniques
 
