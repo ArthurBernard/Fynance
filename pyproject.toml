@@ -34,7 +34,6 @@ dependencies = [
     "scipy>=1.11",
     "seaborn>=0.12",
     "torch>=2.0",
-    "xgboost>=2.0",
 ]
 
 [project.optional-dependencies]

@@ -30,6 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- `xgboost` dependency — it was declared in `pyproject.toml` but never imported anywhere in the package (lighter install; non-breaking)
+
 - Legacy notebooks: the Keras `Exemple_Rolling_NeuralNetwork.ipynb` and the stale dev notebooks `test_roll_NN_test.ipynb` / `Test_various_NN_models_with_simulated_data.ipynb`
 
 ## [1.4.0] - 2026-06-14
