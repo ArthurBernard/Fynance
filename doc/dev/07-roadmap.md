@@ -57,14 +57,13 @@ notebook/rapport.
 
 ### 5.4 Features / indicateurs techniques
 
-- [ ] **Tendance** : EMA, MACD, ADX.
-- [ ] **Momentum** : RSI, ROC, Williams %R.
-- [ ] **Volatilité** : ATR, Bollinger Band width, vol réalisée glissante.
-- [ ] **Volume** : OBV, VWAP (si données intraday disponibles).
-- [ ] **Statistiques glissantes** : autocorrélation, skewness, kurtosis
-  des returns sur fenêtres multiples (5, 10, 21, 63 jours).
-- [ ] **Vol conditionnelle** : GARCH(1,1) comme feature (via `fynance.estimator`).
-- [ ] Implémenter dans `fynance/features/` avec décorateurs `@WrapperArray` existants.
+Fait (single-série, causaux) : `roc`, `realized_volatility`, `rolling_skewness`,
+`rolling_kurtosis`, `rolling_autocorr` (PR #86) ; déjà présents : EMA/MACD/RSI/
+Bollinger/CCI/HMA. Reste **différé** (nécessite une API multi-séries OHLCV) :
+
+- [ ] **ATR / ADX / Williams %R** (High/Low) et **OBV / VWAP** (Volume) — exigent
+  des entrées OHLCV ; concevoir une API multi-séries d'abord.
+- [ ] **GARCH(1,1) comme feature** (via `fynance.estimator`).
 
 ### 5.5 Normalisation des features
 

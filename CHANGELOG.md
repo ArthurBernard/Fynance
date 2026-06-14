@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Technical indicators in `fynance.features.indicators`: `roc`, `realized_volatility`, `rolling_skewness`, `rolling_kurtosis`, `rolling_autocorr` — single-series, strictly causal, with parity + no-lookahead tests
+
 ### Changed
 
 ### Fixed
