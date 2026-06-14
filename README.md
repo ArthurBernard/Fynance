@@ -67,20 +67,27 @@ print(fy.sharpe(returns))
 
 # ERC portfolio allocation
 cov = np.cov(np.random.randn(5, 252))
-weights = fy.ERC(cov)()
+weights = fy.ERC(cov)
 print(weights)
 ```
 
 Rolling walk-forward training with a neural network:
 
 ```python
+import torch
+import torch.nn as nn
 from fynance.models.rolling import RollMultiLayerPerceptron
 
 model = RollMultiLayerPerceptron(X, y, layers=[64, 32])
-model(n=252, s=21, r=21)   # 252-day train, 21-day test, 21-day roll step
-for eval_result in model:
-    print(eval_result)
+model.set_optimizer(nn.MSELoss, torch.optim.Adam, lr=1e-3)
+model(train_period=252, test_period=21, roll_period=21)  # walk-forward windows
+for eval_set, test_set in model:   # each step trains on the past, tests the next
+    model._training()
 ```
+
+See [`Notebooks/pytorch_examples.ipynb`](Notebooks/pytorch_examples.ipynb) for a
+runnable tour (metrics, allocation, MLP/TCN/Transformer with custom losses,
+walk-forward CV).
 
 ## Links
 
