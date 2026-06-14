@@ -41,12 +41,6 @@ __all__ = ["normalize", "roll_normalize", "roll_standardize", "Scale",
            "standardize"]
 
 
-# TODO :
-#     - Use wrapper for axis for scale methods
-#     - Use wrapper for axis for standardize and normalize functions
-#     - Finish functions or method to scale with moving functions.
-
-
 _HANDLER_MOMENTUM = {
     "s": [sma, smstd],
     "w": [wma, wmstd],

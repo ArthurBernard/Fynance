@@ -43,8 +43,6 @@ from scipy.optimize import Bounds, LinearConstraint, minimize
 # Local packages
 from fynance.features.metrics import diversified_ratio
 
-# TODO : cython
-
 __all__ = ['ERC', 'HRP', 'IVP', 'MDP', 'MVP', 'MVP_uc', 'rolling_allocation']
 
 
@@ -144,8 +142,6 @@ def ERC(
 
 def _get_quasi_diag(link: NDArray[np.float64]) -> list[int]:
     """ Compute quasi diagonal matrix.
-
-    TODO : verify the efficiency
 
     Parameter
     ---------
