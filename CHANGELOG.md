@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `features/metrics.py` (1782 lines) split by concern into `returns.py`, `ratios.py`, `drawdown.py`, `stats.py` + `_metrics_helpers.py`. `metrics.py` is kept as a thin re-export aggregator, so the public API (`fynance.*`, `fynance.features.metrics.*`), all import paths and the Sphinx docs are unchanged
 - `models/rolling.py` slimmed: the `CVResult` dataclass moved to `models/cv_result.py` (re-exported; imports preserved) and the dead `get_perf` helper removed. The coupled `_RollingBasis`/`RollMultiLayerPerceptron` hierarchy is kept together by design
 - `backtest/dynamic_plot_backtest.py` split: the orchestrator `BacktestNeuralNet` moved to a new `backtest/backtest_neural_net.py` (re-exported from `fynance.backtest`; existing imports preserved). The tightly-coupled `DynaPlot*` plot family stays together
 - `estimator.estimation()` now raises `NotImplementedError` (it was an experimental, non-functional placeholder marked "NOT YET WORKING") and points to `models.econometric_models.get_parameters` (the Cython-backed authoritative path); unused `fmin`/`target_function_cy` imports removed

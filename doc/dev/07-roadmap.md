@@ -98,11 +98,13 @@ fynance/features/
 Mettre à jour `features/__init__.py` pour importer depuis les 4 nouveaux
 fichiers (+ `metrics_cy`). Supprimer `metrics.py`.
 
-- [ ] Créer `_metrics_helpers.py` avec tous les helpers privés
-- [ ] Créer `returns.py`, `ratios.py`, `drawdown.py`, `stats.py`
-- [ ] Mettre à jour `features/__init__.py` (supprimer import `metrics`)
-- [ ] Supprimer `metrics.py`
-- [ ] Vérifier que tous les tests et doctests passent (`pytest` + `--doctest-modules`)
+- [x] Créer `_metrics_helpers.py` avec tous les helpers privés. ✅ PR #70
+- [x] Créer `returns.py`, `ratios.py`, `drawdown.py`, `stats.py`. ✅ PR #70
+- [~] `features/__init__.py` inchangé : `metrics.py` gardé comme **agrégateur**
+  mince (re-export) plutôt que supprimé — sinon 6 modules + la page Sphinx
+  `features.metrics.rst` casseraient. Déviation justifiée. ✅ PR #70
+- [~] `metrics.py` **non supprimé** (devenu shim de re-export, ~30 lignes). ✅ PR #70
+- [x] Tests + doctests + parité + `sphinx-build -W` verts. ✅ PR #70
 
 ### 5.2 Éclater les fichiers multi-classes de `fynance/models/`
 
