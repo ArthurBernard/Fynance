@@ -26,7 +26,7 @@ library's core invariant, enforced in tests.
   published to PyPI; `Development Status :: 5 - Production/Stable`.
 - **Python 3.10–3.13** (CI matrix). Build is `setuptools` + **Cython 3** +
   **NumPy 2**.
-- **~250 tests** under `fynance/tests/` (mirrors the package), **plus doctests**
+- **~300 tests** under `fynance/tests/` (mirrors the package), **plus doctests**
   run on every module via `--doctest-modules` — docstring examples are part of
   the suite and must stay runnable. `ruff` + `mypy` configured; Sphinx docs build
   (furo).
