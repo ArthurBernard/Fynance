@@ -246,28 +246,65 @@ pour les nouveaux indicateurs de 7.4 et 7.5.
 
 ### 6.1 Supprimer code obsolète dans models/ et backtest/
 
-- [ ] Supprimer `fynance/models/basis.py` — `SignalModel` (stub, `self.y_pred`
-  jamais assigné) et `MagnitudeModel` (juste `pass`). Aucune référence ailleurs.
-- [ ] Supprimer `class __BacktestNeuralNet` dans `dynamic_plot_backtest.py`
-  (marqué "OLD VERSION => DEPRECIATED")
-- [ ] Décider du sort de `class _BacktestNeuralNet` (stub TODO, jamais utilisé)
+- [x] Supprimer `fynance/models/basis.py` — `SignalModel` (stub, `self.y_pred`
+  jamais assigné) et `MagnitudeModel` (juste `pass`). ✅ PR #58.
+- [x] Supprimer `class __BacktestNeuralNet` dans `dynamic_plot_backtest.py`
+  (marqué "OLD VERSION => DEPRECIATED"). ✅ PR #58.
+- [x] Décider du sort de `class _BacktestNeuralNet` (stub TODO) — supprimé. ✅ PR #58.
 
 ### 6.2 Optimisations allocation.py
 
 - [ ] `HRP()` : remplacer le loop Python de réordonnancement par du fancy indexing
   NumPy (`w[np.array(sortIx)] = w_sorted`)
-- [ ] `rolling_allocation()` : nettoyer le double `.bfill()` (lignes ~705, 719)
+- [x] `rolling_allocation()` : réécrit pandas-free en numpy (le double `.bfill()` est désormais un seul helper `_bfill`). ✅ PR #61.
 - [ ] Évaluer cache de la matrice de covariance entre steps consécutifs dans
   `rolling_allocation()` (O(N²) par step, 100 steps × 250 assets = coûteux)
 
 ### 6.3 Optimisations rolling.py / _base.py
 
-- [ ] `rolling.py _training()` : supprimer les `print` de debug dans le hot loop
-- [ ] `_base.py _set_data()` : utiliser `X.to_numpy(dtype=np.float64, copy=False)`
-  pour les DataFrames afin d'éviter les copies accidentelles
+- [x] `rolling.py _training()` : `print` de debug supprimés. ✅ PR #58.
+- [x] `_base.py _set_data()` : entrée pandas remplacée par polars (`X.to_numpy()`).
+  ✅ PR #61. (Reste optionnel : passer `dtype=np.float64` à `to_numpy`.)
 
 ### 6.4 Migrer les TODO inline
 
 - [ ] Passer en revue les ~15 commentaires `# TODO` / `# FIXME` dans le code
   (metrics.py, _base.py, allocation.py, _wrappers.py, backtest/) et fermer
   ou migrer vers TODO.md ceux qui restent pertinents
+
+
+## 8. Qualité & dette technique (audit 2026-06-14)
+
+Items issus de l'audit complet du dépôt **non couverts ailleurs** dans cette
+roadmap. Le reste de l'audit a déjà été traité (PRs #58–#62) ou figure dans les
+sections 3, 5 et 6 ci-dessus.
+
+### 8.1 `estimator/estimator.py` — décider du sort
+- [ ] `estimation()` est annoncée « NOT YET WORKING ! » / « NEED TO FIND AN
+  OPTIMIZER » mais reste exposée. La finir (brancher un optimiseur correct) **ou**
+  la marquer explicitement expérimentale / la retirer.
+
+### 8.2 Typage : résorber les 104 erreurs mypy puis ajouter le gate CI
+- [ ] `mypy fynance/` = 104 erreurs (bruit numpy-2 `Returning Any`, hiérarchies
+  torch `predict`/`train_on` incompatibles, `print_stats.py` variable `bool`
+  réassignée en `ndarray`). Les corriger par lots.
+- [ ] Une fois à 0, ajouter un job `mypy` dans `ci.yml` (à côté de
+  ruff / interrogate / docs).
+
+### 8.3 Couverture du cœur causal
+- [ ] `models/rolling.py` (64 %) — couvrir la boucle d'entraînement `_training`.
+- [ ] `algorithms/rolling.py` (22 %) — walk-forward allocation.
+- [ ] `models/econometric_models.py` (54 %) — chemins ARMA/GARCH.
+- [ ] `algorithms/browsers.py` (0 %) — clarifier le rôle puis tester ou retirer.
+
+### 8.4 Tests de propriété (transformer des conventions en garde-fous)
+- [ ] **Parité py ↔ cy** : suite paramétrée
+  `assert np.allclose(py_impl(x), cy_impl(x))` pour chaque paire
+  `metrics` / `momentums` / `roll_functions` (aurait attrapé le faux-FIXME
+  `momentums_cy.pyx:26`).
+- [ ] **Non-lookahead générique** : perturber `X[t+1:]` et vérifier que `f(X)[t]`
+  est inchangé, pour chaque feature rolling.
+
+### 8.5 Compléter les inventaires de doc/dev
+- [ ] Ajouter `features/money_management.py`, `_exceptions.py` et le sous-package
+  `models/loss/` aux inventaires de `01-overview.md` / `04-subpackages.md`.
