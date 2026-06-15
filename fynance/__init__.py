@@ -69,12 +69,13 @@ from .estimator import *
 from .features import *
 from .metrics import *
 from .models import *
+from .plot import *
 from .portfolio import *
 
 # Aggregate each subpackage's public surface. Use ``sys.modules`` rather than the
 # package attributes, which a star import may have shadowed with a name that
 # collides with a submodule (e.g. the ``backtest`` engine function).
-for _name in ("models", "estimator", "features", "metrics", "backtest", "portfolio"):
+for _name in ("models", "estimator", "features", "metrics", "plot", "backtest", "portfolio"):
     __all__ += _sys.modules[f"{__name__}.{_name}"].__all__
 
 # Restore the subpackage attribute shadowed by such a collision so that
