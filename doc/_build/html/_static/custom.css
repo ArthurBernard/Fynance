@@ -1,0 +1,444 @@
+/* ========================================================================== */
+/*                       FYNANCE — Custom Furo styling                        */
+/* ========================================================================== */
+
+/* === Page logo header (top navbar) ======================================== */
+:root { --navbar-height: 3.5rem; }
+
+.page-logo-header {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 1.5rem;
+    height: var(--navbar-height);
+    background: var(--color-sidebar-background);
+    border-bottom: 1px solid var(--color-sidebar-background-border);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+.page-logo-header__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+.page-logo-header img {
+    height: 2rem;
+    width: auto;
+}
+.page-logo-header__name {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-foreground-primary);
+    letter-spacing: -0.01em;
+}
+.page-logo-header__nav {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: auto;
+}
+.page-logo-header__nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-foreground-secondary);
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+.page-logo-header__nav-link:hover {
+    background: var(--color-background-hover);
+    color: var(--color-foreground-primary);
+}
+.page-logo-header__icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+/* Offset Furo's sticky sidebar and TOC to sit below the header */
+.sidebar-sticky { top: var(--navbar-height) !important; }
+.toc-sticky     { top: var(--navbar-height) !important; }
+
+/* === Responsive: compact header on small screens ========================= */
+@media (max-width: 700px) {
+    :root { --navbar-height: 5.5rem; }
+    .page-logo-header {
+        flex-wrap: wrap;
+        align-content: center;
+        height: auto;
+        min-height: var(--navbar-height);
+        padding: 0.35rem 1rem;
+        row-gap: 0.1rem;
+    }
+    /* Brand takes full width → nav wraps to second row */
+    .page-logo-header__brand { flex: 0 0 100%; }
+    .page-logo-header__nav {
+        margin-left: 0;
+        width: 100%;
+        justify-content: flex-start;
+    }
+    .page-logo-header__nav-link {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.8rem;
+    }
+    .page-logo-header img { height: 1.5rem; }
+    .page-logo-header__name { font-size: 1rem; }
+}
+
+/* Divider between nav groups */
+.page-logo-header__divider {
+    display: inline-block;
+    width: 1px;
+    height: 1.25rem;
+    background: var(--color-sidebar-background-border);
+    margin: 0 0.25rem;
+}
+
+/* === Homepage hero header ================================================= */
+.hero-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin: 0.5rem 0 1.5rem;
+}
+.hero-header img {
+    height: 180px;
+    width: auto;
+    flex-shrink: 0;
+}
+
+/* === Badge row ============================================================ */
+.badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    align-items: center;
+    margin: 0.75rem 0 1.25rem;
+    padding: 0;
+}
+.badge-row img { vertical-align: middle; }
+.hero-title {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 2rem !important;
+    font-weight: 700;
+    color: var(--color-foreground-primary);
+    border: none !important;
+}
+/* Hide the RST-generated duplicate h1 on the homepage */
+section.hidden-rst-title > h1 {
+    display: none;
+}
+
+/* ========================================================================== */
+/*                       AXE 4 — Sidebar: related projects                    */
+/* ========================================================================== */
+
+.sidebar-related-projects {
+    padding: 0.6rem 1rem 0.8rem;
+    border-top: 1px solid var(--color-background-border);
+    margin-top: 0.5rem;
+}
+
+.sidebar-related-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-foreground-muted);
+    margin: 0 0 0.5rem;
+}
+
+.sidebar-related-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-related-list li {
+    margin: 0.2rem 0;
+}
+
+.sidebar-related-list a {
+    font-size: 0.84rem;
+    color: var(--color-foreground-primary);
+    text-decoration: none;
+    display: block;
+    padding: 0.1rem 0;
+}
+
+.sidebar-related-list a:hover {
+    color: var(--color-brand-primary);
+}
+
+/* === Web fonts ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* === Typography =========================================================== */
+:root {
+    --font-stack: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-stack--monospace: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+}
+
+/* === Base typography ===================================================== */
+body {
+    font-feature-settings: 'cv11', 'ss01', 'ss03';
+}
+article {
+    line-height: 1.65;
+}
+
+/* ========================================================================== */
+/*                       AXE 2 — Class pages                                  */
+/* ========================================================================== */
+
+/* === Class header card =================================================== */
+/* Furo signatures use padding-left:3em + text-indent:-2.5em for hanging
+   indent on wrapped lines. Keep that; just shift the whole block right so
+   the border-left doesn't overlap the first character of "class". */
+dl.py.class > dt:first-child {
+    background: linear-gradient(to right,
+        var(--color-api-background),
+        color-mix(in srgb, var(--color-api-background) 20%, transparent) 80%);
+    border-left: 4px solid var(--color-brand-primary);
+    border-radius: 6px;
+    padding: 0.9rem 1.2rem 0.9rem 3.5em;  /* 3em (furo) + ~0.5em margin */
+    font-size: 1.05rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    margin-bottom: 1.5rem;
+}
+
+/* === Method / attribute / property cards ================================= */
+dl.py.method,
+dl.py.attribute,
+dl.py.property,
+dl.py.classmethod,
+dl.py.staticmethod {
+    background: var(--color-background-secondary);
+    border: 1px solid var(--color-background-border);
+    border-radius: 6px;
+    margin: 1.2rem 0;
+    padding: 0;
+    overflow: hidden;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+dl.py.method:hover,
+dl.py.attribute:hover,
+dl.py.property:hover,
+dl.py.classmethod:hover,
+dl.py.staticmethod:hover {
+    border-color: color-mix(in srgb, var(--color-brand-primary) 35%, var(--color-background-border));
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+/* Card header (signature row) */
+dl.py.method > dt:first-child,
+dl.py.attribute > dt:first-child,
+dl.py.property > dt:first-child,
+dl.py.classmethod > dt:first-child,
+dl.py.staticmethod > dt:first-child {
+    background: var(--color-background-hover);
+    padding: 0.7rem 1rem;
+    margin: 0;
+    border-bottom: 1px solid var(--color-background-border);
+}
+
+/* Card body (description + field-lists) */
+dl.py.method > dd,
+dl.py.attribute > dd,
+dl.py.property > dd,
+dl.py.classmethod > dd,
+dl.py.staticmethod > dd {
+    padding: 0.9rem 1rem;
+    margin: 0;
+}
+
+/* === Member type chips (method / property / attribute …) ================= */
+dl.py.method > dt:first-child::before,
+dl.py.classmethod > dt:first-child::before,
+dl.py.staticmethod > dt:first-child::before,
+dl.py.property > dt:first-child::before,
+dl.py.attribute > dt:first-child::before {
+    display: inline-block;
+    background: var(--color-brand-primary);
+    color: white;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.15rem 0.45rem;
+    border-radius: 3px;
+    margin-right: 0.7rem;
+    vertical-align: middle;
+    font-family: var(--font-stack);
+}
+dl.py.method > dt:first-child::before      { content: "method"; }
+dl.py.classmethod > dt:first-child::before { content: "classmethod"; }
+dl.py.staticmethod > dt:first-child::before { content: "static"; }
+dl.py.property > dt:first-child::before    { content: "property"; background: #6b7280; }
+dl.py.attribute > dt:first-child::before   { content: "attribute"; background: #6b7280; }
+
+/* "class" keyword chip in class header */
+dl.py.class > dt:first-child em.property {
+    background: var(--color-brand-primary);
+    color: white;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    font-style: normal;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-right: 0.7rem;
+    font-family: var(--font-stack);
+}
+
+/* === Field lists (Parameters / Returns / Raises) ========================= */
+dl.field-list > dt {
+    background: transparent;
+    border-bottom: 2px solid var(--color-brand-primary);
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--color-brand-content);
+    padding: 0.4rem 0;
+    margin-top: 1rem;
+    display: inline-block;
+}
+dl.field-list > dd {
+    margin-bottom: 1rem;
+    padding-left: 0.4rem;
+}
+/* Parameter names */
+dl.field-list > dd strong {
+    color: var(--color-foreground-primary);
+    font-family: var(--font-stack--monospace);
+    font-size: 0.92em;
+    background: var(--color-background-hover);
+    padding: 0.05rem 0.4rem;
+    border-radius: 3px;
+}
+
+/* === Rubrics (Notes / Examples / References) ============================= */
+.rubric {
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-brand-content);
+    border-bottom: 2px solid var(--color-brand-primary);
+    padding-bottom: 0.3rem;
+    margin: 1.6rem 0 0.8rem;
+}
+
+/* === "See also" admonition =============================================== */
+.admonition.seealso {
+    border-left-color: var(--color-brand-primary);
+    background: transparent;
+}
+.admonition.seealso > .admonition-title {
+    background: transparent;
+    color: var(--color-brand-content);
+    text-transform: uppercase;
+    font-size: 0.82rem;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+}
+
+/* === numpydoc Methods / Attributes tables ================================ */
+table.docutils {
+    border: 1px solid var(--color-background-border);
+    border-radius: 6px;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    width: 100%;
+    margin: 0.8rem 0 1.5rem;
+}
+table.docutils th,
+table.docutils td {
+    padding: 0.55rem 0.85rem;
+    vertical-align: top;
+    border-top: none;
+    border-bottom: 1px solid var(--color-background-border);
+}
+table.docutils tr:last-child td {
+    border-bottom: none;
+}
+table.docutils th {
+    background: var(--color-background-hover);
+    border-bottom: 2px solid var(--color-brand-primary);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-brand-content);
+}
+table.docutils tbody tr:hover {
+    background: color-mix(in srgb, var(--color-brand-primary) 5%, transparent);
+}
+
+/* ========================================================================== */
+/*                       AXE 3 — Navigation polish                            */
+/* ========================================================================== */
+
+/* === Anchor links visible on hover only ================================== */
+.headerlink {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    margin-left: 0.4rem;
+    text-decoration: none;
+}
+h1:hover > .headerlink,
+h2:hover > .headerlink,
+h3:hover > .headerlink,
+h4:hover > .headerlink,
+h5:hover > .headerlink,
+h6:hover > .headerlink,
+dt:hover > .headerlink {
+    opacity: 0.55;
+}
+.headerlink:hover {
+    opacity: 1 !important;
+}
+
+/* === Active sidebar item ================================================= */
+.sidebar-tree .current-page > .reference,
+.sidebar-tree .current > .reference {
+    background: color-mix(in srgb, var(--color-brand-primary) 12%, transparent);
+    border-left: 3px solid var(--color-brand-primary);
+    font-weight: 600;
+}
+
+/* === Inline code in body text ============================================ */
+code.literal {
+    background: color-mix(in srgb, var(--color-brand-primary) 8%, var(--color-background-secondary));
+    padding: 0.08rem 0.35rem;
+    border-radius: 3px;
+    font-size: 0.88em;
+}
+
+/* === sphinx-design cards on landing ====================================== */
+.sd-card {
+    border: 1px solid var(--color-background-border) !important;
+    border-radius: 8px !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.sd-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-brand-primary) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+.sd-card-title {
+    color: var(--color-brand-content) !important;
+    font-weight: 700;
+}
