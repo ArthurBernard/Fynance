@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking Changes
 
+### Added
+
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [2.0.0] - 2026-06-15
+
+### Breaking Changes
+
 - **2.0 refactor** into a layered ML/DL backtesting tool. No compatibility shims; see [`doc/MIGRATION-2.0.md`](doc/MIGRATION-2.0.md).
 - `fynance.algorithms` renamed to **`fynance.portfolio`** (allocation + sizing).
 - Performance metrics moved out of `fynance.features` into **`fynance.metrics`** (`sharpe`, `sortino`, `calmar`, `diversified_ratio`, `annual_return`/`annual_volatility`, `drawdown`, `mdd`, `perf_*`, `returns_strat`, `roll_*`); the `fynance.features.metrics` aggregator is removed. `mad`/`roll_mad` moved to `fynance.features.stats`.
