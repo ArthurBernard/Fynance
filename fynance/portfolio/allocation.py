@@ -41,7 +41,7 @@ from numpy.typing import NDArray
 from scipy.optimize import Bounds, LinearConstraint, minimize
 
 # Local packages
-from fynance.features.metrics import diversified_ratio
+from fynance.metrics import diversified_ratio
 
 __all__ = ['ERC', 'HRP', 'IVP', 'MDP', 'MVP', 'MVP_uc', 'rolling_allocation']
 

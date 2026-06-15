@@ -35,7 +35,7 @@ class DirectionalAccuracyLoss(BaseLoss):
     produces a harder approximation closer to the true 0/1 accuracy.
 
     **This is a training proxy** — the value is not comparable to the
-    numpy :func:`~fynance.features.metrics.directional_accuracy` metric,
+    numpy :func:`~fynance.features.stats.directional_accuracy` metric,
     which returns a hard 0/1 fraction.
 
     Parameters

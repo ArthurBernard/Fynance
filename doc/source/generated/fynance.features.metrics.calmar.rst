@@ -1,9 +1,0 @@
-﻿calmar
-===============================
-
-*Defined in* :mod:`fynance.features.metrics`
-
-.. currentmodule:: fynance.features.metrics
-
-.. autofunction:: calmar
-   :no-index:
