@@ -452,8 +452,7 @@ def MVP(
         try:
             iv = np.linalg.pinv(mat_cov)
         except np.linalg.LinAlgError:
-            print(mat_cov)
-            raise np.linalg.LinAlgError
+            raise
 
     e = np.ones([iv.shape[0], 1])
     w = (iv @ e) / (e.T @ iv @ e)
