@@ -13,11 +13,7 @@
 # External packages
 import numpy as np
 
-from fynance.estimator.estimator_cy import loglikelihood_cy
-from fynance.models.econometric_models import get_parameters
-
-# Internal packages
-from fynance.models.econometric_models_cy import ARMA_cy, ARMA_GARCH_cy
+from fynance.models.econometric_models import ARMA, ARMA_GARCH, get_parameters
 
 __all__ = ['estimation', 'target_function', 'loglikelihood']
 
@@ -60,25 +56,33 @@ def target_function(params, y, p=0, q=0, Q=0, P=0, cons=True, model='arch'):
     )
 
     if model.lower() == 'arch' or model.lower() == 'garch':
-        u, h = ARMA_GARCH_cy(
-            y, phi, theta, alpha, beta, c, omega, p, q, Q, P
-        )
+        u, h = ARMA_GARCH(y, phi, theta, alpha, beta, c, omega, p, q, Q, P)
 
     elif model.lower() == 'arma':
-        u = ARMA_cy(y, phi, theta, c, p, q)
+        u = ARMA(y, phi, theta, c, p, q)
         h = np.ones([u.size], dtype=np.float64)
 
     else:
         raise ValueError(f"Unknown model: {model!r}")
 
-    L = loglikelihood_cy(u, h)
-
-    return L
+    return _loglikelihood(u, h)
 
 
 # =========================================================================== #
 #                                DISTRIBUTION                                 #
 # =========================================================================== #
+
+
+def _loglikelihood(u, h):
+    """ Normal log-likelihood (matches the former Cython ``loglikelihood_cy``).
+
+    Adds a 1e-8 floor to every conditional variance term (not only zeros), as
+    the Cython implementation did; used internally by :func:`target_function`.
+    """
+    h2 = np.square(h) + 1e-8
+    L = u.size * np.log(2 * np.pi) + np.sum(np.log(h2)) + np.sum(np.square(u) / h2)
+
+    return 0.5 * L
 
 
 def loglikelihood(u, h):

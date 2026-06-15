@@ -31,11 +31,8 @@ else:
 include_dirs = [numpy.get_include(), '.']
 
 extensions = [
-    Extension(
-        'fynance.models.econometric_models_cy',
-        ['fynance/models/econometric_models_cy' + ext],
-        include_dirs=include_dirs,
-    ),
+    # NOTE: the econometric (ARMA/GARCH) and estimator kernels were ported to
+    # numba (@njit) in 2.1; only the features kernels remain in Cython.
     Extension(
         'fynance.features.metrics_cy',
         ['fynance/features/metrics_cy' + ext],
@@ -44,11 +41,6 @@ extensions = [
     Extension(
         'fynance.features.momentums_cy',
         ['fynance/features/momentums_cy' + ext],
-        include_dirs=include_dirs,
-    ),
-    Extension(
-        'fynance.estimator.estimator_cy',
-        ['fynance/estimator/estimator_cy' + ext],
         include_dirs=include_dirs,
     ),
     Extension(

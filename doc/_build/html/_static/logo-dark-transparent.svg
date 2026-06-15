@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="237 200 570 570" width="256" height="256">
+<defs>
+<style>
+.struct{fill:#a4adb8;} .green{fill:url(#gGreen);} .red{fill:url(#gRed);}
+.edge{stroke:url(#gEdge);stroke-width:3;stroke-linecap:round;fill:none;}
+.node{fill:url(#gNode);} .wick{stroke:#a4adb8;stroke-width:6;stroke-linecap:round;}
+.cwick{stroke:#a4adb8;stroke-width:5;stroke-linecap:round;} .body{stroke:#a4adb8;stroke-width:3;}
+</style>
+<radialGradient id="gNode" cx="40%" cy="35%" r="75%">
+  <stop offset="0%" stop-color="#6ea8ff"/><stop offset="100%" stop-color="#2f6df0"/>
+</radialGradient>
+<linearGradient id="gEdge" x1="0" y1="0" x2="1" y2="0">
+  <stop offset="0%" stop-color="#566b82" stop-opacity="0.55"/>
+  <stop offset="50%" stop-color="#566b82" stop-opacity="0.95"/>
+  <stop offset="100%" stop-color="#566b82" stop-opacity="0.55"/>
+</linearGradient>
+<linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#2ec45f"/><stop offset="100%" stop-color="#15923a"/>
+</linearGradient>
+<linearGradient id="gRed" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#ff463b"/><stop offset="100%" stop-color="#cf1410"/>
+</linearGradient>
+<filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+  <feGaussianBlur stdDeviation="6" result="b"/>
+  <feFlood flood-color="#5b93ff" flood-opacity="0.75"/>
+  <feComposite in2="b" operator="in" result="g"/>
+  <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+</filter>
+<filter id="softshadow" x="-30%" y="-30%" width="160%" height="160%">
+  <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.18"/>
+</filter>
+<linearGradient id="gArc" x1="0" y1="0" x2="0.5" y2="1">
+  <stop offset="0%" stop-color="#c3ccd6"/>
+  <stop offset="55%" stop-color="#7f8a97"/>
+  <stop offset="100%" stop-color="#5a636e"/>
+</linearGradient>
+<filter id="bevel" x="-20%" y="-20%" width="140%" height="140%">
+  <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+  <feSpecularLighting in="blur" surfaceScale="4" specularConstant="0.8" specularExponent="18" lighting-color="#ffffff" result="spec">
+    <fePointLight x="350" y="180" z="260"/>
+  </feSpecularLighting>
+  <feComposite in="spec" in2="SourceAlpha" operator="in" result="spec2"/>
+  <feComposite in="SourceGraphic" in2="spec2" operator="arithmetic" k1="0" k2="1" k3="0.55" k4="0"/>
+</filter>
+</defs>
+
+<g filter="url(#glow)"><line class="edge" x1="302" y1="367" x2="432" y2="392"/><line class="edge" x1="302" y1="367" x2="432" y2="466"/><line class="edge" x1="302" y1="367" x2="432" y2="541"/><line class="edge" x1="302" y1="442" x2="432" y2="392"/><line class="edge" x1="302" y1="442" x2="432" y2="466"/><line class="edge" x1="302" y1="442" x2="432" y2="541"/><line class="edge" x1="302" y1="516" x2="432" y2="392"/><line class="edge" x1="302" y1="516" x2="432" y2="466"/><line class="edge" x1="302" y1="516" x2="432" y2="541"/><line class="edge" x1="302" y1="590" x2="432" y2="392"/><line class="edge" x1="302" y1="590" x2="432" y2="466"/><line class="edge" x1="302" y1="590" x2="432" y2="541"/><line class="edge" x1="432" y1="392" x2="593" y2="392"/><line class="edge" x1="432" y1="392" x2="593" y2="466"/><line class="edge" x1="432" y1="392" x2="593" y2="541"/><line class="edge" x1="432" y1="466" x2="593" y2="392"/><line class="edge" x1="432" y1="466" x2="593" y2="466"/><line class="edge" x1="432" y1="466" x2="593" y2="541"/><line class="edge" x1="432" y1="541" x2="593" y2="392"/><line class="edge" x1="432" y1="541" x2="593" y2="466"/><line class="edge" x1="432" y1="541" x2="593" y2="541"/><line class="edge" x1="593" y1="392" x2="742" y2="442"/><line class="edge" x1="593" y1="392" x2="742" y2="516"/><line class="edge" x1="593" y1="466" x2="742" y2="442"/><line class="edge" x1="593" y1="466" x2="742" y2="516"/><line class="edge" x1="593" y1="541" x2="742" y2="442"/><line class="edge" x1="593" y1="541" x2="742" y2="516"/><circle class="node" cx="302" cy="367" r="11"/><circle class="node" cx="302" cy="442" r="11"/><circle class="node" cx="302" cy="516" r="11"/><circle class="node" cx="302" cy="590" r="11"/><circle class="node" cx="432" cy="392" r="10"/><circle class="node" cx="432" cy="466" r="10"/><circle class="node" cx="432" cy="541" r="10"/><circle class="node" cx="593" cy="392" r="10"/><circle class="node" cx="593" cy="466" r="10"/><circle class="node" cx="593" cy="541" r="10"/><circle class="node" cx="742" cy="442" r="12"/><circle class="node" cx="742" cy="516" r="12"/></g>
+<g filter="url(#softshadow)">
+<g filter="url(#bevel)">
+<path fill="url(#gArc)" d="M 506 304 A 168 174 0 0 0 506 652 A 92 174 0 0 1 506 304 Z"/>
+<path fill="url(#gArc)" d="M 518 304 A 168 174 0 0 1 518 652 A 92 174 0 0 0 518 304 Z"/>
+</g>
+</g>
+<line class="wick" x1="512" y1="250" x2="512" y2="720"/>
+<line class="cwick" x1="460" y1="455" x2="460" y2="512"/><line class="cwick" x1="494" y1="492" x2="494" y2="535"/>
+<line class="cwick" x1="528" y1="462" x2="528" y2="532"/><line class="cwick" x1="562" y1="388" x2="562" y2="482"/>
+<rect class="red body" x="449" y="470" width="22" height="30" rx="2"/><rect class="red body" x="483" y="500" width="22" height="20" rx="2"/>
+<rect class="green body" x="517" y="470" width="22" height="50" rx="2"/><rect class="green body" x="551" y="400" width="22" height="70" rx="2"/>
+</svg>
