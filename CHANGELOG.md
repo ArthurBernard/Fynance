@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `import fynance` no longer eagerly imports matplotlib/seaborn (lazy in the rolling-NN live-viz path); the legacy `backtest` plot objects (`PlotBackTest`/`DynaPlotBackTest`/`display_perf`) are no longer on the eager public surface (still importable as submodules). Plotting/reporting is `fynance.plot`.
+
 ### Fixed
 
 - `ARMAX_GARCH`: the external-regressor coefficients (`psi`) and MA coefficients (`theta`) were swapped between the public wrapper and the kernel, so `psi` was applied to past residuals instead of the exogenous regressor `x` (a long-standing bug, preserved verbatim through the Cython→numba port). Fixed; `ARMA_GARCH` was unaffected.
