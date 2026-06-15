@@ -22,16 +22,16 @@ Turn the toolbox into a complete layered ML/DL backtesting tool
 **Detailed plan tree:** `doc/dev/plans/v2-refactor/` (global `00-plan.md` +
 per-epic `EN-*/00-plan.md` + per-task leaves). Ships epic-by-epic, leaf = 1 PR.
 
-- [ ] **E1 core** — `PriceSeries`, Protocol seams, numpy/torch bridges
-- [ ] **E2 data** — DataSource port, CSV/Parquet adapters, align, temporal splits
-- [ ] **E3 features+metrics** — regroup features, extract perf-metrics → `metrics/`
-- [ ] **E4 backtest** — CostModel + vectorized engine → `BacktestResult`
-- [ ] **E5 reporting** — metrics consolidation, `plot/`, `tearsheet()`
-- [ ] **E6 signal+portfolio** — `signal/` mappers, `portfolio/` (ex-algorithms)
-- [ ] **E7 models+numba** — estimator→numba, drop Cython, SignalModel conformance
-- [ ] **E8 strategy** — optional orchestrator + walk-forward run
-- [ ] **E9 ui** — optional Streamlit playground (deferrable to 2.1)
-- [ ] **E10 docs** — Sphinx restructure, example notebook, README + migration guide
+- [x] **E1 core** — `PriceSeries`, Protocol seams, numpy/torch bridges
+- [x] **E2 data** — DataSource port, CSV/Parquet adapters, align, temporal splits
+- [x] **E3 features+metrics** — regroup features, extract perf-metrics → `metrics/`
+- [x] **E4 backtest** — CostModel + vectorized engine → `BacktestResult`
+- [x] **E5 reporting** — metrics consolidation, `plot/`, `tearsheet()`
+- [x] **E6 signal+portfolio** — `signal/` mappers, `portfolio/` (ex-algorithms)
+- [ ] **E7 models+numba** — estimator→numba, drop Cython, SignalModel conformance  *(only epic remaining; correctness-critical numba port — deliberately deferred, non-blocking for v2.0.0)*
+- [x] **E8 strategy** — optional orchestrator + walk-forward run
+- [x] **E9 ui** — optional Streamlit playground (deferrable to 2.1)
+- [x] **E10 docs** — Sphinx restructure, example notebook, README + migration guide
 
 Order: E1 → (E2 ∥ E3 ∥ E6 ∥ E7) → E4 → E5 → E8 → (E9 ∥ E10).
 
