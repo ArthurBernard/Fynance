@@ -442,7 +442,7 @@ def ARMAX_GARCH(y, x, phi, psi, theta, alpha, beta, c, omega, p, q, Q, P):
 
     # Compute residuals and volatility
     u, h = _armax_garch(
-        y, x, phi, theta, psi, alpha, beta, float(c), float(omega), int(p),
+        y, x, phi, psi, theta, alpha, beta, float(c), float(omega), int(p),
         int(q), int(Q), int(P)
     )
 
