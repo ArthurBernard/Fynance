@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking Changes
 
+### Added
+
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [2.0.0] - 2026-06-15
+
+### Breaking Changes
+
 - **2.0 refactor** into a layered ML/DL backtesting tool. No compatibility shims; see [`doc/MIGRATION-2.0.md`](doc/MIGRATION-2.0.md).
 - `fynance.algorithms` renamed to **`fynance.portfolio`** (allocation + sizing).
 - Performance metrics moved out of `fynance.features` into **`fynance.metrics`** (`sharpe`, `sortino`, `calmar`, `diversified_ratio`, `annual_return`/`annual_volatility`, `drawdown`, `mdd`, `perf_*`, `returns_strat`, `roll_*`); the `fynance.features.metrics` aggregator is removed. `mad`/`roll_mad` moved to `fynance.features.stats`.
@@ -21,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`fynance.plot`** — composable matplotlib figures and a one-call `tearsheet`/`tearsheet_text`.
 - **`fynance.signal`** — prediction→position mappers (`sign`, `threshold`, `rank`, `vol_target_position`) and `SignalPipeline`.
 - **`fynance.strategy.Strategy`** — optional orchestrator composing the pipeline, with `run` and no-lookahead `run_walk_forward`.
-- Top-level API: key names re-exported on `fynance` (`PriceSeries`, `load`, `Strategy`, `tearsheet`, `backtest`, …).
+- Top-level API: key names re-exported on `fynance` (`PriceSeries`, `load`, `Strategy`, `tearsheet`, `sharpe`, `summary`, …). The vectorized engine is `fynance.backtest.backtest` (the `backtest` attribute on `fynance` is the subpackage).
 - Optional **Streamlit playground** (`apps/playground/`, `pip install -e ".[ui]"`).
 - `Notebooks/quickstart_v2.ipynb` end-to-end tour; Sphinx pages for every 2.0 subpackage; `doc/MIGRATION-2.0.md`.
 
@@ -32,6 +46,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 
 ### Removed
+
+- Dead legacy `fynance.core.series.Series` (a `numpy.ndarray` subclass superseded by `PriceSeries`); it was never part of the public `fynance` namespace.
 
 ## [1.6.0] - 2026-06-14
 

@@ -82,24 +82,32 @@ def test_swappable_signal_slot():
 
 
 def test_walk_forward_no_lookahead():
-    class LastSignModel:
+    # A model that *genuinely depends on y* (so the probe is not vacuous).
+    class MeanSignModel:
         def fit(self, X, y):
+            self.bias = float(np.mean(y))
             return self
 
         def predict(self, X):
-            X = np.asarray(X)
-            return np.sign(np.diff(X, prepend=X[0]))
+            return np.full(np.asarray(X).shape[0], self.bias)
 
     prices = _prices(400)
     y = np.sign(np.diff(prices, prepend=prices[0]))
-    strat = Strategy(model=LastSignModel(), signal=sign)
+    strat = Strategy(model=MeanSignModel(), signal=sign)
     base = strat.run_walk_forward(prices, y, train=100, test=20, step=20)
     assert isinstance(base, BacktestResult)
     assert np.isfinite(base.summary()["sharpe"])
 
-    # corrupting the far-future target must not change the result
-    y2 = y.copy()
-    y2[-30:] *= -1
-    pert = strat.run_walk_forward(prices, y2, train=100, test=20, step=20)
-    # OOS coverage identical in length
-    assert base.equity.shape == pert.equity.shape
+    # No-lookahead: perturbing the FUTURE (last 40 obs of prices and targets)
+    # must leave every out-of-sample position that predates it unchanged.
+    cut = len(prices) - 40
+    p2 = prices.copy()
+    p2[cut:] *= 1.2
+    y2 = np.sign(np.diff(p2, prepend=p2[0]))
+    pert = strat.run_walk_forward(p2, y2, train=100, test=20, step=20)
+
+    assert base.positions.shape == pert.positions.shape
+    # positions whose window ends before the perturbation are identical
+    prefix = cut - 100 - 40  # conservative: before any window touching the tail
+    assert prefix > 0
+    assert np.allclose(base.positions[:prefix], pert.positions[:prefix])
