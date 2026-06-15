@@ -25,14 +25,81 @@ from __future__ import annotations
 # Built-in packages
 # Third party packages
 import numpy as np
+
+# Local packages
+from numba import njit
 from numpy.typing import NDArray
 
 from fynance._wrappers import WrapperArray
 
-# Local packages
-from fynance.features.roll_functions_cy import *
-
 __all__ = ["roll_min", "roll_max"]
+
+
+@njit(cache=True)
+def _roll_min_1d(X, w):
+    """ Rolling minimum over a trailing window of size ``w`` (numba). """
+    T = X.shape[0]
+    out = np.empty(T, dtype=np.float64)
+    for t in range(T):
+        i = max(0, t - w + 1)
+        m = X[i]
+        while i < t:
+            i += 1
+            if X[i] < m:
+                m = X[i]
+        out[t] = m
+    return out
+
+
+@njit(cache=True)
+def _roll_min_2d(X, w):
+    """ Column-wise rolling minimum (numba). """
+    T, N = X.shape
+    out = np.empty((T, N), dtype=np.float64)
+    for n in range(N):
+        for t in range(T):
+            i = max(0, t - w + 1)
+            m = X[i, n]
+            while i < t:
+                i += 1
+                if X[i, n] < m:
+                    m = X[i, n]
+            out[t, n] = m
+    return out
+
+
+@njit(cache=True)
+def _roll_max_1d(X, w):
+    """ Rolling maximum over a trailing window of size ``w`` (numba). """
+    T = X.shape[0]
+    out = np.empty(T, dtype=np.float64)
+    for t in range(T):
+        i = max(0, t - w + 1)
+        m = X[i]
+        while i < t:
+            i += 1
+            if X[i] > m:
+                m = X[i]
+        out[t] = m
+    return out
+
+
+@njit(cache=True)
+def _roll_max_2d(X, w):
+    """ Column-wise rolling maximum (numba). """
+    T, N = X.shape
+    out = np.empty((T, N), dtype=np.float64)
+    for n in range(N):
+        for t in range(T):
+            i = max(0, t - w + 1)
+            m = X[i, n]
+            while i < t:
+                i += 1
+                if X[i, n] > m:
+                    m = X[i, n]
+            out[t, n] = m
+    return out
+
 
 
 # =========================================================================== #
@@ -100,9 +167,9 @@ def roll_min(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDA
 def _roll_min(X, w):
     if len(X.shape) == 2:
 
-        return np.asarray(roll_min_cy_2d(X, w))
+        return _roll_min_2d(X, w)
 
-    return np.asarray(roll_min_cy_1d(X, w))
+    return _roll_min_1d(X, w)
 
 
 @WrapperArray('dtype', 'axis', 'window')
@@ -165,6 +232,6 @@ def roll_max(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDA
 def _roll_max(X, w):
     if len(X.shape) == 2:
 
-        return np.asarray(roll_max_cy_2d(X, w))
+        return _roll_max_2d(X, w)
 
-    return np.asarray(roll_max_cy_1d(X, w))
+    return _roll_max_1d(X, w)

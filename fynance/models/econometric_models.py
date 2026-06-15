@@ -31,7 +31,96 @@ import numpy as np
 import polars as pl
 
 # Local packages
-from fynance.models.econometric_models_cy import *
+from numba import njit
+
+
+@njit(cache=True)
+def _ma(y, theta, c, q):
+    """ MA(q) residual recursion (numba kernel). """
+    T = y.size
+    u = np.zeros(T)
+    for t in range(T):
+        s = 0.0
+        for i in range(min(t, q)):
+            s += u[t - i - 1] * theta[i]
+        if s > 1e12 or s < -1e12:
+            return 1e6 * np.ones(T)
+        u[t] = y[t] - c - s
+    return u
+
+
+@njit(cache=True)
+def _arma(y, phi, theta, c, p, q):
+    """ ARMA(p, q) residual recursion (numba kernel). """
+    T = y.size
+    u = np.zeros(T)
+    for t in range(T):
+        s = 0.0
+        for i in range(min(t, max(q, p))):
+            if i < q:
+                s += u[t - i - 1] * theta[i]
+            if i < p:
+                s += y[t - i - 1] * phi[i]
+            if s > 1e12 or s < -1e12:
+                return 1e6 * np.ones(T)
+        u[t] = y[t] - c - s
+    return u
+
+
+@njit(cache=True)
+def _arma_garch(y, phi, theta, alpha, beta, c, omega, p, q, Q, P):
+    """ ARMA(p, q)-GARCH(Q, P) residual/volatility recursion (numba kernel). """
+    T = y.size
+    u = np.zeros(T)
+    h = np.zeros(T)
+    for t in range(T):
+        arma = 0.0
+        arch = 0.0
+        for i in range(min(t, max(max(q, p), max(Q, P)))):
+            if i < p:
+                arma += y[t - i - 1] * phi[i]
+            if i < q:
+                arma += u[t - i - 1] * theta[i]
+            if i < Q:
+                arch += u[t - i - 1] ** 2 * alpha[i]
+            if i < P:
+                arch += h[t - i - 1] ** 2 * beta[i]
+            if arch < 0.0:
+                return 1e8 * np.ones(T), np.ones(T)
+            if arch > 1e12 or arma > 1e12 or arma < -1e12:
+                return 1e6 * np.ones(T), np.ones(T)
+        u[t] = y[t] - c - arma
+        h[t] = np.sqrt(omega + arch)
+    return u, h
+
+
+@njit(cache=True)
+def _armax_garch(y, x, phi, psi, theta, alpha, beta, c, omega, p, q, Q, P):
+    """ ARMAX(p, q)-GARCH(Q, P) residual/volatility recursion (numba kernel). """
+    T = y.size
+    u = np.zeros(T)
+    h = np.zeros(T)
+    for t in range(T):
+        armax = 0.0
+        for k in range(x.shape[1]):
+            armax += x[t, k] * psi[k]
+        arch = 0.0
+        for i in range(min(t, max(max(q, p), max(Q, P)))):
+            if i < p:
+                armax += y[t - i - 1] * phi[i]
+            if i < q:
+                armax += u[t - i - 1] * theta[i]
+            if i < Q:
+                arch += u[t - i - 1] ** 2 * alpha[i]
+            if i < P:
+                arch += h[t - i - 1] ** 2 * beta[i]
+            if arch < 0.0:
+                return 1e8 * np.ones(T), np.ones(T)
+            if arch > 1e12 or armax > 1e12 or armax < -1e12:
+                return 1e6 * np.ones(T), np.ones(T)
+        u[t] = y[t] - c - armax
+        h[t] = np.sqrt(omega + arch)
+    return u, h
 
 __all__ = [
     'get_parameters', 'MA', 'ARMA', 'ARMA_GARCH', 'ARMAX_GARCH'
@@ -169,7 +258,7 @@ def MA(y, theta, c, q):
 
     theta = theta.astype(np.float64).reshape([theta.size])
     # Compute residuals
-    u = MA_cy(y, theta, np.float64(c), int(q))
+    u = _ma(y, theta, float(c), int(q))
 
     return u
 
@@ -213,7 +302,7 @@ def ARMA(y, phi, theta, c, p, q):
     phi = np.asarray(phi, dtype=np.float64)
 
     # Compute residuals
-    u = ARMA_cy(y, phi, theta, float(c), int(p), int(q))
+    u = _arma(y, phi, theta, float(c), int(p), int(q))
 
     return u
 
@@ -278,7 +367,7 @@ def ARMA_GARCH(y, phi, theta, alpha, beta, c, omega, p, q, Q, P):
     alpha = np.asarray(alpha, dtype=np.float64)
     beta = np.asarray(beta, dtype=np.float64)
 
-    u, h = ARMA_GARCH_cy(
+    u, h = _arma_garch(
         y, phi, theta, alpha, beta, float(c), float(omega), int(p), int(q),
         int(Q), int(P)
     )
@@ -352,7 +441,7 @@ def ARMAX_GARCH(y, x, phi, psi, theta, alpha, beta, c, omega, p, q, Q, P):
     beta = np.asarray(beta, dtype=np.float64)
 
     # Compute residuals and volatility
-    u, h = ARMAX_GARCH_cy(
+    u, h = _armax_garch(
         y, x, phi, theta, psi, alpha, beta, float(c), float(omega), int(p),
         int(q), int(Q), int(P)
     )

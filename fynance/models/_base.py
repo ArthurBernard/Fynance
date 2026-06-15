@@ -236,17 +236,50 @@ class BaseNeuralNet(torch.nn.Module):
 
         return loss
 
+    def fit(self, X, y, epochs: int = 1, x_type=None, y_type=None):
+        """ Fit the model on ``(X, y)`` for ``epochs`` full-batch steps.
+
+        Convenience wrapper that makes the network conform to the
+        :class:`~fynance.core.protocols.SignalModel` protocol: it coerces the
+        data via :meth:`set_data` and runs :meth:`train_on` ``epochs`` times.
+        An optimizer must have been registered with :meth:`set_optimizer`.
+
+        Parameters
+        ----------
+        X, y : array-like
+            Input and output data (numpy / torch / polars), shapes ``(T, N)``
+            and ``(T, M)``.
+        epochs : int
+            Number of full-batch training steps.
+        x_type, y_type : torch.dtype, optional
+            Target dtypes forwarded to :meth:`set_data`.
+
+        Returns
+        -------
+        BaseNeuralNet
+            ``self``, to allow chaining.
+
+        """
+        self.set_data(X, y, x_type=x_type, y_type=y_type)
+
+        for _ in range(epochs):
+            self.train_on(self.X, self.y)  # type: ignore[has-type]
+
+        return self
+
     @torch.no_grad()
-    def predict(self, X: torch.Tensor) -> torch.Tensor:
+    def predict(self, X) -> torch.Tensor:
         """ Predicts outputs of neural network model.
 
         Runs ``self.forward(X)`` under :func:`torch.no_grad`, so no
         autograd graph is built. The returned tensor is detached and
-        lives on the same device as the model parameters.
+        lives on the same device as the model parameters. Array-like inputs
+        (numpy / polars) are coerced to a tensor first, so the method also
+        satisfies the :class:`~fynance.core.protocols.SignalModel` contract.
 
         Parameters
         ----------
-        X : torch.Tensor
+        X : array-like
            Inputs to compute prediction. Same shape and dtype contract
            as :meth:`train_on`.
 
@@ -256,6 +289,9 @@ class BaseNeuralNet(torch.nn.Module):
            Outputs prediction (detached, gradient-free).
 
         """
+        if not isinstance(X, torch.Tensor):
+            X = self._set_data(X)
+
         return self(X).detach()
 
     def set_data(self, X: NDArray | torch.Tensor | pl.DataFrame, y: NDArray | torch.Tensor | pl.DataFrame, x_type=None, y_type=None):

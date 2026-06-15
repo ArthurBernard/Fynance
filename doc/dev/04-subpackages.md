@@ -9,9 +9,9 @@ modernisation).
 
 | Subpackage | Policy | Why |
 |---|---|---|
-| `features` (`.py` + `*_cy.pyx`) | **Extend only** — never rewrite the Cython kernels | Fast, correct, depended on; new code goes in the `.py` twin via Numba |
+| `features` (`.py`, Numba kernels) | **Extend freely** — numerical kernels are Numba `@njit` | Fast, correct, depended on |
 | `algorithms.allocation` | **Stable public API** — deprecation path required for breaking changes | Users call ERC/HRP/IVP/MDP/MVP directly |
-| `estimator` | **Cython is authoritative** — do not duplicate parameter logic in Python | One source for ARMA/GARCH estimation |
+| `estimator` / `models.econometric_models` | **Single Numba implementation** — do not duplicate parameter logic | One source for ARMA/GARCH estimation |
 | `models` | **Modernise freely** (PyTorch) | The active R&D surface |
 | `backtest` | **Improve freely** | Plotting/eval, no external API contract |
 | `core` | Shared helpers — change with care (wide blast radius) | Used everywhere |
@@ -41,7 +41,7 @@ modernisation).
   `fynance.features.metrics`) as before; the split is transparent.
 - **`estimator.estimation()`** is an experimental stub that raises
   `NotImplementedError` — use `models.econometric_models.get_parameters`
-  (Cython-backed) for ARMA/GARCH estimation.
+  (Numba-backed) for ARMA/GARCH estimation.
 - **`lstm.py`/`gru.py` internal hierarchies** (`_LSTMCell → LSTMCell →
   LongShortTermMemory`) and `_RollingBasis`/`RollMultiLayerPerceptron` are
   intentionally **not** split — too tightly coupled.

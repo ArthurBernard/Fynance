@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=68", "Cython>=3.0", "numpy>=2.0"]
+requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "fynance"
-version = "2.0.0"
+version = "2.1.0"
 description = "Python and Cython scripts of machine learning, econometrics and statistical features for financial analysis"
 readme = "README.md"
 license = { text = "MIT" }
@@ -38,7 +38,6 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "Cython>=3.0",
     "pytest>=7.4",
     "pytest-benchmark>=4.0",
     "interrogate>=1.5",
@@ -117,10 +116,6 @@ warn_unused_configs = true
 
 [[tool.mypy.overrides]]
 module = [
-  "fynance.features.metrics_cy",
-  "fynance.features.momentums_cy",
-  "fynance.features.roll_functions_cy",
-  "fynance.models.econometric_models_cy",
 ]
 ignore_errors = true
 

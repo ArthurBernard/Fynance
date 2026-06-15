@@ -19,9 +19,8 @@ aborts the run**. `conftest.py` sets NumPy legacy scalar repr
 (`np.set_printoptions(legacy='1.25')`) so NumPy-2 scalar reprs don't break
 existing doctests.
 
-> **Build first.** The suite imports compiled extensions — run
-> `python setup.py build_ext --inplace` after a fresh clone or any `.pyx` edit,
-> or collection fails at `import fynance`.
+> **Pure-Python build.** No compile step — the package is Numba-backed (no
+> Cython). A plain `pip install -e ".[dev]"` is enough before running the suite.
 
 ## Conventions (do not regress)
 

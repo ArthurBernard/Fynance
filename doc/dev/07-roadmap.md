@@ -28,7 +28,7 @@ per-epic `EN-*/00-plan.md` + per-task leaves). Ships epic-by-epic, leaf = 1 PR.
 - [x] **E4 backtest** — CostModel + vectorized engine → `BacktestResult`
 - [x] **E5 reporting** — metrics consolidation, `plot/`, `tearsheet()`
 - [x] **E6 signal+portfolio** — `signal/` mappers, `portfolio/` (ex-algorithms)
-- [ ] **E7 models+numba** — estimator→numba, drop Cython, SignalModel conformance  *(only epic remaining; correctness-critical numba port — deliberately deferred, non-blocking for v2.0.0)*
+- [x] **E7 models+numba** — estimator+features Cython→numba, Cython build dropped, SignalModel conformance (2.1)
 - [x] **E8 strategy** — optional orchestrator + walk-forward run
 - [x] **E9 ui** — optional Streamlit playground (deferrable to 2.1)
 - [x] **E10 docs** — Sphinx restructure, example notebook, README + migration guide

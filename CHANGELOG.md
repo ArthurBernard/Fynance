@@ -18,6 +18,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.1.0] - 2026-06-15
+
+### Breaking Changes
+
+- **All Cython removed** (E7 numba modernization). The `*_cy` kernels — features `momentums`/`metrics`/`roll_functions` and the ARMA/GARCH `econometric_models`/`estimator` — were ported to **Numba `@njit`**; the `*_cy` modules and their public `*_cy_1d/2d` / `MA_cy`/`ARMA_cy`/… symbols are gone. The build is now pure-Python (no `setup.py`, no compile step).
+
+### Added
+
+- `BaseNeuralNet.fit(X, y, epochs)` and array-like `predict` — every NN model (MLP/RNN/GRU/LSTM/TCN/Transformer) now conforms to the `SignalModel` protocol and composes with `fynance.strategy.Strategy`.
+
+### Changed
+
+- Numerical kernels run on Numba `@njit` instead of Cython (parity verified to 1e-9/1e-10 against the former Cython via golden-value tests). `pyproject.toml` build-system no longer requires Cython.
+
+### Fixed
+
+- `roll_annual_volatility` (and therefore `roll_sharpe`) returned `NaN` for windowed cases: the Cython kernel aliased its return buffer with the output array (`cdef double[:] R = var`), corrupting the rolling sums. The Numba port uses a separate buffer and computes correctly.
+
+### Deprecated
+
+### Removed
+
+- `setup.py`, all `*_cy.pyx`/`.c` modules, and the Cython build machinery.
+
 ## [2.0.0] - 2026-06-15
 
 ### Breaking Changes
