@@ -130,3 +130,22 @@ Template:
 - **Rejected alternatives**: full public parity with dccd (would publish the R&D
   roadmap — rejected on privacy); doing nothing (leaves `/finish-task`'s ADR/status
   steps with nowhere to write).
+
+### 2026-06-15 — fynance 2.0: layered architecture + protocols (D4: Strategy API)  [accepted]
+- **Choice**: the 2.0 refactor adopts a **layered architecture with `typing.Protocol`
+  seams** (`DataSource`, `FeatureTransform`, `SignalModel`, `Allocator`,
+  `CostModel`, `Metric`), ports&adapters **only** at I/O (`fynance.data`), **not**
+  full hexagonal. numpy is the lingua franca; pytorch stays confined to
+  `fynance.models`; numba for hot loops. New maillons: `core` (`PriceSeries`),
+  `data`, `metrics` (out of `features`), vectorized `backtest`, `signal`,
+  `portfolio` (ex-`algorithms`), `plot`/`tearsheet`, `strategy`.
+- **D4 — Strategy API**: a **fluent dataclass-style** constructor (protocol-typed
+  slots as keyword args) with `.run` / `.run_walk_forward`, **not** a declarative
+  config tree. Every slot is optional so the maillons stay usable standalone
+  (composition, not a forced pipeline).
+- **Why**: the domain is maths on arrays — full hexagonal adds ceremony with no
+  payoff; protocol composition gives the modularity/testability where it matters
+  while keeping the toolbox usable piecewise. Fluent slots match the scientific
+  Python idiom (sklearn-like) and keep the orchestrator optional.
+- **Note**: breaking 2.0 (no compat shims): `algorithms`→`portfolio`,
+  perf-metrics `features`→`metrics`. Flagged for the major bump in `CHANGELOG.md`.
