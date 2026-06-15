@@ -47,6 +47,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- Dead legacy `fynance.core.series.Series` (a `numpy.ndarray` subclass superseded by `PriceSeries`); it was never part of the public `fynance` namespace.
+
 ## [1.6.0] - 2026-06-14
 
 ### Added
