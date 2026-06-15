@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking Changes
 
+### Added
+
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [2.1.0] - 2026-06-15
+
+### Breaking Changes
+
 - **All Cython removed** (E7 numba modernization). The `*_cy` kernels — features `momentums`/`metrics`/`roll_functions` and the ARMA/GARCH `econometric_models`/`estimator` — were ported to **Numba `@njit`**; the `*_cy` modules and their public `*_cy_1d/2d` / `MA_cy`/`ARMA_cy`/… symbols are gone. The build is now pure-Python (no `setup.py`, no compile step).
 
 ### Added
