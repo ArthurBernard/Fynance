@@ -32,11 +32,11 @@ class SharpeLoss(BaseLoss):
     where :math:`r` is ``y_pred``, :math:`rf_p = rf / period` is the
     per-period risk-free rate, :math:`\mu` and :math:`\sigma` are the
     mean and population standard deviation (``correction=0``, consistent
-    with :func:`~fynance.features.metrics.sharpe`), and :math:`\varepsilon`
+    with :func:`~fynance.metrics.sharpe`), and :math:`\varepsilon`
     is the numerical stabilizer (``eps``).
 
     **This is a training proxy** — the value is not comparable to the
-    numpy :func:`~fynance.features.metrics.sharpe` evaluation metric,
+    numpy :func:`~fynance.metrics.sharpe` evaluation metric,
     which annualizes over a price series.
 
     Parameters

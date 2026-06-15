@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fynance"
-version = "1.6.0"
+version = "2.0.0"
 description = "Python and Cython scripts of machine learning, econometrics and statistical features for financial analysis"
 readme = "README.md"
 license = { text = "MIT" }
@@ -55,6 +55,10 @@ doc = [
     "sphinx-design",
     "sphinx-copybutton",
 ]
+ui = [
+    "streamlit>=1.30",
+    "streamlit-ace",
+]
 
 [project.urls]
 Homepage = "https://github.com/ArthurBernard/Fynance"
@@ -93,11 +97,9 @@ ignore = ["E501"]
 "fynance/**/__init__.py" = ["F401", "F403", "F405"]
 "fynance/__init__.py" = ["F401", "F403", "F405"]
 # Dual Cython/Python files use star imports to pull Cython symbols
-"fynance/algorithms/browsers.py" = ["F403", "F405"]
-"fynance/features/metrics.py" = ["F403", "F405"]
-"fynance/features/returns.py" = ["F403", "F405"]
-"fynance/features/ratios.py" = ["F403", "F405"]
-"fynance/features/drawdown.py" = ["F403", "F405"]
+"fynance/metrics/returns.py" = ["F403", "F405"]
+"fynance/metrics/ratios.py" = ["F403", "F405"]
+"fynance/metrics/drawdown.py" = ["F403", "F405"]
 "fynance/features/stats.py" = ["F403", "F405"]
 "fynance/features/_metrics_helpers.py" = ["F403", "F405"]
 "fynance/features/momentums.py" = ["F403", "F405"]

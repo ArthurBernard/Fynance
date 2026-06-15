@@ -64,3 +64,18 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
 Larger axes parked for later: realistic backtesting (transaction costs, position
 sizing), market-regime conditioning, multi-resolution features, and the
 docs-hosting decision. Tracked in the roadmap; not bugs.
+
+## 2026-06-15 — fynance 2.0 refactor: 9/10 epics shipped
+
+The 2.0 architecture is **complete and releasable**. Shipped on `develop` (PRs
+#99–#108): E1 core (`PriceSeries`, protocols), E2 data (adapters, splits), E3
+metrics extraction, E4 vectorized backtest engine, E5 reporting (`tearsheet`),
+E6 signal + portfolio rename, E8 `Strategy`, E9 Streamlit playground, E10 docs
+(Sphinx, notebook, README, `MIGRATION-2.0.md`). Top-level API re-exports all
+maillons. 462 tests, 4 CI gates green per PR.
+
+**Remaining**: E7 (Cython→numba: estimator/econometric port, drop Cython build,
+`SignalModel` conformance). Deliberately deferred — correctness-critical
+numerical port (best done with golden-value parity), non-blocking for v2.0.0.
+Decision pending: do E7 before the release, or cut **v2.0.0** now and land numba
+in 2.1.

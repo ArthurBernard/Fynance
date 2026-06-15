@@ -21,7 +21,7 @@ analysis, portfolio allocation, and backtest trading strategies.
 
 Subpackages
 -----------
-algorithms      --- Financial algorithms
+portfolio       --- Portfolio allocation & sizing
 backtest        --- Backtest strategy tools
 estimator       --- Parameter estimation (Cython ARMA/GARCH)
 features        --- Features extraction
@@ -36,7 +36,7 @@ _wrappers   --- Fynance wrapper functions
 API stability policy (1.x series)
 ---------------------------------
 The symbols re-exported below from :mod:`fynance.models`,
-:mod:`fynance.algorithms.allocation`, :mod:`fynance.features` and
+:mod:`fynance.portfolio.allocation`, :mod:`fynance.features` and
 :mod:`fynance.estimator` form the **public, stable API** for the 1.x
 release line. Within 1.x:
 
@@ -62,14 +62,30 @@ except PackageNotFoundError:
 
 __all__ = ['__version__']
 
-from .algorithms import *
+import sys as _sys
+
 from .backtest import *
+from .core import *
+from .data import *
 from .estimator import *
 from .features import *
+from .metrics import *
 from .models import *
+from .plot import *
+from .portfolio import *
+from .signal import *
+from .strategy import *
 
-__all__ += models.__all__
-__all__ += estimator.__all__
-__all__ += features.__all__
-__all__ += backtest.__all__
-__all__ += algorithms.__all__
+# Aggregate each subpackage's public surface. Use ``sys.modules`` rather than the
+# package attributes, which a star import may have shadowed with a name that
+# collides with a submodule (e.g. the ``backtest`` engine function).
+for _name in ("core", "data", "models", "estimator", "features", "metrics",
+              "plot", "signal", "backtest", "portfolio", "strategy"):
+    __all__ += _sys.modules[f"{__name__}.{_name}"].__all__
+
+# Restore the subpackage attribute shadowed by such a collision so that
+# ``fynance.backtest`` resolves to the package (``fynance.backtest.backtest``
+# stays the engine function).
+backtest = _sys.modules[__name__ + ".backtest"]
+
+del _sys, _name

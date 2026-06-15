@@ -33,10 +33,10 @@ class SortinoLoss(BaseLoss):
     where :math:`r` is ``y_pred`` and :math:`rf_p = rf / period`.
     The denominator is a differentiable proxy for the downside deviation;
     its magnitude differs from the numpy
-    :func:`~fynance.features.metrics.sortino` evaluation metric.
+    :func:`~fynance.metrics.sortino` evaluation metric.
 
     **This is a training proxy** — the value is not comparable to the
-    numpy :func:`~fynance.features.metrics.sortino` evaluation metric.
+    numpy :func:`~fynance.metrics.sortino` evaluation metric.
 
     Parameters
     ----------
