@@ -1,21 +1,32 @@
 #!/usr/bin/env python3
 # coding: utf-8
-# @Author: ArthurBernard
-# @Email: arthur.bernard.92@gmail.com
-# @Date: 2021-04-05 20:35:18
-# @Last modified by: ArthurBernard
-# @Last modified time: 2021-04-05 20:35:21
 
-""" Description. """
+""" Core value objects and composition contracts.
 
-# Built-in packages
+.. currentmodule:: fynance.core
 
-# Third party packages
+Exposes :class:`PriceSeries` (the central numpy-backed financial time-series)
+and the :mod:`typing.Protocol` seams the pipeline composes through.
+
+"""
 
 # Local packages
+from .price_series import PriceSeries
+from .protocols import (
+    Allocator,
+    CostModel,
+    DataSource,
+    FeatureTransform,
+    Metric,
+    SignalModel,
+)
 
-__all__ = []
-
-
-if __name__ == "__main__":
-    pass
+__all__ = [
+    'PriceSeries',
+    'DataSource',
+    'FeatureTransform',
+    'SignalModel',
+    'Allocator',
+    'CostModel',
+    'Metric',
+]
