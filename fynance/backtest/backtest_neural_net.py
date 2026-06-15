@@ -8,16 +8,6 @@ loss / accuracy / performance plots from
 :mod:`fynance.backtest.dynamic_plot_backtest` into a single updating figure.
 """
 
-# Third-party packages
-from matplotlib import pyplot as plt
-
-# Local packages
-from fynance.backtest.dynamic_plot_backtest import (
-    DynaPlotAccuracy,
-    DynaPlotLoss,
-    DynaPlotPerf,
-)
-
 __all__ = ['BacktestNeuralNet']
 
 
@@ -26,6 +16,9 @@ class BacktestNeuralNet:
     def __init__(self, figsize=(9, 6), loss_xlim=None, perf_xlim=None,
                  accu_xlim=None, plot_accuracy=False, plot_loss=True,
                  plot_perf=False, **subplot_kw):
+        from matplotlib import pyplot as plt  # lazy: keeps matplotlib off the
+        # `import fynance` path (live training viz only).
+
         # Set dynamic plot object
         n_rows = plot_accuracy + plot_loss + plot_perf
         self.f, self.axes = plt.subplots(n_rows, 1, figsize=figsize,
@@ -52,13 +45,14 @@ class BacktestNeuralNet:
 
     def set_plot_accuracy(self, ax, accu_xlim=None):
         """ Set plot accuracy object. """
+        from fynance.backtest.dynamic_plot_backtest import DynaPlotAccuracy
+
         self.dp_accu = DynaPlotAccuracy(self.f, ax)
         self.dp_accu.ax.grid()
         self.dp_accu.ax.set_autoscaley_on(True)
 
         if accu_xlim is not None:
             self.dp_accu.ax.set_xlim(*accu_xlim, auto=False)
-            print("setup xlim:", accu_xlim)
             self.dp_accu.ax.set_autoscalex_on(False)
 
         else:
@@ -75,13 +69,14 @@ class BacktestNeuralNet:
 
     def set_plot_loss(self, ax, loss_xlim=None):
         """ Set plot loss object. """
+        from fynance.backtest.dynamic_plot_backtest import DynaPlotLoss
+
         self.dp_loss = DynaPlotLoss(self.f, ax)
         self.dp_loss.ax.grid()
         self.dp_loss.ax.set_autoscaley_on(True)
 
         if loss_xlim is not None:
             self.dp_loss.ax.set_xlim(*loss_xlim, auto=False)
-            print("setup xlim:", loss_xlim)
             self.dp_loss.ax.set_autoscalex_on(False)
 
         else:
@@ -98,12 +93,13 @@ class BacktestNeuralNet:
 
     def set_plot_perf(self, ax, perf_xlim=None):
         # set perf plot
+        from fynance.backtest.dynamic_plot_backtest import DynaPlotPerf
+
         self.dp_perf = DynaPlotPerf(self.f, ax)
         self.dp_perf.ax.grid()
         self.dp_perf.ax.set_autoscaley_on(True)
         if perf_xlim is not None:
             self.dp_perf.ax.set_xlim(*perf_xlim, auto=False)
-            print("setup xlim:", perf_xlim)
             self.dp_perf.ax.set_autoscalex_on(False)
 
         else:

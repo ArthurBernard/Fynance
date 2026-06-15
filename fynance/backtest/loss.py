@@ -16,7 +16,6 @@ import numpy as np
 from numpy.typing import NDArray
 
 # Local packages
-from fynance.backtest.plot import PlotSeries
 
 __all__ = ['LossSeries']
 
@@ -95,6 +94,8 @@ class LossSeries:
 
         """
         # Setup plot object
+        from fynance.backtest.plot import PlotSeries  # lazy (matplotlib)
+
         self.plot = PlotSeries(ax=ax)
 
         # Set ax properties
