@@ -40,7 +40,7 @@
    :padding: 0
 
    .. grid-item-card:: :octicon:`goal;1.2em;sd-mr-1` Algorithms
-      :link: algorithms
+      :link: portfolio
       :link-type: doc
 
       Portfolio allocation (ERC, HRP, IVP, MDP, MVP) and rolling
@@ -84,7 +84,7 @@
    :hidden:
    :caption: Reference
 
-   algorithms
+   portfolio
    backtest
    estimator
    features

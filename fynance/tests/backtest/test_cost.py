@@ -6,10 +6,11 @@
 # Third-party packages
 import numpy as np
 
-# Local packages
-from fynance.algorithms.sizing import transaction_cost
 from fynance.backtest.cost import ProportionalCost
 from fynance.core import CostModel
+
+# Local packages
+from fynance.portfolio.sizing import transaction_cost
 
 
 def test_zero_fee_zero_cost():

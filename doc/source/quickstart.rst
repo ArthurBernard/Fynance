@@ -57,7 +57,7 @@ Build risk-parity and minimum-variance portfolios from a covariance matrix:
 
 .. code-block:: python
 
-   from fynance.algorithms import ERC, HRP, MVP
+   from fynance.portfolio import ERC, HRP, MVP
 
    cov = np.cov(np.random.randn(5, 252))   # 5-asset covariance
 
@@ -67,7 +67,7 @@ Build risk-parity and minimum-variance portfolios from a covariance matrix:
 
    print(w_erc.round(4))
 
-See :doc:`algorithms` for all allocation methods and the rolling wrapper.
+See :doc:`portfolio` for all allocation methods and the rolling wrapper.
 
 ----
 

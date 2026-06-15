@@ -1,5 +1,5 @@
 --------------------------------------------------
- Financial algorithms (:mod:`fynance.algorithms`)
+ Portfolio (:mod:`fynance.portfolio`)
 --------------------------------------------------
 
 Portfolio allocation algorithms and rolling walk-forward wrappers.
@@ -10,7 +10,7 @@ Portfolio allocation algorithms and rolling walk-forward wrappers.
    :padding: 0
 
    .. grid-item-card:: :octicon:`project;1.2em;sd-mr-1` Portfolio allocation
-      :link: algorithms.allocation
+      :link: portfolio.allocation
       :link-type: doc
 
       Equal Risk Contribution (ERC), Hierarchical Risk Parity (HRP),
@@ -19,7 +19,7 @@ Portfolio allocation algorithms and rolling walk-forward wrappers.
       walk-forward wrapper.
 
    .. grid-item-card:: :octicon:`pin;1.2em;sd-mr-1` Position sizing
-      :link: algorithms.sizing
+      :link: portfolio.sizing
       :link-type: doc
 
       Fractional Kelly, volatility targeting and transaction costs.
@@ -28,5 +28,5 @@ Portfolio allocation algorithms and rolling walk-forward wrappers.
    :maxdepth: 1
    :hidden:
 
-   algorithms.allocation
-   algorithms.sizing
+   portfolio.allocation
+   portfolio.sizing

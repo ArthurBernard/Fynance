@@ -8,13 +8,14 @@
 
 """
 
-.. currentmodule:: fynance.algorithms
+.. currentmodule:: fynance.portfolio
 
 .. toctree::
    :maxdepth: 1
    :caption: Contents:
 
-   algorithms.allocation
+   portfolio.allocation
+   portfolio.sizing
 
 """
 
