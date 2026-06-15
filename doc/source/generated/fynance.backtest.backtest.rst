@@ -1,9 +1,9 @@
-﻿display_perf
-=============================
+﻿backtest
+=========================
 
 *Defined in* :mod:`fynance.backtest`
 
 .. currentmodule:: fynance.backtest
 
-.. autofunction:: display_perf
+.. autofunction:: backtest
    :no-index:

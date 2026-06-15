@@ -69,7 +69,7 @@ def set_text_stats(
 
     See Also
     --------
-    PlotBackTest, display_perf
+    fynance.plot.tearsheet
 
     """
     txt = ''

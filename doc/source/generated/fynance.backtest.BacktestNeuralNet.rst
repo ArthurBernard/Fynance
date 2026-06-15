@@ -1,11 +1,11 @@
-﻿PlotBackTest
-=============================
+﻿BacktestNeuralNet
+==================================
 
 *Defined in* :mod:`fynance.backtest`
 
 .. currentmodule:: fynance.backtest
 
-.. autoclass:: PlotBackTest
+.. autoclass:: BacktestNeuralNet
    :members:
    :inherited-members:
    :special-members: __call__, __iter__, __next__
