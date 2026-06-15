@@ -12,7 +12,7 @@ from warnings import warn
 import numpy as np
 
 # Local packages
-from numba import njit
+from numba import njit, prange
 
 # Local packages
 from fynance.features.momentums import _ema, _emstd, _sma, _sma_1d, _smstd, _wma, _wmstd
@@ -82,32 +82,39 @@ def _roll_drawdown_2d(X, w, raw):
 
 @njit(cache=True)
 def _roll_mdd_1d(X, w, raw):
+    # First w points: expanding drawdown, running max of it (== Cython).
     T = X.shape[0]
     mdd = np.empty(T, dtype=np.float64)
     S = 0.0
-    dd0 = _drawdown_1d(X[0:w].copy(), raw)
+    run = X[0]
     for t in range(min(w, T)):
-        if dd0[t] > S:
-            S = dd0[t]
+        if X[t] > run:
+            run = X[t]
+        dd = (run - X[t]) if raw != 0 else (1.0 - X[t] / run)
+        if dd > S:
+            S = dd
         mdd[t] = S
+    # Trailing windows: max drawdown within X[t-w+1 : t+1], computed in place
+    # (no per-window allocation, same arithmetic as the former Cython).
     for t in range(w, T):
-        win = _drawdown_1d(X[t - w + 1: t + 1].copy(), raw)
-        S = win[0]
-        i = 1
-        while i < w:
-            if win[i] > S:
-                S = win[i]
-            i += 1
+        run = X[t - w + 1]
+        S = 0.0
+        for j in range(t - w + 1, t + 1):
+            if X[j] > run:
+                run = X[j]
+            dd = (run - X[j]) if raw != 0 else (1.0 - X[j] / run)
+            if dd > S:
+                S = dd
         mdd[t] = S
     return mdd
 
 
-@njit(cache=True)
+@njit(parallel=True, cache=True)
 def _roll_mdd_2d(X, w, raw):
     T, N = X.shape
     out = np.empty((T, N), dtype=np.float64)
-    for n in range(N):
-        out[:, n] = _roll_mdd_1d(X[:, n].copy(), w, raw)
+    for n in prange(N):
+        out[:, n] = _roll_mdd_1d(np.ascontiguousarray(X[:, n]), w, raw)
     return out
 
 
