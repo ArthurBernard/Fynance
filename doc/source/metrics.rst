@@ -46,3 +46,11 @@ Rolling versions
    roll_annual_volatility
    roll_drawdown
    roll_mdd
+
+Aggregated report
+=================
+
+.. autosummary::
+   :toctree: generated/
+
+   summary

@@ -19,12 +19,13 @@ from .drawdown import *
 from .ratios import *
 from .returns import *
 from .returns import perf_strat, returns_strat  # noqa: F401
+from .summary import METRICS, summary  # noqa: F401
 
 # Aggregate __all__ via sys.modules (the star imports above rebind names that
 # collide with a submodule, e.g. the ``drawdown`` function vs the module).
 __all__ = []
 for _m in ("returns", "ratios", "drawdown"):
     __all__ += _sys.modules[f"{__name__}.{_m}"].__all__
-__all__ += ['perf_strat', 'returns_strat']
+__all__ += ['perf_strat', 'returns_strat', 'METRICS', 'summary']
 
 del _sys, _m

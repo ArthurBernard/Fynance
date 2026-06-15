@@ -90,3 +90,4 @@
    features
    metrics
    models
+   plot
