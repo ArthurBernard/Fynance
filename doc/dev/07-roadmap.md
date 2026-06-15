@@ -15,6 +15,28 @@ shipped, `03-decisions.md` for *why*. Keep it short and true.
 ---
 
 
+## 1. fynance 2.0 — full refactor  ⭐ active
+
+Turn the toolbox into a complete layered ML/DL backtesting tool
+(data→features→signal→portfolio→backtest→metrics). Breaking 2.0, no compat.
+**Detailed plan tree:** `doc/dev/plans/v2-refactor/` (global `00-plan.md` +
+per-epic `EN-*/00-plan.md` + per-task leaves). Ships epic-by-epic, leaf = 1 PR.
+
+- [ ] **E1 core** — `PriceSeries`, Protocol seams, numpy/torch bridges
+- [ ] **E2 data** — DataSource port, CSV/Parquet adapters, align, temporal splits
+- [ ] **E3 features+metrics** — regroup features, extract perf-metrics → `metrics/`
+- [ ] **E4 backtest** — CostModel + vectorized engine → `BacktestResult`
+- [ ] **E5 reporting** — metrics consolidation, `plot/`, `tearsheet()`
+- [ ] **E6 signal+portfolio** — `signal/` mappers, `portfolio/` (ex-algorithms)
+- [ ] **E7 models+numba** — estimator→numba, drop Cython, SignalModel conformance
+- [ ] **E8 strategy** — optional orchestrator + walk-forward run
+- [ ] **E9 ui** — optional Streamlit playground (deferrable to 2.1)
+- [ ] **E10 docs** — Sphinx restructure, example notebook, README + migration guide
+
+Order: E1 → (E2 ∥ E3 ∥ E6 ∥ E7) → E4 → E5 → E8 → (E9 ∥ E10).
+
+---
+
 ## 5. R&D — Loss, architecture, données
 
 Objectif : identifier empiriquement la meilleure combinaison loss / architecture / features
