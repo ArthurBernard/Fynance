@@ -14,7 +14,6 @@ from numpy.typing import NDArray
 from fynance._exceptions import ArraySizeError
 from fynance._wrappers import WrapperArray
 from fynance.features._metrics_helpers import *  # noqa: F401,F403
-from fynance.features.metrics_cy import *
 
 __all__ = ['annual_volatility', 'sharpe', 'sortino', 'calmar', 'diversified_ratio', 'roll_annual_volatility', 'roll_sharpe', 'roll_calmar']
 

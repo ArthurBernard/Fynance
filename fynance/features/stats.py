@@ -13,7 +13,6 @@ from numpy.typing import NDArray
 # Local packages
 from fynance._wrappers import WrapperArray
 from fynance.features._metrics_helpers import *  # noqa: F401,F403
-from fynance.features.metrics_cy import *
 
 __all__ = ['accuracy', 'directional_accuracy', 'percent_positive',
            'tail_ratio', 'z_score', 'roll_z_score', 'mad', 'roll_mad']
@@ -391,6 +390,6 @@ def roll_mad(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDA
     """
     if len(X.shape) == 2:
 
-        return np.asarray(roll_mad_cy_2d(X, w))  # type: ignore[name-defined]
+        return _roll_mad_2d(X, w)
 
-    return np.asarray(roll_mad_cy_1d(X, w))  # type: ignore[name-defined]
+    return _roll_mad_1d(X, w)

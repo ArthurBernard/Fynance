@@ -13,7 +13,6 @@ from numpy.typing import NDArray
 # Local packages
 from fynance._wrappers import WrapperArray
 from fynance.features._metrics_helpers import *  # noqa: F401,F403
-from fynance.features.metrics_cy import *
 
 __all__ = ['annual_return', 'perf_index', 'perf_returns', 'roll_annual_return']
 

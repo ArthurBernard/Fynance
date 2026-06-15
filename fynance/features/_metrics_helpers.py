@@ -12,10 +12,203 @@ from warnings import warn
 import numpy as np
 
 # Local packages
-from fynance.features.metrics_cy import *
-from fynance.features.momentums import _ema, _emstd, _sma, _smstd, _wma, _wmstd
+from numba import njit
 
-__all__ = ['_annual_return', '_compute_returns', '_annual_volatility', '_annual_downside_volatility', '_drawdown', '_roll_annual_return', '_roll_annual_volatility', '_roll_drawdown', '_roll_mdd', '_roll_annual_return_py', '_roll_annual_volatility_py', '_handler_ma', '_handler_mstd']
+# Local packages
+from fynance.features.momentums import _ema, _emstd, _sma, _sma_1d, _smstd, _wma, _wmstd
+
+# --------------------------------------------------------------------------- #
+#   numba metric kernels (ported 1:1 from the former Cython metrics_cy)        #
+# --------------------------------------------------------------------------- #
+
+
+@njit(cache=True)
+def _drawdown_1d(X, raw):
+    T = X.shape[0]
+    dd = np.empty(T, dtype=np.float64)
+    S = X[0]
+    for t in range(T):
+        if X[t] > S:
+            S = X[t]
+        if raw != 0:
+            dd[t] = S - X[t]
+        else:
+            dd[t] = 1.0 - X[t] / S
+    return dd
+
+
+@njit(cache=True)
+def _drawdown_2d(X, raw):
+    T, N = X.shape
+    out = np.empty((T, N), dtype=np.float64)
+    for n in range(N):
+        out[:, n] = _drawdown_1d(X[:, n].copy(), raw)
+    return out
+
+
+@njit(cache=True)
+def _roll_drawdown_1d(X, w, raw):
+    T = X.shape[0]
+    if w >= T:
+        return _drawdown_1d(X, raw)
+    dd = np.empty(T, dtype=np.float64)
+    S = X[0]
+    for t in range(T):
+        if t < w:
+            if X[t] > S:
+                S = X[t]
+        else:
+            S = X[t]
+            i = 1
+            while i < w:
+                if X[t - i] > S:
+                    S = X[t - i]
+                i += 1
+        if raw != 0:
+            dd[t] = S - X[t]
+        else:
+            dd[t] = 1.0 - X[t] / S
+    return dd
+
+
+@njit(cache=True)
+def _roll_drawdown_2d(X, w, raw):
+    T, N = X.shape
+    out = np.empty((T, N), dtype=np.float64)
+    for n in range(N):
+        out[:, n] = _roll_drawdown_1d(X[:, n].copy(), w, raw)
+    return out
+
+
+@njit(cache=True)
+def _roll_mdd_1d(X, w, raw):
+    T = X.shape[0]
+    mdd = np.empty(T, dtype=np.float64)
+    S = 0.0
+    dd0 = _drawdown_1d(X[0:w].copy(), raw)
+    for t in range(min(w, T)):
+        if dd0[t] > S:
+            S = dd0[t]
+        mdd[t] = S
+    for t in range(w, T):
+        win = _drawdown_1d(X[t - w + 1: t + 1].copy(), raw)
+        S = win[0]
+        i = 1
+        while i < w:
+            if win[i] > S:
+                S = win[i]
+            i += 1
+        mdd[t] = S
+    return mdd
+
+
+@njit(cache=True)
+def _roll_mdd_2d(X, w, raw):
+    T, N = X.shape
+    out = np.empty((T, N), dtype=np.float64)
+    for n in range(N):
+        out[:, n] = _roll_mdd_1d(X[:, n].copy(), w, raw)
+    return out
+
+
+@njit(cache=True)
+def _roll_annual_return_1d(X, p, w, d):
+    T = X.shape[0]
+    ar = np.empty(T, dtype=np.float64)
+    R = 0.0
+    _w = 1.0
+    for t in range(T):
+        if t < w:
+            R = X[t] / X[0]
+            _w = float(t + 1 - d)
+        else:
+            R = X[t] / X[t - w + 1]
+        if t < d:
+            ar[t] = 0.0
+        else:
+            ar[t] = R ** (p / _w) - 1.0
+    return ar
+
+
+@njit(cache=True)
+def _roll_annual_return_2d(X, p, w, d):
+    T, N = X.shape
+    out = np.empty((T, N), dtype=np.float64)
+    for n in range(N):
+        out[:, n] = _roll_annual_return_1d(X[:, n].copy(), p, w, d)
+    return out
+
+
+@njit(cache=True)
+def _roll_annual_volatility_1d(X, p, ll, w, d):
+    T = X.shape[0]
+    av = np.empty(T, dtype=np.float64)
+    R = np.zeros(T, dtype=np.float64)
+    S = 0.0
+    S2 = 0.0
+    _w = 1.0
+    _w_d = 1.0
+    sub_R = 0.0
+    av[0] = 0.0
+    for t in range(1, T):
+        if ll != 0:
+            R[t] = np.log(X[t] / X[t - 1])
+        else:
+            R[t] = X[t] / X[t - 1] - 1.0
+        if t < w:
+            _w = float(t + 1)
+            _w_d = float(t + 1 - d)
+            sub_R = 0.0
+        elif t > w:
+            sub_R = R[t - w]
+        S += R[t] - sub_R
+        S2 += R[t] * R[t] - sub_R * sub_R
+        if t < d:
+            av[t] = 0.0
+        else:
+            av[t] = np.sqrt(p * (S2 - (S / _w) * S) / _w_d)
+    return av
+
+
+@njit(cache=True)
+def _roll_annual_volatility_2d(X, p, ll, w, d):
+    T, N = X.shape
+    out = np.empty((T, N), dtype=np.float64)
+    for n in range(N):
+        out[:, n] = _roll_annual_volatility_1d(X[:, n].copy(), p, ll, w, d)
+    return out
+
+
+@njit(cache=True)
+def _roll_mad_1d(X, w):
+    ma = _sma_1d(X, w)
+    T = X.shape[0]
+    mad = np.empty(T, dtype=np.float64)
+    for t in range(T):
+        S = 0.0
+        i = 0
+        if t < w:
+            while i <= t:
+                S += abs(X[i] - ma[t])
+                i += 1
+            mad[t] = S / (t + 1)
+        else:
+            while i < w:
+                S += abs(X[t - i] - ma[t])
+                i += 1
+            mad[t] = S / w
+    return mad
+
+
+@njit(cache=True)
+def _roll_mad_2d(X, w):
+    T, N = X.shape
+    out = np.empty((T, N), dtype=np.float64)
+    for n in range(N):
+        out[:, n] = _roll_mad_1d(X[:, n].copy(), w)
+    return out
+
+__all__ = ['_annual_return', '_compute_returns', '_annual_volatility', '_annual_downside_volatility', '_drawdown', '_roll_annual_return', '_roll_annual_volatility', '_roll_drawdown', '_roll_mdd', '_roll_annual_return_py', '_roll_annual_volatility_py', '_handler_ma', '_handler_mstd', '_roll_mad_1d', '_roll_mad_2d']
 
 _handler_ma = {'s': _sma, 'w': _wma, 'e': _ema}
 _handler_mstd = {'s': _smstd, 'w': _wmstd, 'e': _emstd}
@@ -71,9 +264,9 @@ def _drawdown(X, raw):
 
     if len(X.shape) == 2:
 
-        return np.asarray(drawdown_cy_2d(X, int(raw)))
+        return _drawdown_2d(X, int(raw))
 
-    return np.asarray(drawdown_cy_1d(X, int(raw)))
+    return _drawdown_1d(X, int(raw))
 
 
 def _roll_annual_return(X, period, w, ddof):
@@ -90,9 +283,9 @@ def _roll_annual_return(X, period, w, ddof):
 
     elif len(X.shape) == 2:
 
-        return np.asarray(roll_annual_return_cy_2d(X, period, w, ddof))
+        return _roll_annual_return_2d(X, period, w, ddof)
 
-    return np.asarray(roll_annual_return_cy_1d(X, period, w, ddof))
+    return _roll_annual_return_1d(X, period, w, ddof)
 
 
 def _roll_annual_volatility(X, period, log, w, axis, ddof):
@@ -105,13 +298,9 @@ def _roll_annual_volatility(X, period, log, w, axis, ddof):
 
     elif len(X.shape) == 2:
 
-        return np.asarray(roll_annual_volatility_cy_2d(
-            X, period, int(log), w, ddof
-        ))
+        return _roll_annual_volatility_2d(X, period, int(log), w, ddof)
 
-    return np.asarray(roll_annual_volatility_cy_1d(
-        X, period, int(log), w, ddof
-    ))
+    return _roll_annual_volatility_1d(X, period, int(log), w, ddof)
 
 
 def _roll_drawdown(X, w, raw):
@@ -127,17 +316,17 @@ def _roll_drawdown(X, w, raw):
 
     if len(X.shape) == 2:
 
-        return np.asarray(roll_drawdown_cy_2d(X, w, int(raw)))
+        return _roll_drawdown_2d(X, w, int(raw))
 
-    return np.asarray(roll_drawdown_cy_1d(X, w, int(raw)))
+    return _roll_drawdown_1d(X, w, int(raw))
 
 
 def _roll_mdd(X, w, raw):
     if len(X.shape) == 2:
 
-        return np.asarray(roll_mdd_cy_2d(X, w, int(raw)))
+        return _roll_mdd_2d(X, w, int(raw))
 
-    return np.asarray(roll_mdd_cy_1d(X, w, int(raw)))
+    return _roll_mdd_1d(X, w, int(raw))
 
 
 def _roll_annual_return_py(X, period, w, ddof):

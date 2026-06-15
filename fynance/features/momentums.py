@@ -30,16 +30,186 @@ from __future__ import annotations
 # Built-in packages
 # External packages
 import numpy as np
+
+# Local packages
+from numba import njit
 from numpy.typing import NDArray
 
 from fynance._wrappers import WrapperArray
 
-# Local packages
-from fynance.features.momentums_cy import *
-
 __all__ = [
     'sma', 'wma', 'ema', 'smstd', 'wmstd', 'emstd',
 ]
+
+
+# --------------------------------------------------------------------------- #
+#   numba kernels (ported 1:1 from the former Cython implementation)           #
+# --------------------------------------------------------------------------- #
+
+
+@njit(cache=True)
+def _sma_1d(X, w):
+    T = X.shape[0]
+    ma = np.empty(T, dtype=np.float64)
+    S = 0.0
+    for t in range(T):
+        if t < w:
+            S += X[t]
+            ma[t] = S / (t + 1)
+        else:
+            S += X[t] - X[t - w]
+            ma[t] = S / w
+    return ma
+
+
+@njit(cache=True)
+def _sma_2d(X, w):
+    T, N = X.shape
+    out = np.empty((T, N), dtype=np.float64)
+    for n in range(N):
+        out[:, n] = _sma_1d(X[:, n].copy(), w)
+    return out
+
+
+@njit(cache=True)
+def _wma_1d(X, w):
+    T = X.shape[0]
+    ma = np.empty(T, dtype=np.float64)
+    m = 1.0
+    for t in range(T):
+        S = 0.0
+        if t < w:
+            mm = float(t + 1)
+            m = mm * (mm + 1.0) / 2.0
+            i = 0
+            while i <= t:
+                S += (i + 1) * X[i]
+                i += 1
+        else:
+            i = 0
+            while i < w:
+                S += (w - i) * X[t - i]
+                i += 1
+        ma[t] = S / m
+    return ma
+
+
+@njit(cache=True)
+def _wma_2d(X, w):
+    T, N = X.shape
+    out = np.empty((T, N), dtype=np.float64)
+    for n in range(N):
+        out[:, n] = _wma_1d(X[:, n].copy(), w)
+    return out
+
+
+@njit(cache=True)
+def _ema_1d(X, alpha):
+    T = X.shape[0]
+    ma = np.empty(T, dtype=np.float64)
+    ma[0] = X[0]
+    for t in range(1, T):
+        ma[t] = alpha * ma[t - 1] + (1.0 - alpha) * X[t]
+    return ma
+
+
+@njit(cache=True)
+def _ema_2d(X, alpha):
+    T, N = X.shape
+    out = np.empty((T, N), dtype=np.float64)
+    for n in range(N):
+        out[:, n] = _ema_1d(X[:, n].copy(), alpha)
+    return out
+
+
+@njit(cache=True)
+def _smstd_1d(X, w, d):
+    T = X.shape[0]
+    sd = np.empty(T, dtype=np.float64)
+    S = 0.0
+    S2 = 0.0
+    _w = 1.0
+    _w_d = 1.0
+    for t in range(T):
+        if t < w:
+            _w = float(t + 1)
+            _w_d = float(t + 1 - d)
+            sub_X = 0.0
+        else:
+            sub_X = X[t - w]
+        S += X[t] - sub_X
+        S2 += X[t] * X[t] - sub_X * sub_X
+        if t < d:
+            sd[t] = 0.0
+        else:
+            sd[t] = np.sqrt((S2 - (S / _w) * S) / _w_d)
+    return sd
+
+
+@njit(cache=True)
+def _smstd_2d(X, w, d):
+    T, N = X.shape
+    out = np.empty((T, N), dtype=np.float64)
+    for n in range(N):
+        out[:, n] = _smstd_1d(X[:, n].copy(), w, d)
+    return out
+
+
+@njit(cache=True)
+def _wmstd_1d(X, w):
+    T = X.shape[0]
+    sd = np.empty(T, dtype=np.float64)
+    m = 1.0
+    for t in range(T):
+        S = 0.0
+        S2 = 0.0
+        if t < w:
+            mm = float(t + 1)
+            m = mm * (mm + 1.0) / 2.0
+            i = 0
+            while i <= t:
+                S += (i + 1) * X[i]
+                S2 += (i + 1) * X[i] * X[i]
+                i += 1
+        else:
+            i = 0
+            while i < w:
+                S += (w - i) * X[t - i]
+                S2 += (w - i) * X[t - i] * X[t - i]
+                i += 1
+        sd[t] = np.sqrt(S2 / m - (S / m) * (S / m))
+    return sd
+
+
+@njit(cache=True)
+def _wmstd_2d(X, w):
+    T, N = X.shape
+    out = np.empty((T, N), dtype=np.float64)
+    for n in range(N):
+        out[:, n] = _wmstd_1d(X[:, n].copy(), w)
+    return out
+
+
+@njit(cache=True)
+def _emstd_1d(X, alpha):
+    T = X.shape[0]
+    sd = np.empty(T, dtype=np.float64)
+    m = X[0]
+    sd[0] = 0.0
+    for t in range(1, T):
+        m = alpha * m + (1.0 - alpha) * X[t]
+        m2 = (1.0 - alpha) * (X[t] - m) * (X[t] - m)
+        sd[t] = np.sqrt(alpha * sd[t - 1] * sd[t - 1] + m2)
+    return sd
+
+
+@njit(cache=True)
+def _emstd_2d(X, alpha):
+    T, N = X.shape
+    out = np.empty((T, N), dtype=np.float64)
+    for n in range(N):
+        out[:, n] = _emstd_1d(X[:, n].copy(), alpha)
+    return out
 
 # =========================================================================== #
 #                               Moving Averages                               #
@@ -115,9 +285,9 @@ def sma(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDArray:
 def _sma(X, w):
     if len(X.shape) == 2:
 
-        return np.asarray(sma_cy_2d(X, w))
+        return _sma_2d(X, w)
 
-    return np.asarray(sma_cy_1d(X, w))
+    return _sma_1d(X, w)
 
 
 @WrapperArray('dtype', 'axis', 'window')
@@ -168,9 +338,9 @@ def wma(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDArray:
 def _wma(X, w):
     if len(X.shape) == 2:
 
-        return np.asarray(wma_cy_2d(X, w))
+        return _wma_2d(X, w)
 
-    return np.asarray(wma_cy_1d(X, w))
+    return _wma_1d(X, w)
 
 
 @WrapperArray('dtype', 'axis')
@@ -249,9 +419,9 @@ def ema(X: NDArray, alpha: float = 0.94, w: int | None = None, axis: int = 0, dt
 def _ema(X, alpha):
     if len(X.shape) == 2:
 
-        return np.asarray(ema_cy_2d(X, float(alpha)))
+        return _ema_2d(X, float(alpha))
 
-    return np.asarray(ema_cy_1d(X, float(alpha)))
+    return _ema_1d(X, float(alpha))
 
 
 # =========================================================================== #
@@ -317,9 +487,9 @@ def smstd(X: NDArray, w: int | None = None, ddof: int = 0, axis: int = 0, dtype=
 def _smstd(X, w, ddof=0):
     if len(X.shape) == 2:
 
-        return np.asarray(smstd_cy_2d(X, w, ddof))
+        return _smstd_2d(X, w, ddof)
 
-    return np.asarray(smstd_cy_1d(X, w, ddof))
+    return _smstd_1d(X, w, ddof)
 
 
 @WrapperArray('dtype', 'axis', 'window')
@@ -371,9 +541,9 @@ def wmstd(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDArra
 def _wmstd(X, w):
     if len(X.shape) == 2:
 
-        return np.asarray(wmstd_cy_2d(X, w))
+        return _wmstd_2d(X, w)
 
-    return np.asarray(wmstd_cy_1d(X, w))
+    return _wmstd_1d(X, w)
 
 
 @WrapperArray('dtype', 'axis')
@@ -447,9 +617,9 @@ def emstd(X: NDArray, alpha: float = 0.94, w: int | None = None, axis: int = 0, 
 def _emstd(X, alpha):
     if len(X.shape) == 2:
 
-        return np.asarray(emstd_cy_2d(X, float(alpha)))
+        return _emstd_2d(X, float(alpha))
 
-    return np.asarray(emstd_cy_1d(X, float(alpha)))
+    return _emstd_1d(X, float(alpha))
 
 
 if __name__ == '__main__':
