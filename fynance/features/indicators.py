@@ -37,8 +37,8 @@ from scipy import stats as _sp_stats
 
 # Local packages
 from fynance._wrappers import WrapperArray
-from fynance.features.metrics import roll_mad
 from fynance.features.momentums import _ema, _emstd, _sma, _smstd, _wma, _wmstd
+from fynance.features.stats import roll_mad
 
 __all__ = [
     'bollinger_band', 'cci', 'hma', 'macd_hist', 'macd_line',

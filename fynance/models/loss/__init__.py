@@ -21,7 +21,7 @@ Notes
 -----
 Each loss is a **training proxy**: its scalar value is not numerically
 comparable to the corresponding evaluation metric in
-:mod:`fynance.features.metrics`. Use those metrics for out-of-sample
+:mod:`fynance.metrics`. Use those metrics for out-of-sample
 reporting; use these losses only inside training loops.
 
 """

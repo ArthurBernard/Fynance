@@ -17,7 +17,7 @@ features.
 
    features.filters
    features.indicators
-   features.metrics
+   features.stats
    features.momentums
    features.roll_functions
    features.scale
@@ -30,7 +30,6 @@ from . import (
     engineering,
     filters,
     indicators,
-    metrics,
     metrics_cy,
     momentums,
     momentums_cy,
@@ -39,11 +38,11 @@ from . import (
     roll_functions,
     roll_functions_cy,
     scale,
+    stats,
 )
 from .engineering import *
 from .filters import *
 from .indicators import *
-from .metrics import *
 from .metrics_cy import *
 from .momentums import *
 from .momentums_cy import *
@@ -52,12 +51,12 @@ from .regime import *
 from .roll_functions import *
 from .roll_functions_cy import *
 from .scale import *
+from .stats import *
 
 __all__ = engineering.__all__
 __all__ += regime.__all__
 __all__ += filters.__all__
 __all__ += metrics_cy.__all__
-__all__ += metrics.__all__
 __all__ += momentums_cy.__all__
 __all__ += momentums.__all__
 __all__ += indicators.__all__
@@ -65,3 +64,4 @@ __all__ += money_management.__all__
 __all__ += roll_functions_cy.__all__
 __all__ += roll_functions.__all__
 __all__ += scale.__all__
+__all__ += stats.__all__

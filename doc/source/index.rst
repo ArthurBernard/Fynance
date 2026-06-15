@@ -88,4 +88,5 @@
    backtest
    estimator
    features
+   metrics
    models

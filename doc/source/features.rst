@@ -23,12 +23,12 @@ moving standard deviations and rolling functions.
 
       Bollinger Band, CCI, Hull Moving Average, MACD, RSI.
 
-   .. grid-item-card:: :octicon:`meter;1.2em;sd-mr-1` Metrics
-      :link: features.metrics
+   .. grid-item-card:: :octicon:`meter;1.2em;sd-mr-1` Statistics
+      :link: features.stats
       :link-type: doc
 
-      Annualized return and volatility, Calmar ratio, Sharpe ratio,
-      maximum drawdown, Z-score and more.
+      Accuracy and directional accuracy, positive-return share, tail
+      ratio, z-score and mean absolute deviation.
 
    .. grid-item-card:: :octicon:`arrow-up-right;1.2em;sd-mr-1` Momentums
       :link: features.momentums
@@ -91,7 +91,7 @@ Common parameters across modules:
    features.engineering
    features.filters
    features.indicators
-   features.metrics
+   features.stats
    features.momentums
    features.regime
    features.roll_functions

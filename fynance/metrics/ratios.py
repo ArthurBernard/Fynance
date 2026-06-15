@@ -256,8 +256,8 @@ def calmar(X: NDArray, period: int = 252, axis: int = 0, dtype=None, ddof: int =
     Notes
     -----
     Calmar ratio [3]_ is the compouned annual return
-    (:func:`~fynance.features.metrics.annual_return`) over the maximum drawdown
-    (:func:`~fynance.features.metrics.mdd`). Let :math:`T` the number of time
+    (:func:`~fynance.metrics.annual_return`) over the maximum drawdown
+    (:func:`~fynance.metrics.mdd`). Let :math:`T` the number of time
     observations, DD the vector of drawdown:
 
     .. math::
@@ -553,8 +553,8 @@ def roll_calmar(X: NDArray, period: float = 252., w: int | None = None, axis: in
     Notes
     -----
     Calmar ratio [3]_ is the rolling compouned annual return
-    (:func:`~fynance.features.metrics.roll_annual_return`) over the rolling
-    maximum drawdown (:func:`~fynance.features.metrics.roll_mdd`). Let
+    (:func:`~fynance.metrics.roll_annual_return`) over the rolling
+    maximum drawdown (:func:`~fynance.metrics.roll_mdd`). Let
     :math:`T` the number of time observations, DD the vector of drawdown,
     :math:`\forall t \in [1:T]`:
 

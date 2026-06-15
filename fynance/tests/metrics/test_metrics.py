@@ -17,7 +17,7 @@ import pytest
 # Local packages
 import fynance as fy
 from fynance._exceptions import ArraySizeError
-from fynance.features.metrics import perf_strat
+from fynance.metrics import perf_strat
 
 
 @pytest.fixture()

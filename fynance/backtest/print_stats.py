@@ -14,7 +14,8 @@ import numpy as np
 from numpy.typing import NDArray
 
 # Local packages
-from fynance.features.metrics import accuracy, calmar, sharpe
+from fynance.features.stats import accuracy
+from fynance.metrics import calmar, sharpe
 
 __all__ = ['set_text_stats']
 

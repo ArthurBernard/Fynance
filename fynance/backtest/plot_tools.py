@@ -12,8 +12,8 @@ from matplotlib import pyplot as plt
 
 # Internal packages
 from fynance.backtest.print_stats import set_text_stats
-from fynance.features.metrics import drawdown, roll_sharpe
 from fynance.features.money_management import iso_vol
+from fynance.metrics import drawdown, roll_sharpe
 
 # Set plot style
 plt.style.use('seaborn-v0_8')

@@ -16,7 +16,7 @@ from fynance.features._metrics_helpers import *  # noqa: F401,F403
 from fynance.features.metrics_cy import *
 
 __all__ = ['accuracy', 'directional_accuracy', 'percent_positive',
-           'tail_ratio', 'z_score', 'roll_z_score']
+           'tail_ratio', 'z_score', 'roll_z_score', 'mad', 'roll_mad']
 
 
 @WrapperArray('axis')
@@ -303,3 +303,94 @@ def tail_ratio(X: NDArray, alpha: float = 0.05, axis: int = 0) -> NDArray:
     lo = np.abs(np.quantile(X, alpha, axis=0))
 
     return np.where(lo > 0, hi / np.where(lo > 0, lo, 1.0), 0.0)
+
+
+@WrapperArray('dtype')
+def mad(X: NDArray, axis: int = 0, dtype=None) -> NDArray:
+    """ Compute the Mean Absolute Deviation of each `X`' series.
+
+    Compute the mean of the absolute value of the distance to the mean [6]_.
+
+    Parameters
+    ----------
+    X : np.ndarray[np.dtype, ndim=1 or 2]
+        Time-series of prices, performances or index.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
+
+    Returns
+    -------
+    dtype or np.ndarray[dtype, ndim=1]
+        Values of mean absolute deviation of each series.
+
+    References
+    ----------
+    .. [6] https://en.wikipedia.org/wiki/Average_absolute_deviation
+
+    Examples
+    --------
+    >>> X = np.array([70., 100., 90., 110., 150., 80.])
+    >>> mad(X)
+    20.0
+
+    See Also
+    --------
+    roll_mad
+
+    """
+    return np.mean(np.abs(X.T - np.mean(X, axis=axis)).T, axis=axis)
+
+
+@WrapperArray('dtype', 'axis', 'window')
+def roll_mad(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDArray:
+    """ Compute rolling Mean Absolut Deviation for each `X`' series.
+
+    Compute the moving average of the absolute value of the distance to the
+    moving average [6]_.
+
+    Parameters
+    ----------
+    X : np.ndarray[dtype, ndim=1 or 2]
+        Time series (price, performance or index).
+    w : int, optional
+        Size of the lagged window of the rolling function, must be positive. If
+        ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is None.
+    axis : {0, 1}, optional
+        Axis along wich the computation is done. Default is 0.
+    dtype : np.dtype, optional
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from `X` input.
+
+    Returns
+    -------
+    np.ndarray[dtype, ndim=1 or 2]
+        Series of mean absolute deviation.
+
+    References
+    ----------
+    .. [6] https://en.wikipedia.org/wiki/Average_absolute_deviation
+
+    Examples
+    --------
+    >>> X = np.array([70, 100, 90, 110, 150, 80])
+    >>> roll_mad(X, dtype=np.float64)
+    array([ 0.        , 15.        , 11.11111111, 12.5       , 20.8       ,
+           20.        ])
+    >>> X = np.array([60, 100, 80, 120, 160, 80]).astype(np.float64)
+    >>> roll_mad(X, w=3, dtype=np.float64)
+    array([ 0.        , 20.        , 13.33333333, 13.33333333, 26.66666667,
+           26.66666667])
+
+    See Also
+    --------
+    mad
+
+    """
+    if len(X.shape) == 2:
+
+        return np.asarray(roll_mad_cy_2d(X, w))  # type: ignore[name-defined]
+
+    return np.asarray(roll_mad_cy_1d(X, w))  # type: ignore[name-defined]
