@@ -35,27 +35,54 @@ pip install -e ".[dev]"
 python setup.py build_ext --inplace
 ```
 
+## Architecture
+
+A complete, layered ML/DL backtesting tool — **data → features → signal →
+portfolio → backtest → metrics** — composed through `typing.Protocol` seams.
+numpy is the lingua franca; PyTorch is confined to `fynance.models`. Each piece
+is usable standalone; `fynance.strategy.Strategy` is an *optional* orchestrator.
+
+> **2.0 is a breaking release.** See [`doc/MIGRATION-2.0.md`](doc/MIGRATION-2.0.md)
+> for the import-path map (e.g. `fynance.algorithms` → `fynance.portfolio`,
+> performance metrics → `fynance.metrics`).
+
 ## Subpackages
 
-**Algorithms** `fynance.algorithms`  
-Portfolio allocation methods (ERC, HRP, IVP, MDP, MVP), walk-forward wrappers, and position sizing (fractional Kelly, volatility targeting, transaction costs).
+**Core** `fynance.core` — `PriceSeries` value object (thin, numpy-backed) and the
+pipeline protocols (`DataSource`, `FeatureTransform`, `SignalModel`, `Allocator`,
+`CostModel`, `Metric`).
 
-**Backtest** `fynance.backtest`  
-Profit-and-loss plotting and performance measurement.
+**Data** `fynance.data` — file adapters (`load` for CSV/Parquet → `PriceSeries`),
+alignment/resampling, and no-lookahead temporal splits (`train_test_split`,
+`walk_forward`).
 
-**Estimator** `fynance.estimator`  
-Cython ARMA / GARCH parameter estimation.
+**Features** `fynance.features` — technical indicators (Bollinger, RSI, MACD, ROC,
+realized volatility, rolling skew/kurtosis/autocorr, …), momentums (SMA, EMA, WMA),
+scaling (incl. rolling rank), statistics, feature engineering (multi-resolution,
+Granger causality) and market-regime detection.
 
-**Features** `fynance.features`  
-Kalman filter, technical indicators (Bollinger, RSI, MACD, ROC, realized volatility, rolling skew/kurtosis/autocorr, …),
-statistical momentums (SMA, EMA, WMA, …), metrics (Sharpe, Sortino, Calmar, drawdown, tail ratio, …), scaling
-(incl. rolling rank), feature-engineering tools (multi-resolution, Granger causality), and market-regime detection.
+**Metrics** `fynance.metrics` — performance/evaluation metrics (Sharpe, Sortino,
+Calmar, drawdown, …) and a one-call `summary`.
 
-**Models** `fynance.models`  
-Econometric models (MA, ARMA, ARMA-GARCH), neural networks with PyTorch (MLP, RNN, GRU, LSTM,
-MultiHeadAttention, **TCN**, **Transformer**), a **direction+magnitude stacking ensemble**,
-differentiable loss functions (Sharpe, Sortino, Calmar, Omega, directional, hybrid),
-robust-training utilities (purged CV, early stopping, sample weighting), and walk-forward rolling evaluation.
+**Signal** `fynance.signal` — prediction → position mappers (`sign`, `threshold`,
+`rank`, vol-targeting) and a model+mapper pipeline.
+
+**Portfolio** `fynance.portfolio` — allocation (ERC, HRP, IVP, MDP, MVP) and
+sizing (fractional Kelly, volatility targeting, transaction costs).
+
+**Backtest** `fynance.backtest` — vectorized engine (`backtest`: positions +
+returns/prices + cost → `BacktestResult`) and cost models.
+
+**Plot** `fynance.plot` — composable matplotlib figures and a one-call
+`tearsheet` report.
+
+**Models** `fynance.models` — econometric models (MA, ARMA, ARMA-GARCH) and
+PyTorch nets (MLP, RNN, GRU, LSTM, MultiHeadAttention, TCN, Transformer), a
+direction+magnitude stacking ensemble, differentiable losses (Sharpe, Sortino,
+Calmar, Omega, directional, hybrid), and robust-training utilities.
+
+**Strategy** `fynance.strategy` — optional orchestrator composing the maillons
+end-to-end, with single-run and walk-forward evaluation.
 
 ## Quick start
 
@@ -63,33 +90,26 @@ robust-training utilities (purged CV, early stopping, sample weighting), and wal
 import numpy as np
 import fynance as fy
 
-# Sharpe ratio
-returns = np.random.randn(252) * 0.01
-print(fy.sharpe(returns))
+# 1. Data — load a CSV/Parquet file, or build a PriceSeries directly
+prices = fy.PriceSeries(100 * np.cumprod(1 + np.random.randn(750) * 0.01))
 
-# ERC portfolio allocation
-cov = np.cov(np.random.randn(5, 252))
-weights = fy.ERC(cov)
-print(weights)
+# 2. Compose a strategy: momentum feature -> position -> backtest with costs
+strat = fy.Strategy(
+    features=lambda p: np.sign(np.diff(p, prepend=p[0])),
+    signal=lambda x: x,
+    cost=fy.ProportionalCost(fee=0.0005),
+)
+result = strat.run(prices)
+
+# 3. Evaluate and report
+print(result.summary())     # Sharpe, Sortino, Calmar, max drawdown, ...
+fig = fy.tearsheet(result)  # one-call performance report
 ```
 
-Rolling walk-forward training with a neural network:
-
-```python
-import torch
-import torch.nn as nn
-from fynance.models.rolling import RollMultiLayerPerceptron
-
-model = RollMultiLayerPerceptron(X, y, layers=[64, 32])
-model.set_optimizer(nn.MSELoss, torch.optim.Adam, lr=1e-3)
-model(train_period=252, test_period=21, roll_period=21)  # walk-forward windows
-for eval_set, test_set in model:   # each step trains on the past, tests the next
-    model._training()
-```
-
-See [`Notebooks/pytorch_examples.ipynb`](Notebooks/pytorch_examples.ipynb) for a
-runnable tour (metrics, allocation, MLP/TCN/Transformer with custom losses,
-walk-forward CV).
+See [`Notebooks/quickstart_v2.ipynb`](Notebooks/quickstart_v2.ipynb) for the full
+runnable tour (data, features, walk-forward, reporting). An optional Streamlit
+playground ships under [`apps/playground/`](apps/playground/)
+(`pip install -e ".[ui]" && streamlit run apps/playground/app.py`).
 
 ## Links
 

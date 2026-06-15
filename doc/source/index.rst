@@ -84,6 +84,9 @@
    :hidden:
    :caption: Reference
 
+   core
+   data
+   signal
    portfolio
    backtest
    estimator
