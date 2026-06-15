@@ -16,7 +16,7 @@ with a ``.run`` method, rather than a declarative config tree.
 from __future__ import annotations
 
 # Built-in packages
-from typing import Any, Callable, Sequence
+from typing import Any, Callable
 
 # Third-party packages
 import numpy as np
