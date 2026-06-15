@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from fynance.algorithms.allocation import (
+from fynance.portfolio.allocation import (
     ERC,
     HRP,
     IVP,

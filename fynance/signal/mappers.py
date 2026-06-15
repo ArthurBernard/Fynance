@@ -15,7 +15,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 # Local packages
-from fynance.algorithms.sizing import vol_target
+from fynance.portfolio.sizing import vol_target
 
 __all__ = ['sign', 'threshold', 'rank', 'vol_target_position']
 
@@ -107,7 +107,7 @@ def vol_target_position(
     """ Scale a directional signal by causal volatility-targeting leverage.
 
     Multiplies a directional ``signal`` by the leverage from
-    :func:`fynance.algorithms.sizing.vol_target` (inverse of *past* realized
+    :func:`fynance.portfolio.sizing.vol_target` (inverse of *past* realized
     volatility). Strictly causal.
     """
     sig = np.asarray(signal, dtype=np.float64)

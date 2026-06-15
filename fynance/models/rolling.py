@@ -12,7 +12,7 @@ in production.
 A concrete :class:`RollMultiLayerPerceptron` combines this iterator
 with :class:`fynance.models.mlp.MultiLayerPerceptron`. The
 same pattern is applied to portfolio allocation in
-:func:`fynance.algorithms.allocation.rolling_allocation`.
+:func:`fynance.portfolio.allocation.rolling_allocation`.
 
 Main entry points
 -----------------

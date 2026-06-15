@@ -5,7 +5,7 @@
 
 import numpy as np
 
-from fynance.algorithms.sizing import kelly_fraction, transaction_cost, vol_target
+from fynance.portfolio.sizing import kelly_fraction, transaction_cost, vol_target
 
 
 def test_kelly_fraction_formula():

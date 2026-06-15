@@ -16,7 +16,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 # Local packages
-from fynance.algorithms.sizing import transaction_cost
+from fynance.portfolio.sizing import transaction_cost
 
 __all__ = ['ProportionalCost']
 
