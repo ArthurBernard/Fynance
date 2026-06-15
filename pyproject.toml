@@ -55,6 +55,10 @@ doc = [
     "sphinx-design",
     "sphinx-copybutton",
 ]
+ui = [
+    "streamlit>=1.30",
+    "streamlit-ace",
+]
 
 [project.urls]
 Homepage = "https://github.com/ArthurBernard/Fynance"
