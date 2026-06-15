@@ -91,3 +91,4 @@
    metrics
    models
    plot
+   strategy
