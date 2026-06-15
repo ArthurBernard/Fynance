@@ -27,7 +27,7 @@ from __future__ import annotations
 import numpy as np
 
 # Local packages
-from numba import njit
+from numba import njit, prange
 from numpy.typing import NDArray
 
 from fynance._wrappers import WrapperArray
@@ -37,67 +37,66 @@ __all__ = ["roll_min", "roll_max"]
 
 @njit(cache=True)
 def _roll_min_1d(X, w):
-    """ Rolling minimum over a trailing window of size ``w`` (numba). """
+    """ Rolling minimum over a trailing window of size ``w``.
+
+    O(n) monotonic-deque implementation (each index is pushed/popped once);
+    the returned minima are identical to the naive O(n*w) computation.
+    """
     T = X.shape[0]
     out = np.empty(T, dtype=np.float64)
+    dq = np.empty(T, dtype=np.int64)  # indices, values increasing front->back
+    head = 0
+    tail = 0
     for t in range(T):
-        i = max(0, t - w + 1)
-        m = X[i]
-        while i < t:
-            i += 1
-            if X[i] < m:
-                m = X[i]
-        out[t] = m
+        while tail > head and X[dq[tail - 1]] >= X[t]:
+            tail -= 1
+        dq[tail] = t
+        tail += 1
+        if dq[head] < t - w + 1:
+            head += 1
+        out[t] = X[dq[head]]
     return out
 
 
-@njit(cache=True)
+@njit(parallel=True, cache=True)
 def _roll_min_2d(X, w):
-    """ Column-wise rolling minimum (numba). """
+    """ Column-wise rolling minimum (O(n) per column, parallel over columns). """
     T, N = X.shape
     out = np.empty((T, N), dtype=np.float64)
-    for n in range(N):
-        for t in range(T):
-            i = max(0, t - w + 1)
-            m = X[i, n]
-            while i < t:
-                i += 1
-                if X[i, n] < m:
-                    m = X[i, n]
-            out[t, n] = m
+    for n in prange(N):
+        out[:, n] = _roll_min_1d(np.ascontiguousarray(X[:, n]), w)
     return out
 
 
 @njit(cache=True)
 def _roll_max_1d(X, w):
-    """ Rolling maximum over a trailing window of size ``w`` (numba). """
+    """ Rolling maximum over a trailing window of size ``w``.
+
+    O(n) monotonic-deque implementation; identical maxima to the naive form.
+    """
     T = X.shape[0]
     out = np.empty(T, dtype=np.float64)
+    dq = np.empty(T, dtype=np.int64)  # indices, values decreasing front->back
+    head = 0
+    tail = 0
     for t in range(T):
-        i = max(0, t - w + 1)
-        m = X[i]
-        while i < t:
-            i += 1
-            if X[i] > m:
-                m = X[i]
-        out[t] = m
+        while tail > head and X[dq[tail - 1]] <= X[t]:
+            tail -= 1
+        dq[tail] = t
+        tail += 1
+        if dq[head] < t - w + 1:
+            head += 1
+        out[t] = X[dq[head]]
     return out
 
 
-@njit(cache=True)
+@njit(parallel=True, cache=True)
 def _roll_max_2d(X, w):
-    """ Column-wise rolling maximum (numba). """
+    """ Column-wise rolling maximum (O(n) per column, parallel over columns). """
     T, N = X.shape
     out = np.empty((T, N), dtype=np.float64)
-    for n in range(N):
-        for t in range(T):
-            i = max(0, t - w + 1)
-            m = X[i, n]
-            while i < t:
-                i += 1
-                if X[i, n] > m:
-                    m = X[i, n]
-            out[t, n] = m
+    for n in prange(N):
+        out[:, n] = _roll_max_1d(np.ascontiguousarray(X[:, n]), w)
     return out
 
 
