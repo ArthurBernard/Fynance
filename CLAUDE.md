@@ -11,14 +11,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-# Dev setup from scratch
-pip install -e ".[dev]" && python setup.py build_ext --inplace
+# Dev setup from scratch (pure-Python build — no compile step)
+pip install -e ".[dev]"
 
 # Activate git hooks (run once per clone)
 git config core.hooksPath .githooks
-
-# Build Cython extensions (required after editing any .pyx file)
-python setup.py build_ext --inplace
 
 # Run full test suite (--doctest-modules --exitfirst -vv configured in pyproject.toml)
 pytest
@@ -106,35 +103,40 @@ test + verify) → `/finish-task` (tests, ADR, CHANGELOG, PR, archive the leaf) 
 
 ## Architecture
 
-### Cython / Python dual-implementation (features)
+### Numerical kernels — Numba (no Cython)
 
-`fynance/features/` has two files per computation: `metrics_cy.pyx` (Cython, compiled) and `metrics.py` (pure Python). The `__init__.py` imports both. New performance-critical code should use **Numba `@njit`** — not new Cython — and live in the Python file alongside the existing implementation.
-
-The `USE_CYTHON='auto'` guard in `setup.py` tries to compile `.pyx` sources with Cython; if unavailable it falls back to pre-compiled `.c` files. Do not break this fallback when touching `setup.py`.
+As of 2.1 there is **no Cython** in the package: the former `*_cy.pyx` kernels
+(features `momentums`/`metrics`/`roll_functions`, and the ARMA/GARCH
+`estimator`/`econometric_models`) were ported to **Numba `@njit`** living in the
+`.py` modules (private `_kernel`-style functions). New performance-critical code
+uses Numba too. The build is pure-Python (no compile step, no `setup.py`).
 
 ### Rolling / walk-forward pattern
 
-`_RollingBasis` in `fynance/models/rolling.py` is the base for all walk-forward evaluation. It behaves as an iterator: `__call__` sets window parameters (`n` = train length, `s` = test length, `r` = roll step), and each `__next__` call trains on `X[t-n:t]` and predicts on `X[t:t+s]`. `RollMultiLayerPerceptron` subclasses this. `rolling_allocation()` in `fynance/algorithms/` replicates the same pattern as a function decorator for portfolio methods.
+`_RollingBasis` in `fynance/models/rolling.py` is the base for all walk-forward evaluation. It behaves as an iterator: `__call__` sets window parameters (`n` = train length, `s` = test length, `r` = roll step), and each `__next__` call trains on `X[t-n:t]` and predicts on `X[t:t+s]`. `RollMultiLayerPerceptron` subclasses this. `rolling_allocation()` in `fynance/portfolio/` replicates the same pattern as a function decorator for portfolio methods.
 
 ### Estimator → models pipeline
 
-`fynance/estimator/estimator_cy.pyx` is the Cython ARMA/GARCH parameter estimator. `fynance/models/econometric_models.py` wraps it via `get_parameters()`. Do not duplicate parameter estimation logic in the Python layer.
+`fynance/models/econometric_models.py` holds the Numba ARMA/GARCH kernels
+(`_ma`/`_arma`/`_arma_garch`/`_armax_garch`) wrapped by `MA`/`ARMA`/… and
+`get_parameters()`. `fynance/estimator/estimator.py` builds on them. Keep a single
+implementation — do not duplicate parameter logic.
 
 ## Modernization constraints
 
 - **Performance**: Numba `@njit` for new numerical code. No new Cython unless wrapping a C library.
 - **ML**: PyTorch only. Do not extend Keras/TensorFlow code.
 - **Architecture targets**: LSTM, TCN, Transformers over rolling MLP; walk-forward CV in training loops; custom loss functions targeting Sharpe/Sortino/directional accuracy.
-- **Build**: `pyproject.toml` is the authoritative build config. `setup.py` handles Cython extensions only.
+- **Build**: `pyproject.toml` is the authoritative (pure-Python) build config; there is no `setup.py` and no compile step.
 - **CI**: GitHub Actions (`.github/workflows/ci.yml`). Travis-CI removed.
 
 ## Stable vs. in-progress subpackages
 
 | Subpackage | Policy |
 |---|---|
-| `fynance.features` | Extend only — never rewrite Cython code |
-| `fynance.algorithms.allocation` | Stable public API — deprecation path required for breaking changes |
-| `fynance.estimator` | Do not duplicate logic in Python — Cython is authoritative |
+| `fynance.features` | Extend freely; numerical kernels are Numba `@njit` |
+| `fynance.portfolio.allocation` | Stable public API — deprecation path required for breaking changes |
+| `fynance.estimator` / `fynance.models.econometric_models` | Single Numba implementation — do not duplicate parameter logic |
 | `fynance.backtest` | Improve freely |
 | `fynance.models` | Modernize ML architecture freely |
 

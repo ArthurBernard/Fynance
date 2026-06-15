@@ -26,8 +26,6 @@ jobs:
           pip install -e ".[dev]"
           pip install interrogate
 
-      - name: Build Cython extensions
-        run: python setup.py build_ext --inplace
 
       - name: Generate docstring coverage badge
         run: |

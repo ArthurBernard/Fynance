@@ -30,9 +30,7 @@ from . import (
     engineering,
     filters,
     indicators,
-    metrics_cy,
     momentums,
-    momentums_cy,
     money_management,
     regime,
     roll_functions,
@@ -42,9 +40,7 @@ from . import (
 from .engineering import *
 from .filters import *
 from .indicators import *
-from .metrics_cy import *
 from .momentums import *
-from .momentums_cy import *
 from .money_management import *
 from .regime import *
 from .roll_functions import *
@@ -54,8 +50,6 @@ from .stats import *
 __all__ = engineering.__all__
 __all__ += regime.__all__
 __all__ += filters.__all__
-__all__ += metrics_cy.__all__
-__all__ += momentums_cy.__all__
 __all__ += momentums.__all__
 __all__ += indicators.__all__
 __all__ += money_management.__all__
