@@ -39,3 +39,37 @@ def test_loglikelihood_handles_zero_h():
     u = np.array([0.0, 1.0, -1.0])
     h = np.array([0.0, 1.0, 2.0])
     assert np.isfinite(loglikelihood(u, h))
+
+
+def test_target_function_arma_returns_finite():
+    import numpy as np
+
+    from fynance.estimator.estimator import target_function
+
+    y = np.random.default_rng(0).normal(0, 1, 40).astype(np.float64)
+    # params: c, phi(1), theta(1)
+    L = target_function(np.array([0.0, 0.3, 0.2]), y, p=1, q=1, cons=True,
+                        model="arma")
+    assert np.isfinite(L)
+
+
+def test_target_function_garch_returns_finite():
+    import numpy as np
+
+    from fynance.estimator.estimator import target_function
+
+    y = np.random.default_rng(1).normal(0, 1, 40).astype(np.float64)
+    # params: c, phi(1), theta(1), omega, alpha(1), beta(1)
+    params = np.array([0.0, 0.3, 0.2, 0.1, 0.1, 0.85])
+    L = target_function(params, y, p=1, q=1, Q=1, P=1, cons=True, model="garch")
+    assert np.isfinite(L)
+
+
+def test_target_function_unknown_model_raises():
+    import numpy as np
+    import pytest
+
+    from fynance.estimator.estimator import target_function
+
+    with pytest.raises(ValueError):
+        target_function(np.array([0.0]), np.zeros(5), cons=True, model="nope")
