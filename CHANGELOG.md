@@ -12,6 +12,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [2.1.1] - 2026-06-16
+
+### Breaking Changes
+
+### Added
+
+### Changed
+
 - Performance: rolling extrema (`roll_min`/`roll_max`) reimplemented with an O(n) monotonic deque (was O(n·w)) — ~10× faster at w=250, now flat in window size; their 2-D versions and `roll_mdd` run column-parallel (`numba` `prange`) and `roll_mdd` no longer allocates per window (~2×). Results are bit-identical to the previous implementation (verified against a naive reference).
 
 ### Fixed
