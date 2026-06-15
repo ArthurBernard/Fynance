@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `ARMAX_GARCH`: the external-regressor coefficients (`psi`) and MA coefficients (`theta`) were swapped between the public wrapper and the kernel, so `psi` was applied to past residuals instead of the exogenous regressor `x` (a long-standing bug, preserved verbatim through the Cython→numba port). Fixed; `ARMA_GARCH` was unaffected.
+
 ### Deprecated
 
 ### Removed
