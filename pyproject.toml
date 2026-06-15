@@ -119,7 +119,6 @@ warn_unused_configs = true
 module = [
   "fynance.features.metrics_cy",
   "fynance.features.momentums_cy",
-  "fynance.features.roll_functions_cy",
 ]
 ignore_errors = true
 

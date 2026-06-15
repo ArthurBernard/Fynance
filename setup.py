@@ -43,11 +43,6 @@ extensions = [
         ['fynance/features/momentums_cy' + ext],
         include_dirs=include_dirs,
     ),
-    Extension(
-        'fynance.features.roll_functions_cy',
-        ['fynance/features/roll_functions_cy' + ext],
-        include_dirs=include_dirs,
-    ),
 ]
 
 if USE_CYTHON:

@@ -36,7 +36,6 @@ from . import (
     money_management,
     regime,
     roll_functions,
-    roll_functions_cy,
     scale,
     stats,
 )
@@ -49,7 +48,6 @@ from .momentums_cy import *
 from .money_management import *
 from .regime import *
 from .roll_functions import *
-from .roll_functions_cy import *
 from .scale import *
 from .stats import *
 
@@ -61,7 +59,6 @@ __all__ += momentums_cy.__all__
 __all__ += momentums.__all__
 __all__ += indicators.__all__
 __all__ += money_management.__all__
-__all__ += roll_functions_cy.__all__
 __all__ += roll_functions.__all__
 __all__ += scale.__all__
 __all__ += stats.__all__
