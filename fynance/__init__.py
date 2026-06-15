@@ -62,14 +62,23 @@ except PackageNotFoundError:
 
 __all__ = ['__version__']
 
+import sys as _sys
+
 from .algorithms import *
 from .backtest import *
 from .estimator import *
 from .features import *
 from .models import *
 
-__all__ += models.__all__
-__all__ += estimator.__all__
-__all__ += features.__all__
-__all__ += backtest.__all__
-__all__ += algorithms.__all__
+# Aggregate each subpackage's public surface. Use ``sys.modules`` rather than the
+# package attributes, which a star import may have shadowed with a name that
+# collides with a submodule (e.g. the ``backtest`` engine function).
+for _name in ("models", "estimator", "features", "backtest", "algorithms"):
+    __all__ += _sys.modules[f"{__name__}.{_name}"].__all__
+
+# Restore the subpackage attribute shadowed by such a collision so that
+# ``fynance.backtest`` resolves to the package (``fynance.backtest.backtest``
+# stays the engine function).
+backtest = _sys.modules[__name__ + ".backtest"]
+
+del _sys, _name
