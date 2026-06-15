@@ -35,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`fynance.plot`** — composable matplotlib figures and a one-call `tearsheet`/`tearsheet_text`.
 - **`fynance.signal`** — prediction→position mappers (`sign`, `threshold`, `rank`, `vol_target_position`) and `SignalPipeline`.
 - **`fynance.strategy.Strategy`** — optional orchestrator composing the pipeline, with `run` and no-lookahead `run_walk_forward`.
-- Top-level API: key names re-exported on `fynance` (`PriceSeries`, `load`, `Strategy`, `tearsheet`, `backtest`, …).
+- Top-level API: key names re-exported on `fynance` (`PriceSeries`, `load`, `Strategy`, `tearsheet`, `sharpe`, `summary`, …). The vectorized engine is `fynance.backtest.backtest` (the `backtest` attribute on `fynance` is the subpackage).
 - Optional **Streamlit playground** (`apps/playground/`, `pip install -e ".[ui]"`).
 - `Notebooks/quickstart_v2.ipynb` end-to-end tour; Sphinx pages for every 2.0 subpackage; `doc/MIGRATION-2.0.md`.
 
