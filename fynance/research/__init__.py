@@ -15,8 +15,11 @@ downstream, never here.
 """
 
 # Local
-from . import experiment, report, runner, synthetic
+from . import compare, experiment, guards, ledger, report, runner, synthetic
+from .compare import *
 from .experiment import *
+from .guards import *
+from .ledger import *
 from .report import *
 from .runner import *
 from .synthetic import *
@@ -26,3 +29,6 @@ __all__ += experiment.__all__
 __all__ += synthetic.__all__
 __all__ += runner.__all__
 __all__ += report.__all__
+__all__ += guards.__all__
+__all__ += compare.__all__
+__all__ += ledger.__all__

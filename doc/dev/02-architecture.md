@@ -6,6 +6,9 @@ or models out. The structure is by *concern*, wired through `typing.Protocol`
 seams, with a shared causal-windowing pattern running through it.
 
 ```
+research            experiment harness: run_experiment → Experiment → write_report
+   │  drives           (data-agnostic; artifacts -> caller's output_dir only)
+   ▼
 strategy            optional orchestrator (compose the maillons end-to-end)
    │  composes
    ▼
@@ -47,6 +50,10 @@ stability policy per package.)
   kept for `RollMultiLayerPerceptron` but off the eager public surface.
 - **`plot/` · `strategy/`** — composable matplotlib figures + `tearsheet` (lazy
   import); the optional `Strategy` orchestrator + `run_walk_forward`.
+- **`research/`** — data-agnostic experiment harness: `experiment.py`
+  (`Experiment`), `runner.py` (`run_experiment`), `report.py` (`write_report`,
+  lazy matplotlib/nbformat), `synthetic.py` (`gbm`/`regime_switching`). Writes
+  artifacts only to a caller-provided `output_dir`; no real-data dependency.
 - **`estimator/`** — Numba ARMA/GARCH parameter estimation. **Authoritative** —
   parameter logic lives here / in `econometric_models`, not duplicated.
 
