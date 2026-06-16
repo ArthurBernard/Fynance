@@ -12,6 +12,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [2.1.3] - 2026-06-16
+
+### Breaking Changes
+
+### Added
+
+### Changed
+
 - Removed the last stale Cython references from the user-facing surface (package docstring, `estimator`/`econometric_models` docstrings, the API-stability policy now reads "2.x"). Internal parity-test docstrings keep accurate "former Cython" provenance notes.
 
 ### Fixed
