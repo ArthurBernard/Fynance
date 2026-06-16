@@ -13,6 +13,7 @@ adapters live downstream.
    :toctree: generated/
 
    Experiment
+   Ledger
    run_experiment
    write_report
    compare_report
