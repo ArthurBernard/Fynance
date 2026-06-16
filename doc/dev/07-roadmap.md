@@ -19,6 +19,31 @@ shipped, `03-decisions.md` for *why*. Keep it short and true.
 
 ---
 
+## 2. Research harness — outillage R&D piloté par l'IA  ⭐ active
+
+Faire de fynance le **substrat** qu'un agent (Claude Code) pilote pour tester des
+stratégies et produire des **artefacts de résultats portables**. fynance =
+**l'outil seulement** : les expériences sur vraie data et leurs **résultats sont
+stockés dans un repo privé séparé** qui dépend de fynance — *jamais* dans fynance.
+Data-agnostique : construit et testé sur un **générateur synthétique** (la vraie
+data est injectée en aval). Plan détaillé : `doc/dev/plans/research-harness/`.
+
+- [ ] **S1 harnais** — `fynance.research` : `Experiment` (spec + code généré +
+  résultats + seed, sérialisable), `run_experiment(strategy, data, *,
+  walk_forward, costs, seed, output_dir)`, générateur synthétique (GBM/régimes,
+  sert aussi de **test null**), writer de rapport (notebook + markdown/PNG vers un
+  `output_dir` configurable), skill `/run-strategy` encodant la boucle
+  write → validate → backtest → report → publish → résume.
+- [ ] **S2 garde-fous** — shuffle/permutation test, intégration purged walk-forward,
+  **deflated Sharpe + compteur d'essais** (anti-overfitting), rapport de
+  comparaison multi-stratégies vs baseline.
+- [ ] **S3 ledger** — save/load/compare des expériences (parquet/json) →
+  leaderboard cumulatif.
+
+> Les adaptateurs de vraie data (dccd…) et le stockage des résultats vivent dans
+> le **repo privé** de recherche, pas ici. Un explorateur Streamlit au-dessus du
+> ledger reste optionnel et plus tardif.
+
 ## 1. R&D — Loss, architecture, données
 
 Objectif : identifier empiriquement la meilleure combinaison loss / architecture / features
