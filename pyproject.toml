@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fynance"
-version = "2.1.1"
-description = "Python and Cython scripts of machine learning, econometrics and statistical features for financial analysis"
+version = "2.1.2"
+description = "Pure-Python (Numba-accelerated) machine learning, econometrics and statistical tools for financial analysis and backtesting"
 readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "Arthur Bernard", email = "arthur.bernard.92@gmail.com" }]
@@ -17,7 +17,6 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python",
-    "Programming Language :: Cython",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -95,7 +94,7 @@ ignore = ["E501"]
 [tool.ruff.lint.per-file-ignores]
 "fynance/**/__init__.py" = ["F401", "F403", "F405"]
 "fynance/__init__.py" = ["F401", "F403", "F405"]
-# Dual Cython/Python files use star imports to pull Cython symbols
+# Aggregator modules use star imports to re-export their split kernels
 "fynance/metrics/returns.py" = ["F403", "F405"]
 "fynance/metrics/ratios.py" = ["F403", "F405"]
 "fynance/metrics/drawdown.py" = ["F403", "F405"]
@@ -109,7 +108,7 @@ ignore = ["E501"]
 [tool.mypy]
 python_version = "3.10"
 ignore_missing_imports = true
-# numpy / Cython kernels pervasively return Any; we still declare
+# numpy / Numba kernels pervasively return Any; we still declare
 # concrete return annotations but don't fail the build on their Any-returns
 warn_return_any = false
 warn_unused_configs = true

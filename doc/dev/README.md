@@ -17,7 +17,7 @@ live in the repo-root `CLAUDE.md`.
 1. [`01-overview.md`](01-overview.md) — what fynance is, the current state, the
    repo map, the subpackages.
 2. [`02-architecture.md`](02-architecture.md) — the package layout, the
-   Cython/Python dual implementation, the rolling/walk-forward pattern, the
+   Numba kernels (golden-value parity), the rolling/walk-forward pattern, the
    estimator→models pipeline.
 3. [`03-decisions.md`](03-decisions.md) — the design choices and *why* (Numba over
    new Cython, PyTorch over Keras, the loss-function split, NumPy over polars),
@@ -34,9 +34,9 @@ live in the repo-root `CLAUDE.md`.
 - [`plans/`](plans/) — **active plan trees** (durable, hierarchical task plans).
   Each roadmap item being worked on expands into a `plans/<epic>/` tree of a
   global map + precise leaf specs that drive `/plan` → `/execute-leaf` →
-  `/finish-task`. See [`plans/README.md`](plans/README.md). **The trees and the
-  roadmap (`07-roadmap.md`) are gitignored** (kept local — R&D / strategy stays
-  private); only this format reference and the descriptive docs above are tracked.
+  `/finish-task`. See [`plans/README.md`](plans/README.md). **The plan trees are
+  gitignored** (kept local — R&D / strategy stays private); the descriptive docs
+  above, the roadmap (`07-roadmap.md`) and `plans/README.md` are tracked.
 
 ## Conventions for keeping this current
 

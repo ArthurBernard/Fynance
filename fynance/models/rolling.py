@@ -33,7 +33,6 @@ from typing import Callable
 # External packages
 import numpy as np
 import torch
-from matplotlib import pyplot as plt
 from numpy.typing import NDArray
 
 from fynance.backtest.backtest_neural_net import BacktestNeuralNet
@@ -41,9 +40,6 @@ from fynance.backtest.backtest_neural_net import BacktestNeuralNet
 # Local packages
 from fynance.models.cv_result import CVResult
 from fynance.models.mlp import MultiLayerPerceptron
-
-plt.style.use('seaborn-v0_8')
-
 
 __all__ = ['CVResult', '_RollingBasis', 'RollMultiLayerPerceptron']
 
@@ -317,6 +313,10 @@ class _RollingBasis:
         matplotlib.figure.Figure
 
         """
+        from matplotlib import pyplot as plt  # lazy: keeps matplotlib off the
+        # `import fynance` path (plotting is opt-in).
+        plt.style.use('seaborn-v0_8')
+
         df = self.get_stats()
         if df.size == 0:
             raise RuntimeError('No log data — run the model first.')

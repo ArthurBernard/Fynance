@@ -1,21 +1,24 @@
 # 2 — Architecture
 
-fynance is a **layered numerical library**, not a service. There's no I/O layer
-and no daemon: callers pass arrays/DataFrames in and get arrays/models out. The
-structure is by *concern* (features → algorithms/models → backtest), with a
-shared causal-windowing pattern running through all of them.
+fynance is a **layered numerical library**, not a service. Ports & adapters live
+only at the I/O edge (`data/`); everything else passes arrays in and gets arrays
+or models out. The structure is by *concern*, wired through `typing.Protocol`
+seams, with a shared causal-windowing pattern running through it.
 
 ```
-backtest        evaluate + plot results
+strategy            optional orchestrator (compose the maillons end-to-end)
+   │  composes
+   ▼
+backtest · plot     vectorized engine + cost → BacktestResult; tearsheet reporting
    │  consumes
    ▼
-algorithms · models      allocation, walk-forward training, econometrics
-   │  build on
+signal · portfolio · models   position mappers, allocation/sizing, walk-forward
+   │  build on                training, econometrics
    ▼
-features · estimator     indicators, metrics, ARMA/GARCH params (hot paths in Cython)
-   │  operate on
+features · metrics · estimator   indicators, perf metrics, ARMA/GARCH params
+   │  operate on                  (hot paths in Numba @njit)
    ▼
-core                     series helpers, array wrappers
+core · data         PriceSeries + protocols; adapters, align, temporal splits
 ```
 
 ## Subpackage by subpackage
@@ -23,43 +26,43 @@ core                     series helpers, array wrappers
 (See [`04-subpackages.md`](04-subpackages.md) for the public API surface and the
 stability policy per package.)
 
-- **`features/`** — the numerical kernels: `metrics` (Sharpe/Sortino/Calmar,
-  drawdowns, accuracy, z-score…), `momentums` (EMA/SMA/…), `indicators`,
-  `filters`, `roll_functions`, `scale`, `money_management`. The heavy ones ship a
-  `.py` *and* a compiled `*_cy.pyx` twin (see below).
-- **`algorithms/`** — `allocation.py`: ERC, HRP, IVP, MDP, MVP portfolio methods
-  plus `rolling_allocation()` (walk-forward driver for allocation). Stable
-  public API.
-- **`estimator/`** — `estimator_cy.pyx`: the Cython ARMA/GARCH parameter
-  estimator. **Authoritative** — parameter logic lives here, not duplicated in
-  Python.
-- **`models/`** — econometric (`econometric_models.py` wrapping the estimator) and
-  neural (`mlp`, `rnn`, `gru`, `lstm`, `attention`) on a rolling/walk-forward
-  base; `loss/` holds custom PyTorch losses.
-- **`backtest/`** — `plot_backtest`, `dynamic_plot_backtest`,
-  `backtest_neural_net`, `print_stats`, `loss`; evaluation and visualisation.
-  Improve freely.
-- **`core/`** — `series.py` array/series helpers shared across packages.
+- **`core/`** — `PriceSeries` (numpy-backed value object; compose, don't subclass
+  `ndarray`) and the pipeline protocols (`DataSource`/`FeatureTransform`/
+  `SignalModel`/`Allocator`/`CostModel`/`Metric`, `runtime_checkable`).
+- **`data/`** — the only I/O layer: `load()` dispatcher + CSV/Parquet adapters,
+  causal `align`/`resample`, no-lookahead `train_test_split`/`walk_forward`.
+- **`features/`** — numerical kernels: `momentums` (EMA/SMA/…), `indicators`,
+  `filters`, `roll_functions`, `scale`, `engineering`, `regime`,
+  `_metrics_helpers` (the Numba metric kernels), `money_management`.
+- **`metrics/`** — performance/evaluation metrics split by concern: `ratios`
+  (Sharpe/Sortino/Calmar/…), `drawdown`, `returns`, `summary` (one-call panel).
+- **`signal/` · `portfolio/`** — `sign`/`threshold`/`rank`/vol-target mappers +
+  `SignalPipeline`; `allocation.py` (ERC/HRP/IVP/MDP/MVP + `rolling_allocation()`,
+  stable public API) and `sizing.py`.
+- **`models/`** — econometric (`econometric_models.py`, Numba ARMA/GARCH) and
+  neural (`mlp`, `rnn`, `gru`, `lstm`, `attention`, `tcn`, `transformer`) on a
+  rolling/walk-forward base; `loss/` (torch losses), `training.py`, `ensemble.py`.
+- **`backtest/`** — vectorized `engine` + `cost` + `result`; the legacy live-viz
+  plot stack (`plot_backtest`/`dynamic_plot_backtest`/`backtest_neural_net`) is
+  kept for `RollMultiLayerPerceptron` but off the eager public surface.
+- **`plot/` · `strategy/`** — composable matplotlib figures + `tearsheet` (lazy
+  import); the optional `Strategy` orchestrator + `run_walk_forward`.
+- **`estimator/`** — Numba ARMA/GARCH parameter estimation. **Authoritative** —
+  parameter logic lives here / in `econometric_models`, not duplicated.
 
 ## Three cross-cutting patterns
 
-### 1. Cython / Python dual implementation (`features/`)
+### 1. Numba kernels with golden-value parity (`features/`, `models/`, `estimator/`)
 
-Each performance-critical kernel exists twice: a compiled `*_cy.pyx` (e.g.
-`momentums_cy`, `roll_functions_cy`, `metrics_cy`) and a thin Python wrapper that
-calls it (`momentums.py`, `roll_functions.py`, …). `features/__init__.py` imports
-both layers. `setup.py`'s `USE_CYTHON='auto'` guard compiles the `.pyx` if Cython
-is available, else falls back to pre-compiled `.c` files — **do not break this
-fallback**. Kernel correctness is cross-checked against independent NumPy
-references by the property tests (`tests/features/test_property.py`).
-
-> The metrics surface is now split across `returns.py`, `ratios.py`,
-> `drawdown.py`, `stats.py` + `_metrics_helpers.py`, with `metrics.py` kept as a
-> thin re-export aggregator (public API unchanged).
-
-> **Going forward**: new performance-critical code uses **Numba `@njit`** in the
-> Python file, *not* new Cython. The Cython twins are kept (extend-only), not
-> grown. See [`03-decisions.md`](03-decisions.md).
+Performance-critical kernels are private Numba `@njit` functions (e.g.
+`_ema`/`_sma` in `momentums`, the `_roll_*` kernels in `_metrics_helpers`, the
+`_arma`/`_arma_garch` kernels in `econometric_models`) wrapped by thin public
+functions. There is **no Cython** — the former `*_cy.pyx` twins were ported to
+Numba in 2.1 (E7) and the build is pure-Python. Each kernel is cross-checked
+against an independent NumPy reference *and* a golden value captured from the
+former Cython (1e-9/1e-10) by the property/parity tests
+(`tests/features/test_property.py`, the `*_parity` tests). New numeric code uses
+Numba `@njit`, not Cython. See [`03-decisions.md`](03-decisions.md).
 
 ### 2. Rolling / walk-forward (the causal core)
 
@@ -67,21 +70,22 @@ references by the property tests (`tests/features/test_property.py`).
 It is an **iterator**: `__call__` sets the window (`n` = train length, `s` = test
 length, `r` = roll step); each `__next__` trains on `X[t-n:t]` and predicts on
 `X[t:t+s]`. `RollMultiLayerPerceptron` subclasses it; `rolling_allocation()`
-(`algorithms/`) replicates the same shape as a decorator for portfolio methods.
+(`portfolio/`) replicates the same shape as a decorator for portfolio methods.
 
 This pattern is *the* lookahead guard: a window can only ever see its own past.
 Any new model or feature must preserve it.
 
 ### 3. Estimator → models pipeline
 
-`estimator/estimator_cy.pyx` estimates ARMA/GARCH parameters; `models/
-econometric_models.py` wraps it via `get_parameters()`. The Python layer never
-re-implements parameter estimation — the Cython estimator is the single source.
+`estimator/estimator.py` and `models/econometric_models.py` hold the Numba ARMA/
+GARCH kernels; `models` wraps them via `get_parameters()`. The wrapper layer never
+re-implements parameter estimation — the Numba kernels are the single source.
 
 ## ML backend
 
-PyTorch is the ML backend. Legacy Keras/TensorFlow code is being **retired, not
-extended**: new architectures (TCN, Transformer, custom losses) target PyTorch,
-with `nn.Module` models trained through the walk-forward base and financial loss
-functions (Sharpe/Sortino/directional) implemented as pure torch ops in
-`models/loss/`.
+PyTorch is the ML backend, confined to `models/`. TensorFlow/Keras is fully
+retired (none in the package). New architectures (TCN, Transformer, custom losses)
+target PyTorch, with `nn.Module` models trained through the walk-forward base and
+financial loss functions (Sharpe/Sortino/directional) implemented as pure torch
+ops in `models/loss/`. Every NN model conforms to the `SignalModel` protocol
+(`fit`/`predict`) so it composes with `strategy.Strategy`.

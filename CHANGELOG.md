@@ -18,6 +18,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.1.2] - 2026-06-16
+
+### Breaking Changes
+
+### Added
+
+### Changed
+
+- `import fynance` no longer eagerly imports matplotlib/seaborn (lazy in the rolling-NN live-viz path); the legacy `backtest` plot objects (`PlotBackTest`/`DynaPlotBackTest`/`display_perf`) are no longer on the eager public surface (still importable as submodules). Plotting/reporting is `fynance.plot`.
+- Documentation and packaging metadata refreshed for the pure-Python (Numba) 2.x reality: dropped the stale `Cython` PyPI classifier and "Python and Cython" project description, fixed the install instructions (no compile step), and rewrote the developer brief / Sphinx pages to the layered architecture.
+
+### Fixed
+
+- `ARMAX_GARCH`: the external-regressor coefficients (`psi`) and MA coefficients (`theta`) were swapped between the public wrapper and the kernel, so `psi` was applied to past residuals instead of the exogenous regressor `x` (a long-standing bug, preserved verbatim through the Cython→numba port). Fixed; `ARMA_GARCH` was unaffected.
+
+### Deprecated
+
+### Removed
+
+- Dead private helpers `_roll_annual_return_py` / `_roll_annual_volatility_py` (superseded numpy fallbacks) from `fynance.features._metrics_helpers`.
+
 ## [2.1.1] - 2026-06-16
 
 ### Breaking Changes
@@ -26,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Removed a leftover debug `print` in `portfolio.allocation` (singular-covariance error path now re-raises cleanly).
 - Performance: rolling extrema (`roll_min`/`roll_max`) reimplemented with an O(n) monotonic deque (was O(n·w)) — ~10× faster at w=250, now flat in window size; their 2-D versions and `roll_mdd` run column-parallel (`numba` `prange`) and `roll_mdd` no longer allocates per window (~2×). Results are bit-identical to the previous implementation (verified against a naive reference).
 
 ### Fixed
