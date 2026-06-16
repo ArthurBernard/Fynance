@@ -19,24 +19,18 @@ shipped, `03-decisions.md` for *why*. Keep it short and true.
 
 ---
 
-## 2. Research harness — outillage R&D piloté par l'IA  ⭐ active
+## 2. Research harness — extensions optionnelles
 
-Faire de fynance le **substrat** qu'un agent (Claude Code) pilote pour tester des
-stratégies et produire des **artefacts de résultats portables**. fynance =
-**l'outil seulement** : les expériences sur vraie data et leurs **résultats sont
-stockés dans un repo privé séparé** qui dépend de fynance — *jamais* dans fynance.
-Data-agnostique : construit et testé sur un **générateur synthétique** (la vraie
-data est injectée en aval). Plan détaillé : `doc/dev/plans/research-harness/`.
+Le harnais R&D `fynance.research` est **livré** (S1–S3) : `Experiment`,
+`run_experiment`, `write_report`, générateurs synthétiques, garde-fous
+(`permutation_test`, `deflated_sharpe_ratio`) et `Ledger`/`leaderboard` — piloté
+par la skill `/run-strategy`. Voir `CHANGELOG.md`. Data-agnostique et sans
+stockage de résultats (tout vers un `output_dir`). Restent optionnels :
 
-- [ ] **S2 garde-fous** — shuffle/permutation test, intégration purged walk-forward,
-  **deflated Sharpe + compteur d'essais** (anti-overfitting), rapport de
-  comparaison multi-stratégies vs baseline.
-- [ ] **S3 ledger** — save/load/compare des expériences (parquet/json) →
-  leaderboard cumulatif.
-
-> Les adaptateurs de vraie data (dccd…) et le stockage des résultats vivent dans
-> le **repo privé** de recherche, pas ici. Un explorateur Streamlit au-dessus du
-> ledger reste optionnel et plus tardif.
+- [ ] Explorateur **Streamlit** au-dessus du ledger (parcourir/filtrer/comparer les
+  runs persistés) — interactif, plus tardif.
+- [ ] (**hors fynance**) adaptateurs de vraie data (dccd…) + stockage des
+  résultats : dans le **repo privé** de recherche qui dépend de fynance.
 
 ## 1. R&D — Loss, architecture, données
 
