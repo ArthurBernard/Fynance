@@ -15,15 +15,15 @@ https://fynance.readthedocs.io/en/latest/index.html.
 
 Contents
 --------
-Fynance is a python/cython project that includes several machine learning,
-econometric and statistical subpackages specialy adapted for financial
-analysis, portfolio allocation, and backtest trading strategies.
+Fynance is a pure-Python (Numba-accelerated) project that includes several
+machine learning, econometric and statistical subpackages specially adapted
+for financial analysis, portfolio allocation, and backtest trading strategies.
 
 Subpackages
 -----------
 portfolio       --- Portfolio allocation & sizing
 backtest        --- Backtest strategy tools
-estimator       --- Parameter estimation (Cython ARMA/GARCH)
+estimator       --- Parameter estimation (Numba ARMA/GARCH)
 features        --- Features extraction
 models          --- Econometric and Neural Network models (using PyTorch)
 
@@ -33,12 +33,12 @@ _exceptions --- Fynance exceptions
 tests       --- Run fynance unittests
 _wrappers   --- Fynance wrapper functions
 
-API stability policy (1.x series)
+API stability policy (2.x series)
 ---------------------------------
 The symbols re-exported below from :mod:`fynance.models`,
-:mod:`fynance.portfolio.allocation`, :mod:`fynance.features` and
-:mod:`fynance.estimator` form the **public, stable API** for the 1.x
-release line. Within 1.x:
+:mod:`fynance.portfolio.allocation`, :mod:`fynance.features`,
+:mod:`fynance.metrics` and :mod:`fynance.estimator` form the **public,
+stable API** for the 2.x release line. Within 2.x:
 
 - public function and class signatures are frozen — no removals, no
   backward-incompatible signature changes;
@@ -48,7 +48,7 @@ release line. Within 1.x:
 - :mod:`fynance.backtest` and :mod:`fynance.models` *internal* helpers
   (names prefixed with ``_``) remain free to evolve.
 
-Breaking changes are reserved for the 2.x line and tracked in
+Breaking changes are reserved for the next major line and tracked in
 ``CHANGELOG.md``.
 
 """

@@ -12,7 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Removed the last stale Cython references from the user-facing surface (package docstring, `estimator`/`econometric_models` docstrings, the API-stability policy now reads "2.x"). Internal parity-test docstrings keep accurate "former Cython" provenance notes.
+
 ### Fixed
+
+- Read the Docs builds were failing since v2.1.0 — `.readthedocs.yaml` still ran `python setup.py build_ext` (no `setup.py` in the pure-Python build), so the hosted docs were stuck on a pre-2.0 render. Dropped the obsolete build step; RTD now builds the current docs.
 
 ### Deprecated
 

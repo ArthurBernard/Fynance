@@ -31,7 +31,7 @@ def estimation(y, x0, p=0, q=0, Q=0, P=0, cons=True, model='arch'):
        driver never reached a working optimiser. It is kept as a placeholder
        only; calling it raises :class:`NotImplementedError`.
 
-       For ARMA/GARCH parameter estimation use the Cython-backed path exposed
+       For ARMA/GARCH parameter estimation use the Numba-backed path exposed
        through :func:`fynance.models.econometric_models.get_parameters`, which
        is the authoritative implementation (the Python layer must not duplicate
        it — see the estimator stability policy).
@@ -45,7 +45,7 @@ def estimation(y, x0, p=0, q=0, Q=0, P=0, cons=True, model='arch'):
     raise NotImplementedError(
         "fynance.estimator.estimation is experimental and not implemented; "
         "use fynance.models.econometric_models.get_parameters for ARMA/GARCH "
-        "parameter estimation (the Cython-backed, authoritative path)."
+        "parameter estimation (the Numba-backed, authoritative path)."
     )
 
 
@@ -74,10 +74,10 @@ def target_function(params, y, p=0, q=0, Q=0, P=0, cons=True, model='arch'):
 
 
 def _loglikelihood(u, h):
-    """ Normal log-likelihood (matches the former Cython ``loglikelihood_cy``).
+    """ Normal log-likelihood.
 
     Adds a 1e-8 floor to every conditional variance term (not only zeros), as
-    the Cython implementation did; used internally by :func:`target_function`.
+    the original kernel did; used internally by :func:`target_function`.
     """
     h2 = np.square(h) + 1e-8
     L = u.size * np.log(2 * np.pi) + np.sum(np.log(h2)) + np.sum(np.square(u) / h2)
