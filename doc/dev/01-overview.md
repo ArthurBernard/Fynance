@@ -2,20 +2,27 @@
 
 ## What fynance is
 
-**fynance** is a Python + Cython library of machine-learning, econometric, and
-statistical tools for **financial time-series analysis**. It bundles four things
-that usually live in separate packages:
+**fynance** is a pure-Python library (Numba-accelerated kernels) of
+machine-learning, econometric, and statistical tools for **financial time-series
+analysis and backtesting**. Since 2.0 it is a **layered backtesting tool**
+(data → features → signal → portfolio → backtest → metrics) composed through
+`typing.Protocol` seams, not just a grab-bag of functions:
 
-- **Features** — financial indicators, metrics, filters, momentums, scaling
-  (Sharpe/Sortino/Calmar, drawdowns, rolling stats, …), with Cython-accelerated
-  hot paths.
-- **Algorithms** — portfolio allocation (ERC, HRP, IVP, MDP, MVP) and a generic
-  rolling/walk-forward driver.
-- **Models** — econometric (ARMA/GARCH via a Cython estimator) and neural
-  (MLP, RNN/GRU/LSTM, attention, TCN, Transformer, stacking ensemble) with a
-  walk-forward training base, plus custom PyTorch losses (Sharpe/Sortino/Calmar/
-  Omega/directional/hybrid).
-- **Backtest** — evaluation, P&L/perf plotting (static + dynamic), stat printing.
+- **Core** — `PriceSeries` (thin numpy-backed value object) and the pipeline
+  protocols (`DataSource`/`FeatureTransform`/`SignalModel`/`Allocator`/
+  `CostModel`/`Metric`).
+- **Data** — `load()` + CSV/Parquet adapters, causal align/resample, no-lookahead
+  temporal splits.
+- **Features** — financial indicators, momentums, filters, scaling, feature
+  engineering, regime detection (Numba-accelerated hot paths).
+- **Metrics** — Sharpe/Sortino/Calmar, drawdowns, rolling stats, one-call summary.
+- **Signal / Portfolio** — prediction→position mappers; allocation (ERC/HRP/IVP/
+  MDP/MVP) + sizing.
+- **Models** — econometric (ARMA/GARCH) and neural (MLP, RNN/GRU/LSTM, attention,
+  TCN, Transformer, stacking ensemble) on a walk-forward training base, plus custom
+  PyTorch losses (Sharpe/Sortino/Calmar/Omega/directional/hybrid).
+- **Backtest / Plot / Strategy** — vectorized engine + cost models →
+  `BacktestResult`; `tearsheet` reporting; optional `Strategy` orchestrator.
 
 The throughline is **strict temporal causality**: every rolling feature and every
 training window is computed from the past only — no lookahead. This is the
@@ -23,44 +30,49 @@ library's core invariant, enforced in tests.
 
 ## Current state (snapshot)
 
-- **Version `1.3.4`** (in `pyproject.toml`, static), released on `master` and
+- **Version `2.1.1`** (in `pyproject.toml`, static), released on `master` and
   published to PyPI; `Development Status :: 5 - Production/Stable`.
-- **Python 3.10–3.13** (CI matrix). Build is `setuptools` + **Cython 3** +
-  **NumPy 2**.
-- **~300 tests** under `fynance/tests/` (mirrors the package), **plus doctests**
+- **Python 3.10–3.13** (CI matrix). Build is **pure-Python** (setuptools, no
+  compile step) — numerical kernels are Numba `@njit`. No Cython.
+- **501 tests** under `fynance/tests/` (mirrors the package), **plus doctests**
   run on every module via `--doctest-modules` — docstring examples are part of
-  the suite and must stay runnable. `ruff` + `mypy` configured; Sphinx docs build
-  (furo).
-- **Core stack**: NumPy 2, pandas 2, SciPy, Numba (`@njit`), **PyTorch** (the ML
-  backend — Keras/TensorFlow is being retired), matplotlib/seaborn.
+  the suite and must stay runnable.
+- **Four CI gates**: pytest (3.10–3.13), `ruff`, `interrogate` (docstring
+  coverage ≥ 80%), Sphinx build `-W`, and `mypy` clean.
+- **Core stack**: NumPy, SciPy, Numba (`@njit`), **PyTorch** (the ML backend —
+  no TensorFlow/Keras), matplotlib/seaborn (lazy — `import fynance` stays
+  matplotlib-free).
 
 ## Repo map
 
 ```
 fynance/
-  features/      # indicators, metrics, momentums, filters, scale,
-                 #   roll_functions, money_management
-                 #   (each hot path has a .py + a compiled *_cy.pyx twin)
-  algorithms/    # allocation (ERC/HRP/IVP/MDP/MVP), rolling_allocation
-  models/        # econometric_models (ARMA/GARCH) + neural (mlp/rnn/gru/lstm/
-                 #   attention) on a rolling/walk-forward base; loss/ (torch losses)
-  estimator/     # estimator_cy.pyx — ARMA/GARCH parameter estimation (Cython)
-  backtest/      # plotting (static + dynamic), loss, print_stats
-  core/          # series helpers
-  _exceptions.py # ArraySizeError and friends (shared error types)
-  tests/         # mirrors the package; pytest + doctests
+  core/        # PriceSeries value object + pipeline protocols
+  data/        # load() + CSV/Parquet adapters, align/resample, temporal splits
+  features/    # indicators, momentums, filters, scale, engineering, regime,
+               #   _metrics_helpers (Numba kernels), money_management
+  metrics/     # ratios, drawdown, returns, summary (perf/eval metrics)
+  signal/      # prediction→position mappers + SignalPipeline
+  portfolio/   # allocation (ERC/HRP/IVP/MDP/MVP) + sizing
+  models/      # econometric_models (ARMA/GARCH, Numba) + neural (mlp/rnn/gru/
+               #   lstm/attention/tcn/transformer) on a walk-forward base;
+               #   loss/ (torch losses), training, ensemble
+  backtest/    # vectorized engine + cost + result; legacy live-viz plot stack
+  plot/        # composable matplotlib figures + tearsheet (lazy import)
+  strategy/    # optional Strategy orchestrator + walk-forward run
+  estimator/   # ARMA/GARCH parameter estimation (Numba)
+  tests/       # mirrors the package; pytest + doctests
 doc/
-  source/        # Sphinx (furo) end-user docs
-  dev/           # THIS folder — agent-facing brief
-setup.py         # Cython extension build only (metadata is in pyproject.toml)
+  source/      # Sphinx (furo) end-user docs
+  dev/         # THIS folder — agent-facing brief
+pyproject.toml # authoritative build config (pure-Python; no setup.py)
 ```
 
 ## Three things an agent should never break
 
 1. **No lookahead bias** — any feature at `t` must be `f(data[..t])`; any training
    window trains on the strict past. See `03-decisions.md` and `05-testing.md`.
-2. **The Cython fallback** — `setup.py` compiles `.pyx` if Cython is present, else
-   falls back to shipped `.c`. New numeric code uses **Numba `@njit`**, not new
-   Cython.
+2. **Numba kernels with golden-value parity** — performance-critical numeric code
+   is Numba `@njit`; every kernel has a parity test (1e-9/1e-10). No Cython.
 3. **Doctests are tests** — every docstring example runs under
    `--doctest-modules`; a broken example fails CI.

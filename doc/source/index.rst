@@ -26,9 +26,9 @@
      <a href="https://pepy.tech/project/fynance"><img src="https://pepy.tech/badge/fynance" alt="Downloads"></a>
    </div>
 
-**Fynance** is a Python and Cython package providing **machine learning**,
-**econometric** and **statistical** tools for **financial analysis** and
-**backtesting of trading strategies**.
+**Fynance** is a pure-Python package (Numba-accelerated kernels) providing
+**machine learning**, **econometric** and **statistical** tools for
+**financial analysis** and **backtesting of trading strategies**.
 
 .. code-block:: bash
 
@@ -39,24 +39,24 @@
    :margin: 0
    :padding: 0
 
-   .. grid-item-card:: :octicon:`goal;1.2em;sd-mr-1` Algorithms
+   .. grid-item-card:: :octicon:`goal;1.2em;sd-mr-1` Portfolio
       :link: portfolio
       :link-type: doc
 
-      Portfolio allocation (ERC, HRP, IVP, MDP, MVP) and rolling
-      walk-forward wrappers.
+      Portfolio allocation (ERC, HRP, IVP, MDP, MVP), position sizing and
+      rolling walk-forward wrappers.
 
    .. grid-item-card:: :octicon:`rocket;1.2em;sd-mr-1` Backtest
       :link: backtest
       :link-type: doc
 
-      Profit-and-loss plotting and performance measurement.
+      Vectorized backtesting engine, cost models and performance reporting.
 
    .. grid-item-card:: :octicon:`pulse;1.2em;sd-mr-1` Estimator
       :link: estimator
       :link-type: doc
 
-      Cython ARMA / GARCH parameter estimation.
+      Numba-accelerated ARMA / GARCH parameter estimation.
 
    .. grid-item-card:: :octicon:`stack;1.2em;sd-mr-1` Features
       :link: features
@@ -70,7 +70,7 @@
       :link-type: doc
 
       Econometric models, neural networks (MLP, RNN, GRU, LSTM,
-      attention) and walk-forward training.
+      attention, TCN, Transformer) and walk-forward training.
 
 .. toctree::
    :hidden:
