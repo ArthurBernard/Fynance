@@ -28,12 +28,6 @@ stockés dans un repo privé séparé** qui dépend de fynance — *jamais* dans
 Data-agnostique : construit et testé sur un **générateur synthétique** (la vraie
 data est injectée en aval). Plan détaillé : `doc/dev/plans/research-harness/`.
 
-- [ ] **S1 harnais** — `fynance.research` : `Experiment` (spec + code généré +
-  résultats + seed, sérialisable), `run_experiment(strategy, data, *,
-  walk_forward, costs, seed, output_dir)`, générateur synthétique (GBM/régimes,
-  sert aussi de **test null**), writer de rapport (notebook + markdown/PNG vers un
-  `output_dir` configurable), skill `/run-strategy` encodant la boucle
-  write → validate → backtest → report → publish → résume.
 - [ ] **S2 garde-fous** — shuffle/permutation test, intégration purged walk-forward,
   **deflated Sharpe + compteur d'essais** (anti-overfitting), rapport de
   comparaison multi-stratégies vs baseline.
