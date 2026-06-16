@@ -12,7 +12,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [2.1.2] - 2026-06-16
+
+### Breaking Changes
+
+### Added
+
+### Changed
+
 - `import fynance` no longer eagerly imports matplotlib/seaborn (lazy in the rolling-NN live-viz path); the legacy `backtest` plot objects (`PlotBackTest`/`DynaPlotBackTest`/`display_perf`) are no longer on the eager public surface (still importable as submodules). Plotting/reporting is `fynance.plot`.
+- Documentation and packaging metadata refreshed for the pure-Python (Numba) 2.x reality: dropped the stale `Cython` PyPI classifier and "Python and Cython" project description, fixed the install instructions (no compile step), and rewrote the developer brief / Sphinx pages to the layered architecture.
 
 ### Fixed
 
