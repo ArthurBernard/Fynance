@@ -33,6 +33,13 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
 - **Backtest / Plot**: vectorized `backtest()` engine → `BacktestResult`,
   `ProportionalCost`; reporting via `fynance.plot` (`tearsheet`, composable
   figures, lazy matplotlib so `import fynance` stays matplotlib-free).
+- **Research harness** (`fynance.research`, S1): `Experiment` (serializable
+  spec + code + seed + metrics + curves), `run_experiment` (seeded, cost-aware,
+  walk-forward; no-lookahead probe), `write_report` (portable markdown + tearsheet
+  PNG + notebook), and `gbm`/`regime_switching` synthetic generators. **Data-agnostic
+  and result-free**: artifacts only go to a caller-provided `output_dir`; real data
+  + result storage live in a separate private repo. Driven by the user-level
+  `/run-strategy` skill. Guardrails (S2) and ledger (S3) are pending.
 - **Numerical kernels on Numba `@njit`** — no Cython anywhere; the build is
   pure-Python (no `setup.py`, no compile step). Every kernel has a golden-value
   parity test (1e-9/1e-10) captured from the former Cython.
@@ -50,6 +57,9 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
   normalization on real out-of-sample data, market-regime conditioning, and
   multi-series OHLCV indicators — see the roadmap (§1). Most items are blocked on
   having a real dataset / orchestration rather than on missing code.
+- **Research harness** (roadmap §2): S1 shipped (above); **S2 guardrails**
+  (shuffle/permutation test, deflated Sharpe, trials counter) and **S3 ledger**
+  (save/load/compare → leaderboard) are next.
 
 ## Known gaps / sharp edges (by design or deferred)
 
