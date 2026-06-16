@@ -18,6 +18,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.2.0] - 2026-06-16
+
+### Breaking Changes
+
+### Added
+
+- `fynance.research` — new data-agnostic research-harness subpackage. First piece: `Experiment`, a serializable record (spec + generated code + seed + metrics + curves + provenance) with `to_dict`/`from_dict`/`save`/`load`. Artifacts are written only to a caller-provided `output_dir` (fynance never stores results itself).
+- `fynance.research` synthetic generators `gbm` and `regime_switching` — seeded price paths so the harness is testable with zero real data (and usable as a null test).
+- `fynance.research.run_experiment(strategy, data, *, name, walk_forward, costs, seed, output_dir, ...)` — runs a seeded, cost-aware, walk-forward (or single) backtest through the existing maillons and returns a populated `Experiment`; saves it under `output_dir` when given. No-lookahead verified by a black-box causality probe.
+- `fynance.research.write_report(experiment, output_dir, *, notebook, execute)` — renders an experiment into portable, remotely-viewable artifacts (markdown + tearsheet PNG + a re-runnable notebook) under `output_dir`. matplotlib/nbformat imported lazily; notebook execution is opt-in and degrades gracefully.
+
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
 ## [2.1.3] - 2026-06-16
 
 ### Breaking Changes

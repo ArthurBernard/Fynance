@@ -64,6 +64,10 @@ __all__ = ['__version__']
 
 import sys as _sys
 
+# Research harness — kept namespaced (``fynance.research.*``), not flattened into
+# the top-level surface, and not eagerly heavy (its report writer imports
+# matplotlib lazily).
+from . import research
 from .backtest import *
 from .core import *
 from .data import *
