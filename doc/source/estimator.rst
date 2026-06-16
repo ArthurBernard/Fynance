@@ -2,8 +2,8 @@
  Estimator (:mod:`fynance.estimator`)
 --------------------------------------
 
-Internal Cython module implementing ARMA / GARCH parameter estimation
-via maximum likelihood.
+Internal Numba-accelerated module implementing ARMA / GARCH parameter
+estimation via maximum likelihood.
 
 .. note::
 

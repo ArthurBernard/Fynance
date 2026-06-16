@@ -17,8 +17,9 @@
 
 ___
 
-Python and Cython package providing **machine learning**, **econometric** and **statistical** tools
-for **financial analysis** and **backtesting of trading strategies**.
+Pure-Python package (Numba-accelerated kernels) providing **machine learning**,
+**econometric** and **statistical** tools for **financial analysis** and
+**backtesting of trading strategies**.
 
 ## Installation
 
@@ -32,8 +33,10 @@ From source:
 git clone https://github.com/ArthurBernard/Fynance.git
 cd Fynance
 pip install -e ".[dev]"
-python setup.py build_ext --inplace
 ```
+
+The build is pure-Python — there is no compile step (numerical kernels are
+Numba `@njit`, JIT-compiled on first call).
 
 ## Architecture
 

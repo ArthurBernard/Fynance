@@ -5,10 +5,11 @@ Installation
 Requirements
 ------------
 
-- Python **3.8** or later
-- NumPy, SciPy, PyTorch (installed automatically via pip)
-- A C compiler and Cython are needed only when building from source
-  (pre-compiled binaries are bundled in the PyPI wheel)
+- Python **3.10** or later
+- NumPy, SciPy, Numba, PyTorch (installed automatically via pip)
+
+The package is **pure-Python** — there is no compile step. The numerical
+kernels are Numba ``@njit`` functions, JIT-compiled on first call.
 
 Install with pip
 ----------------
@@ -25,10 +26,6 @@ Install from source
    git clone https://github.com/ArthurBernard/Fynance.git
    cd Fynance
    pip install -e ".[dev]"
-   python setup.py build_ext --inplace
-
-The ``build_ext`` step compiles the Cython extensions (``estimator``,
-``features``). It must be re-run after editing any ``.pyx`` file.
 
 Verify the installation
 -----------------------

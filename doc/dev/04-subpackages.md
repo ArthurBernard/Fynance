@@ -9,43 +9,55 @@ modernisation).
 
 | Subpackage | Policy | Why |
 |---|---|---|
-| `features` (`.py`, Numba kernels) | **Extend freely** — numerical kernels are Numba `@njit` | Fast, correct, depended on |
-| `algorithms.allocation` | **Stable public API** — deprecation path required for breaking changes | Users call ERC/HRP/IVP/MDP/MVP directly |
+| `core` | **Change with care** (wide blast radius) — `PriceSeries` + protocols | The seams everything composes through |
+| `data` | **Extend freely** — the only I/O layer (ports & adapters) | New sources/formats are additive |
+| `features` / `metrics` | **Extend freely** — numerical kernels are Numba `@njit` | Fast, correct, depended on |
+| `portfolio.allocation` | **Stable public API** — deprecation path required for breaking changes | Users call ERC/HRP/IVP/MDP/MVP directly |
 | `estimator` / `models.econometric_models` | **Single Numba implementation** — do not duplicate parameter logic | One source for ARMA/GARCH estimation |
-| `models` | **Modernise freely** (PyTorch) | The active R&D surface |
-| `backtest` | **Improve freely** | Plotting/eval, no external API contract |
-| `core` | Shared helpers — change with care (wide blast radius) | Used everywhere |
+| `signal` / `models` | **Modernise freely** (PyTorch) | The active R&D surface |
+| `backtest` / `plot` / `strategy` | **Improve freely** | Engine/reporting/orchestration, no frozen contract |
 
 ## Public API surface (what callers import)
 
-- **`features`** — `sharpe`, `sortino`, `calmar`, `drawdown`/`mdd`,
-  `roll_*` rolling variants, `z_score`, `accuracy`, momentums (EMA/SMA…),
-  filters, `scale`, `roll_functions`, `money_management`. Re-exported from
-  `features/__init__.py` (which pulls both the Python and `_cy` implementations).
-- **`algorithms`** — portfolio allocation (`ERC`, `HRP`, `IVP`, `MDP`, `MVP`,
-  `rolling_allocation()`) and position sizing (`sizing.py`: `kelly_fraction`,
-  `vol_target`, `transaction_cost`).
+- **`core`** — `PriceSeries`; the protocols (`DataSource`/`FeatureTransform`/
+  `SignalModel`/`Allocator`/`CostModel`/`Metric`).
+- **`data`** — `load()`, `CSVSource`/`ParquetSource`, `align`/`resample`,
+  `train_test_split`/`walk_forward`.
+- **`features`** — momentums (EMA/SMA/WMA…), indicators (RSI/MACD/Bollinger/…),
+  `filters`, `scale`, `engineering`, `regime`, `money_management`. Numba `@njit`
+  kernels live in the `.py` modules (no `_cy` twins).
+- **`metrics`** — `sharpe`, `sortino`, `calmar`, `diversified_ratio`,
+  `annual_return`/`annual_volatility`, `drawdown`/`mdd`, `perf_*`, `roll_*`
+  variants, plus one-call `summary`.
+- **`signal` / `portfolio`** — `sign`/`threshold`/`rank`/vol-target mappers +
+  `SignalPipeline`; allocation (`ERC`/`HRP`/`IVP`/`MDP`/`MVP`,
+  `rolling_allocation()`) and sizing (`kelly_fraction`/`vol_target`/
+  `transaction_cost`).
 - **`models`** — econometric (`ARMA`/`GARCH` family via `get_parameters`) and
   neural (`MultiLayerPerceptron`, `RollMultiLayerPerceptron`, RNN/`GRU`/`LSTM`,
   attention, `TemporalConvNet`, `Transformer`), `StackingEnsemble`; custom losses
   under `models/loss/` (Sharpe/Sortino/Calmar/Omega/directional/hybrid); training
   utils in `models/training.py`.
-- **`backtest`** — `BackTest`/plotting objects (`PlotBackTest`,
-  `DynaPlotBackTest`, …), `print_stats`.
+- **`backtest` / `plot` / `strategy`** — `backtest()` + `BacktestResult` +
+  `ProportionalCost`; `tearsheet`/`tearsheet_text`; `Strategy` +
+  `run_walk_forward`. (The legacy live-viz objects `PlotBackTest`/
+  `DynaPlotBackTest`/`display_perf` remain as lazy submodules, off the eager
+  surface.)
 
 ## Known sharp edges (by design)
 
-- **`features/metrics.py`** is a thin **re-export aggregator** — the
-  implementations live in `returns.py`, `ratios.py`, `drawdown.py`, `stats.py`
-  and `_metrics_helpers.py`. Import from `fynance.features` (or
-  `fynance.features.metrics`) as before; the split is transparent.
+- **Performance metrics live in `fynance.metrics`** (since 2.0), not
+  `fynance.features` — `ratios.py`/`drawdown.py`/`returns.py`/`summary.py`. The
+  Numba metric kernels are in `features/_metrics_helpers.py`; `mad`/`roll_mad`
+  are in `features/stats.py`.
 - **`estimator.estimation()`** is an experimental stub that raises
   `NotImplementedError` — use `models.econometric_models.get_parameters`
   (Numba-backed) for ARMA/GARCH estimation.
 - **`lstm.py`/`gru.py` internal hierarchies** (`_LSTMCell → LSTMCell →
   LongShortTermMemory`) and `_RollingBasis`/`RollMultiLayerPerceptron` are
   intentionally **not** split — too tightly coupled.
-- **Inputs** accept numpy / torch / **polars**; **outputs** are numpy (no pandas).
+- **numpy is the lingua franca** at every seam; PyTorch is confined to `models/`;
+  table inputs are coerced to numpy at the `data/` edge (no pandas in the core).
 
 > Open work lives in `07-roadmap.md`; this file only notes settled design points
 > so an agent doesn't mistake one for a bug.

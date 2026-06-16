@@ -7,13 +7,14 @@ is the running, dated ADR log.
 
 ## Numerical core
 
-- **Cython for the existing hot paths, kept extend-only.** `features/` and
-  `estimator/` ship compiled `*_cy.pyx` kernels with pure-Python twins and a `.c`
-  fallback. They're fast and correct; we don't rewrite them.
-- **Numba `@njit` for *new* numerical code, not new Cython.** New kernels live in
-  the Python file alongside the existing implementation. Rationale: `@njit` gives
-  near-C speed without a compile step, a `.pyx`/`.c` pair to maintain, or breaking
-  the build fallback. New Cython is only acceptable when wrapping a C library.
+- **Numba `@njit` for all numerical kernels — no Cython.** The former `*_cy.pyx`
+  kernels (features `momentums`/`metrics`/`roll_functions`, the ARMA/GARCH
+  `estimator`/`econometric_models`) were ported to Numba `@njit` in the Python
+  modules (E7 / 2.1.0); the build is now pure-Python with no compile step.
+  Rationale: `@njit` gives near-C speed without a `.pyx`/`.c` pair to maintain or a
+  C toolchain to ship. New Cython is only acceptable when wrapping a C library.
+  See the dated ADR entry below — this tombstones the earlier "Cython extend-only"
+  decision.
 - **NumPy at the core; polars only at the I/O edges (pandas removed).** The
   linear-algebra-heavy core (allocation, rolling windows) is raw NumPy — fastest
   and the natural input for torch. Array-like *inputs* are accepted as
@@ -28,7 +29,7 @@ is the running, dated ADR log.
   training target `torch`.
 - **Loss functions: two independent paths (the "Option C" split).** Evaluation/
   backtest metrics (Sharpe/Sortino/…) stay as NumPy formulas in
-  `features/metrics.py`; the *training* losses are re-implemented as pure torch
+  `fynance.metrics`; the *training* losses are re-implemented as pure torch
   ops in `models/loss/`. The two paths never convert numpy↔torch — each is native
   to its context. Cost: the formula exists twice; benefit: no autograd-breaking
   conversions, no numpy in the training graph.
@@ -42,10 +43,10 @@ is the running, dated ADR log.
 
 ## Build & packaging
 
-- **`pyproject.toml` is the authoritative build config; `setup.py` only compiles
-  Cython.** Single static `version` in `pyproject.toml` (one source of truth for
-  `/release`). Wheels are built with `cibuildwheel` (manylinux) + an sdist, then
-  trusted-published to PyPI on a `v*` tag.
+- **`pyproject.toml` is the authoritative (pure-Python) build config; there is no
+  `setup.py` and no compile step.** Single static `version` in `pyproject.toml`
+  (one source of truth for `/release`). A pure-Python universal wheel
+  (`py3-none-any`) + an sdist are built and trusted-published to PyPI on a `v*` tag.
 
 ## Decision journal (ADR)
 
@@ -70,6 +71,24 @@ Template:
 ```
 
 <!-- new entries below, newest first -->
+
+### 2026-06-15 — All Cython ported to Numba; pure-Python build (E7 / 2.1.0)  [tombstone]
+- **Choice**: remove **all** Cython. The `*_cy.pyx`/`.c` kernels — features
+  `momentums`/`metrics`/`roll_functions` and the ARMA/GARCH `econometric_models`/
+  `estimator` — were ported to **Numba `@njit`** functions living in the `.py`
+  modules; `setup.py` and the whole compile step were deleted. The build is now
+  pure-Python and `release.yml` ships a single `py3-none-any` wheel (no
+  `cibuildwheel`/manylinux).
+- **Why**: one implementation per kernel instead of a `.pyx`/`.c`/Python triple;
+  no C toolchain to ship or maintain; `@njit` matches the former Cython speed.
+  Parity was captured as golden values from the compiled `.so` **before** deletion
+  and asserted to 1e-9/1e-10 — this strictness surfaced two real bugs
+  (`roll_annual_volatility` buffer aliasing, a missing `roll_annual_return` term).
+- **Tombstones**: the earlier "Cython for the existing hot paths, kept extend-only"
+  and "`setup.py` only compiles Cython / `cibuildwheel` manylinux wheels"
+  decisions — purged from the prose above.
+- **Rejected alternatives**: keeping the Cython twins (the maintenance/build cost
+  the port removes); a C-extension rewrite (no payoff over `@njit`).
 
 ### 2026-06-14 — Read the Docs is the canonical docs host (roadmap §3.1)  [accepted]
 - **Choice**: keep **Read the Docs** as the single documentation host. `.readthedocs.yaml`
