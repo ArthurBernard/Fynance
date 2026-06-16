@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `fynance.research` — new data-agnostic research-harness subpackage. First piece: `Experiment`, a serializable record (spec + generated code + seed + metrics + curves + provenance) with `to_dict`/`from_dict`/`save`/`load`. Artifacts are written only to a caller-provided `output_dir` (fynance never stores results itself).
+- `fynance.research` synthetic generators `gbm` and `regime_switching` — seeded price paths so the harness is testable with zero real data (and usable as a null test).
 
 ### Changed
 

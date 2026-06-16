@@ -13,3 +13,5 @@ adapters live downstream.
    :toctree: generated/
 
    Experiment
+   gbm
+   regime_switching
