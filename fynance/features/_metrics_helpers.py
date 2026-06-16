@@ -82,7 +82,7 @@ def _roll_drawdown_2d(X, w, raw):
 
 @njit(cache=True)
 def _roll_mdd_1d(X, w, raw):
-    # First w points: expanding drawdown, running max of it (== Cython).
+    # First w points: expanding drawdown, running max of it (parity reference).
     T = X.shape[0]
     mdd = np.empty(T, dtype=np.float64)
     S = 0.0

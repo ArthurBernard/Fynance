@@ -13,7 +13,7 @@ from fynance.estimator.estimator import estimation, loglikelihood
 
 def test_estimation_raises_not_implemented():
     # estimation() is an experimental, non-functional placeholder; it must
-    # fail loudly and point to the Cython-backed path instead of returning
+    # fail loudly and point to the Numba-backed path instead of returning
     # silently wrong estimates.
     y = np.array([0.1, -0.2, 0.3, 0.0, -0.1])
     with pytest.raises(NotImplementedError, match="get_parameters"):

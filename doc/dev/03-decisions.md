@@ -72,6 +72,21 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-06-16 — Fix RTD build + remove the GitHub Pages docs workflow (PR #131)  [accepted]
+- **Choice**: drop the `post_install: python setup.py build_ext --inplace` job
+  from `.readthedocs.yaml`, and delete the master-only `.github/workflows/docs.yml`
+  (Sphinx build + GitHub Pages deploy). Read the Docs remains the single docs host;
+  the required CI `Docs (Sphinx, -W)` gate in `ci.yml` validates the build.
+- **Why**: both still ran `setup.py build_ext`, which has not existed since v2.1.0
+  (pure-Python/Numba) — so **RTD builds and the master Pages workflow had been
+  failing on every build/push**. `docs.yml` also contradicted the RTD-canonical
+  decision below.
+- **Corrects** the 2026-06-14 entry: `.readthedocs.yaml` no longer "compiles the
+  Cython ext", and a GitHub Pages deploy workflow *did* exist (master-only) and is
+  now removed.
+- **Note**: per-version (per-tag) docs are an RTD **dashboard** setting (Admin →
+  Versions / Automation Rules), not something the repo config controls.
+
 ### 2026-06-15 — All Cython ported to Numba; pure-Python build (E7 / 2.1.0)  [tombstone]
 - **Choice**: remove **all** Cython. The `*_cy.pyx`/`.c` kernels — features
   `momentums`/`metrics`/`roll_functions` and the ARMA/GARCH `econometric_models`/

@@ -5,10 +5,9 @@
 
 Two invariants that the per-function unit tests do not check directly:
 
-1. **Reference parity** — each Cython-backed kernel matches an independent,
+1. **Reference parity** — each Numba kernel matches an independent,
    pure-NumPy reference of the same definition. This is the cross-check that
-   would catch a window off-by-one (cf. the stale ``w + 1`` FIXME in
-   ``momentums_cy.pyx``).
+   would catch a window off-by-one.
 2. **No lookahead** — every kernel is strictly causal: output ``[:t]`` is
    unchanged when the future ``X[t:]`` is perturbed.
 """
