@@ -32,8 +32,8 @@ def _check_dtype(X, dtype):
 def wrap_dtype(func):
     """ Check the dtype of the `X` array.
 
-    Convert dtype of X to np.float64 before to pass to cython function and
-    convert to specified dtype at the end.
+    Convert dtype of X to np.float64 before passing it to the numba kernel and
+    convert to the specified dtype at the end.
 
     """
     @wraps(func)

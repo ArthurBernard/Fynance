@@ -24,8 +24,7 @@ features.
 
 """
 
-# Cython imports
-# Python imports
+# Submodule imports
 from . import (
     engineering,
     filters,

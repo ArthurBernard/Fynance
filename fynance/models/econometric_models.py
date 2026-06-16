@@ -10,7 +10,7 @@
 
 Pure-NumPy implementations of moving-average, autoregressive and
 GARCH-family processes used to simulate or fit return series. Parameter
-estimation is delegated to the Cython routines in
+estimation is delegated to the Numba routines in
 :mod:`fynance.estimator` via :func:`get_parameters`, a single
 maximum-likelihood entry point for all four model types.
 

@@ -1,27 +1,38 @@
 #!/usr/bin/env bash
-# Enforces Git Flow branch protection.
+# Git Flow reminder (non-blocking).
 # Install: git config core.hooksPath .githooks
+#
+# Reads the refs actually being pushed from stdin (the pre-push protocol:
+# "<local ref> <local sha> <remote ref> <remote sha>"), so it never interferes
+# with tag pushes (e.g. release tags `vX.Y.Z`) — only branch pushes are checked,
+# and only with a warning. The real protection for `master` is GitHub branch
+# protection server-side; this hook is just a local nudge toward the PR flow.
 
-current_branch=$(git symbolic-ref HEAD 2>/dev/null | sed 's|refs/heads/||')
+z40=0000000000000000000000000000000000000000
 
-# Hard block: never push directly to master
-if [ "$current_branch" = "master" ]; then
-    echo ""
-    echo "ERROR: Direct push to 'master' is not allowed."
-    echo "       Open a Pull Request from 'develop' -> 'master'."
-    echo "       See CONTRIBUTING.md for the full Git Flow."
-    echo ""
-    exit 1
-fi
+while read -r local_ref local_sha remote_ref remote_sha; do
+    # Only nudge on branch pushes; skip tags, notes, deletions, etc.
+    case "$remote_ref" in
+        refs/heads/*) ;;
+        *) continue ;;
+    esac
+    [ "$local_sha" = "$z40" ] && continue
 
-# Soft warning: develop should receive PRs, not direct commits
-if [ "$current_branch" = "develop" ]; then
-    echo ""
-    echo "WARNING: You are pushing directly to 'develop'."
-    echo "         Prefer a feat/ branch and a PR, except for merges or initial setup."
-    echo "         (push allowed -- press Ctrl+C within 5s to cancel)"
-    echo ""
-    sleep 5
-fi
+    branch=${remote_ref#refs/heads/}
+    case "$branch" in
+        master)
+            echo ""
+            echo "WARNING: pushing directly to 'master'."
+            echo "         The Git Flow is develop -> master via a release PR (see CONTRIBUTING.md)."
+            echo ""
+            ;;
+        develop)
+            echo ""
+            echo "WARNING: pushing directly to 'develop'."
+            echo "         Prefer a feat/fix/chore/docs branch + PR (see CONTRIBUTING.md)."
+            echo ""
+            ;;
+    esac
+done
 
 exit 0
