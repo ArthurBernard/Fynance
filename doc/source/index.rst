@@ -95,3 +95,4 @@
    models
    plot
    strategy
+   research

@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+""" Research harness (:mod:`fynance.research`).
+
+A **data-agnostic** layer for running strategy experiments and emitting portable
+result artifacts. fynance is *the tool*: it never stores results itself — every
+artifact is written to a caller-provided ``output_dir`` (a downstream private
+research repo points that wherever it wants). Built and tested on the synthetic
+generators in :mod:`fynance.research.synthetic`; real-data adapters live
+downstream, never here.
+
+.. currentmodule:: fynance.research
+
+"""
+
+# Local
+from . import experiment
+from .experiment import *
+
+__all__: list[str] = []
+__all__ += experiment.__all__
