@@ -15,8 +15,10 @@ downstream, never here.
 """
 
 # Local
-from . import experiment
+from . import experiment, synthetic
 from .experiment import *
+from .synthetic import *
 
 __all__: list[str] = []
 __all__ += experiment.__all__
+__all__ += synthetic.__all__
