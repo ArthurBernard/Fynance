@@ -10,6 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [2.3.0] - 2026-06-17
+
+### Breaking Changes
+
+### Added
+
 - `fynance.research` guardrails (`guards.py`): `permutation_test` (shuffle the asset's returns, build a null distribution of a metric → p-value; detects a spurious edge / leakage) and `probabilistic_sharpe_ratio` / `deflated_sharpe_ratio` (Bailey & López de Prado — does the edge survive the number of trials?). Anti-overfitting / anti-data-snooping for AI-driven search.
 - `fynance.research.compare_report(experiments, output_dir)` and `leaderboard(experiments)` — rank a set of experiments and overlay their equity curves into a portable comparison report (leaderboard markdown + overlay PNG).
 - `fynance.research.Ledger(root)` — a persistent experiment store: `append`/`load`/`leaderboard`, an `n_trials` count, and `deflated_sharpe(experiment)` that judges a selected strategy against the ledger's trial count and Sharpe dispersion. The store lives entirely under the caller's `root`.

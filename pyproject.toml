@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fynance"
-version = "2.2.0"
+version = "2.3.0"
 description = "Pure-Python (Numba-accelerated) machine learning, econometrics and statistical tools for financial analysis and backtesting"
 readme = "README.md"
 license = { text = "MIT" }
