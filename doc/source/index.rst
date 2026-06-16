@@ -72,6 +72,13 @@
       Econometric models, neural networks (MLP, RNN, GRU, LSTM,
       attention, TCN, Transformer) and walk-forward training.
 
+   .. grid-item-card:: :octicon:`beaker;1.2em;sd-mr-1` Research
+      :link: research
+      :link-type: doc
+
+      Data-agnostic experiment harness: run, report and reproduce
+      strategies, emitting portable result artifacts.
+
 .. toctree::
    :hidden:
    :caption: Getting Started

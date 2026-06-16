@@ -16,6 +16,7 @@ modernisation).
 | `estimator` / `models.econometric_models` | **Single Numba implementation** — do not duplicate parameter logic | One source for ARMA/GARCH estimation |
 | `signal` / `models` | **Modernise freely** (PyTorch) | The active R&D surface |
 | `backtest` / `plot` / `strategy` | **Improve freely** | Engine/reporting/orchestration, no frozen contract |
+| `research` | **Extend freely — but stay data-agnostic & result-free** | The AI-driven R&D harness; must never depend on real data or store results (→ `output_dir` only) |
 
 ## Public API surface (what callers import)
 
@@ -43,6 +44,10 @@ modernisation).
   `run_walk_forward`. (The legacy live-viz objects `PlotBackTest`/
   `DynaPlotBackTest`/`display_perf` remain as lazy submodules, off the eager
   surface.)
+- **`research`** (namespaced as `fynance.research.*`, not flattened) — `Experiment`,
+  `run_experiment`, `write_report`, `gbm`/`regime_switching`. Driven by the
+  user-level `/run-strategy` skill. Artifacts go only to a caller-provided
+  `output_dir`.
 
 ## Known sharp edges (by design)
 

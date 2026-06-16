@@ -23,6 +23,9 @@ analysis and backtesting**. Since 2.0 it is a **layered backtesting tool**
   PyTorch losses (Sharpe/Sortino/Calmar/Omega/directional/hybrid).
 - **Backtest / Plot / Strategy** — vectorized engine + cost models →
   `BacktestResult`; `tearsheet` reporting; optional `Strategy` orchestrator.
+- **Research** — data-agnostic experiment harness (`Experiment`,
+  `run_experiment`, `write_report`, synthetic generators) emitting portable result
+  artifacts to a caller-provided `output_dir`; fynance never stores results itself.
 
 The throughline is **strict temporal causality**: every rolling feature and every
 training window is computed from the past only — no lookahead. This is the
@@ -60,6 +63,8 @@ fynance/
   backtest/    # vectorized engine + cost + result; legacy live-viz plot stack
   plot/        # composable matplotlib figures + tearsheet (lazy import)
   strategy/    # optional Strategy orchestrator + walk-forward run
+  research/    # data-agnostic experiment harness: Experiment, run_experiment,
+               #   write_report, synthetic generators (results -> output_dir only)
   estimator/   # ARMA/GARCH parameter estimation (Numba)
   tests/       # mirrors the package; pytest + doctests
 doc/

@@ -87,6 +87,12 @@ Calmar, Omega, directional, hybrid), and robust-training utilities.
 **Strategy** `fynance.strategy` — optional orchestrator composing the maillons
 end-to-end, with single-run and walk-forward evaluation.
 
+**Research** `fynance.research` — data-agnostic experiment harness: `Experiment`
+(serializable run record), `run_experiment` (seeded, cost-aware, walk-forward),
+`write_report` (portable markdown + tearsheet PNG + notebook) and synthetic data
+generators (`gbm`, `regime_switching`). Results are written only to a
+caller-provided `output_dir` — fynance never stores them itself.
+
 ## Quick start
 
 ```python
