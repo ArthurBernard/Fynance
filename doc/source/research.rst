@@ -15,6 +15,8 @@ adapters live downstream.
    Experiment
    run_experiment
    write_report
+   compare_report
+   leaderboard
    permutation_test
    probabilistic_sharpe_ratio
    deflated_sharpe_ratio
