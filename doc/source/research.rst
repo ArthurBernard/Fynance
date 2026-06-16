@@ -15,5 +15,8 @@ adapters live downstream.
    Experiment
    run_experiment
    write_report
+   permutation_test
+   probabilistic_sharpe_ratio
+   deflated_sharpe_ratio
    gbm
    regime_switching

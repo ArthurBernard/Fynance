@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `fynance.research` guardrails (`guards.py`): `permutation_test` (shuffle the asset's returns, build a null distribution of a metric → p-value; detects a spurious edge / leakage) and `probabilistic_sharpe_ratio` / `deflated_sharpe_ratio` (Bailey & López de Prado — does the edge survive the number of trials?). Anti-overfitting / anti-data-snooping for AI-driven search.
+
 ### Changed
 
 ### Fixed
