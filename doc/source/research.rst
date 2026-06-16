@@ -14,5 +14,6 @@ adapters live downstream.
 
    Experiment
    run_experiment
+   write_report
    gbm
    regime_switching

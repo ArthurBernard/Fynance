@@ -15,8 +15,9 @@ downstream, never here.
 """
 
 # Local
-from . import experiment, runner, synthetic
+from . import experiment, report, runner, synthetic
 from .experiment import *
+from .report import *
 from .runner import *
 from .synthetic import *
 
@@ -24,3 +25,4 @@ __all__: list[str] = []
 __all__ += experiment.__all__
 __all__ += synthetic.__all__
 __all__ += runner.__all__
+__all__ += report.__all__
