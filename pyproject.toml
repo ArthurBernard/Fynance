@@ -44,6 +44,7 @@ dev = [
     "ruff>=0.4",
     "mypy>=1.8",
     "numpydoc",
+    "nbformat",
 ]
 doc = [
     "sphinx>=7.0",
@@ -52,6 +53,7 @@ doc = [
     "nbsphinx",
     "sphinx-design",
     "sphinx-copybutton",
+    "nbformat",
 ]
 ui = [
     "streamlit>=1.30",
