@@ -72,6 +72,19 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-06-17 — Self-describing experiments (provenance block) (PR #163)  [accepted]
+- **Choice**: provenance (what data + what features + run config produced a result)
+  is recorded **generically in `fynance.research`** — `run_experiment` builds a
+  structured `spec` and `write_report` renders a Provenance table — rather than as
+  a per-repo manifest convention downstream.
+- **Why**: the pain ("can't see the data/features behind a result") is generic, so
+  the fix belongs in the tool: every consumer gets self-describing artifacts for
+  free, with no convention to drift. Backward compatible (optional fields; old
+  specs still render), so no break to existing `experiment.json`.
+- **Rejected alternatives**: a hand-maintained "strategy card" / manifest in the
+  private repo (manual, non-reusable, drifts); doing nothing (the result artifacts
+  stay opaque).
+
 ### 2026-06-16 — Fix RTD build + remove the GitHub Pages docs workflow (PR #131)  [accepted]
 - **Choice**: drop the `post_install: python setup.py build_ext --inplace` job
   from `.readthedocs.yaml`, and delete the master-only `.github/workflows/docs.yml`

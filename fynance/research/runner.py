@@ -35,6 +35,33 @@ def _to_array(data: Any) -> NDArray[np.float64]:
     return np.asarray(data, dtype=np.float64).reshape(-1)
 
 
+def _index_bound(data: Any, pos: int) -> Any:
+    """ Return a JSON-friendly index value at ``pos`` (first/-1), or None. """
+    index = getattr(data, "index", None)
+    if index is None:
+        return None
+    try:
+        value = np.asarray(index).reshape(-1)[pos]
+    except (IndexError, ValueError):
+        return None
+    # datetime64 -> ISO string; numpy scalars -> native python.
+    if isinstance(value, np.datetime64):
+        return str(value)
+
+    return value.item() if hasattr(value, "item") else value
+
+
+def _callable_name(fn: Any) -> str | None:
+    """ Best-effort readable name for a signal/feature callable. """
+    if fn is None:
+        return None
+    name = getattr(fn, "__name__", None)
+    if name and name != "<lambda>":
+        return name
+
+    return type(fn).__name__ if not callable(fn) else name or "<callable>"
+
+
 def _seed_everything(seed: int) -> None:
     """ Seed numpy (and torch if present) for reproducibility. """
     np.random.seed(seed)
@@ -58,6 +85,9 @@ def run_experiment(
     period: int = 252,
     seed: int = 0,
     code: str | None = None,
+    feature_names: list[str] | None = None,
+    feature_desc: str | None = None,
+    data_desc: str | None = None,
     output_dir: str | Path | None = None,
 ) -> Experiment:
     """ Run a strategy experiment and return a populated :class:`Experiment`.
@@ -88,8 +118,24 @@ def run_experiment(
         Master seed (numpy + torch).
     code : str, optional
         Generated strategy source, stored verbatim on the experiment.
+    feature_names : list of str, optional
+        Column names of ``X`` — recorded in the provenance so a report shows what
+        each feature is. Ignored when ``X`` is None.
+    feature_desc : str, optional
+        Free-text description of how ``X`` was built (the feature recipe),
+        recorded in the provenance. Ignored when ``X`` is None.
+    data_desc : str, optional
+        Free-text description of the price data (source, instrument, resolution),
+        recorded in the provenance.
     output_dir : str or pathlib.Path, optional
         When given, the experiment is saved under ``<output_dir>/<name>/``.
+
+    Notes
+    -----
+    The returned experiment's ``spec`` carries a self-describing **provenance**
+    block (``data``, ``features``, ``model``, ``signal``, ``walk_forward``,
+    ``cost``, ``period``, ``seed``) so an artifact always records *what produced
+    it*. :func:`fynance.research.write_report` renders it as a Provenance table.
 
     Returns
     -------
@@ -114,10 +160,29 @@ def run_experiment(
 
     metrics = result.summary(period=period)
 
+    data_block: dict[str, Any] = {
+        "kind": getattr(data, "name", None) or type(data).__name__,
+        "n": int(n),
+        "start": _index_bound(data, 0),
+        "end": _index_bound(data, -1),
+        "desc": data_desc,
+    }
+
+    if X is None:
+        features_block: dict[str, Any] | None = None
+    else:
+        features_block = {
+            "X_shape": [int(d) for d in np.asarray(X).shape],
+            "names": list(feature_names) if feature_names is not None else None,
+            "desc": feature_desc,
+        }
+
     spec: dict[str, Any] = {
-        "data": {"kind": getattr(data, "name", None) or type(data).__name__,
-                 "n": int(n)},
-        "features": None if X is None else {"X_shape": list(np.asarray(X).shape)},
+        "data": data_block,
+        "features": features_block,
+        "model": type(strategy.model).__name__ if getattr(
+            strategy, "model", None) is not None else None,
+        "signal": _callable_name(getattr(strategy, "signal", None)),
         "walk_forward": walk_forward,
         "cost": type(strategy.cost).__name__ if strategy.cost is not None else None,
         "period": period,

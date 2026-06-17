@@ -37,6 +37,48 @@ def _metrics_table(metrics: dict[str, float]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _provenance_table(spec: dict | None) -> str:
+    """ Render the experiment ``spec`` provenance as a markdown table.
+
+    Surfaces *what produced the result*: data, features, model, signal, and the
+    run config. Degrades gracefully to whatever fields are present (older specs).
+    """
+    if not spec:
+        return "_no provenance_\n"
+
+    rows: list[tuple[str, str]] = []
+
+    data = spec.get("data")
+    if isinstance(data, dict):
+        span = ""
+        if data.get("start") is not None or data.get("end") is not None:
+            span = f" ({data.get('start')} → {data.get('end')})"
+        rows.append(("data", f"{data.get('kind')} · n={data.get('n')}{span}"))
+        if data.get("desc"):
+            rows.append(("data desc", str(data["desc"])))
+    elif data is not None:
+        rows.append(("data", str(data)))
+
+    feats = spec.get("features")
+    if isinstance(feats, dict):
+        rows.append(("features", f"X={feats.get('X_shape')}"))
+        if feats.get("names"):
+            rows.append(("feature names", ", ".join(map(str, feats["names"]))))
+        if feats.get("desc"):
+            rows.append(("feature desc", str(feats["desc"])))
+    else:
+        rows.append(("features", "none (price-only)"))
+
+    for key in ("model", "signal", "walk_forward", "cost", "period", "seed"):
+        if key in spec and spec[key] is not None:
+            rows.append((key, f"`{spec[key]}`"))
+
+    lines = ["| field | value |", "| --- | --- |"]
+    lines += [f"| {k} | {v} |" for k, v in rows]
+
+    return "\n".join(lines) + "\n"
+
+
 def _write_png(experiment: Experiment, png_path: Path, period: int) -> bool:
     """ Render the tearsheet from the equity curve to ``png_path``.
 
@@ -76,7 +118,9 @@ def _build_notebook(experiment: Experiment, target: Path, period: int,
     nb.cells = [
         new_markdown_cell(f"# Experiment: {experiment.name}\n\n"
                           f"Reconstructed from `experiment.json` "
-                          f"(fynance {experiment.fynance_version})."),
+                          f"(fynance {experiment.fynance_version}). The full "
+                          f"provenance (data, features, model, run config) lives "
+                          f"under `exp['spec']`."),
         new_code_cell(
             "import json\n"
             "import numpy as np\n"
@@ -150,9 +194,8 @@ def write_report(
           f"- fynance: `{experiment.fynance_version}`",
           f"- created: `{experiment.created_at}`",
           f"- seed: `{experiment.seed}`",
-          f"- data: `{experiment.spec.get('data')}`" if experiment.spec else "",
-          f"- walk_forward: `{experiment.spec.get('walk_forward')}`"
-          if experiment.spec else "",
+          "\n## Provenance\n",
+          _provenance_table(experiment.spec),
           "\n## Metrics\n",
           _metrics_table(experiment.metrics)]
     if "png" in written:
