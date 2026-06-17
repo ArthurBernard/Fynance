@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Self-describing experiments (provenance).** `run_experiment` now records a structured *provenance* block in `Experiment.spec` — `data` (kind, length, index span, optional `data_desc`), `features` (`X` shape, optional `feature_names`/`feature_desc`), `model`, `signal`, `walk_forward`, `cost`, `period`, `seed` — so every artifact records *what produced it*. `write_report` surfaces it as a **Provenance** table at the top of `report.md`. New optional `run_experiment` keyword args `feature_names`, `feature_desc`, `data_desc`. Backward compatible: older `experiment.json` specs still load and render (the table degrades to available fields).
+
 ### Changed
 
 ### Fixed
