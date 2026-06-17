@@ -40,9 +40,13 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
   **guardrails** (`permutation_test`, `probabilistic_sharpe_ratio`,
   `deflated_sharpe_ratio`), comparison report (`compare_report`/`leaderboard`) and a
   persistent `Ledger` (append/load/leaderboard, `n_trials`, deflated-Sharpe vs
-  trials). **Data-agnostic and result-free**: artifacts only go to a caller-provided
-  `output_dir`; real data + result storage live in a separate private repo. Driven
-  by the user-level `/run-strategy` skill.
+  trials). **Multi-input**: `Strategy`/`run_experiment` accept a precomputed
+  feature matrix `X`/`y` (price → P&L only; walk-forward slices `X` per window =
+  the rolling-NN refit), and `fynance.features.RegimeDetector` gives a **causal**
+  regime label (fit-on-train/assign-online; `detect_regimes` stays in-sample for
+  analysis). **Data-agnostic and result-free**: artifacts only go to a
+  caller-provided `output_dir`; real data + result storage live in a separate
+  private repo (`fynance-research`). Driven by the user-level `/run-strategy` skill.
 - **Numerical kernels on Numba `@njit`** — no Cython anywhere; the build is
   pure-Python (no `setup.py`, no compile step). Every kernel has a golden-value
   parity test (1e-9/1e-10) captured from the former Cython.
