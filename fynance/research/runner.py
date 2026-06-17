@@ -51,6 +51,7 @@ def run_experiment(
     data: Any,
     *,
     name: str,
+    X: NDArray | None = None,
     y: NDArray | None = None,
     walk_forward: dict[str, Any] | None = None,
     costs: Any = None,
@@ -69,6 +70,10 @@ def run_experiment(
         Price series the strategy runs on (coerced to float64).
     name : str
         Experiment slug (also the output sub-directory).
+    X : array-like, optional
+        Precomputed feature matrix aligned with ``data`` (rows = time). Passed
+        through to the strategy — the way to feed exogenous / regime / multi-venue
+        features the price-only featurizer cannot build. Must be causal.
     y : array-like, optional
         Supervised target for a model-based strategy run via ``walk_forward``.
         Defaults to zeros (ignored by rule-based strategies).
@@ -101,17 +106,18 @@ def run_experiment(
     n = prices.shape[0]
 
     if walk_forward is not None:
-        target = np.zeros(n) if y is None else np.asarray(y, dtype=np.float64)
-        result = strategy.run_walk_forward(data, target, **walk_forward)
+        target = np.zeros(n) if y is None else np.asarray(y)  # preserve dtype
+        result = strategy.run_walk_forward(data, target, **walk_forward, X=X)
 
     else:
-        result = strategy.run(data, y)
+        result = strategy.run(data, y, X=X)
 
     metrics = result.summary(period=period)
 
     spec: dict[str, Any] = {
         "data": {"kind": getattr(data, "name", None) or type(data).__name__,
                  "n": int(n)},
+        "features": None if X is None else {"X_shape": list(np.asarray(X).shape)},
         "walk_forward": walk_forward,
         "cost": type(strategy.cost).__name__ if strategy.cost is not None else None,
         "period": period,
