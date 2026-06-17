@@ -55,6 +55,7 @@ from .loss import (
 )
 from .lstm import LongShortTermMemory, LSTMCell
 from .mlp import MultiLayerPerceptron
+from .objective import ObjectiveModel
 from .rnn import RecurrentNeuralNetwork
 from .rolling import CVResult, RollMultiLayerPerceptron, _RollingBasis
 from .tcn import TemporalConvNet
@@ -79,6 +80,8 @@ __all__ = [
     'BaseNeuralNet',
     'StackingEnsemble',
     'MultiLayerPerceptron',
+    # objective-aligned training
+    'ObjectiveModel',
     # rnn / gru / lstm
     'GRUCell',
     'GatedRecurrentUnit',
