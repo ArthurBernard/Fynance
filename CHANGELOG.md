@@ -10,6 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [2.5.0] - 2026-06-17
+
+### Breaking Changes
+
+### Added
+
 - `fynance.models.ObjectiveModel` — **objective-aligned training**: a `SignalModel` that trains a neural network (any `nn.Module`; a clean MLP by default) **directly on a differentiable financial objective** (`SharpeLoss`/`SortinoLoss`/…) rather than MSE. The net outputs positions and the loss is computed on `positions * returns`; `fit(X, y)` reads `y` as the realized returns, `predict(X)` returns positions in `[-1, 1]`. Plugs into the harness via the `X` path with `signal=identity`, `y=returns`.
 
 ### Changed
