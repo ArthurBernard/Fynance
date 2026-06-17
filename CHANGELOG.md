@@ -18,6 +18,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.4.1] - 2026-06-17
+
+### Breaking Changes
+
+### Added
+
+### Changed
+
+### Fixed
+
+- `sharpe` / `sortino` crashed (`TypeError`) on a **constant / zero-volatility** equity curve — a legitimate result for a flat ("do-nothing") strategy. They now return `0.0` when the excess return is also zero and `+inf` for a riskless positive drift, for both scalar (1-D) and array (2-D) inputs (shared `_safe_ratio` helper). `summary()` no longer crashes on a flat curve.
+
+### Deprecated
+
+### Removed
+
 ## [2.4.0] - 2026-06-17
 
 ### Breaking Changes
