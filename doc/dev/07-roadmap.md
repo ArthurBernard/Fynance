@@ -19,6 +19,21 @@ shipped, `03-decisions.md` for *why*. Keep it short and true.
 
 ---
 
+## 3. Entraînement aligné-objectif (`ObjectiveModel`)  ⭐ active
+
+Brique **générique** fynance débloquant la stratégie B (repo privé) : entraîner un
+réseau directement sur un **objectif risque-ajusté** (`SharpeLoss`/`SortinoLoss`…)
+plutôt qu'en MSE sur une cible. Le réseau sort des **positions** ; la loss porte sur
+`positions × returns`. Se branche sur le harnais I1 (`X`=features, `y`=returns,
+`signal=identity`).
+
+- [ ] **OBJ** `ObjectiveModel` — un `SignalModel` (`fit(X, returns)`/`predict→positions`)
+  qui entraîne un `nn.Module` quelconque (MLP par défaut, tête linéaire ;
+  TCN/LSTM passables) sur une loss financière différentiable. Reproductible (seed),
+  testé sur data synthétique à edge connu (apprend des positions à Sharpe > 0).
+
+> Les stratégies (B objectif-aligné, A multi-venue) vivent dans le repo privé.
+
 ## 2. Research harness — extensions optionnelles
 
 Le harnais R&D `fynance.research` est **livré** (S1–S3) : `Experiment`,

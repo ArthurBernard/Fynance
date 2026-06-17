@@ -34,3 +34,4 @@ time-ordered sequences, prefer the recurrent architectures described in
 
    _base.BaseNeuralNet
    mlp.MultiLayerPerceptron
+   objective.ObjectiveModel
