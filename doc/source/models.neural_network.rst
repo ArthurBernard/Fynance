@@ -18,6 +18,25 @@ tabular or sliding-window features (technical indicators, volatility signals). F
 time-ordered sequences, prefer the recurrent architectures described in
 :doc:`models.recurrent_neural_network`.
 
+.. rubric:: Objective-aligned training
+
+:class:`~fynance.models.objective.ObjectiveModel` trains a network **directly on a
+differentiable financial objective** — e.g. :class:`~fynance.models.loss.SharpeLoss`
+— rather than MSE against a target. The net outputs *positions* and the loss is
+computed on ``positions * returns``: ``fit(X, y)`` reads ``y`` as the realized
+returns, and ``predict(X)`` returns positions in ``[-1, 1]``. It is a
+``SignalModel``, so it drops straight into a :class:`~fynance.strategy.Strategy`
+with an identity signal::
+
+    from fynance.models import ObjectiveModel, SharpeLoss
+    from fynance.strategy import Strategy
+
+    model = ObjectiveModel(layers=(16, 8), loss=SharpeLoss(), epochs=60, seed=0)
+    strat = Strategy(model=model, signal=lambda positions: positions)
+
+Feed it through the research harness via the ``X`` path with ``y`` = returns; see
+:doc:`research_workflow`.
+
 .. rubric:: Inheritance
 
 ``BaseNeuralNet`` → ``MultiLayerPerceptron``

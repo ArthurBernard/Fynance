@@ -85,6 +85,7 @@
 
    installation
    quickstart
+   research_workflow
    changelog
 
 .. toctree::

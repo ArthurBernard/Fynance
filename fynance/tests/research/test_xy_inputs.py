@@ -95,7 +95,9 @@ def test_run_experiment_threads_and_records_X():
                          name="xy", X=X, y=y, walk_forward=dict(train=80, test=40))
 
     assert isinstance(exp, Experiment)
-    assert exp.spec["features"] == {"X_shape": [X.shape[0], X.shape[1]]}
+    assert exp.spec["features"]["X_shape"] == [X.shape[0], X.shape[1]]
+    assert exp.spec["features"]["names"] is None  # no names provided
+    assert exp.spec["model"] == "LinearStub"      # model recorded in provenance
     assert np.all(np.isfinite(list(exp.metrics.values())))
 
 

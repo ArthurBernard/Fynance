@@ -4,6 +4,12 @@ Quickstart
 
 See :doc:`installation` for prerequisites and install instructions.
 
+.. tip::
+
+   Ready to test a full strategy? :doc:`research_workflow` walks the end-to-end
+   research loop — features, walk-forward backtest, guardrails and a portable
+   report — building on the pieces below.
+
 ----
 
 Financial metrics

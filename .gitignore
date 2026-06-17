@@ -39,3 +39,6 @@ TODO.md
 # only the plan trees and archived snapshots stay local
 doc/dev/plans/*/
 doc/dev/_archive/
+
+# Local output of examples/research_workflow.py (results live in a downstream repo)
+research_out/

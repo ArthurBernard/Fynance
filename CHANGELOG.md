@@ -18,6 +18,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.6.0] - 2026-06-17
+
+### Breaking Changes
+
+### Added
+
+- **Reference narrative for the new capabilities.** `strategy.rst` documents the `X`/`y` multi-input contract (precomputed causal feature matrix; walk-forward slices it per window = the model refit; dtypes preserved); `models.neural_network.rst` gains an objective-aligned training section on `ObjectiveModel`; `features.regime.rst` spells out the causal `RegimeDetector` contract; `quickstart` links to the new workflow tutorial.
+- **Research workflow tutorial + runnable example.** New `doc/source/research_workflow.rst` walks the canonical loop end-to-end on synthetic data (data → causal `X`/`y` features → rule-based & objective-aligned strategies → walk-forward `run_experiment` → permutation/deflated-Sharpe guardrails → portable report) — the documented, portable form of the `/run-strategy` skill. Shipped alongside a runnable `examples/research_workflow.py` (exercised in CI so it cannot rot).
+- **Self-describing experiments (provenance).** `run_experiment` now records a structured *provenance* block in `Experiment.spec` — `data` (kind, length, index span, optional `data_desc`), `features` (`X` shape, optional `feature_names`/`feature_desc`), `model`, `signal`, `walk_forward`, `cost`, `period`, `seed` — so every artifact records *what produced it*. `write_report` surfaces it as a **Provenance** table at the top of `report.md`. New optional `run_experiment` keyword args `feature_names`, `feature_desc`, `data_desc`. Backward compatible: older `experiment.json` specs still load and render (the table degrades to available fields).
+
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
 ## [2.5.0] - 2026-06-17
 
 ### Breaking Changes
