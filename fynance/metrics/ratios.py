@@ -6,6 +6,8 @@
 from __future__ import annotations
 
 # Built-in packages
+from typing import Any
+
 # Third-party packages
 import numpy as np
 from numpy.typing import NDArray
@@ -16,6 +18,32 @@ from fynance._wrappers import WrapperArray
 from fynance.features._metrics_helpers import *  # noqa: F401,F403
 
 __all__ = ['annual_volatility', 'sharpe', 'sortino', 'calmar', 'diversified_ratio', 'roll_annual_volatility', 'roll_sharpe', 'roll_calmar']
+
+
+def _safe_ratio(excess: NDArray, denom: NDArray) -> Any:
+    """ ``excess / denom`` robust to a zero denominator (scalar **or** array).
+
+    A zero-volatility series has an undefined ratio: it is ``+inf`` when the
+    excess return is non-zero (a riskless gain), and ``0`` when the excess is also
+    zero (a flat, do-nothing curve). Returns a numpy scalar for 0-D input and an
+    array otherwise — matching the surrounding ratio functions' shape contract.
+    """
+    excess = np.asarray(excess, dtype=np.float64)
+    denom = np.asarray(denom, dtype=np.float64)
+
+    if denom.ndim == 0:
+        if denom != 0.:
+
+            return np.float64(excess / denom)
+
+        return np.float64(np.inf if excess != 0. else 0.)
+
+    res = np.full(denom.shape, np.inf, dtype=np.float64)
+    nz = denom != 0.
+    res[nz] = excess[nz] / denom[nz]
+    res[(~nz) & (excess == 0.)] = 0.
+
+    return res
 
 
 @WrapperArray('dtype', 'axis', 'null', 'ddof', min_size=2)
@@ -162,14 +190,8 @@ def sharpe(X: NDArray, rf: float = 0, period: int = 252, log: bool = False, axis
     """
     ret = _annual_return(X, period, ddof)
     vol = _annual_volatility(X, period, log, axis, ddof)
-    if (vol == 0.).any():
-        res = ret - rf
-        res[vol == 0.] = np.inf
-        res[vol != 0.] = res[vol != 0.] / vol[vol != 0.]
 
-        return res
-
-    return (ret - rf) / vol
+    return _safe_ratio(ret - rf, vol)
 
 
 @WrapperArray('dtype', 'axis', 'null', 'ddof', min_size=2)
@@ -238,14 +260,7 @@ def sortino(
     ret = _annual_return(X, period, ddof)
     downside_vol = np.sqrt(period) * np.std(np.where(R < 0, R, 0.), axis=axis, ddof=ddof)
 
-    if (downside_vol == 0.).any():
-        res = ret - rf
-        res[downside_vol == 0.] = np.inf
-        res[downside_vol != 0.] = res[downside_vol != 0.] / downside_vol[downside_vol != 0.]
-
-        return res
-
-    return (ret - rf) / downside_vol
+    return _safe_ratio(ret - rf, downside_vol)
 
 
 @WrapperArray('dtype', 'axis', 'ddof', min_size=2)
