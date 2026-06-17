@@ -19,6 +19,26 @@ shipped, `03-decisions.md` for *why*. Keep it short and true.
 
 ---
 
+## 3. Harnais multi-input — entrées `X`/`y` + régime causal  ⭐ active
+
+Débloquer les **stratégies NN sophistiquées** (qui vivent dans le repo privé) en
+donnant au harnais ce qui lui manque : nourrir un **modèle** avec une **matrice de
+features `X` (+ cible `y`)** alignée sur le prix, et un **label de régime causal**
+(le `detect_regimes` actuel est in-sample → lookahead). Ces deux briques sont
+**génériques** (l'outil) ; les stratégies A/B/C les consomment côté privé.
+
+- [ ] **I1 entrées `X`/`y`** — `Strategy.run`/`run_walk_forward` et
+  `run_experiment` acceptent une matrice de features précalculée `X` (alignée sur
+  le prix) + `y`, slicée par fenêtre (refit walk-forward = le « rolling NN »). Le
+  prix ne sert plus qu'au PnL ; `X` porte features exogènes / régime / multi-venue.
+- [ ] **I2 régime causal** — un `RegimeDetector` (fit k-means sur le train,
+  assignation online du test au centroïde le plus proche) + `regime_features`
+  causales. `detect_regimes` (in-sample) reste pour l'analyse. Probe no-lookahead.
+
+> Les stratégies (C régime+rolling NN, B TCN/LSTM+SharpeLoss, A multi-venue) et les
+> adaptateurs de vraie data vivent dans le **repo privé** `fynance-research`, pas
+> ici. fynance ne fournit que les briques génériques ci-dessus.
+
 ## 2. Research harness — extensions optionnelles
 
 Le harnais R&D `fynance.research` est **livré** (S1–S3) : `Experiment`,
