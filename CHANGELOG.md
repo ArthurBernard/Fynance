@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `Strategy.run` / `Strategy.run_walk_forward` and `fynance.research.run_experiment` accept a precomputed feature matrix `X` (aligned with the price index): when given it replaces `features(prices)` and the walk-forward slices `X[train]`/`X[test]` per window (the rolling-NN refit). Prices are used only for the P&L; `X` carries exogenous / regime / multi-venue inputs the price-only featurizer cannot build. `X`/`y` dtypes are preserved (so a float32 `X` matches a float32 torch model).
+
 ### Changed
 
 ### Fixed

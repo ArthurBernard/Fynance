@@ -83,9 +83,24 @@ class Strategy:
 
         return np.asarray(self.features(prices), dtype=np.float64)
 
-    def _positions(self, prices: NDArray, y: NDArray | None) -> NDArray:
-        """ Compute the (unshifted) position series from a price series. """
-        feats = self._featurize(prices)
+    def _resolve_features(self, prices: NDArray, X: NDArray | None) -> NDArray:
+        """ Use a precomputed feature matrix ``X`` if given, else featurize prices.
+
+        ``X`` is the caller's responsibility to keep **aligned with the price
+        index** and **causal** — it carries exogenous features (engineered inputs,
+        a regime label, other venues) that the price-only featurizer cannot build.
+        Its dtype is preserved (so a float32 ``X`` matches a float32 torch model).
+        """
+        if X is not None:
+
+            return np.asarray(X)
+
+        return self._featurize(prices)
+
+    def _positions(self, prices: NDArray, y: NDArray | None,
+                   X: NDArray | None = None) -> NDArray:
+        """ Compute the (unshifted) position series. """
+        feats = self._resolve_features(prices, X)
 
         if self.model is not None:
             if y is not None:
@@ -98,16 +113,21 @@ class Strategy:
 
         return np.asarray(self.signal(preds), dtype=np.float64).reshape(-1)
 
-    def run(self, data: Any, y: NDArray | None = None) -> BacktestResult:
+    def run(self, data: Any, y: NDArray | None = None,
+            X: NDArray | None = None) -> BacktestResult:
         """ Run the strategy on a price series, returning a backtest result.
 
         Parameters
         ----------
         data : PriceSeries or array-like
-            Price series.
+            Price series (used for the P&L).
         y : array-like, optional
             Supervised target for the model (fit on the whole series; for
             leak-free training use :meth:`run_walk_forward`).
+        X : array-like, optional
+            Precomputed feature matrix aligned with ``data`` (rows = time). When
+            given it replaces ``features(prices)`` — use it to feed exogenous /
+            regime / multi-venue inputs the price-only featurizer cannot build.
 
         Returns
         -------
@@ -116,7 +136,7 @@ class Strategy:
         """
         prices = _as_array(data)
         returns = prices[1:] / prices[:-1] - 1.0
-        positions = self._positions(prices, y)
+        positions = self._positions(prices, y, X)
 
         # Align positions with the returns series (drop the first observation).
         if positions.shape[0] == prices.shape[0]:
@@ -132,16 +152,18 @@ class Strategy:
         test: int,
         step: int | None = None,
         purge: int = 0,
+        X: NDArray | None = None,
     ) -> BacktestResult:
         """ Walk-forward run: refit per window on train only, predict on test.
 
         The model and features are fit on each train slice only; out-of-sample
         positions are stitched together and backtested. Strictly no-lookahead.
+        This per-window refit *is* the rolling-NN pattern when ``model`` is a net.
 
         Parameters
         ----------
         data : PriceSeries or array-like
-            Price series.
+            Price series (used for the P&L).
         y : array-like
             Supervised target aligned with ``data``.
         train, test : int
@@ -150,6 +172,11 @@ class Strategy:
             Roll step (defaults to ``test``).
         purge : int
             Embargo removed at the train/test boundary.
+        X : array-like, optional
+            Precomputed feature matrix aligned with ``data`` (rows = time). When
+            given, each window slices ``X[train]`` / ``X[test]`` instead of
+            featurizing the price slices — the way to feed exogenous / regime /
+            multi-venue features. ``X`` must be causal and index-aligned.
 
         Returns
         -------
@@ -158,7 +185,8 @@ class Strategy:
 
         """
         prices = _as_array(data)
-        y_arr = np.asarray(y, dtype=np.float64)
+        y_arr = np.asarray(y)  # preserve caller dtype (match X / the model)
+        X_arr = None if X is None else np.asarray(X)  # preserve caller dtype
         n = prices.shape[0]
 
         oos_pos: list[float] = []
@@ -166,8 +194,13 @@ class Strategy:
 
         for tr, te in walk_forward(n, train=train, test=test, step=step,
                                    purge=purge):
-            feats_tr = self._featurize(prices[tr])
-            feats_te = self._featurize(prices[te])
+            if X_arr is not None:
+                feats_tr = X_arr[tr]
+                feats_te = X_arr[te]
+
+            else:
+                feats_tr = self._featurize(prices[tr])
+                feats_te = self._featurize(prices[te])
 
             if self.model is not None:
                 self.model.fit(feats_tr, y_arr[tr])
