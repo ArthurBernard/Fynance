@@ -34,6 +34,12 @@ with an identity signal::
     model = ObjectiveModel(layers=(16, 8), loss=SharpeLoss(), epochs=60, seed=0)
     strat = Strategy(model=model, signal=lambda positions: positions)
 
+Set ``cost`` (a per-bar proportional fee, e.g. ``0.0026``) to train on the
+**net-of-cost** return ``positions * returns - cost * |Δpositions|``: the net then
+learns to *hold* rather than churn — the anti-churn lever for high-cost or
+high-frequency settings (use the same value as the backtest's
+:class:`~fynance.backtest.ProportionalCost`).
+
 Feed it through the research harness via the ``X`` path with ``y`` = returns; see
 :doc:`research_workflow`.
 
