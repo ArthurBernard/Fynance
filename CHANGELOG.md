@@ -10,6 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [2.8.0] - 2026-06-18
+
+### Breaking Changes
+
+### Added
+
 - **Mini-batch training for `ObjectiveModel`.** New `batch_size` (and `shuffle`) parameters train on **contiguous** mini-batches instead of full-batch — so a `fit` does `epochs * ceil(T / batch_size)` optimizer steps instead of just `epochs`. This is what makes the objective actually converge on long (e.g. minute-resolution) series, where full-batch gave far too few updates. The turnover penalty is carried across chunk boundaries (in time order); `batch_size=None` keeps the original full-batch behaviour.
 
 ### Changed
