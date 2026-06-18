@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Turnover-penalized (net-of-cost) objective training.** `ObjectiveModel` gains a `cost` parameter: when non-zero the objective is computed on `positions * returns - cost * |Δpositions|`, so the network learns to **hold** positions instead of churning — the anti-churn lever for high-cost / high-frequency settings. Defaults to `0` (unchanged behaviour).
+
 ### Changed
 
 ### Fixed
