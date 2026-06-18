@@ -92,3 +92,36 @@ def test_cost_default_zero_is_unchanged():
     a = ObjectiveModel(epochs=20, seed=3).fit(X, returns).predict(X)
     b = ObjectiveModel(epochs=20, cost=0.0, seed=3).fit(X, returns).predict(X)
     assert np.allclose(a, b)
+
+
+def _sr(model, X, returns):
+    pos = np.asarray(model.predict(X)).reshape(-1)
+    return sharpe(np.cumprod(1 + pos * returns), period=252)
+
+
+def test_minibatch_trains_more_than_full_batch():
+    # Full-batch does only `epochs` gradient steps; mini-batching does
+    # `epochs * n_chunks` -> at the same (low) epoch budget it should learn more.
+    X, returns = _edge_data()
+    full = ObjectiveModel(layers=(8,), epochs=5, lr=5e-3, seed=0).fit(X, returns)
+    mini = ObjectiveModel(layers=(8,), epochs=5, lr=5e-3, batch_size=256,
+                          seed=0).fit(X, returns)
+
+    assert _sr(mini, X, returns) > _sr(full, X, returns)
+
+
+def test_minibatch_reproducible_with_seed():
+    X, returns = _edge_data(n=600)
+    a = ObjectiveModel(epochs=8, batch_size=128, seed=5).fit(X, returns).predict(X)
+    b = ObjectiveModel(epochs=8, batch_size=128, seed=5).fit(X, returns).predict(X)
+    assert np.allclose(a, b)
+
+
+def test_minibatch_with_cost_reduces_turnover():
+    X, returns = _alternating_edge()
+    free = ObjectiveModel(layers=(8,), epochs=20, lr=5e-3, batch_size=256,
+                          seed=0).fit(X, returns)
+    pricey = ObjectiveModel(layers=(8,), epochs=20, lr=5e-3, batch_size=256,
+                            cost=0.1, seed=0).fit(X, returns)
+
+    assert _turnover(pricey.predict(X)) < _turnover(free.predict(X))
