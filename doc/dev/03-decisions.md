@@ -72,6 +72,18 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-06-18 — Anti-churn brick 2: inference-time turnover mappers (PR #170)  [accepted]
+- **Choice**: add three causal, composable position mappers to `fynance.signal` —
+  `ema_smooth`, `deadband` (sticky/hysteretic, magnitude-preserving), `min_hold`
+  (minimum dwell). The inference-time complement to brick 1's train-time penalty.
+- **Why**: two layers beat one. The net-of-cost objective makes the model *want*
+  to hold; the mappers give a hard, model-agnostic turnover cap on top (and work
+  for rule-based strategies too). Kept as separate small functions (composable)
+  rather than one mega-mapper.
+- **Rejected alternatives**: folding everything into the existing `threshold`
+  (it discards magnitude and is stateless — wrong tool); only the train-time
+  penalty (can't hard-cap trade frequency).
+
 ### 2026-06-18 — Anti-churn brick 1: net-of-cost objective training (PR #169)  [accepted]
 - **Choice**: penalize turnover **inside the training objective** — `ObjectiveModel`
   optimizes `Sharpe(positions*returns − cost*|Δpositions|)` via a new `cost` param —

@@ -10,11 +10,18 @@ import numpy as np
 from fynance.core import SignalModel
 from fynance.signal import (
     SignalPipeline,
+    deadband,
+    ema_smooth,
+    min_hold,
     rank,
     sign,
     threshold,
     vol_target_position,
 )
+
+
+def _turnover(pos):
+    return float(np.abs(np.diff(np.asarray(pos, dtype=float), prepend=0.0)).sum())
 
 
 def test_sign():
@@ -77,3 +84,62 @@ def test_dummy_model_conforms_to_signalmodel():
             return np.zeros(len(X))
 
     assert isinstance(DummyModel(), SignalModel)
+
+
+# --- anti-churn mappers -----------------------------------------------------
+
+def test_ema_smooth_cuts_turnover_and_is_causal():
+    flips = np.array([1.0, -1.0] * 50)               # churns every bar
+    smoothed = ema_smooth(flips, alpha=0.2)
+    assert _turnover(smoothed) < _turnover(flips)     # turnover reduced
+    # causal: a future value cannot change an earlier output
+    other = flips.copy()
+    other[60:] = 0.0
+    assert np.allclose(ema_smooth(flips, 0.2)[:60], ema_smooth(other, 0.2)[:60])
+
+
+def test_ema_smooth_alpha_one_is_identity():
+    p = np.array([0.3, -0.7, 1.0, -0.2])
+    assert np.allclose(ema_smooth(p, alpha=1.0), p)
+
+
+def test_ema_smooth_rejects_bad_alpha():
+    import pytest
+    for bad in (0.0, -0.1, 1.5):
+        with pytest.raises(ValueError):
+            ema_smooth(np.zeros(3), alpha=bad)
+
+
+def test_deadband_holds_through_small_moves():
+    out = deadband(np.array([0.0, 0.05, 0.5, 0.55, -0.4]), band=0.2)
+    assert np.allclose(out, [0.0, 0.0, 0.5, 0.5, -0.4])
+
+
+def test_deadband_cuts_turnover():
+    rng = np.random.default_rng(0)
+    noisy = rng.normal(0, 0.05, 200)                 # jitter around 0
+    assert _turnover(deadband(noisy, band=0.2)) < _turnover(noisy)
+
+
+def test_deadband_is_causal():
+    p = np.array([0.0, 0.5, 0.55, 0.9, -0.4])
+    other = p.copy()
+    other[3:] = 5.0
+    assert np.allclose(deadband(p, 0.2)[:3], deadband(other, 0.2)[:3])
+
+
+def test_min_hold_enforces_dwell():
+    out = min_hold(np.array([1.0, -1.0, 1.0, -1.0, 1.0, -1.0]), hold=3)
+    assert np.allclose(out, [1.0, 1.0, 1.0, -1.0, -1.0, -1.0])
+
+
+def test_min_hold_noop_when_hold_leq_one():
+    p = np.array([1.0, -1.0, 1.0])
+    assert np.allclose(min_hold(p, hold=1), p)
+
+
+def test_min_hold_is_causal():
+    p = np.array([1.0, 1.0, -1.0, -1.0, 1.0, 1.0])
+    other = p.copy()
+    other[4:] = -1.0
+    assert np.allclose(min_hold(p, 3)[:4], min_hold(other, 3)[:4])
