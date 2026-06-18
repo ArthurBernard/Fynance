@@ -69,7 +69,18 @@ class ObjectiveModel:
     lr : float
         Learning rate.
     epochs : int
-        Full-batch training steps per :meth:`fit`.
+        Passes over the data per :meth:`fit`. With full-batch (``batch_size``
+        ``None``) this is the number of optimizer steps; with mini-batches it is
+        ``epochs * ceil(T / batch_size)`` steps — **far more updates**, which the
+        objective usually needs to converge on long series.
+    batch_size : int, optional
+        Train on **contiguous** mini-batches of this many bars (order preserved so
+        the turnover penalty stays meaningful). ``None`` (default) = full batch.
+        Mini-batching is the practical way to actually train on long (e.g. minute)
+        series — full-batch gives only ``epochs`` gradient steps total.
+    shuffle : bool
+        When mini-batching, shuffle the **order of the contiguous chunks** each
+        epoch (rows within a chunk stay ordered). Improves SGD; default True.
     position_fn : callable
         Maps the net output to a position; default ``tanh`` (positions in
         ``[-1, 1]``).
@@ -100,6 +111,8 @@ class ObjectiveModel:
         optimizer: type[torch.optim.Optimizer] = torch.optim.Adam,
         lr: float = 1e-3,
         epochs: int = 80,
+        batch_size: int | None = None,
+        shuffle: bool = True,
         position_fn: Callable[[torch.Tensor], torch.Tensor] = torch.tanh,
         cost: float = 0.0,
         seed: int = 0,
@@ -110,6 +123,8 @@ class ObjectiveModel:
         self.optimizer_cls = optimizer
         self.lr = lr
         self.epochs = epochs
+        self.batch_size = batch_size
+        self.shuffle = shuffle
         self.position_fn = position_fn
         self.cost = cost
         self.seed = seed
@@ -129,8 +144,24 @@ class ObjectiveModel:
 
         return self.position_fn(out)
 
+    def _strat_return(self, pos: torch.Tensor, ret: torch.Tensor,
+                      prev: torch.Tensor | None) -> torch.Tensor:
+        """ Net-of-cost strategy return ``pos*ret - cost*|Δpos|`` for a chunk.
+
+        ``prev`` is the (detached) last position of the previous contiguous chunk
+        so the turnover at the chunk boundary is charged correctly; ``None`` (or a
+        shuffled chunk) charges entry from flat on the first bar.
+        """
+        strat = pos * ret
+        if self.cost:
+            first = pos[:1].abs() if prev is None else (pos[:1] - prev).abs()
+            turnover = torch.cat([first, torch.abs(pos[1:] - pos[:-1])])
+            strat = strat - self.cost * turnover
+
+        return strat
+
     def fit(self, X: NDArray, y: NDArray) -> ObjectiveModel:
-        """ Train the net to maximize the objective of ``positions * y``.
+        """ Train the net to maximize the objective of the net-of-cost return.
 
         Parameters
         ----------
@@ -149,21 +180,30 @@ class ObjectiveModel:
         rt = torch.as_tensor(np.asarray(y, dtype=np.float32).reshape(-1))
         self._ensure_net(Xt.shape[1])
 
+        T = Xt.shape[0]
+        bs = self.batch_size or T
+        n_chunks = (T + bs - 1) // bs
+        gen = torch.Generator().manual_seed(self.seed)
+
         self.net.train()  # type: ignore[union-attr]
         for _ in range(self.epochs):
-            self._optim.zero_grad()  # type: ignore[union-attr]
-            pos = self._positions(Xt)
-            strat_ret = pos * rt
-            if self.cost:
-                # Turnover penalty: charge ``cost * |Δposition|`` each bar (the
-                # first bar charges entry from flat). This couples positions
-                # across time so the net learns to *hold* rather than churn —
-                # the loss optimizes the **net-of-cost** return series.
-                turnover = torch.cat([pos[:1].abs(), torch.abs(pos[1:] - pos[:-1])])
-                strat_ret = strat_ret - self.cost * turnover
-            loss = self.loss(strat_ret)
-            loss.backward()
-            self._optim.step()  # type: ignore[union-attr]
+            order: list[int] = list(range(n_chunks))
+            if self.shuffle and n_chunks > 1:
+                order = torch.randperm(n_chunks, generator=gen).tolist()
+
+            prev: torch.Tensor | None = None
+            for ci in order:
+                a, b = ci * bs, min((ci + 1) * bs, T)
+                self._optim.zero_grad()  # type: ignore[union-attr]
+                pos = self._positions(Xt[a:b])
+                # Carry the previous chunk's last position only when chunks run in
+                # time order (no shuffle); a shuffled chunk charges entry-from-flat.
+                strat_ret = self._strat_return(pos, rt[a:b],
+                                               None if self.shuffle else prev)
+                loss = self.loss(strat_ret)
+                loss.backward()
+                self._optim.step()  # type: ignore[union-attr]
+                prev = pos[-1].detach()
 
         return self
 
