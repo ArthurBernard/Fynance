@@ -72,6 +72,20 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-06-18 — Mini-batch training for ObjectiveModel (PR #173)  [accepted]
+- **Choice**: add contiguous mini-batch SGD (`batch_size`/`shuffle`) to
+  `ObjectiveModel`; a `fit` now does `epochs * ceil(T/batch_size)` steps instead of
+  `epochs` full-batch steps. Chunks stay time-ordered so the turnover penalty
+  remains meaningful (carried across chunk boundaries when not shuffled).
+- **Why**: the full-batch path gave only `epochs` (~40) gradient updates on
+  hundreds-of-thousands of bars — the minute-resolution models were drastically
+  **under-trained**, which alone could explain weak/null results. Mini-batching is
+  the prerequisite to honestly test whether OHLC carries edge. `batch_size=None`
+  preserves the old behaviour (backward compatible).
+- **Rejected alternatives**: only raising `epochs` (full-batch steps are O(T) each
+  and still few); shuffling individual rows (breaks the turnover diff / Sharpe
+  temporal structure) — hence *chunk-order* shuffle, rows kept ordered.
+
 ### 2026-06-18 — Anti-churn brick 2: inference-time turnover mappers (PR #170)  [accepted]
 - **Choice**: add three causal, composable position mappers to `fynance.signal` —
   `ema_smooth`, `deadband` (sticky/hysteretic, magnitude-preserving), `min_hold`
