@@ -73,6 +73,14 @@ class ObjectiveModel:
     position_fn : callable
         Maps the net output to a position; default ``tanh`` (positions in
         ``[-1, 1]``).
+    cost : float
+        Per-bar proportional turnover cost penalized **during training** (e.g.
+        ``0.0026`` for 26 bps). When non-zero the objective is computed on the
+        **net-of-cost** return ``positions * returns - cost * |Δpositions|``, so
+        the net learns to hold positions instead of churning — the anti-churn
+        brick for high-cost / high-frequency settings. Use the same value as the
+        backtest's :class:`~fynance.backtest.ProportionalCost`. Default ``0``
+        (no penalty, original behaviour).
     seed : int
         Seed for reproducible initialization/training.
 
@@ -93,6 +101,7 @@ class ObjectiveModel:
         lr: float = 1e-3,
         epochs: int = 80,
         position_fn: Callable[[torch.Tensor], torch.Tensor] = torch.tanh,
+        cost: float = 0.0,
         seed: int = 0,
     ):
         self.net = net
@@ -102,6 +111,7 @@ class ObjectiveModel:
         self.lr = lr
         self.epochs = epochs
         self.position_fn = position_fn
+        self.cost = cost
         self.seed = seed
         self._optim: torch.optim.Optimizer | None = None
 
@@ -142,7 +152,15 @@ class ObjectiveModel:
         self.net.train()  # type: ignore[union-attr]
         for _ in range(self.epochs):
             self._optim.zero_grad()  # type: ignore[union-attr]
-            strat_ret = self._positions(Xt) * rt
+            pos = self._positions(Xt)
+            strat_ret = pos * rt
+            if self.cost:
+                # Turnover penalty: charge ``cost * |Δposition|`` each bar (the
+                # first bar charges entry from flat). This couples positions
+                # across time so the net learns to *hold* rather than churn —
+                # the loss optimizes the **net-of-cost** return series.
+                turnover = torch.cat([pos[:1].abs(), torch.abs(pos[1:] - pos[:-1])])
+                strat_ret = strat_ret - self.cost * turnover
             loss = self.loss(strat_ret)
             loss.backward()
             self._optim.step()  # type: ignore[union-attr]

@@ -72,6 +72,19 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-06-18 — Anti-churn brick 1: net-of-cost objective training (PR #169)  [accepted]
+- **Choice**: penalize turnover **inside the training objective** — `ObjectiveModel`
+  optimizes `Sharpe(positions*returns − cost*|Δpositions|)` via a new `cost` param —
+  rather than only post-processing positions or relying on the backtest cost.
+- **Why**: at realistic crypto fees (Kraken ~0.26% taker → ~0.52% round-trip) a
+  high-frequency strategy that flips often is structurally unprofitable. Teaching
+  the net the cost at train time makes it *hold* (the gradient couples positions
+  across bars), which a post-hoc filter cannot do as well. Generic, opt-in
+  (`cost=0` default = unchanged).
+- **Rejected alternatives**: only an inference-time smoother/deadband (necessary
+  but insufficient — the model still *wants* to churn); a separate cost-aware loss
+  class (more API surface than threading `cost` through the existing objective).
+
 ### 2026-06-17 — Self-describing experiments (provenance block) (PR #163)  [accepted]
 - **Choice**: provenance (what data + what features + run config produced a result)
   is recorded **generically in `fynance.research`** — `run_experiment` builds a
