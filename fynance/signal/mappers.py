@@ -6,6 +6,11 @@
 Pure numpy and causal: the position at ``t`` depends only on the prediction at
 ``t`` (the engine in :mod:`fynance.backtest` applies the causal one-step shift).
 
+The **anti-churn** mappers — :func:`ema_smooth`, :func:`deadband`,
+:func:`min_hold` — are stateful (each output depends on the past output) but
+strictly causal; compose them to cut turnover where transaction costs would
+otherwise eat the edge (high fees / high frequency).
+
 """
 
 from __future__ import annotations
@@ -17,7 +22,8 @@ from numpy.typing import NDArray
 # Local packages
 from fynance.portfolio.sizing import vol_target
 
-__all__ = ['sign', 'threshold', 'rank', 'vol_target_position']
+__all__ = ['sign', 'threshold', 'rank', 'vol_target_position',
+           'ema_smooth', 'deadband', 'min_hold']
 
 
 def sign(pred: NDArray) -> NDArray[np.float64]:
@@ -120,3 +126,115 @@ def vol_target_position(
     )
 
     return sig * lev
+
+
+def ema_smooth(pred: NDArray, alpha: float = 0.2) -> NDArray[np.float64]:
+    """ Causally smooth a position with an exponential moving average.
+
+    ``out[t] = alpha * pred[t] + (1 - alpha) * out[t-1]`` — a low ``alpha`` reacts
+    slowly, cutting turnover by damping minute-to-minute flips. Anti-churn.
+
+    Parameters
+    ----------
+    pred : array-like, shape (T,)
+        Raw position / prediction series.
+    alpha : float
+        Smoothing factor in ``(0, 1]`` (``1`` = no smoothing).
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> ema_smooth(np.array([0.0, 1.0, 1.0, -1.0]), alpha=0.5)
+    array([ 0.   ,  0.5  ,  0.75 , -0.125])
+
+    """
+    if not 0.0 < alpha <= 1.0:
+
+        raise ValueError("alpha must be in (0, 1]")
+
+    p = np.asarray(pred, dtype=np.float64).reshape(-1)
+    out = np.empty_like(p)
+    acc = 0.0 if p.size == 0 else p[0]
+    for t in range(p.size):
+        acc = alpha * p[t] + (1.0 - alpha) * acc
+        out[t] = acc
+
+    return out
+
+
+def deadband(pred: NDArray, band: float = 0.1) -> NDArray[np.float64]:
+    """ Hold the previous position unless the target moves by more than ``band``.
+
+    A *sticky* dead-band: ``out[t] = pred[t]`` only when
+    ``|pred[t] - out[t-1]| > band``, else ``out[t] = out[t-1]``. Magnitude is
+    preserved (unlike :func:`threshold`), but small oscillations are ignored, so
+    the position changes only on meaningful moves. Anti-churn.
+
+    Parameters
+    ----------
+    pred : array-like, shape (T,)
+        Raw position / prediction series.
+    band : float
+        Minimum change required to update the held position (``>= 0``).
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> deadband(np.array([0.0, 0.05, 0.5, 0.55, -0.4]), band=0.2)
+    array([ 0. ,  0. ,  0.5,  0.5, -0.4])
+
+    """
+    if band < 0.0:
+
+        raise ValueError("band must be >= 0")
+
+    p = np.asarray(pred, dtype=np.float64).reshape(-1)
+    out = np.empty_like(p)
+    held = 0.0 if p.size == 0 else p[0]
+    for t in range(p.size):
+        if abs(p[t] - held) > band:
+            held = p[t]
+        out[t] = held
+
+    return out
+
+
+def min_hold(pos: NDArray, hold: int, tol: float = 1e-9) -> NDArray[np.float64]:
+    """ Enforce a minimum holding period between position changes.
+
+    Once the position changes, it is **frozen for ``hold`` bars** before another
+    change can take effect — a hard cap on trade frequency. Strictly causal.
+
+    Parameters
+    ----------
+    pos : array-like, shape (T,)
+        Position series (e.g. already mapped to a target).
+    hold : int
+        Minimum number of bars between two changes (``hold <= 1`` is a no-op).
+    tol : float
+        Changes smaller than ``tol`` are treated as no change.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> min_hold(np.array([1., -1., 1., -1., 1., -1.]), hold=3)
+    array([ 1.,  1.,  1., -1., -1., -1.])
+
+    """
+    p = np.asarray(pos, dtype=np.float64).reshape(-1)
+    if hold <= 1 or p.size == 0:
+
+        return p.copy()
+
+    out = np.empty_like(p)
+    held = p[0]
+    out[0] = held
+    since = 0
+    for t in range(1, p.size):
+        since += 1
+        if since >= hold and abs(p[t] - held) > tol:
+            held = p[t]
+            since = 0
+        out[t] = held
+
+    return out

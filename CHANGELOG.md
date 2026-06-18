@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Anti-churn signal mappers.** `fynance.signal` gains three causal, composable position mappers to cut turnover where transaction costs dominate: `ema_smooth` (EMA-smooth a position), `deadband` (sticky hold unless the target moves beyond a band, magnitude-preserving), and `min_hold` (enforce a minimum holding period between changes). They pair with the train-time `ObjectiveModel(cost=...)` penalty.
 - **Turnover-penalized (net-of-cost) objective training.** `ObjectiveModel` gains a `cost` parameter: when non-zero the objective is computed on `positions * returns - cost * |Δpositions|`, so the network learns to **hold** positions instead of churning — the anti-churn lever for high-cost / high-frequency settings. Defaults to `0` (unchanged behaviour).
 
 ### Changed

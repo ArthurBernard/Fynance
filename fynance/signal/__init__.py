@@ -12,7 +12,15 @@ with a mapper.
 """
 
 # Local packages
-from .mappers import rank, sign, threshold, vol_target_position
+from .mappers import (
+    deadband,
+    ema_smooth,
+    min_hold,
+    rank,
+    sign,
+    threshold,
+    vol_target_position,
+)
 from .pipeline import SignalPipeline
 
 __all__ = [
@@ -20,5 +28,8 @@ __all__ = [
     'threshold',
     'rank',
     'vol_target_position',
+    'ema_smooth',
+    'deadband',
+    'min_hold',
     'SignalPipeline',
 ]
