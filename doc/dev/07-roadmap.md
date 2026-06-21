@@ -12,7 +12,7 @@ shipped, `03-decisions.md` for *why*. Keep it short and true.
 > Loop : `/pick-task` → `/plan` (arbre dans `plans/`) → `/execute-leaf` →
 > `/finish-task`. Release : `/release` quand `[Unreleased]` est suffisamment rempli.
 
-> **fynance 2.x livré** (v2.8.0 sur `master`/PyPI). Le refactor en couches, le port
+> **fynance 2.x livré** (v2.9.0 sur `master`/PyPI). Le refactor en couches, le port
 > Cython→Numba (build pure-Python), le harnais R&D `fynance.research` (S1–S3), la
 > brique d'entraînement aligné-objectif (`ObjectiveModel`) et les **bricks de
 > librairie** (conteneur `OHLCV` + indicateurs ATR/ADX/Williams %R/OBV/VWAP, feature
@@ -27,6 +27,17 @@ shipped, `03-decisions.md` for *why*. Keep it short and true.
 > code de librairie réutilisable, data-agnostique.
 
 ---
+
+## 3. Chore — CI / hygiène
+
+Dette d'outillage repérée pendant le batch library-bricks (v2.9.0). Non bloquant.
+
+- [ ] **CI sur les PR vers `develop`.** `ci.yml` ne s'est pas déclenché sur les PR
+  de feature ciblant `develop` (la suite n'a tourné qu'en local) — vérifier les
+  triggers du workflow pour que les 4 gates s'exécutent aussi sur ces PR.
+- [ ] **Job « Update badges » en échec.** L'étape « Commit badge if changed »
+  (workflow `Badges`) échoue à chaque push sur `develop` (problème de push du badge
+  de couverture docstring) — corriger les permissions / la condition de commit.
 
 ## 2. Research harness — extension optionnelle
 
