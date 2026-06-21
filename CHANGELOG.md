@@ -10,6 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [2.9.0] - 2026-06-21
+
+### Breaking Changes
+
+### Added
+
 - **`fynance.core.OHLCV` — aligned multi-series value object.** A thin,
   numpy-backed container for aligned Open/High/Low/Close/Volume series (the
   multi-series counterpart of `PriceSeries`): `close` required, the other four
