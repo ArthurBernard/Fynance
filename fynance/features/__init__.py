@@ -31,6 +31,7 @@ from . import (
     indicators,
     momentums,
     money_management,
+    ohlcv,
     regime,
     roll_functions,
     scale,
@@ -41,6 +42,7 @@ from .filters import *
 from .indicators import *
 from .momentums import *
 from .money_management import *
+from .ohlcv import *
 from .regime import *
 from .roll_functions import *
 from .scale import *
@@ -52,6 +54,7 @@ __all__ += filters.__all__
 __all__ += momentums.__all__
 __all__ += indicators.__all__
 __all__ += money_management.__all__
+__all__ += ohlcv.__all__
 __all__ += roll_functions.__all__
 __all__ += scale.__all__
 __all__ += stats.__all__
