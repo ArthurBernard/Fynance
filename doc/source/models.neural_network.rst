@@ -43,6 +43,17 @@ high-frequency settings (use the same value as the backtest's
 Feed it through the research harness via the ``X`` path with ``y`` = returns; see
 :doc:`research_workflow`.
 
+.. rubric:: Regime-conditioned architecture
+
+:class:`~fynance.models.regime_model.RegimeMoE` conditions an objective-aligned
+network on the **causal** market regime (:class:`~fynance.features.RegimeDetector`):
+the prediction depends on which volatility regime the market is in. ``routing="soft"``
+(default) concatenates a learned regime **embedding** to the features through a
+shared trunk; ``routing="hard"`` uses one **expert** per regime. The regime label
+is produced by a detector fit on the **training** slice only and assigned online,
+from a designated positive price/level column of ``X`` (``regime_col``). It reuses
+``ObjectiveModel`` for training, so it is a ``SignalModel`` like the above.
+
 .. rubric:: Inheritance
 
 ``BaseNeuralNet`` → ``MultiLayerPerceptron``
@@ -60,3 +71,4 @@ Feed it through the research harness via the ``X`` path with ``y`` = returns; se
    _base.BaseNeuralNet
    mlp.MultiLayerPerceptron
    objective.ObjectiveModel
+   regime_model.RegimeMoE
