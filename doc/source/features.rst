@@ -23,6 +23,12 @@ moving standard deviations and rolling functions.
 
       Bollinger Band, CCI, Hull Moving Average, MACD, RSI.
 
+   .. grid-item-card:: :octicon:`graph;1.2em;sd-mr-1` OHLCV indicators
+      :link: features.ohlcv
+      :link-type: doc
+
+      ATR, ADX, Williams %R (High/Low) and OBV, VWAP (Volume).
+
    .. grid-item-card:: :octicon:`meter;1.2em;sd-mr-1` Statistics
       :link: features.stats
       :link-type: doc
@@ -54,6 +60,12 @@ moving standard deviations and rolling functions.
       :link-type: doc
 
       Unsupervised regime labelling by clustering volatility/return features.
+
+   .. grid-item-card:: :octicon:`graph;1.2em;sd-mr-1` GARCH volatility
+      :link: features.garch
+      :link-type: doc
+
+      Causal GARCH(1,1) conditional volatility as a feature.
 
    .. grid-item-card:: :octicon:`arrow-switch;1.2em;sd-mr-1` Scale
       :link: features.scale
@@ -91,8 +103,10 @@ Common parameters across modules:
    features.engineering
    features.filters
    features.indicators
+   features.ohlcv
    features.stats
    features.momentums
    features.regime
+   features.garch
    features.roll_functions
    features.scale

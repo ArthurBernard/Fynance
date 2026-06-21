@@ -10,14 +10,21 @@ Granger-causality test for filtering candidate features.
 from __future__ import annotations
 
 # Built-in packages
-from typing import Callable
+from collections.abc import Mapping
+from typing import Any, Callable
 
 # Third-party packages
 import numpy as np
 from numpy.typing import NDArray
 from scipy import stats as _sp_stats
 
-__all__ = ['IncrementalMoments', 'granger_causality', 'multi_resolution']
+# Local packages
+from fynance.features.indicators import realized_volatility
+
+__all__ = [
+    'IncrementalMoments', 'adaptive_roll', 'adaptive_volatility',
+    'granger_causality', 'multi_resolution',
+]
 
 
 def multi_resolution(
@@ -154,3 +161,119 @@ class IncrementalMoments:
     def std(self) -> float:
         """ Population standard deviation. """
         return self.var ** 0.5
+
+
+def adaptive_roll(
+    X: NDArray,
+    func: Callable[..., NDArray],
+    windows: Mapping[int, int],
+    regimes: NDArray,
+    **kwargs: Any,
+) -> NDArray:
+    r""" Apply a window-based feature with a **regime-dependent** window.
+
+    At each bar ``t`` the output is ``func(X, windows[regimes[t]])[t]`` — a short
+    window in one regime, a longer one in another. Causal as long as both inputs
+    are: ``func`` must be a trailing-window feature (value at ``t`` uses
+    ``X[..t]``) and ``regimes`` a causal label (e.g. from
+    :class:`~fynance.features.RegimeDetector`, fit-on-train / assign-online).
+
+    Parameters
+    ----------
+    X : np.ndarray
+        One-dimensional input series.
+    func : callable
+        A trailing-window feature taking ``(X, w, **kwargs)`` and returning an
+        array aligned with ``X`` (e.g.
+        :func:`~fynance.features.momentums.sma`,
+        :func:`~fynance.features.indicators.realized_volatility`).
+    windows : mapping of int to int
+        Window size for each regime label. Must cover every label present in
+        ``regimes``.
+    regimes : np.ndarray
+        Causal integer regime label per bar, aligned with ``X``.
+    **kwargs
+        Extra keyword arguments forwarded to ``func``.
+
+    Returns
+    -------
+    np.ndarray
+        The regime-adaptive feature, shape ``(len(X),)``.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from fynance.features.momentums import sma
+    >>> X = np.arange(1., 7.)
+    >>> regimes = np.array([0, 0, 0, 1, 1, 1])
+    >>> adaptive_roll(X, sma, {0: 1, 1: 3}, regimes)
+    array([1., 2., 3., 3., 4., 5.])
+
+    """
+    x = np.asarray(X, dtype=np.float64).reshape(-1)
+    reg = np.asarray(regimes).reshape(-1)
+
+    if reg.size != x.size:
+
+        raise ValueError(
+            f"regimes length {reg.size} != X length {x.size}"
+        )
+
+    present = set(int(r) for r in np.unique(reg))
+    missing = present - set(windows)
+
+    if missing:
+
+        raise ValueError(f"windows has no entry for regime(s) {sorted(missing)}")
+
+    # Compute the feature once per distinct window, then select per bar.
+    out = np.empty(x.size, dtype=np.float64)
+    for w in set(windows.values()):
+        col = np.asarray(func(x, w, **kwargs)).reshape(-1)
+        labels_with_w = [lab for lab, win in windows.items() if win == w]
+        mask = np.isin(reg, labels_with_w)
+        out[mask] = col[mask]
+
+    return out
+
+
+def adaptive_volatility(
+    X: NDArray,
+    windows: Mapping[int, int],
+    regimes: NDArray,
+    period: int = 252,
+) -> NDArray:
+    r""" Regime-adaptive realized volatility (worked example of :func:`adaptive_roll`).
+
+    Uses a short volatility window in some regimes and a longer one in others, so
+    the estimate reacts fast in turbulent regimes and stays smooth in calm ones.
+
+    Parameters
+    ----------
+    X : np.ndarray
+        One-dimensional price/level series.
+    windows : mapping of int to int
+        Volatility window for each regime label.
+    regimes : np.ndarray
+        Causal integer regime label per bar, aligned with ``X``.
+    period : int, optional
+        Annualization factor. Default 252.
+
+    Returns
+    -------
+    np.ndarray
+        Regime-adaptive annualized volatility, shape ``(len(X),)``.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> rng = np.random.default_rng(0)
+    >>> X = 100 * np.exp(np.cumsum(rng.standard_normal(100) * 0.01))
+    >>> regimes = (np.arange(100) // 50)   # two regimes
+    >>> adaptive_volatility(X, {0: 5, 1: 20}, regimes).shape
+    (100,)
+
+    """
+    return adaptive_roll(
+        X, realized_volatility, windows, regimes, period=period,
+    )

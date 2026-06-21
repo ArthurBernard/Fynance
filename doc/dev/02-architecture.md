@@ -39,12 +39,14 @@ stability policy per package.)
   `_metrics_helpers` (the Numba metric kernels), `money_management`.
 - **`metrics/`** — performance/evaluation metrics split by concern: `ratios`
   (Sharpe/Sortino/Calmar/…), `drawdown`, `returns`, `summary` (one-call panel).
-- **`signal/` · `portfolio/`** — `sign`/`threshold`/`rank`/vol-target mappers +
-  `SignalPipeline`; `allocation.py` (ERC/HRP/IVP/MDP/MVP + `rolling_allocation()`,
-  stable public API) and `sizing.py`.
+- **`signal/` · `portfolio/`** — `sign`/`threshold`/`rank`/vol-target +
+  anti-churn (`ema_smooth`/`deadband`/`min_hold`) mappers + `SignalPipeline`;
+  `allocation.py` (ERC/HRP/IVP/MDP/MVP + `rolling_allocation()`, stable public
+  API) and `sizing.py`.
 - **`models/`** — econometric (`econometric_models.py`, Numba ARMA/GARCH) and
   neural (`mlp`, `rnn`, `gru`, `lstm`, `attention`, `tcn`, `transformer`) on a
-  rolling/walk-forward base; `loss/` (torch losses), `training.py`, `ensemble.py`.
+  rolling/walk-forward base; `loss/` (torch losses), `objective.py`
+  (objective-aligned training), `training.py`, `ensemble.py`.
 - **`backtest/`** — vectorized `engine` + `cost` + `result`; the legacy live-viz
   plot stack (`plot_backtest`/`dynamic_plot_backtest`/`backtest_neural_net`) is
   kept for `RollMultiLayerPerceptron` but off the eager public surface.
