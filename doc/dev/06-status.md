@@ -27,16 +27,26 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
   hybrid) in `models/loss/`; robust-training utils (purged CV, early stopping,
   sample weighting) in `models/training.py`. All NN models conform to
   `SignalModel` (`fit`/`predict`).
+- **Objective-aligned training** (`models/objective.py`): `ObjectiveModel` trains
+  any `nn.Module` (MLP by default) **directly on a differentiable financial
+  objective** (`SharpeLoss`/`SortinoLoss`/…) — the net outputs positions, the loss
+  is computed on `positions * returns`. **Net-of-cost** (`cost=` penalizes
+  turnover so the net learns to *hold*) and **mini-batch** (`batch_size`/`shuffle`,
+  contiguous chunks — what makes it converge on long minute-resolution series).
+  Plugs into the harness via the `X` path with `signal=identity`, `y=returns`.
 - **Signal / Portfolio**: `signal/` mappers (`sign`/`threshold`/`rank`/
-  vol-targeting + `SignalPipeline`); `portfolio/` allocation (ERC/HRP/IVP/MDP/MVP)
-  + sizing (fractional Kelly, vol-targeting, transaction costs).
+  vol-targeting + **anti-churn** `ema_smooth`/`deadband`/`min_hold` +
+  `SignalPipeline`); `portfolio/` allocation (ERC/HRP/IVP/MDP/MVP) + sizing
+  (fractional Kelly, vol-targeting, transaction costs).
 - **Backtest / Plot**: vectorized `backtest()` engine → `BacktestResult`,
   `ProportionalCost`; reporting via `fynance.plot` (`tearsheet`, composable
   figures, lazy matplotlib so `import fynance` stays matplotlib-free).
 - **Research harness** (`fynance.research`, S1–S3 complete): `Experiment`
   (serializable spec + code + seed + metrics + curves), `run_experiment` (seeded,
-  cost-aware, walk-forward; no-lookahead probe), `write_report` (portable markdown +
-  tearsheet PNG + notebook), `gbm`/`regime_switching` synthetic generators,
+  cost-aware, walk-forward; no-lookahead probe; records a **provenance** block —
+  data/features/model/run config — into the spec), `write_report` (portable
+  markdown with a Provenance table + tearsheet PNG + notebook),
+  `gbm`/`regime_switching` synthetic generators,
   **guardrails** (`permutation_test`, `probabilistic_sharpe_ratio`,
   `deflated_sharpe_ratio`), comparison report (`compare_report`/`leaderboard`) and a
   persistent `Ledger` (append/load/leaderboard, `n_trials`, deflated-Sharpe vs
@@ -50,23 +60,26 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
 - **Numerical kernels on Numba `@njit`** — no Cython anywhere; the build is
   pure-Python (no `setup.py`, no compile step). Every kernel has a golden-value
   parity test (1e-9/1e-10) captured from the former Cython.
-- **Quality gates (all 4 enforced in CI)**: 501 unit tests + doctests on every
-  module (`--doctest-modules`), incl. property tests (kernel parity + no-lookahead);
+- **Quality gates (all 4 enforced in CI)**: 593 tests collected (unit + doctests
+  on every module via `--doctest-modules`), incl. property tests (kernel parity + no-lookahead);
   `ruff`; `interrogate` (docstring coverage ≥ 80%, currently ~93.6%); Sphinx
   build `-W`; **`mypy` clean (0 errors)**.
-- **Released**: `v2.1.1` on `master` + PyPI; `Production/Stable`. CI matrix
+- **Released**: `v2.8.0` on `master` + PyPI; `Production/Stable`. CI matrix
   3.10–3.13; release builds a pure-Python universal wheel + sdist and creates the
   GitHub Release from the CHANGELOG on tag.
 
 ## In progress / active surface
 
-- **R&D** (`models/`): empirical comparison of losses / architectures / feature
-  normalization on real out-of-sample data, market-regime conditioning, and
-  multi-series OHLCV indicators — see the roadmap (§1). Most items are blocked on
-  having a real dataset / orchestration rather than on missing code.
-- **Research harness** (roadmap §2): S1–S3 shipped (above). Optional next: a
-  Streamlit explorer over the ledger; real-data adapters + result storage live in
-  the separate private research repo, not here.
+Nothing is currently in flight (`develop` is clean). The 2.x library is
+feature-complete for its current scope; remaining open work is **library bricks**
+only — multi-series OHLCV indicators, regime-conditioned architecture, adaptive
+windows, a richer backtest, and an optional Streamlit ledger explorer. See the
+roadmap (§1–§2) and the **Deferred** section below.
+
+**Out of scope here**: strategy research on **real data** (empirical loss /
+architecture / normalization benchmarks, out-of-sample Sharpe, online regimes,
+feature selection) lives in the separate **private repo** `fynance-research`,
+which depends on fynance. This public repo stays data-agnostic and result-free.
 
 ## Known gaps / sharp edges (by design or deferred)
 
@@ -101,6 +114,20 @@ Larger axes parked for later: realistic backtesting beyond proportional cost
 (non-linear slippage / market impact), market-regime conditioning of the
 architecture, adaptive windows, and multi-series OHLCV indicators (ATR/ADX/OBV/
 VWAP) requiring a multi-series input API. Tracked in the roadmap; not bugs.
+
+## 2026-06-21 — research line shipped (v2.2 → v2.8); roadmap re-scoped
+
+Since 2.1.1 the **R&D enablement line** shipped end-to-end: the `fynance.research`
+harness (S1–S3 — `Experiment`/`run_experiment`/`write_report`, synthetic
+generators, permutation / deflated-Sharpe guardrails, `Ledger`/leaderboard,
+multi-input `X`/`y`, causal `RegimeDetector`, self-describing provenance) and the
+**objective-aligned training brick** `ObjectiveModel` (v2.5 differentiable
+objective → v2.7 net-of-cost turnover penalty + anti-churn signal mappers → v2.8
+mini-batch training that makes it converge on long series). The roadmap was
+**re-scoped**: strategy research on real data moves to the private
+`fynance-research` repo; the public roadmap keeps only data-agnostic library
+bricks (multi-series OHLCV indicators, regime-conditioned architecture, adaptive
+windows, realistic backtest, Streamlit explorer). Latest release **v2.8.0**.
 
 ## 2026-06-16 — fynance 2.1.x shipped; post-release audit clean
 

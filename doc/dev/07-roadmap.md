@@ -12,109 +12,61 @@ shipped, `03-decisions.md` for *why*. Keep it short and true.
 > Loop : `/pick-task` → `/plan` (arbre dans `plans/`) → `/execute-leaf` →
 > `/finish-task`. Release : `/release` quand `[Unreleased]` est suffisamment rempli.
 
-> **fynance 2.0 + 2.1 livrés** (v2.1.1 sur `master`/PyPI). Le refactor en couches,
-> le port Cython→Numba (build pure-Python) et la passe perf sont terminés — voir
-> `CHANGELOG.md` / `03-decisions.md`. Reste l'axe R&D ci-dessous, majoritairement
-> bloqué sur la disponibilité de données réelles plutôt que sur du code manquant.
+> **fynance 2.x livré** (v2.8.0 sur `master`/PyPI). Le refactor en couches, le port
+> Cython→Numba (build pure-Python), le harnais R&D `fynance.research` (S1–S3) et la
+> brique d'entraînement aligné-objectif (`ObjectiveModel` : objectif différentiable,
+> net de coûts, mini-batch) sont **terminés** — voir `CHANGELOG.md` / `03-decisions.md`.
+> Reste, ci-dessous, des **bricks de librairie** non bloquées par la donnée.
+
+> ⚠️ **Hors scope ici** : la recherche de stratégie sur **vraie data** (benchmarks
+> empiriques loss / architecture / normalisation, évaluation Sharpe out-of-sample,
+> régimes en ligne, sélection de features) vit dans le **repo privé**
+> `fynance-research` qui dépend de fynance. La roadmap publique ne tient que du
+> code de librairie réutilisable, data-agnostique.
 
 ---
 
-## 3. Entraînement aligné-objectif (`ObjectiveModel`)  ⭐ active
+## 2. Research harness — extension optionnelle
 
-Brique **générique** fynance débloquant la stratégie B (repo privé) : entraîner un
-réseau directement sur un **objectif risque-ajusté** (`SharpeLoss`/`SortinoLoss`…)
-plutôt qu'en MSE sur une cible. Le réseau sort des **positions** ; la loss porte sur
-`positions × returns`. Se branche sur le harnais I1 (`X`=features, `y`=returns,
-`signal=identity`).
-
-- [ ] **OBJ** `ObjectiveModel` — un `SignalModel` (`fit(X, returns)`/`predict→positions`)
-  qui entraîne un `nn.Module` quelconque (MLP par défaut, tête linéaire ;
-  TCN/LSTM passables) sur une loss financière différentiable. Reproductible (seed),
-  testé sur data synthétique à edge connu (apprend des positions à Sharpe > 0).
-
-> Les stratégies (B objectif-aligné, A multi-venue) vivent dans le repo privé.
-
-## 2. Research harness — extensions optionnelles
-
-Le harnais R&D `fynance.research` est **livré** (S1–S3) : `Experiment`,
+Le harnais `fynance.research` est **livré** (S1–S3) : `Experiment`,
 `run_experiment`, `write_report`, générateurs synthétiques, garde-fous
-(`permutation_test`, `deflated_sharpe_ratio`) et `Ledger`/`leaderboard` — piloté
-par la skill `/run-strategy`. Voir `CHANGELOG.md`. Data-agnostique et sans
-stockage de résultats (tout vers un `output_dir`). Restent optionnels :
+(`permutation_test`, `deflated_sharpe_ratio`), `Ledger`/`leaderboard`, multi-input
+`X`/`y` et provenance auto-descriptive. Reste optionnel :
 
-- [ ] Explorateur **Streamlit** au-dessus du ledger (parcourir/filtrer/comparer les
-  runs persistés) — interactif, plus tardif.
-- [ ] (**hors fynance**) adaptateurs de vraie data (dccd…) + stockage des
-  résultats : dans le **repo privé** de recherche qui dépend de fynance.
+- [ ] Explorateur **Streamlit** au-dessus du Ledger (parcourir / filtrer / comparer
+  les runs persistés) — interactif, plus tardif.
 
-## 1. R&D — Loss, architecture, données
+## 1. Bricks library (non bloquées par la donnée)
 
-Objectif : identifier empiriquement la meilleure combinaison loss / architecture / features
-pour les séries temporelles financières. Chaque sous-tâche est exploratoire :
-elle peut déboucher sur du code dans `fynance/models/` ou rester à l'état de
-notebook/rapport.
+Travail de librairie pur, testable sur data synthétique. Exploratoire : peut
+déboucher sur du code dans `fynance/` ou rester à l'état de rapport.
 
-### 1.1 Nouvelles loss functions
+### 1.1 Indicateurs OHLCV multi-séries
 
-Fait (PR #88) : `CalmarLoss`, `OmegaLoss`, `HybridLoss` (α fixe ou learnable).
+Single-série & causaux déjà présents : EMA/MACD/RSI/Bollinger/CCI/HMA, `roc`,
+`realized_volatility`, `rolling_skewness`/`kurtosis`/`autocorr`. Manquent les
+indicateurs exigeant plusieurs séries :
 
-- [ ] 🟡 **Benchmark empirique** : comparer les loss sur un jeu de données réel
-  (out-of-sample Sharpe/Sortino/Calmar/accuracy/drawdown) — nécessite des données.
-
-### 1.2 Architecture : ensemble direction + magnitude avec meta-modèle
-
-Fait (PR #93) : `StackingEnsemble` — bases direction/magnitude + méta-modèle
-entraîné sur les prédictions **out-of-fold** (leak-free).
-
-- [ ] 🟡 Comparer empiriquement vs modèle unique `SharpeLoss` (besoin de données).
-
-### 1.3 Régimes de marché
-
-Fait (PR #92) : `detect_regimes` (k-means in-sample sur vol/return, labels
-ordonnés par vol). Reste 🟡 (besoin de données / orchestration) :
-
-- [ ] Conditionner l'architecture (mixture-of-experts / embedding de régime).
-- [ ] Assignation online causale + évaluer l'impact sur le Sharpe out-of-sample.
-
-### 1.4 Features / indicateurs techniques
-
-Fait (single-série, causaux) : `roc`, `realized_volatility`, `rolling_skewness`,
-`rolling_kurtosis`, `rolling_autocorr` (PR #86) ; déjà présents : EMA/MACD/RSI/
-Bollinger/CCI/HMA. Reste **différé** (nécessite une API multi-séries OHLCV) :
-
-- [ ] **ATR / ADX / Williams %R** (High/Low) et **OBV / VWAP** (Volume) — exigent
-  des entrées OHLCV ; concevoir une API multi-séries d'abord.
+- [ ] Concevoir une **API multi-séries OHLCV** d'abord, puis **ATR / ADX /
+  Williams %R** (High/Low) et **OBV / VWAP** (Volume).
 - [ ] **GARCH(1,1) comme feature** (via `fynance.estimator`).
 
-### 1.5 Normalisation des features
+### 1.2 Architecture conditionnée par le régime
 
-Couvert : rolling z-score (`roll_standardize`/`roll_z_score`), vol-targeting
-(`sizing.vol_target`), rank-based (`scale.roll_rank`, PR #89).
+`RegimeDetector` causal (fit-on-train / assign-online) est déjà livré ; reste à
+s'en servir pour piloter l'architecture :
 
-- [ ] 🟡 Comparer empiriquement les trois approches sur le Sharpe out-of-sample
-  (nécessite des données).
+- [ ] Conditionner le modèle sur le régime — **mixture-of-experts** /
+  embedding de régime.
 
-### 1.6 Protocole d'entraînement robuste
+### 1.3 Fenêtres adaptatives (dépend de §1.2)
 
-Fait (PR #90) : purged walk-forward CV (`cross_validate(..., purge=)`),
-`exp_sample_weights` (décroissance exponentielle), `EarlyStopping` (sur métrique).
-La construction causale des features reste garantie par les property tests
-(parité + non-lookahead) — convention continue, pas de code dédié.
+- [ ] `window` variable selon le régime de volatilité.
 
-- [ ] (optionnel) down-weight basse vol dans `exp_sample_weights` (variante).
+### 1.4 Backtest réaliste
 
-### 1.7 R&D rolling — features multi-résolution et efficacité
-
-Fait (PR #91) : `multi_resolution`, `granger_causality`, `IncrementalMoments`
-(Welford O(1)) dans `features/engineering.py`.
-
-- [ ] **Fenêtres adaptatives** : `window` variable selon le régime de vol
-  (dépend de §1.3 détection de régime).
-
-### 1.8 Backtest réaliste
-
-Fait (PR #87) : `portfolio/sizing.py` (`kelly_fraction`, causal `vol_target`,
+Fait : `portfolio/sizing.py` (`kelly_fraction`, causal `vol_target`,
 `transaction_cost` turnover-based) ; métriques `percent_positive`, `tail_ratio`.
 Reste optionnel :
 
-- [ ] Slippage / impact de marché non-linéaire au-delà du coût proportionnel.
+- [ ] **Slippage / impact de marché non-linéaire** au-delà du coût proportionnel.
