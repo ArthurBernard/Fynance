@@ -72,6 +72,86 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-06-21 — Library-bricks epic: roadmap §1 shipped (PRs #177–#182)  [accepted]
+- **Choice**: ship the data-agnostic "library bricks" (roadmap §1) as six atomic
+  PRs and **re-scope** the roadmap — real-data strategy research moves to the
+  private `fynance-research` repo; the public roadmap keeps only reusable,
+  data-agnostic library work. Bricks: `core.OHLCV`, OHLCV indicators, causal
+  GARCH feature, `RegimeMoE`, adaptive windows, non-linear cost (each entry below).
+- **Why**: most remaining roadmap items were blocked on real data, not on missing
+  code; separating the *library* (here) from the *research* (private repo) lets the
+  public package stay data-agnostic and result-free while still gaining the bricks
+  the research needs. One PR per concern keeps each disposable and reviewable.
+- **Rejected alternatives**: one fourre-tout branch (against the one-PR-one-concern
+  rule); keeping the data-blocked research items on the public roadmap (drift —
+  they never move without data that lives elsewhere).
+
+### 2026-06-21 — `core.OHLCV` value object for the multi-series input (PR #177)  [accepted]
+- **Choice**: introduce a thin numpy-backed `OHLCV` value object (composition, not
+  `ndarray` subclassing — mirroring `PriceSeries`) as the input contract for the
+  multi-series indicators, rather than passing loose `high`/`low`/`close`/`volume`
+  arrays everywhere. `close` required, others optional (absent-field access raises),
+  equal length enforced at construction.
+- **Why**: a typed, validated, reusable container catches misaligned/missing series
+  once at the edge instead of in every indicator; the indicators still accept raw
+  arrays too, so the object is an *option*, not a tax.
+- **Rejected alternatives**: a pandas/polars DataFrame as the contract (heavier,
+  re-introduces a frame dependency at the core); subclassing `ndarray` (the
+  fragility `PriceSeries` already avoids).
+
+### 2026-06-21 — OHLCV indicators: raw-arrays-first API with an OHLCV overload (PR #182)  [accepted]
+- **Choice**: implement `atr`/`adx`/`williams_r`/`obv`/`vwap` as functions taking
+  the **raw aligned arrays** as the primary signature, with a thin dispatch that
+  also accepts a single `OHLCV` as the first argument. Rolling loops are Numba
+  `@njit` kernels; ATR/ADX use Wilder smoothing.
+- **Why**: raw-arrays-first matches the existing `features` idiom (every other
+  indicator takes arrays), keeps the functions usable without constructing a
+  container, and the overload gives the typed path for free.
+- **Rejected alternatives**: OHLCV-only signatures (forces object construction,
+  breaks the array idiom); methods on `OHLCV` (couples the container to the whole
+  indicator library).
+
+### 2026-06-21 — Causal GARCH feature = expanding-fit + forward-filter (PR #179)  [accepted]
+- **Choice**: expose GARCH(1,1) conditional volatility as a feature by fitting the
+  parameters on a training prefix (optionally refit on the expanding window) and
+  **forward-filtering** σ over the series; the `min_train` warmup is `NaN`. Reuse
+  the authoritative `models.econometric_models` recursion + `estimator` likelihood;
+  the MLE fit is a thin scipy `SLSQP` wrapper.
+- **Why**: σ_t in GARCH is 𝓕ₜ₋₁-measurable, so filtering forward with past-fit
+  parameters is strictly causal — the only leak risks are the parameters (handled
+  by expanding-fit) and the warmup (NaN'd). Reusing the single recursion respects
+  the estimator no-duplication policy.
+- **Rejected alternatives**: a single in-sample fit over the whole series (peeks —
+  leaky); re-implementing the GARCH recursion in `features` (duplicates parameter
+  logic the policy forbids).
+
+### 2026-06-21 — Regime-conditioned architecture: causal detector + MoE (PR #180)  [accepted]
+- **Choice**: `RegimeMoE` routes an objective-aligned net by the **causal** regime
+  (`RegimeDetector` fit-on-train / assign-online, from a designated price/level
+  column of `X`). Default `routing="soft"` (a learned regime embedding concatenated
+  to the features through a shared trunk, differentiable end-to-end); `routing="hard"`
+  offers one expert per regime. Reuses `ObjectiveModel` for training (objective /
+  mini-batch / cost / seed).
+- **Why**: conditioning needs a *causal* regime to be backtest-honest; the
+  in-sample `detect_regimes` would leak. Soft routing trains end-to-end and shares
+  data across regimes (more sample-efficient than fully separate experts) while
+  hard routing stays available when regimes are believed truly disjoint. Composing
+  `ObjectiveModel` avoids duplicating the training loop.
+- **Rejected alternatives**: routing on in-sample `detect_regimes` (leaky); a
+  bespoke training loop (duplicates `ObjectiveModel`); hard routing as the default
+  (less sample-efficient, non-differentiable gate).
+
+### 2026-06-21 — Non-linear cost = square-root market-impact law (PR #178)  [accepted]
+- **Choice**: model convex execution cost as `fee*turnover + impact*turnover**1.5`
+  (square-root impact law) in `MarketImpactCost`, reusing the `ProportionalCost`
+  turnover definition so `exponent=1, impact=0` collapses exactly to the linear model.
+- **Why**: real impact grows super-linearly with trade size; the √-law is the
+  standard, single-parameter convex form, and making the linear case an exact
+  special case keeps it a drop-in extension of the existing cost model.
+- **Rejected alternatives**: a full order-book / market-impact simulator (out of
+  scope for a vectorized backtest); a fixed quadratic only (√-law is the empirically
+  standard default; `exponent` stays tunable).
+
 ### 2026-06-18 — Mini-batch training for ObjectiveModel (PR #173)  [accepted]
 - **Choice**: add contiguous mini-batch SGD (`batch_size`/`shuffle`) to
   `ObjectiveModel`; a `fit` now does `epochs * ceil(T/batch_size)` steps instead of

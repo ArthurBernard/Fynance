@@ -10,7 +10,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`fynance.core.OHLCV` — aligned multi-series value object.** A thin,
+  numpy-backed container for aligned Open/High/Low/Close/Volume series (the
+  multi-series counterpart of `PriceSeries`): `close` required, the other four
+  fields optional (accessing an absent field raises), equal length enforced at
+  construction, with `from_dict`/`from_numpy`/`from_polars` bridges and
+  `to_numpy()`. The input contract the new OHLCV indicators consume.
+- **Multi-series OHLCV indicators (`fynance.features.ohlcv`).** Five causal
+  indicators that need High/Low or Volume: `atr` (Wilder ATR), `adx` (Wilder
+  ADX), `williams_r`, `obv`, and `vwap` (cumulative or rolling). Each takes the
+  raw aligned arrays **or** a single `OHLCV` container; rolling loops are Numba
+  `@njit` kernels.
+- **Causal GARCH(1,1) volatility feature (`fynance.features.garch_volatility`).**
+  Conditional volatility as a strictly causal feature: GARCH(1,1) fit by maximum
+  likelihood on a training prefix (optionally refit on the expanding window every
+  `refit` steps), then forward-filtered over the series; the `min_train` warmup is
+  `NaN`. Reuses the single authoritative ARMA/GARCH recursion and likelihood — no
+  duplicated parameter logic.
+- **Regime-conditioned architecture (`fynance.models.RegimeMoE`).** A
+  `SignalModel` mixture-of-experts conditioned on the **causal** market regime
+  (`RegimeDetector`): `routing="soft"` concatenates a learned regime embedding to
+  the features through a shared trunk (default), `routing="hard"` uses one expert
+  per regime. The regime label is produced by a detector fit on the training slice
+  only and assigned online. Reuses `ObjectiveModel` for the training loop.
+- **Regime-adaptive rolling windows (`fynance.features.adaptive_roll` /
+  `adaptive_volatility`).** Apply a trailing-window feature with a per-bar window
+  chosen by the current causal regime label (short window in one regime, longer in
+  another); a single regime with a constant window reduces exactly to the
+  fixed-window statistic.
+- **Non-linear market-impact cost (`fynance.backtest.MarketImpactCost`).** A
+  `CostModel` adding a convex, super-linear market-impact term on top of the
+  linear fee — `fee*turnover + impact*turnover**exponent` (default `exponent=1.5`,
+  the square-root impact law). `exponent=1, impact=0` reduces exactly to
+  `ProportionalCost`.
+
 ### Changed
+
+- **Roadmap re-scoped to data-agnostic library bricks.** Strategy research on
+  real data (empirical loss/architecture/normalization benchmarks, out-of-sample
+  Sharpe, online regimes) moved to the private `fynance-research` repo; the public
+  roadmap and dev docs now track only reusable, data-agnostic library work. The
+  shipped `ObjectiveModel` epic and the §1 "library bricks" epic were removed from
+  the roadmap.
 
 ### Fixed
 
