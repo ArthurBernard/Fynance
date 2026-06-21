@@ -55,6 +55,12 @@ moving standard deviations and rolling functions.
 
       Unsupervised regime labelling by clustering volatility/return features.
 
+   .. grid-item-card:: :octicon:`graph;1.2em;sd-mr-1` GARCH volatility
+      :link: features.garch
+      :link-type: doc
+
+      Causal GARCH(1,1) conditional volatility as a feature.
+
    .. grid-item-card:: :octicon:`arrow-switch;1.2em;sd-mr-1` Scale
       :link: features.scale
       :link-type: doc
@@ -94,5 +100,6 @@ Common parameters across modules:
    features.stats
    features.momentums
    features.regime
+   features.garch
    features.roll_functions
    features.scale
