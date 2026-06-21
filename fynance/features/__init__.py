@@ -28,6 +28,7 @@ features.
 from . import (
     engineering,
     filters,
+    garch,
     indicators,
     momentums,
     money_management,
@@ -39,6 +40,7 @@ from . import (
 )
 from .engineering import *
 from .filters import *
+from .garch import *
 from .indicators import *
 from .momentums import *
 from .money_management import *
@@ -51,6 +53,7 @@ from .stats import *
 __all__ = engineering.__all__
 __all__ += regime.__all__
 __all__ += filters.__all__
+__all__ += garch.__all__
 __all__ += momentums.__all__
 __all__ += indicators.__all__
 __all__ += money_management.__all__
