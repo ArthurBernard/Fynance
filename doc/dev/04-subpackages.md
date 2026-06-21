@@ -31,14 +31,15 @@ modernisation).
   `annual_return`/`annual_volatility`, `drawdown`/`mdd`, `perf_*`, `roll_*`
   variants, plus one-call `summary`.
 - **`signal` / `portfolio`** — `sign`/`threshold`/`rank`/vol-target mappers +
-  `SignalPipeline`; allocation (`ERC`/`HRP`/`IVP`/`MDP`/`MVP`,
-  `rolling_allocation()`) and sizing (`kelly_fraction`/`vol_target`/
-  `transaction_cost`).
+  anti-churn `ema_smooth`/`deadband`/`min_hold` + `SignalPipeline`; allocation
+  (`ERC`/`HRP`/`IVP`/`MDP`/`MVP`, `rolling_allocation()`) and sizing
+  (`kelly_fraction`/`vol_target`/`transaction_cost`).
 - **`models`** — econometric (`ARMA`/`GARCH` family via `get_parameters`) and
   neural (`MultiLayerPerceptron`, `RollMultiLayerPerceptron`, RNN/`GRU`/`LSTM`,
   attention, `TemporalConvNet`, `Transformer`), `StackingEnsemble`; custom losses
-  under `models/loss/` (Sharpe/Sortino/Calmar/Omega/directional/hybrid); training
-  utils in `models/training.py`.
+  under `models/loss/` (Sharpe/Sortino/Calmar/Omega/directional/hybrid);
+  `ObjectiveModel` (objective-aligned training — net-of-cost, mini-batch) in
+  `models/objective.py`; training utils in `models/training.py`.
 - **`backtest` / `plot` / `strategy`** — `backtest()` + `BacktestResult` +
   `ProportionalCost`; `tearsheet`/`tearsheet_text`; `Strategy` +
   `run_walk_forward`. (The legacy live-viz objects `PlotBackTest`/
