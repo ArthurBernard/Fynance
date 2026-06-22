@@ -72,3 +72,18 @@ def test_iso_vol_warmup_is_one():
 
     assert out[0] == 1.0
     assert out[1] == 1.0
+
+
+def test_iso_vol_accepts_list_input():
+    # A plain list/tuple used to raise a bare AttributeError ('list' object has
+    # no attribute 'size'); the input is now coerced like in sibling modules.
+    data = [95.0, 100.0, 85.0, 105.0, 110.0, 90.0]
+    out_list = iso_vol(data, target_vol=0.5, leverage=2, period=12, half_life=3)
+    out_arr = iso_vol(np.asarray(data), target_vol=0.5, leverage=2,
+                      period=12, half_life=3)
+
+    assert isinstance(out_list, np.ndarray)
+    assert np.allclose(out_list, out_arr)
+    # Tuples work too.
+    assert np.allclose(iso_vol(tuple(data), target_vol=0.5, leverage=2,
+                               period=12, half_life=3), out_arr)

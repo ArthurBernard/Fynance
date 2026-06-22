@@ -32,6 +32,7 @@ Main entry points
 from __future__ import annotations
 
 # Built-in packages
+import warnings
 from typing import Callable
 
 # Third-party
@@ -114,6 +115,11 @@ def ERC(
         return np.ones([1, 1])
 
     up_bound = max(up_bound, 1 / N)
+    # Clamp low_bound so the box stays compatible with the sum-to-one
+    # constraint: with low_bound > 1/N every feasible weight already exceeds
+    # its share, the constraint is infeasible and SLSQP would silently return
+    # weights summing to more than one (as HRP/IVP already guard against).
+    low_bound = min(low_bound, 1 / N)
     # The risk-contribution surrogate is quartic in the covariance, so on
     # return-scale inputs (values ~1e-4) it collapses to ~1e-16, far below
     # SLSQP's default ftol and the optimizer stops at the 1/N start. Rescale
@@ -533,6 +539,11 @@ def MVP_uc(
         return np.ones([1, 1])
 
     up_bound = max(up_bound, 1 / N)
+    # Clamp low_bound so the box stays compatible with the sum-to-one
+    # constraint: with low_bound > 1/N the feasible set is empty and SLSQP
+    # would silently return weights summing to more than one (as HRP/IVP
+    # already guard against).
+    low_bound = min(low_bound, 1 / N)
     # On return-scale inputs the portfolio variance w'Sigma w is ~1e-4 or
     # smaller, which can sit below SLSQP's default ftol so the optimizer stops
     # at the 1/N start. Rescale the covariance to unit trace so the objective
@@ -832,6 +843,9 @@ def _normalize(w: NDArray[np.float64], low_bound: float = 0., up_bound: float = 
         j += 1
 
     if j >= max_iter:
-        print('Iterative normalize algorithm exceeded max iterations')
+        warnings.warn(
+            'Iterative normalize algorithm exceeded max iterations',
+            stacklevel=2,
+        )
 
     return w

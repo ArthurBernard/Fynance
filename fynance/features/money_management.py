@@ -52,6 +52,8 @@ def iso_vol(series, target_vol=0.20, leverage=1., period=252, half_life=11):
            1.07186485])
 
     """
+    # Coerce input to a 1d float array so list/tuple inputs work too.
+    series = np.asarray(series, dtype=np.float64).reshape(-1)
     # Set iso-vol vector
     iv = np.ones([series.size])
     # Compute squared daily return vector (standard return s_t / s_{t-1} - 1)
