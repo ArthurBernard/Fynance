@@ -56,8 +56,37 @@ class Ledger:
         self.root = Path(root)
 
     def append(self, experiment: Experiment) -> Path:
-        """ Persist ``experiment`` under the ledger root; return its json path. """
+        """ Persist ``experiment`` under the ledger root; return its json path.
+
+        The store is **append-only**: appending an experiment whose ``name``
+        already exists raises :class:`FileExistsError` rather than silently
+        overwriting the prior run. Overwriting would undercount
+        :attr:`n_trials` and so deflate the multiple-testing correction fed to
+        the deflated Sharpe ratio. Pick a unique ``name`` (e.g. version-suffix
+        a re-run) before appending.
+
+        Parameters
+        ----------
+        experiment : Experiment
+            The experiment to persist.
+
+        Returns
+        -------
+        pathlib.Path
+            Path to the written ``experiment.json``.
+
+        Raises
+        ------
+        FileExistsError
+            If an experiment with the same ``name`` is already stored.
+
+        """
         self.root.mkdir(parents=True, exist_ok=True)
+        if (self.root / experiment.name / "experiment.json").exists():
+            raise FileExistsError(
+                f"experiment {experiment.name!r} already in the ledger; the "
+                f"store is append-only — use a unique name for a re-run"
+            )
 
         return experiment.save(self.root)
 
@@ -89,15 +118,50 @@ class Ledger:
         Uses the ledger's :attr:`n_trials` as the number of trials and the
         dispersion of the stored Sharpe metrics as the trial variance, so a
         selected strategy is judged against the multiple testing it came from.
+
+        The stored ``sharpe`` metric is **annualized** (by the ``period`` used
+        at run time, recorded in ``spec``), whereas
+        :func:`~fynance.research.deflated_sharpe_ratio` expects a
+        **per-observation** Sharpe (it scales by ``sqrt(n_obs - 1)``
+        internally). This method therefore de-annualizes both the selected
+        strategy's Sharpe and the across-trial variance before the call:
+        ``sr_obs = sr_annual / sqrt(period)`` and ``var_obs = var_annual /
+        period``. Skipping this de-annualization saturates the DSR to ~1
+        (a modest per-period edge looks certain), defeating the guard.
+
+        Parameters
+        ----------
+        experiment : Experiment
+            The selected experiment to deflate.
+        metric : str
+            Metric key holding the (annualized) Sharpe (default ``"sharpe"``).
+
+        Returns
+        -------
+        float
+            Deflated Sharpe ratio in ``[0, 1]``.
+
         """
-        sharpes = [float(e.metrics[metric]) for e in self.load()
-                   if metric in e.metrics]
+        period = self._period(experiment)
+        sharpes = [float(e.metrics[metric]) / np.sqrt(self._period(e))
+                   for e in self.load() if metric in e.metrics]
         sr_variance = float(np.var(sharpes)) if len(sharpes) > 1 else 1.0
 
         n_obs = len(experiment.series["returns"]) if (
             experiment.series and experiment.series.get("returns")) else 0
 
         return deflated_sharpe_ratio(
-            float(experiment.metrics[metric]), n_obs, max(self.n_trials, 1),
-            sr_variance=sr_variance,
+            float(experiment.metrics[metric]) / np.sqrt(period), n_obs,
+            max(self.n_trials, 1), sr_variance=sr_variance,
         )
+
+    @staticmethod
+    def _period(experiment: Experiment) -> float:
+        """ Annualization factor used to compute ``experiment``'s Sharpe. """
+        period = experiment.spec.get("period") if experiment.spec else None
+        try:
+            value = float(period)  # type: ignore[arg-type]
+        except (TypeError, ValueError):
+            return 252.0
+
+        return value if value > 0.0 else 252.0

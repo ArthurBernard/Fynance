@@ -83,8 +83,10 @@ def regime_switching(
 ) -> PriceSeries:
     """ Markov regime-switching price path.
 
-    At each step the active regime switches (to a uniformly-drawn regime) with
-    probability ``p_switch``; log-returns are then drawn from the active
+    The initial regime is drawn uniformly (rather than always starting in
+    regime 0, which biased short paths toward the first regime). At each
+    subsequent step the active regime switches (to a uniformly-drawn regime)
+    with probability ``p_switch``; log-returns are then drawn from the active
     regime's ``(mu, sigma)``. The varying volatility makes it a natural input
     for :func:`fynance.detect_regimes`.
 
@@ -122,7 +124,9 @@ def regime_switching(
 
     steps = max(n - 1, 0)
     states: NDArray[np.int_] = np.empty(steps, dtype=np.int_)
-    state = 0
+    # Draw the initial regime uniformly so short paths are not biased toward
+    # regime 0; subsequent steps switch with probability ``p_switch``.
+    state = int(rng.integers(0, k))
     for t in range(steps):
         if rng.random() < p_switch:
             state = int(rng.integers(0, k))

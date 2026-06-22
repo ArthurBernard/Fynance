@@ -4,6 +4,7 @@
 """ Tests for :mod:`fynance.research.compare`. """
 
 # Built-in
+import math
 from pathlib import Path
 
 # Third-party
@@ -12,7 +13,13 @@ import pytest
 
 # Local
 import fynance
-from fynance.research import compare_report, gbm, leaderboard, run_experiment
+from fynance.research import (
+    Experiment,
+    compare_report,
+    gbm,
+    leaderboard,
+    run_experiment,
+)
 from fynance.strategy import Strategy
 
 
@@ -35,6 +42,35 @@ def test_leaderboard_ranked_by_sharpe(experiments):
     assert {r["name"] for r in rows} == {"a", "b", "c"}
     sharpes = [r["sharpe"] for r in rows]
     assert sharpes == sorted(sharpes, reverse=True)
+
+
+def test_leaderboard_nan_sinks_to_bottom():
+    # A present-but-NaN metric must sort as "worst", not float to the top.
+    exps = [
+        Experiment(name="good", metrics={"sharpe": 2.0}),
+        Experiment(name="bad", metrics={"sharpe": float("nan")}),
+        Experiment(name="mid", metrics={"sharpe": 1.0}),
+    ]
+
+    rows = leaderboard(exps, sort_by="sharpe", descending=True)
+
+    assert [r["name"] for r in rows[:2]] == ["good", "mid"]
+    assert rows[-1]["name"] == "bad"  # NaN sank to the bottom
+    assert math.isnan(rows[-1]["sharpe"])
+
+
+def test_leaderboard_nan_sinks_ascending():
+    # Ascending (lower is better): NaN must still sink to the bottom.
+    exps = [
+        Experiment(name="bad", metrics={"sharpe": float("nan")}),
+        Experiment(name="best", metrics={"sharpe": -1.0}),
+        Experiment(name="worst", metrics={"sharpe": 5.0}),
+    ]
+
+    rows = leaderboard(exps, sort_by="sharpe", descending=False)
+
+    assert rows[0]["name"] == "best"
+    assert rows[-1]["name"] == "bad"
 
 
 def test_compare_report_writes_md_and_png(tmp_path, experiments):
