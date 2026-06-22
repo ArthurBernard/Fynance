@@ -71,3 +71,29 @@ def test_train_test_split_zero_is_empty_test():
     train, test = train_test_split(100, test_size=0.0)
     assert len(test) == 0
     assert len(train) == 100
+
+
+def test_train_test_split_rejects_negative_test_size():
+    # A negative integer would yield out-of-bounds train indices
+    # (e.g. test_size=-3, n=10 -> split=13 -> arange(0, 13)); a negative
+    # fraction would silently produce an empty test set.
+    with pytest.raises(ValueError, match="test_size"):
+        train_test_split(10, test_size=-3)
+    with pytest.raises(ValueError, match="test_size"):
+        train_test_split(10, test_size=-0.2)
+
+
+def test_train_test_split_rejects_test_size_over_n():
+    # A test count larger than n would leave a negative-length train set.
+    with pytest.raises(ValueError, match="exceeds n"):
+        train_test_split(10, test_size=11)
+
+
+def test_walk_forward_rejects_nonpositive_step():
+    # step <= 0 never advances t -> the while loop runs forever.
+    # Use a tiny n and assert the ValueError is raised eagerly (the generator
+    # validates step on the first __next__), so the loop is never entered.
+    with pytest.raises(ValueError, match="step"):
+        next(walk_forward(5, train=2, test=1, step=0))
+    with pytest.raises(ValueError, match="step"):
+        next(walk_forward(5, train=2, test=1, step=-1))

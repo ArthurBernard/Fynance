@@ -49,8 +49,25 @@ def train_test_split(
     (train_idx, test_idx) : tuple of numpy.ndarray
         ``test_idx`` is strictly after ``train_idx`` (no leakage).
 
+    Raises
+    ------
+    ValueError
+        If ``test_size`` is negative (a negative integer would yield
+        out-of-bounds train indices and a negative fraction would silently
+        produce an empty test set), if the resulting test count exceeds ``n``,
+        or if the train set would be empty.
+
     """
+    if test_size < 0:
+
+        raise ValueError(f"test_size must be >= 0, got {test_size}")
+
     n_test = int(round(n * test_size)) if 0 < test_size < 1 else int(test_size)
+
+    if n_test > n:
+
+        raise ValueError(f"test_size ({n_test}) exceeds n ({n})")
+
     split = n - n_test
 
     if split - gap <= 0:
@@ -95,7 +112,8 @@ def walk_forward(
     ValueError
         If ``train <= 0`` or ``purge >= train``: either would yield empty train
         windows (``[t-train : t-purge]`` becomes empty), which silently breaks a
-        downstream ``fit`` with an opaque error instead of failing here.
+        downstream ``fit`` with an opaque error instead of failing here. Also if
+        ``step <= 0``, which would never advance ``t`` and loop forever.
 
     """
     if train <= 0:
@@ -111,6 +129,13 @@ def walk_forward(
 
     if step is None:
         step = test
+
+    if step <= 0:
+
+        raise ValueError(
+            f"step must be > 0, got {step} (otherwise t never advances "
+            "and the window generator loops forever)"
+        )
 
     t = train
 
