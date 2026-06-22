@@ -63,7 +63,14 @@ def _callable_name(fn: Any) -> str | None:
 
 
 def _seed_everything(seed: int) -> None:
-    """ Seed numpy (and torch if present) for reproducibility. """
+    """ Seed the global numpy (and torch) RNGs for reproducibility.
+
+    This mutates process-global RNG state via :func:`numpy.random.seed` so that
+    legacy strategies / models drawing from the global numpy RNG run
+    deterministically. Callers that need *independent* runs (e.g.
+    :func:`permutation_test`) must pass a **distinct** ``seed`` per run rather
+    than reusing one — otherwise every run replays the same global draws.
+    """
     np.random.seed(seed)
     try:  # torch is optional at call time
         import torch
@@ -145,18 +152,27 @@ def run_experiment(
     """
     _seed_everything(seed)
 
-    if costs is not None:
-        strategy.cost = costs
-
     prices = _to_array(data)
     n = prices.shape[0]
 
-    if walk_forward is not None:
-        target = np.zeros(n) if y is None else np.asarray(y)  # preserve dtype
-        result = strategy.run_walk_forward(data, target, **walk_forward, X=X)
+    # Overriding the cost model must not leak past this run: save and restore
+    # the strategy's own cost in a ``finally`` so a later run (or a sibling
+    # iteration of a permutation loop sharing the strategy) is unaffected.
+    _sentinel = object()
+    original_cost: Any = getattr(strategy, "cost", _sentinel)
+    try:
+        if costs is not None:
+            strategy.cost = costs
 
-    else:
-        result = strategy.run(data, y, X=X)
+        if walk_forward is not None:
+            target = np.zeros(n) if y is None else np.asarray(y)  # preserve dtype
+            result = strategy.run_walk_forward(data, target, **walk_forward, X=X)
+
+        else:
+            result = strategy.run(data, y, X=X)
+    finally:
+        if costs is not None and original_cost is not _sentinel:
+            strategy.cost = original_cost
 
     metrics = result.summary(period=period)
 

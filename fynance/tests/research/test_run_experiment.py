@@ -71,6 +71,27 @@ def test_costs_override_changes_result():
     assert free.metrics != pricey.metrics
 
 
+def test_costs_override_does_not_mutate_strategy():
+    # The override must be confined to the single run: a later run on the same
+    # strategy must not inherit it (an aliasing hazard in permutation loops).
+    own = ProportionalCost(0.0005)
+    strat = Strategy(features=lambda p: np.diff(p, prepend=p[0]), cost=own)
+    data = gbm(400, seed=3)
+
+    overridden = run_experiment(strat, data, name="ovr", costs=ProportionalCost(0.02))
+
+    assert strat.cost is own  # restored, not left pointing at the override
+
+    # And a subsequent run with no override uses the strategy's own cost.
+    again = run_experiment(strat, data, name="again")
+    baseline = run_experiment(
+        Strategy(features=lambda p: np.diff(p, prepend=p[0]), cost=ProportionalCost(0.0005)),
+        data, name="base",
+    )
+    assert again.metrics == baseline.metrics
+    assert again.metrics != overridden.metrics
+
+
 def test_no_lookahead_walk_forward():
     # Perturbing the tail must not change the out-of-sample returns on the
     # earlier (unperturbed) prefix — a black-box causality probe.

@@ -74,3 +74,28 @@ def test_version_and_timestamp_autoset():
 
     assert e.fynance_version == fynance.__version__
     assert e.created_at  # non-empty ISO timestamp
+
+
+def test_from_dict_tolerates_unknown_keys(populated):
+    # Forward compatibility: an artifact from a newer fynance may carry extra
+    # fields. from_dict must ignore them rather than raise TypeError.
+    data = populated.to_dict()
+    data["a_future_field"] = {"not": "known here"}
+    data["another_extra"] = 42
+
+    restored = Experiment.from_dict(data)
+
+    assert restored.name == "demo"
+    assert restored.metrics["sharpe"] == 1.5
+    assert not hasattr(restored, "a_future_field")
+
+
+def test_load_raises_clear_error_on_corrupt_json(tmp_path):
+    # A truncated / corrupt artifact must raise a clear ValueError naming the
+    # path, not leak a bare JSONDecodeError.
+    path = tmp_path / "bad" / "experiment.json"
+    path.parent.mkdir(parents=True)
+    path.write_text('{"name": "demo", "metrics": {', encoding="utf-8")  # truncated
+
+    with pytest.raises(ValueError, match="corrupt or truncated"):
+        Experiment.load(path)

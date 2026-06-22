@@ -15,7 +15,7 @@ to a caller-provided ``output_dir``.
 from __future__ import annotations
 
 import json
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, fields
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -85,8 +85,25 @@ class Experiment:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Experiment:
-        """ Rebuild an :class:`Experiment` from a :meth:`to_dict` mapping. """
-        return cls(**data)
+        """ Rebuild an :class:`Experiment` from a :meth:`to_dict` mapping.
+
+        Unknown keys are **ignored** rather than raising, so an artifact written
+        by a newer fynance (carrying extra fields) still loads on an older one.
+
+        Parameters
+        ----------
+        data : dict
+            Mapping produced by :meth:`to_dict` (extra keys tolerated).
+
+        Returns
+        -------
+        Experiment
+            The rebuilt experiment.
+
+        """
+        known = {f.name for f in fields(cls)}
+
+        return cls(**{k: v for k, v in data.items() if k in known})
 
     def save(self, output_dir: str | Path, *, name: str | None = None) -> Path:
         """ Write ``<output_dir>/<name>/experiment.json`` and return its path.
@@ -117,7 +134,32 @@ class Experiment:
 
     @classmethod
     def load(cls, path: str | Path) -> Experiment:
-        """ Load an :class:`Experiment` from an ``experiment.json`` file. """
-        data = json.loads(Path(path).read_text(encoding="utf-8"))
+        """ Load an :class:`Experiment` from an ``experiment.json`` file.
+
+        Parameters
+        ----------
+        path : str or pathlib.Path
+            Path to the ``experiment.json`` artifact.
+
+        Returns
+        -------
+        Experiment
+            The loaded experiment.
+
+        Raises
+        ------
+        ValueError
+            If the file is not valid JSON (corrupt or truncated) — re-raised
+            with the offending path for a clear diagnostic.
+
+        """
+        path = Path(path)
+        text = path.read_text(encoding="utf-8")
+        try:
+            data = json.loads(text)
+        except json.JSONDecodeError as exc:
+            raise ValueError(
+                f"corrupt or truncated experiment artifact at {path}: {exc}"
+            ) from exc
 
         return cls.from_dict(data)

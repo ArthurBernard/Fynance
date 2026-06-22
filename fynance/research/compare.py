@@ -37,7 +37,8 @@ def leaderboard(
     experiments : list of Experiment
         The runs to rank.
     sort_by : str
-        Metric key to sort on (missing values sink to the bottom).
+        Metric key to sort on. Rows missing the metric **or** holding a NaN for
+        it sink to the bottom of the ranking.
     descending : bool
         Higher is better when True.
 
@@ -51,8 +52,18 @@ def leaderboard(
         {"name": e.name, **{k: float(v) for k, v in e.metrics.items()}}
         for e in experiments
     ]
+    # NaN must rank as "worst", not float to the top: a present-but-NaN metric
+    # is treated like a missing value (the docstring's promise).
     worst = float("-inf") if descending else float("inf")
-    rows.sort(key=lambda r: r.get(sort_by, worst), reverse=descending)  # type: ignore[arg-type]
+
+    def _key(row: dict[str, float | str]) -> float:
+        value = row.get(sort_by, worst)
+        if isinstance(value, float) and np.isnan(value):
+            return worst
+
+        return value  # type: ignore[return-value]
+
+    rows.sort(key=_key, reverse=descending)
 
     return rows
 
