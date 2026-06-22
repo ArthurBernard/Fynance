@@ -24,9 +24,10 @@ def _safe_ratio(excess: NDArray, denom: NDArray) -> Any:
     """ ``excess / denom`` robust to a zero denominator (scalar **or** array).
 
     A zero-volatility series has an undefined ratio: it is ``+inf`` when the
-    excess return is non-zero (a riskless gain), and ``0`` when the excess is also
-    zero (a flat, do-nothing curve). Returns a numpy scalar for 0-D input and an
-    array otherwise — matching the surrounding ratio functions' shape contract.
+    excess return is positive (a riskless gain), ``-inf`` when the excess is
+    negative (a riskless loss), and ``0`` when the excess is also zero (a flat,
+    do-nothing curve). Returns a numpy scalar for 0-D input and an array
+    otherwise — matching the surrounding ratio functions' shape contract.
     """
     excess = np.asarray(excess, dtype=np.float64)
     denom = np.asarray(denom, dtype=np.float64)
@@ -36,11 +37,16 @@ def _safe_ratio(excess: NDArray, denom: NDArray) -> Any:
 
             return np.float64(excess / denom)
 
-        return np.float64(np.inf if excess != 0. else 0.)
+        if excess == 0.:
+
+            return np.float64(0.)
+
+        return np.float64(np.sign(excess) * np.inf)
 
     res = np.full(denom.shape, np.inf, dtype=np.float64)
     nz = denom != 0.
     res[nz] = excess[nz] / denom[nz]
+    res[(~nz) & (excess < 0.)] = -np.inf
     res[(~nz) & (excess == 0.)] = 0.
 
     return res
@@ -548,23 +554,13 @@ def roll_sharpe(
     """
     ret = _roll_annual_return(X, period, w, ddof)
     vol = _roll_annual_volatility(X, period, log, w, axis, ddof)
-    sharpe = np.zeros(X.shape)
-    slice_bool = (vol != 0)
 
-    if isinstance(rf, float) or isinstance(rf, int):
-        _rf = rf
-
-    elif isinstance(rf, np.ndarray) and rf.shape[0] != X.shape[0]:
+    if isinstance(rf, np.ndarray) and rf.shape[0] != X.shape[0]:
         msg_prefix = 'rf must be '
 
         raise ArraySizeError(X.shape[0], msg_prefix=msg_prefix)
 
-    else:
-        _rf = rf[slice_bool]
-
-    sharpe[slice_bool] = (ret[slice_bool] - _rf) / vol[slice_bool]
-
-    return sharpe
+    return _safe_ratio(ret - rf, vol)
 
 
 @WrapperArray('dtype', 'axis', 'window', 'ddof', min_size=2)
