@@ -155,13 +155,19 @@ class PriceSeries:
         index = data[index_col].to_numpy() if index_col is not None else None
 
         if value_col is None:
-            candidates = [c for c in data.columns if c != index_col]
+            # Match the documented default: the single non-index *numeric*
+            # column. Filtering by name alone would pick a lone string column
+            # and fail later with an opaque cast-to-float64 error.
+            candidates = [
+                c for c, dt in zip(data.columns, data.dtypes)
+                if c != index_col and dt.is_numeric()
+            ]
 
             if len(candidates) != 1:
 
                 raise ValueError(
                     "value_col is ambiguous; pass it explicitly "
-                    f"(candidates={candidates})"
+                    f"(numeric candidates={candidates})"
                 )
 
             value_col = candidates[0]
@@ -319,6 +325,11 @@ class PriceSeries:
 
             return self._new(r, index=self.index[1:])
 
+        if p.size == 0:
+            # Empty input: no leading NaN to write (full[0] would be OOB).
+
+            return self._new(np.empty(0, dtype=np.float64))
+
         full = np.empty(p.size, dtype=np.float64)
         full[0] = np.nan
         full[1:] = r
@@ -398,6 +409,11 @@ class PriceSeries:
                 f"positions length {pos.size} != returns length "
                 f"{self.values.size}"
             )
+
+        if pos.size == 0:
+            # Empty input: no leading NaN to write (shifted[0] would be OOB).
+
+            return self._new(np.empty(0, dtype=np.float64))
 
         shifted = np.empty_like(pos)
         shifted[0] = np.nan

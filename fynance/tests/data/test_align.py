@@ -50,6 +50,15 @@ def test_ffill_leading_nan_stays_nan():
     assert out["b"].values[2] == 30.0
 
 
+def test_align_rejects_duplicate_index():
+    # Duplicate timestamps would be silently collapsed (index-to-value mapping
+    # keeps only the last), shrinking the series to its unique count.
+    a = PriceSeries([1.0, 2.0, 3.0], index=[1, 2, 2], name="a")
+    b = PriceSeries([10.0, 20.0, 30.0], index=[1, 2, 3], name="b")
+    with pytest.raises(ValueError, match="duplicate"):
+        align({"a": a, "b": b}, how="outer")
+
+
 # --- resample ----------------------------------------------------------------
 
 def _weekly_ps():
@@ -103,3 +112,36 @@ def test_resample_object_datetime_index_raises_clean_error():
     ps = PriceSeries([1.0, 2.0], index=idx)
     with pytest.raises(ValueError, match="datetime64"):
         resample(ps, "1w", agg="last")
+
+
+def _weekly_ps_seconds():
+    # Same as _weekly_ps but with the common datetime64[s] resolution, which
+    # polars does not accept directly (only [D]/[ms]/[us]/[ns]).
+    idx = np.array(
+        ["2020-01-01", "2020-01-02", "2020-01-08", "2020-01-09"],
+        dtype="datetime64[s]",
+    )
+    return PriceSeries([1.0, 2.0, 3.0, 4.0], index=idx, name="x")
+
+
+def test_resample_last_datetime64_seconds():
+    # datetime64[s] used to slip past the dtype.kind guard then raise the
+    # opaque polars resolution error; it now resamples correctly.
+    out = resample(_weekly_ps_seconds(), "1w", agg="last")
+    assert isinstance(out, PriceSeries)
+    assert np.allclose(out.values, [2.0, 4.0])
+    assert out.index.dtype.kind == "M"
+
+
+def test_resample_mean_datetime64_seconds():
+    out = resample(_weekly_ps_seconds(), "1w", agg="mean")
+    assert np.allclose(out.values, [1.5, 3.5])
+
+
+def test_resample_ohlc_datetime64_seconds():
+    out = resample(_weekly_ps_seconds(), "1w", agg="ohlc")
+    assert set(out) == {"open", "high", "low", "close"}
+    assert np.allclose(out["open"].values, [1.0, 3.0])
+    assert np.allclose(out["high"].values, [2.0, 4.0])
+    assert np.allclose(out["low"].values, [1.0, 3.0])
+    assert np.allclose(out["close"].values, [2.0, 4.0])
