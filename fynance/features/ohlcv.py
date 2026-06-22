@@ -44,6 +44,24 @@ def _unpack_hlc(high, low, close):
     return _as1d(high), _as1d(low), _as1d(close)
 
 
+def _check_window(w: int) -> int:
+    """ Validate a smoothing/look-back window and return it as an ``int``.
+
+    Raises
+    ------
+    ValueError
+        If ``w < 1`` (a window of ``0`` would divide by zero in the Wilder
+        recursion and a negative window is meaningless).
+    """
+    w = int(w)
+
+    if w < 1:
+
+        raise ValueError(f"w must be >= 1, got {w}")
+
+    return w
+
+
 # =========================================================================== #
 #                              Numba kernels                                  #
 # =========================================================================== #
@@ -202,6 +220,12 @@ def atr(high, low=None, close=None, w: int = 14) -> NDArray[np.float64]:
     numpy.ndarray
         ATR series, ``>= 0``, aligned with the input.
 
+    Raises
+    ------
+    ValueError
+        If ``w < 1``, or if ``low`` / ``close`` are missing without an
+        ``OHLCV`` first argument.
+
     Examples
     --------
     >>> import numpy as np
@@ -212,9 +236,10 @@ def atr(high, low=None, close=None, w: int = 14) -> NDArray[np.float64]:
     array([1.    , 1.25  , 1.375 , 1.1875])
 
     """
+    w = _check_window(w)
     high, low, close = _unpack_hlc(high, low, close)
 
-    return _atr_kernel(high, low, close, int(w))
+    return _atr_kernel(high, low, close, w)
 
 
 def adx(high, low=None, close=None, w: int = 14) -> NDArray[np.float64]:
@@ -235,6 +260,12 @@ def adx(high, low=None, close=None, w: int = 14) -> NDArray[np.float64]:
     numpy.ndarray
         ADX series in ``[0, 100]``, aligned with the input.
 
+    Raises
+    ------
+    ValueError
+        If ``w < 1``, or if ``low`` / ``close`` are missing without an
+        ``OHLCV`` first argument.
+
     Examples
     --------
     >>> import numpy as np
@@ -248,16 +279,17 @@ def adx(high, low=None, close=None, w: int = 14) -> NDArray[np.float64]:
     True
 
     """
+    w = _check_window(w)
     high, low, close = _unpack_hlc(high, low, close)
 
-    return _adx_kernel(high, low, close, int(w))
+    return _adx_kernel(high, low, close, w)
 
 
 def williams_r(high, low=None, close=None, w: int = 14) -> NDArray[np.float64]:
     r""" Williams %R over a trailing window, causal.
 
     :math:`\%R_t = -100 \cdot (HH_t - C_t) / (HH_t - LL_t)`, where ``HH``/``LL``
-    are the rolling high/low of window ``w``. Bounded in ``[-100, 0]``.
+    are the rolling high/low of window ``w``.
 
     Parameters
     ----------
@@ -269,7 +301,23 @@ def williams_r(high, low=None, close=None, w: int = 14) -> NDArray[np.float64]:
     Returns
     -------
     numpy.ndarray
-        Williams %R in ``[-100, 0]``, aligned with the input.
+        Williams %R, aligned with the input.
+
+    Raises
+    ------
+    ValueError
+        If ``w < 1``, or if ``low`` / ``close`` are missing without an
+        ``OHLCV`` first argument.
+
+    Notes
+    -----
+    %R is bounded in ``[-100, 0]`` **only when the bars are valid OHLC**, i.e.
+    each close lies within its window's high/low range
+    (:math:`LL_t \le C_t \le HH_t`). The raw values are returned unclamped, so a
+    close outside ``[LL_t, HH_t]`` — e.g. corrupt or mismatched series — yields
+    values outside ``[-100, 0]`` (a close above the rolling high gives ``%R > 0``,
+    below the rolling low gives ``%R < -100``). This is intentional: clamping
+    would silently mask such data issues.
 
     Examples
     --------
@@ -281,9 +329,10 @@ def williams_r(high, low=None, close=None, w: int = 14) -> NDArray[np.float64]:
     array([-50.  , -25.  , -16.67, -75.  ])
 
     """
+    w = _check_window(w)
     high, low, close = _unpack_hlc(high, low, close)
 
-    return _williams_kernel(high, low, close, int(w))
+    return _williams_kernel(high, low, close, w)
 
 
 def obv(close, volume=None) -> NDArray[np.float64]:

@@ -102,6 +102,29 @@ def test_missing_args_raise():
         vwap(np.array([1.0, 2.0]))
 
 
+@pytest.mark.parametrize("fn", [atr, adx, williams_r])
+@pytest.mark.parametrize("w", [0, -1])
+def test_window_below_one_raises(fn, w):
+    # w=0 used to raise an uncaught ZeroDivisionError (atr/adx) or produce inf;
+    # it must now raise a clear ValueError, and so must any negative window.
+    h, low, c, _ = _synthetic(n=20)
+    with pytest.raises(ValueError, match="w must be >= 1"):
+        fn(h, low, c, w=w)
+
+
+def test_williams_r_out_of_range_on_invalid_ohlc():
+    # %R is bounded in [-100, 0] only for valid OHLC (low <= close <= high).
+    # A close above the rolling high yields %R > 0; below the rolling low yields
+    # %R < -100. The kernel does NOT clamp -- it surfaces the data issue.
+    h = np.array([10.0, 10.0, 10.0])
+    low = np.array([9.0, 9.0, 9.0])
+    # Close above high at t=1 -> %R > 0; close below low at t=2 -> %R < -100.
+    c = np.array([9.5, 20.0, 0.0])
+    out = williams_r(h, low, c, w=2)
+    assert out[1] > 0.0
+    assert out[2] < -100.0
+
+
 # -- No-lookahead ---------------------------------------------------------
 
 

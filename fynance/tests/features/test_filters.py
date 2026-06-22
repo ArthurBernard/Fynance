@@ -139,3 +139,46 @@ class TestFitKalman:
         assert result['success']
         np.testing.assert_allclose(result['W'], W_TRUE)
         np.testing.assert_allclose(result['V'], V_TRUE)
+
+
+class TestMultivariate:
+    """ State-dimension n > 1: filter, smoother and fit on a 2-D state. """
+
+    N2 = 2
+    T2 = 150
+
+    def _data(self):
+        rng = np.random.default_rng(7)
+        n, T = self.N2, self.T2
+        G2 = F2 = np.eye(n)
+        W2 = np.diag([0.3, 0.8])
+        V2 = np.diag([1.0, 0.5])
+        x = np.cumsum(rng.multivariate_normal(np.zeros(n), W2, T), axis=0)
+        y = x + rng.multivariate_normal(np.zeros(n), V2, T)
+
+        return y, G2, F2, W2, V2
+
+    def test_filter_smoother_shapes_n2(self):
+        y, G2, F2, W2, V2 = self._data()
+        m, C, a, R, e, S = kalman_filter(y, G2, F2, W2, V2)
+        assert m.shape == (self.T2, self.N2)
+        assert C.shape == (self.T2, self.N2, self.N2)
+        ms, Cs = rts_smoother(m, C, a, R, G2)
+        assert ms.shape == (self.T2, self.N2)
+        assert Cs.shape == (self.T2, self.N2, self.N2)
+
+    def test_fit_n2_converges_and_shapes(self):
+        y, G2, F2, _, _ = self._data()
+        result = fit_kalman(y, G2, F2)
+        assert result['success']
+        assert result['W'].shape == (self.N2, self.N2)
+        assert result['V'].shape == (self.N2, self.N2)
+
+    def test_fit_n2_beats_identity(self):
+        y, G2, F2, _, _ = self._data()
+        result = fit_kalman(y, G2, F2)
+        _, _, _, _, e_id, S_id = kalman_filter(
+            y, G2, F2, np.eye(self.N2), np.eye(self.N2)
+        )
+        ll_id = kalman_loglikelihood(e_id, S_id)
+        assert result['loglik'] >= ll_id - 1e-6

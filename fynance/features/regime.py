@@ -11,6 +11,9 @@ embedding) — see the notes on causality.
 
 from __future__ import annotations
 
+# Built-in packages
+import warnings
+
 # Third-party packages
 import numpy as np
 from numpy.typing import NDArray
@@ -20,6 +23,27 @@ from scipy.cluster.vq import kmeans2
 from fynance.features.indicators import realized_volatility
 
 __all__ = ['detect_regimes', 'regime_features', 'RegimeDetector']
+
+
+def _vol_order(vol: NDArray, labels: NDArray, n_regimes: int) -> NDArray:
+    """ Order cluster labels by increasing mean volatility, empty-safe.
+
+    An empty cluster has a ``nan`` mean; treat it as ``+inf`` so it sorts last
+    instead of corrupting the ordering (``argsort`` places ``nan`` last but its
+    relative order is undefined). Empty clusters are unreachable through the
+    ``kmeans2(..., missing='raise')`` path, but this keeps the ordering robust
+    if that guard is ever relaxed.
+    """
+    with np.errstate(invalid='ignore'), warnings.catch_warnings():
+        # An empty cluster triggers a "Mean of empty slice" warning; expected.
+        warnings.simplefilter('ignore', category=RuntimeWarning)
+        means = np.array(
+            [vol[labels == k].mean() for k in range(n_regimes)]
+        )
+
+    means[np.isnan(means)] = np.inf
+
+    return np.argsort(means)
 
 
 def regime_features(X: NDArray, w: int = 21, period: int = 252) -> NDArray:
@@ -41,6 +65,14 @@ def regime_features(X: NDArray, w: int = 21, period: int = 252) -> NDArray:
     -------
     np.ndarray
         Shape ``(len(X), 2)`` — ``[realized_volatility, rolling_mean_log_return]``.
+
+    Notes
+    -----
+    Row ``0`` is a deterministic warmup point: there is no prior observation, so
+    both the realized volatility and the mean log-return are ``0`` (an
+    artificially "ultra-calm" point). It is kept so the matrix stays aligned with
+    ``X``; callers fitting a clustering on the matrix may wish to drop or mask
+    this row.
 
     """
     X = np.asarray(X, dtype=np.float64).reshape(-1)
@@ -108,7 +140,7 @@ class RegimeDetector:
 
         # Order clusters by mean (unstandardized) volatility for stable labels.
         vol = feats[:, 0]
-        order = np.argsort([vol[labels == k].mean() for k in range(self.n_regimes)])
+        order = _vol_order(vol, labels, self.n_regimes)
         remap = np.empty(self.n_regimes, dtype=int)
         remap[order] = np.arange(self.n_regimes)
         self._remap = remap
@@ -175,7 +207,7 @@ def detect_regimes(
     _, labels = kmeans2(z, n_regimes, seed=seed, minit='++', missing='raise')
 
     # Re-order labels by increasing mean volatility for stable interpretation.
-    order = np.argsort([vol[labels == k].mean() for k in range(n_regimes)])
+    order = _vol_order(vol, labels, n_regimes)
     remap = np.empty(n_regimes, dtype=int)
     remap[order] = np.arange(n_regimes)
 

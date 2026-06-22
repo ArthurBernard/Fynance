@@ -125,6 +125,11 @@ def garch_volatility(
         Conditional volatility :math:`\sigma_t`, same length as ``returns``,
         ``NaN`` on the warmup.
 
+    Raises
+    ------
+    ValueError
+        If ``min_train`` is not in ``[2, len(returns))``.
+
     Examples
     --------
     >>> import numpy as np

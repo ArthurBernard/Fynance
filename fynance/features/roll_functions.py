@@ -112,7 +112,7 @@ def roll_min(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDA
 
     .. math::
 
-        roll\_min^w_t(X) = min(X_{t - w}, ..., X_t)
+        roll\_min^w_t(X) = min(X_{t - w + 1}, ..., X_t)
 
     Parameters
     ----------
@@ -177,7 +177,7 @@ def roll_max(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDA
 
     .. math::
 
-        roll\_max^w_t(X) = max(X_{t - w}, ..., X_t)
+        roll\_max^w_t(X) = max(X_{t - w + 1}, ..., X_t)
 
     Parameters
     ----------
@@ -222,7 +222,7 @@ def roll_max(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDA
 
     See Also
     --------
-    roll_max
+    roll_min
 
     """
     return _roll_max(X, w)
