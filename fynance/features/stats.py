@@ -18,7 +18,6 @@ __all__ = ['accuracy', 'directional_accuracy', 'percent_positive',
            'tail_ratio', 'z_score', 'roll_z_score', 'mad', 'roll_mad']
 
 
-@WrapperArray('axis')
 def accuracy(y_true: NDArray, y_pred: NDArray, sign: bool = True, axis: int = 0) -> float:
     r""" Compute the accuracy of prediction.
 
@@ -59,6 +58,10 @@ def accuracy(y_true: NDArray, y_pred: NDArray, sign: bool = True, axis: int = 0)
     mdd, calmar, sharpe, drawdown
 
     """
+    # No `wrap_axis` here: it can only transpose the first positional argument,
+    # leaving `y_pred` mis-oriented for axis=1. Both arrays already share the
+    # same orientation, so reduce directly along `axis` (NumPy handles the
+    # axis bounds, including negative axes).
     if sign:
         y_true = np.sign(y_true)
         y_pred = np.sign(y_pred)
@@ -66,7 +69,6 @@ def accuracy(y_true: NDArray, y_pred: NDArray, sign: bool = True, axis: int = 0)
     return np.sum(y_true == y_pred, axis=axis) / y_true.shape[axis]
 
 
-@WrapperArray('axis')
 def directional_accuracy(
     y_true: NDArray, y_pred: NDArray, axis: int = 0,
 ) -> float:
@@ -109,6 +111,10 @@ def directional_accuracy(
     accuracy
 
     """
+    # No `wrap_axis` here: it can only transpose the first positional argument,
+    # leaving `y_pred` mis-oriented for axis=1. Both arrays already share the
+    # same orientation, so reduce directly along `axis` (NumPy handles the
+    # axis bounds, including negative axes).
     return np.mean(np.sign(y_true) == np.sign(y_pred), axis=axis)
 
 

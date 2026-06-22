@@ -424,6 +424,11 @@ def roll_standardize(X, w=None, a=0, b=1, axis=0, kind_moment="s"):
     s = std(X, w, axis=axis)
 
     if axis == 1:
+        # The rolling moments are returned in the input orientation
+        # (rows, cols); transpose them along with `X` so the time axis lands
+        # on axis 0 and the orientations match before broadcasting.
+        m = m.T if isinstance(m, np.ndarray) and m.ndim == X.ndim else m
+        s = s.T if isinstance(s, np.ndarray) and s.ndim == X.ndim else s
 
         return _standardize(X.T, m, s, a, b).T
 
@@ -508,6 +513,11 @@ def roll_normalize(X, w=None, a=0, b=1, axis=0):
     s = roll_max(X, w, axis=axis)
 
     if axis == 1:
+        # The rolling min/max are returned in the input orientation
+        # (rows, cols); transpose them along with `X` so the time axis lands
+        # on axis 0 and the orientations match before broadcasting.
+        m = m.T if isinstance(m, np.ndarray) and m.ndim == X.ndim else m
+        s = s.T if isinstance(s, np.ndarray) and s.ndim == X.ndim else s
 
         return _normalize(X.T, m, s, a, b).T
 

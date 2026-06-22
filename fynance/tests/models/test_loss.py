@@ -111,6 +111,30 @@ class TestSortinoLoss:
         # scale invariance (old absolute-eps code is off by ~10x here)
         assert loss_10x.item() == pytest.approx(loss.item(), rel=1e-2)
 
+    def test_low_risk_gradient_survives(self):
+        # On a strong-uptrend (near-zero-downside) batch the ratio blows past
+        # MAX_RATIO. A hard clamp pinned the loss to a constant there and so
+        # ZEROED the gradient in exactly the regime we still want to optimize.
+        # The smooth tanh saturation must keep the loss finite AND leave a
+        # non-zero gradient w.r.t. the input.
+        gen = torch.Generator().manual_seed(0)
+        r = (torch.rand(60, generator=gen) * 0.01 + 0.005).requires_grad_(True)
+        loss = SortinoLoss()(r)
+        assert torch.isfinite(loss)
+        loss.backward()
+        assert r.grad is not None
+        assert torch.any(r.grad != 0)
+        assert not torch.isnan(r.grad).any()
+
+    def test_higher_sortino_gives_lower_loss(self):
+        # Sign convention must survive the smooth saturation: a higher-Sortino
+        # batch (more upside, same downside) must give a strictly lower loss
+        # even when both batches are well into the saturating regime.
+        gen = torch.Generator().manual_seed(1)
+        base = torch.rand(60, generator=gen) * 0.01 + 0.005
+        better = base + 0.01   # uniformly higher mean, downside still ~0
+        assert SortinoLoss()(better).item() < SortinoLoss()(base).item()
+
     def test_positive_when_negative_mean(self):
         # Sign convention (like SharpeLoss): a negative-mean return series has a
         # negative Sortino ratio, so the negated loss must be positive.
@@ -208,6 +232,30 @@ class TestCalmarLoss:
         loss = CalmarLoss(eps=1e-8)(torch.zeros(50))
         assert torch.isfinite(loss)
 
+    def test_low_drawdown_gradient_survives(self):
+        from fynance.models.loss import CalmarLoss
+        # Near-zero-drawdown (almost monotone equity) batch: the ratio blows
+        # past MAX_RATIO. A hard clamp pinned the loss to a constant and ZEROED
+        # the gradient there; the smooth tanh saturation must keep the loss
+        # finite AND leave a non-zero gradient w.r.t. the input.
+        gen = torch.Generator().manual_seed(0)
+        r = (torch.rand(100, generator=gen) * 0.01 + 0.005).requires_grad_(True)
+        loss = CalmarLoss()(r)
+        assert torch.isfinite(loss)
+        loss.backward()
+        assert r.grad is not None
+        assert torch.any(r.grad != 0)
+        assert not torch.isnan(r.grad).any()
+
+    def test_higher_calmar_gives_lower_loss(self):
+        from fynance.models.loss import CalmarLoss
+        # Sign convention must survive the smooth saturation: a higher-Calmar
+        # batch (higher return, same near-zero drawdown) gives a lower loss.
+        gen = torch.Generator().manual_seed(1)
+        base = torch.rand(100, generator=gen) * 0.01 + 0.005
+        better = base + 0.01   # higher mean return, drawdown still ~0
+        assert CalmarLoss()(better).item() < CalmarLoss()(base).item()
+
 
 class TestOmegaLoss:
     def test_known_value(self):
@@ -241,6 +289,31 @@ class TestOmegaLoss:
         # backstop must keep the loss finite (not NaN).
         loss = OmegaLoss(threshold=0.0, eps=1e-8)(torch.zeros(50))
         assert torch.isfinite(loss)
+
+    def test_all_gains_gradient_survives(self):
+        from fynance.models.loss import OmegaLoss
+        # All-gains (zero-loss) batch: the ratio blows past MAX_RATIO. A hard
+        # clamp pinned the loss to a constant and ZEROED the gradient there;
+        # the smooth tanh saturation must keep the loss finite AND leave a
+        # non-zero gradient w.r.t. the input.
+        gen = torch.Generator().manual_seed(0)
+        r = (torch.rand(100, generator=gen) * 0.01 + 0.005).requires_grad_(True)
+        loss = OmegaLoss()(r)
+        assert torch.isfinite(loss)
+        loss.backward()
+        assert r.grad is not None
+        assert torch.any(r.grad != 0)
+        assert not torch.isnan(r.grad).any()
+
+    def test_higher_omega_gives_lower_loss(self):
+        from fynance.models.loss import OmegaLoss
+        # Sign convention must survive the smooth saturation: an all-gains batch
+        # (Omega -> high) must give a strictly lower loss than a mixed batch
+        # with real losses (finite, smaller Omega).
+        gen = torch.Generator().manual_seed(2)
+        all_gains = torch.rand(100, generator=gen) * 0.01 + 0.005
+        mixed = torch.rand(100, generator=gen) * 0.02 - 0.01
+        assert OmegaLoss()(all_gains).item() < OmegaLoss()(mixed).item()
 
 
 class TestHybridLoss:

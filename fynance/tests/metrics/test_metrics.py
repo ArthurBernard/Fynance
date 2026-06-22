@@ -501,10 +501,11 @@ def test_sortino(set_variables):
         f(x_2d, axis=0, ddof=7)
     execinfo.match(r'7.*6')
 
-    # All positive returns → downside vol == 0 → inf (tested on 2D; 1D scalar
-    # path shares the same pre-existing limitation as sharpe)
-    x_up_2d = np.array([100., 110., 120., 130., 140., 150.]).reshape(6, 1)
-    assert f(x_up_2d, period=12) == np.array([np.inf])
+    # All positive returns → downside vol == 0 → inf, on both the 2-D array
+    # path and the 1-D scalar (0-D) path.
+    x_up = np.array([100., 110., 120., 130., 140., 150.])
+    assert f(x_up.reshape(6, 1), period=12) == np.array([np.inf])
+    assert np.isposinf(f(x_up, period=12))
 
     # Numeric check: sortino >= sharpe (downside vol <= total vol)
     s_sharpe = fy.sharpe(x_1d.astype(np.float64), period=12)

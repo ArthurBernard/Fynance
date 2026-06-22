@@ -251,6 +251,31 @@ class TestDisplayKpi:
         assert '0.42' in out
         assert '0.73' in out
 
+    def test_kpi_index_clamped_after_loop(self):
+        # __next__ bumps self.i before the StopIteration check, so after the
+        # loop self.i == loss_eval.size. The final out-of-loop _print must not
+        # index out of bounds: the index has to be clamped to the last slot.
+        rb = make_rb()
+        rb.loss_eval = np.zeros(4)
+        rb.loss_test = np.zeros(4)
+        rb.loss_eval[-1] = 0.5
+        rb.loss_test[-1] = 0.6
+        rb.i = rb.loss_eval.size   # one past the last valid slot
+        rb._display_kpi(t=rb.n + rb.s)   # must not raise IndexError
+
+    def test_kpi_zero_denominator_does_not_divide_by_zero(self):
+        # For T=45, n=40, s=10 the denominator (T - n - T % s) is 0; the
+        # progress percentage must be guarded against ZeroDivisionError.
+        X = torch.from_numpy(RNG.standard_normal((45, N_IN)).astype(np.float32))
+        y = torch.from_numpy(RNG.standard_normal((45, N_OUT)).astype(np.float32))
+        rb = _RollingBasis(X, y)
+        rb(train_period=40, test_period=10, roll_period=10)
+        assert rb.T - rb.n - rb.T % rb.s == 0   # degenerate denominator
+        rb.loss_eval = np.zeros(1)
+        rb.loss_test = np.zeros(1)
+        rb.i = 0
+        rb._display_kpi(t=rb.n + rb.s)   # must not raise ZeroDivisionError
+
 
 # ---------------------------------------------------------------------------
 # run(): minimal walk-forward sanity (display off)
@@ -287,3 +312,19 @@ class TestRunWalkForward:
         stats = model.get_stats()
         assert stats.size > 0
         assert np.all(np.isfinite(stats["train_loss"]))
+
+    def test_run_default_kpi_path_completes(self):
+        # The DEFAULT path run(backtest_kpi=True) used to raise IndexError on
+        # the final out-of-loop print: __next__ bumps self.i past the last
+        # filled loss slot before StopIteration. A tiny seeded run with the KPI
+        # display on (plot off) must complete without error.
+        torch.manual_seed(0)
+        model = RollMultiLayerPerceptron(X_t, y_t, layers=[8])
+        model.set_optimizer(nn.MSELoss, torch.optim.Adam, lr=1e-3)
+        model.set_roll_period(
+            train_period=TRAIN, test_period=TEST, roll_period=ROLL, epochs=1,
+        )
+        out = model.run(backtest_plot=False, backtest_kpi=True)
+        assert out is model
+        stats = model.get_stats()
+        assert stats.size > 0

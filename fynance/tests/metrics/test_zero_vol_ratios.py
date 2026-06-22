@@ -7,7 +7,7 @@
 import numpy as np
 
 # Local
-from fynance.metrics import calmar, roll_calmar, sharpe, sortino
+from fynance.metrics import calmar, roll_calmar, roll_sharpe, sharpe, sortino
 from fynance.metrics.ratios import _safe_ratio
 from fynance.metrics.summary import summary
 
@@ -19,11 +19,50 @@ def test_flat_curve_is_zero_not_crash():
 
 
 def test_safe_ratio_zero_denominator():
-    # Riskless gain -> +inf; flat (0/0) -> 0; mixed array handled element-wise.
+    # Riskless gain -> +inf; riskless loss -> -inf; flat (0/0) -> 0; mixed
+    # array handled element-wise.
     assert np.isposinf(_safe_ratio(1.0, 0.0))
+    assert np.isneginf(_safe_ratio(-1.0, 0.0))
     assert _safe_ratio(0.0, 0.0) == 0.0
-    r = _safe_ratio(np.array([1.0, 0.0, 2.0]), np.array([0.0, 0.0, 2.0]))
-    assert np.isposinf(r[0]) and r[1] == 0.0 and r[2] == 1.0
+    r = _safe_ratio(np.array([1.0, -1.0, 0.0, 2.0]),
+                    np.array([0.0, 0.0, 0.0, 2.0]))
+    assert np.isposinf(r[0])
+    assert np.isneginf(r[1])
+    assert r[2] == 0.0
+    assert r[3] == 1.0
+
+
+def test_flat_curve_with_rf_is_riskless_loss():
+    # A flat (zero-volatility) curve evaluated against a positive risk-free
+    # rate is a guaranteed underperformance: the ratio limit is -inf, not the
+    # best-possible +inf. This guards the sign bug in _safe_ratio.
+    flat = np.full(20, 100.0)
+    assert np.isneginf(sharpe(flat, rf=0.05))
+    assert np.isneginf(sortino(flat, rf=0.05))
+
+
+def test_2d_zero_vol_negative_excess_is_neg_inf():
+    # 2-D array path: a flat column with a positive rf scores -inf (riskless
+    # loss), while a real column stays finite.
+    flat = np.full(50, 100.0)
+    rng = np.random.default_rng(0)
+    normal = 100.0 * np.cumprod(1 + rng.standard_normal(50) * 0.01)
+    X = np.column_stack([flat, normal])
+
+    res = sharpe(X, rf=0.05, axis=0)
+    assert res.shape == (2,)
+    assert np.isneginf(res[0])
+    assert np.isfinite(res[1])
+
+
+def test_roll_sharpe_zero_vol_is_signed_inf_not_zero():
+    # A zero-rolling-vol window must follow the calmar/roll_calmar +/-inf
+    # convention, not the old 0.0 zeroing. A flat curve has zero return over
+    # zero volatility at every window: a negative risk-free rate makes the
+    # excess positive (+inf), a positive one makes it a riskless loss (-inf).
+    flat = np.full(6, 100.0)
+    assert np.all(np.isposinf(roll_sharpe(flat, rf=-0.05, period=12)))
+    assert np.all(np.isneginf(roll_sharpe(flat, rf=0.05, period=12)))
 
 
 def test_2d_mixed_columns_no_crash():

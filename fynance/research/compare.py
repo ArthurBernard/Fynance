@@ -100,7 +100,14 @@ def _markdown_table(rows: list[dict[str, float | str]]) -> str:
     if not rows:
         return "_no experiments_\n"
 
-    cols = ["name"] + [k for k in rows[0] if k != "name"]
+    # Union the metric keys across every row (preserving first-seen order) so a
+    # metric present only in lower-ranked rows is not silently dropped.
+    metric_cols: list[str] = []
+    for row in rows:
+        for k in row:
+            if k != "name" and k not in metric_cols:
+                metric_cols.append(k)
+    cols = ["name"] + metric_cols
     head = "| " + " | ".join(cols) + " |"
     sep = "| " + " | ".join("---" for _ in cols) + " |"
     body = []

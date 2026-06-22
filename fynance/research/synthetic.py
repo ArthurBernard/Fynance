@@ -66,6 +66,9 @@ def gbm(
     5
 
     """
+    if n < 1:
+        raise ValueError(f"n must be a positive integer, got {n}")
+
     rng = np.random.default_rng(seed)
     log_ret = mu + sigma * rng.standard_normal(max(n - 1, 0))
     path = np.concatenate([[0.0], np.cumsum(log_ret)])
@@ -117,6 +120,9 @@ def regime_switching(
     True
 
     """
+    if n < 1:
+        raise ValueError(f"n must be a positive integer, got {n}")
+
     rng = np.random.default_rng(seed)
     mus = np.array([r[0] for r in regimes], dtype=np.float64)
     sigmas = np.array([r[1] for r in regimes], dtype=np.float64)

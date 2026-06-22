@@ -195,3 +195,56 @@ def test_scale_axis1_differs_from_axis0(multi_col, kind):
     s1 = fy.Scale(multi_col, kind=kind, axis=1, a=0, b=1)
     s0 = fy.Scale(multi_col, kind=kind, axis=0, a=0, b=1)
     assert not np.allclose(s1.scale(multi_col), s0.scale(multi_col))
+
+
+# --------------------------------------------------------------------------- #
+#   Standalone rolling functions: genuine multi-column axis=1 parity          #
+#   (roadmap 1.2 — PR #193 fixed the Scale path but not these functions)      #
+# --------------------------------------------------------------------------- #
+
+
+@pytest.fixture()
+def roll_multi_col():
+    # Time on axis 1, distinct rows, non-square (3, 6); no constant rolling
+    # window so the rolling std/range never collapses to zero.
+    return np.array([
+        [1., 3., 2., 5., 4., 6.],
+        [6., 4., 7., 2., 8., 3.],
+        [2., 9., 1., 4., 7., 5.],
+    ])
+
+
+@pytest.mark.parametrize("kind_moment", ["s", "w", "e"])
+def test_roll_standardize_axis1_matches_per_row(roll_multi_col, kind_moment):
+    # The standalone roll_standardize used to raise on genuine multi-column
+    # data with axis=1: its rolling-moment parameters stayed in input
+    # orientation (rows, cols) while X.T was (cols, rows), so the broadcast
+    # failed. The result must now equal stacking the 1-D transform of each row.
+    from fynance.features.scale import roll_standardize
+    out = roll_standardize(roll_multi_col, w=3, axis=1, kind_moment=kind_moment)
+    expected = np.vstack([
+        roll_standardize(roll_multi_col[i], w=3, kind_moment=kind_moment)
+        for i in range(roll_multi_col.shape[0])
+    ])
+    assert np.allclose(out, expected, equal_nan=True)
+
+
+def test_roll_normalize_axis1_matches_per_row(roll_multi_col):
+    # Same broadcast bug as roll_standardize, on the rolling min/max path.
+    from fynance.features.scale import roll_normalize
+    out = roll_normalize(roll_multi_col, w=3, axis=1)
+    expected = np.vstack([
+        roll_normalize(roll_multi_col[i], w=3)
+        for i in range(roll_multi_col.shape[0])
+    ])
+    assert np.allclose(out, expected, equal_nan=True)
+
+
+@pytest.mark.parametrize("func", ["roll_standardize", "roll_normalize"])
+def test_standalone_roll_axis1_differs_from_axis0(roll_multi_col, func):
+    # Guard against silently falling back to the axis=0 result.
+    from fynance.features import scale
+    f = getattr(scale, func)
+    out1 = f(roll_multi_col, w=3, axis=1)
+    out0 = f(roll_multi_col, w=3, axis=0)
+    assert not np.allclose(out1, out0, equal_nan=True)

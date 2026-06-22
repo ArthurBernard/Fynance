@@ -42,9 +42,20 @@ class SortinoLoss(BaseLoss):
     The downside deviation is :math:`O(\text{returns})`, so a fixed
     absolute ``eps`` inside the square root is dimensionally wrong: on an
     all-gains batch (zero downside) the loss would explode (e.g. ``-100``).
-    The downside is therefore floored with a **returns-scaled** epsilon
-    proportional to the excess-return magnitude, keeping the loss finite
-    and bounded while preserving the sign convention.
+    The downside is therefore floored with a **returns-scaled** value
+    ``|excess|.mean() / MAX_RATIO`` (plus a bare ``eps`` backstop for the
+    degenerate all-zero batch). This caps the ratio at roughly
+    ``MAX_RATIO`` in the low-downside regime regardless of the return
+    scale, keeping the loss finite and bounded while preserving the sign
+    convention.
+
+    The ratio is then passed through a **smooth saturating map**,
+    ``MAX_RATIO * tanh(ratio / MAX_RATIO)``, instead of a hard clamp. A
+    hard clamp pins the loss to a constant on a low-downside batch and so
+    kills the gradient in exactly the strong-uptrend regime training still
+    wants to push on; ``tanh`` is near-linear for normal-regime ratios
+    (leaving their numerics unchanged) yet keeps a residual, non-zero
+    gradient when the ratio is large.
 
     Parameters
     ----------
@@ -53,8 +64,9 @@ class SortinoLoss(BaseLoss):
     period : int, optional
         Number of periods per year. Default is 252.
     eps : float, optional
-        Relative numerical stabilizer scaling the downside-deviation floor
-        (see Notes). Default is 1e-8.
+        Bare numerical stabilizer added to the returns-scaled downside floor
+        as a backstop for the degenerate all-zero batch (see Notes).
+        Default is 1e-8.
 
     Examples
     --------
@@ -100,10 +112,13 @@ class SortinoLoss(BaseLoss):
         downside = torch.sqrt(torch.mean(F.relu(-excess) ** 2))
         # Floor the downside relative to the return scale: a fixed absolute eps
         # inside the sqrt is dimensionally wrong for an O(returns) downside and
-        # lets the ratio explode on an all-gains batch. ``eps`` backstops the
-        # degenerate all-zero case; the final clamp bounds the magnitude in the
-        # near-zero-downside regime (where pushing for more gains is fine, so
-        # saturating the gradient there is harmless for this training proxy).
-        floor = self.eps * excess.abs().mean() + self.eps
+        # lets the ratio explode on an all-gains batch. Scaling the floor by
+        # ``|excess|.mean() / MAX_RATIO`` caps the ratio at ~MAX_RATIO in the
+        # low-downside regime (scale-invariantly); ``eps`` backstops the
+        # degenerate all-zero case.
+        floor = excess.abs().mean() / _MAX_RATIO + self.eps
         ratio = excess.mean() / torch.clamp(downside, min=floor)
-        return -torch.clamp(ratio, min=-_MAX_RATIO, max=_MAX_RATIO)
+        # Smooth saturating map instead of a hard clamp: tanh is near-linear for
+        # normal-regime ratios (numerics unchanged) but keeps a non-zero
+        # gradient when the ratio is large, unlike a clamp that zeroes it.
+        return -_MAX_RATIO * torch.tanh(ratio / _MAX_RATIO)

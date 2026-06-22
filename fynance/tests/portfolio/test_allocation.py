@@ -126,12 +126,22 @@ def test_mvp_single_asset():
 
 
 def test_mvp_singular_covariance_pinv():
-    """ Linearly dependent columns trigger the pseudo-inverse fallback. """
+    """ An exactly singular covariance triggers the pseudo-inverse fallback.
+
+    A constant (zero-variance) column makes its covariance row/column exactly
+    zero, so the matrix is singular and ``np.linalg.inv`` raises
+    ``LinAlgError`` — genuinely exercising the ``pinv`` branch (a merely
+    near-singular matrix does not raise, so ``inv`` would silently succeed).
+    """
     rng = np.random.default_rng(11)
     a = rng.normal(0.0, 0.01, size=(200, 1))
     b = rng.normal(0.0, 0.01, size=(200, 1))
-    # Third column is an exact linear combination → singular covariance.
-    X = np.column_stack([a, b, 2.0 * a - 3.0 * b])
+    # Third column is constant → zero variance → exactly singular covariance.
+    X = np.column_stack([a, b, np.full((200, 1), 100.0)])
+    # Guard: this construction must actually make inv raise (else the test
+    # would pass without ever reaching the pinv fallback it claims to cover).
+    with pytest.raises(np.linalg.LinAlgError):
+        np.linalg.inv(np.atleast_2d(np.cov(X, rowvar=False)))
     w = MVP(X).flatten()
     assert w.shape == (3,)
     assert abs(w.sum() - 1.0) < 1e-6
@@ -181,6 +191,18 @@ def test_mvp_uc_single_asset():
     w = MVP_uc(X)
     assert w.shape == (1, 1)
     np.testing.assert_allclose(w, [[1.0]])
+
+
+def test_mvp_uc_high_low_bound_still_sums_to_one(returns):
+    """ low_bound > 1/N must be clamped, not break the sum-to-one constraint.
+
+    With N=5 the feasible share per asset is 1/N=0.2; a low_bound of 0.3 makes
+    the box incompatible with sum-to-one. Before the clamp, SLSQP silently
+    returned weights summing to 1.5. low_bound is now clamped to 1/N (as
+    HRP/IVP already do) so the weights still sum to one.
+    """
+    w = MVP_uc(returns, low_bound=0.3).flatten()
+    assert abs(w.sum() - 1.0) < 1e-5, f"weights sum to {w.sum():.6f}"
 
 
 # ---------------------------------------------------------------------------
@@ -239,6 +261,18 @@ def test_erc_single_asset():
     w = ERC(X)
     assert w.shape == (1, 1)
     np.testing.assert_allclose(w, [[1.0]])
+
+
+def test_erc_high_low_bound_still_sums_to_one(returns):
+    """ low_bound > 1/N must be clamped, not break the sum-to-one constraint.
+
+    With N=5 the feasible share per asset is 1/N=0.2; a low_bound of 0.3 makes
+    the box incompatible with sum-to-one. Before the clamp, SLSQP silently
+    returned weights summing to 1.5. low_bound is now clamped to 1/N (as
+    HRP/IVP already do) so the weights still sum to one.
+    """
+    w = ERC(returns, low_bound=0.3).flatten()
+    assert abs(w.sum() - 1.0) < 1e-4, f"weights sum to {w.sum():.6f}"
 
 
 # ---------------------------------------------------------------------------
@@ -396,11 +430,10 @@ def test_normalize_does_not_mutate_input():
     assert out is not w
 
 
-def test_normalize_max_iter_warning(capsys):
+def test_normalize_max_iter_warning():
     w = np.array([0.99, 0.005, 0.003, 0.002])
-    _normalize(w.copy(), low_bound=0.0, up_bound=0.3, max_iter=2)
-    captured = capsys.readouterr()
-    assert "exceeded max iterations" in captured.out
+    with pytest.warns(UserWarning, match="exceeded max iterations"):
+        _normalize(w.copy(), low_bound=0.0, up_bound=0.3, max_iter=2)
 
 
 def test_rolling_allocation_regression():

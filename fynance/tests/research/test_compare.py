@@ -73,6 +73,24 @@ def test_leaderboard_nan_sinks_ascending():
     assert rows[-1]["name"] == "bad"
 
 
+def test_compare_report_table_unions_heterogeneous_metrics(tmp_path):
+    # A metric present only in a lower-ranked row must not be dropped: the table
+    # columns used to be derived from rows[0] alone, silently hiding it.
+    exps = [
+        Experiment(name="top", metrics={"sharpe": 2.0}),
+        Experiment(name="low", metrics={"sharpe": 1.0, "sortino": 3.5}),
+    ]
+
+    out = compare_report(exps, tmp_path, name="het", sort_by="sharpe")
+    text = out["markdown"].read_text()
+
+    header = next(line for line in text.splitlines() if line.startswith("| name"))
+    assert "sharpe" in header
+    assert "sortino" in header  # the lower-ranked-only metric survives
+    # And its value is rendered for the row that has it.
+    assert "3.5000" in text
+
+
 def test_compare_report_writes_md_and_png(tmp_path, experiments):
     out = compare_report(experiments, tmp_path, name="cmp")
 

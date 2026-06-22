@@ -150,6 +150,17 @@ class _OutputLayerMixin:
     cell state (e.g. :class:`~fynance.models.lstm.LongShortTermMemory`)
     must override both methods.
 
+    For drop-in :class:`~fynance.core.protocols.SignalModel` use the
+    mixin also provides :meth:`fit` and a single-argument
+    :meth:`predict`. Because each row is processed independently
+    (stateless gated cell), the hidden state has no carry-over meaning
+    across a fit / predict call and the natural default is to
+    zero-initialize it: :meth:`fit` zero-initializes ``H`` and threads
+    it across epochs, and :meth:`predict` called as ``predict(X)``
+    zero-initializes ``H`` and returns only the prediction. The
+    explicit-state forms ``train_on(X, y, H)`` and ``predict(X, H)``
+    remain available for callers that thread the state themselves.
+
     This mixin is designed for multiple inheritance alongside
     :class:`_RecurrentBase` or one of its subclasses. The MRO must
     place :class:`_OutputLayerMixin` **before** the recurrent base so
@@ -174,6 +185,51 @@ class _OutputLayerMixin:
     def __init__(self, forward_activation=nn.Identity):
         self.W_y = nn.Linear(self.H, self.M, bias=getattr(self, 'bias', True))
         self.f_y = nn.Softmax(dim=-1) if forward_activation is nn.Softmax else forward_activation()
+
+    def _init_state(self, X: torch.Tensor) -> torch.Tensor:
+        """ Build a zero hidden state matching ``X`` (rows, dtype, device). """
+        try:
+            param = next(self.parameters())  # type: ignore[attr-defined]
+            device, dtype = param.device, param.dtype
+
+        except StopIteration:
+            device, dtype = X.device, X.dtype
+
+        return torch.zeros(X.shape[0], self.H, dtype=dtype, device=device)  # type: ignore[attr-defined]
+
+    def fit(self, X, y, epochs: int = 1, x_type=None, y_type=None):
+        """ Fit the model on ``(X, y)`` for ``epochs`` full-batch steps.
+
+        Conforms to the :class:`~fynance.core.protocols.SignalModel`
+        contract. The hidden state is zero-initialized once and threaded
+        across epochs (detached between steps). An optimizer must have
+        been registered with
+        :meth:`~fynance.models._base.BaseNeuralNet.set_optimizer`.
+
+        Parameters
+        ----------
+        X, y : array-like
+            Input and output data (numpy / torch / polars), shapes
+            ``(T, N)`` and ``(T, M)``.
+        epochs : int
+            Number of full-batch training steps.
+        x_type, y_type : torch.dtype, optional
+            Target dtypes forwarded to
+            :meth:`~fynance.models._base.BaseNeuralNet.set_data`.
+
+        Returns
+        -------
+        _OutputLayerMixin
+            ``self``, to allow chaining.
+
+        """
+        self.set_data(X, y, x_type=x_type, y_type=y_type)  # type: ignore[attr-defined]
+        H = self._init_state(self.X)  # type: ignore[attr-defined]
+
+        for _ in range(epochs):
+            _, H = self.train_on(self.X, self.y, H)  # type: ignore[attr-defined]
+
+        return self
 
     @torch.enable_grad()
     def train_on(self, X: torch.Tensor, y: torch.Tensor, H: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
@@ -205,24 +261,56 @@ class _OutputLayerMixin:
         return loss, H.detach()
 
     @torch.no_grad()
-    def predict(self, X: torch.Tensor, H: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+    def predict(self, X, H: torch.Tensor | None = None):
         """ Predicts outputs of neural network model.
+
+        Two calling conventions are supported:
+
+        - ``predict(X)`` — conforms to the
+          :class:`~fynance.core.protocols.SignalModel` contract: ``X``
+          may be array-like (coerced to a tensor), the hidden state is
+          zero-initialized, and **only** the prediction tensor ``Y`` is
+          returned.
+        - ``predict(X, H)`` — explicit-state form: ``X`` and ``H`` are
+          tensors and the updated state is threaded back, returning the
+          ``(Y, H)`` tuple.
+
+        In both cases ``X`` (and ``H``) are moved to the model's device.
 
         Parameters
         ----------
-        X : torch.Tensor
+        X : array-like or torch.Tensor
             Inputs to compute prediction.
-        H : torch.Tensor
-            States of the model.
+        H : torch.Tensor, optional
+            States of the model. If ``None`` (default), a zero state is
+            used and only the prediction is returned.
 
         Returns
         -------
         torch.Tensor
-           Outputs prediction.
-        torch.Tensor
-           Updated states of the model.
+           Outputs prediction (when ``H`` is ``None``).
+        tuple of torch.Tensor
+           ``(Y, H)`` outputs prediction and updated state (when ``H``
+           is provided).
 
         """
+        return_state = H is not None
+
+        if not isinstance(X, torch.Tensor):
+            X = self._set_data(X)  # type: ignore[attr-defined]
+
+        try:
+            device = next(self.parameters()).device  # type: ignore[attr-defined]
+            X = X.to(device)
+            if return_state:
+                H = H.to(device)  # type: ignore[union-attr]
+
+        except StopIteration:
+            pass
+
+        if H is None:
+            H = self._init_state(X)
+
         was_training = self.training  # type: ignore[attr-defined]
         self.eval()  # type: ignore[attr-defined]
         try:
@@ -231,4 +319,8 @@ class _OutputLayerMixin:
         finally:
             self.train(was_training)  # type: ignore[attr-defined]
 
-        return Y.detach(), H.detach()
+        if return_state:
+
+            return Y.detach(), H.detach()
+
+        return Y.detach()

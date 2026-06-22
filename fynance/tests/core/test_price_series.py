@@ -75,6 +75,14 @@ def test_to_returns_dropna_false_keeps_length():
     assert np.isnan(r.values[0])
 
 
+def test_to_returns_dropna_false_empty_series():
+    # Empty input must not IndexError on the leading-NaN write (full[0]).
+    ps = PriceSeries([])
+    r = ps.to_returns("pct", dropna=False)
+    assert len(r) == 0
+    assert r.values.dtype == np.float64
+
+
 def test_to_returns_unknown_kind_raises():
     ps = PriceSeries([100.0, 110.0, 99.0])
     with pytest.raises(ValueError, match="unknown kind"):
@@ -162,6 +170,13 @@ def test_pnl_is_causal():
     assert np.isclose(pnl.values[3], -1.0 * 0.04)
 
 
+def test_pnl_empty_series():
+    # Empty input must not IndexError on the shift (shifted[0]).
+    out = PriceSeries([]).pnl([])
+    assert len(out) == 0
+    assert out.values.dtype == np.float64
+
+
 def test_pnl_no_lookahead():
     # changing a future position must not change earlier pnl
     returns = PriceSeries([0.01, 0.02, -0.03, 0.04])
@@ -208,3 +223,31 @@ def test_from_polars_series_and_frame():
     df = pl.DataFrame({"px": [10.0, 11.0, 12.0]})
     ps2 = PriceSeries.from_polars(df, value_col="px")
     assert np.array_equal(ps2.values, [10.0, 11.0, 12.0])
+
+
+def test_from_polars_default_value_col_picks_numeric():
+    # With a temporal index column and one numeric + one string column, the
+    # default value column must be the numeric one (documented behavior), not
+    # the string column (which would fail with an opaque cast error).
+    pl = pytest.importorskip("polars")
+    df = pl.DataFrame(
+        {
+            "date": ["2020-01-01", "2020-01-02"],
+            "label": ["a", "b"],
+            "px": [10.0, 11.0],
+        }
+    ).with_columns(pl.col("date").str.to_date())
+    ps = PriceSeries.from_polars(df)
+    assert ps.name == "px"
+    assert np.array_equal(ps.values, [10.0, 11.0])
+
+
+def test_from_polars_lone_string_column_raises_clean_error():
+    # A single non-index column that is a string is not a numeric candidate;
+    # value_col resolution must reject it cleanly, not cast-fail later.
+    pl = pytest.importorskip("polars")
+    df = pl.DataFrame(
+        {"date": ["2020-01-01", "2020-01-02"], "label": ["a", "b"]}
+    ).with_columns(pl.col("date").str.to_date())
+    with pytest.raises(ValueError, match="value_col is ambiguous"):
+        PriceSeries.from_polars(df)

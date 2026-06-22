@@ -55,7 +55,26 @@ def align(
     dict of str to PriceSeries
         Series sharing a common index.
 
+    Raises
+    ------
+    ValueError
+        If ``how`` is unknown, or if any input series has duplicate index
+        entries. Duplicate timestamps would otherwise be silently collapsed
+        (the index-to-value mapping keeps only the last value), shrinking the
+        series to its unique count without warning.
+
     """
+    for name, ps in series.items():
+        idx_list = ps.index.tolist()
+
+        if len(idx_list) != len(set(idx_list)):
+
+            raise ValueError(
+                f"series {name!r} has duplicate index entries; align cannot "
+                "map a timestamp to more than one value (deduplicate or "
+                "aggregate the series first)"
+            )
+
     index_sets = [set(ps.index.tolist()) for ps in series.values()]
 
     if how == "outer":
@@ -96,6 +115,11 @@ def resample(
     an explanatory :class:`ValueError` rather than surfacing an opaque polars
     error.
 
+    polars only accepts ``datetime64`` resolutions ``[D]``, ``[ms]``, ``[us]``
+    and ``[ns]``. Any other resolution (the common ``[s]``, plus ``[h]``,
+    ``[m]``, ``[W]``, ``[M]``, ``[Y]``) is losslessly upcast to ``[us]`` before
+    resampling, so it works instead of triggering an opaque polars error.
+
     Parameters
     ----------
     ps : PriceSeries
@@ -127,6 +151,19 @@ def resample(
             f"{index.dtype!r}; convert the index to numpy datetime64 first "
             "(integer and object/datetime.datetime indexes are not supported)"
         )
+
+    # polars only accepts datetime64 [D]/[ms]/[us]/[ns]; upcast any other
+    # resolution (e.g. the common [s], or [h]/[m]/[W]/[M]/[Y]) to [us] so the
+    # call succeeds instead of raising an opaque polars resolution error.
+    _supported = (
+        np.dtype("datetime64[D]"),
+        np.dtype("datetime64[ms]"),
+        np.dtype("datetime64[us]"),
+        np.dtype("datetime64[ns]"),
+    )
+
+    if index.dtype not in _supported:
+        index = index.astype("datetime64[us]")
 
     df = pl.DataFrame({"_t": index, "_v": ps.values}).sort("_t")
     gb = df.group_by_dynamic("_t", every=freq)
