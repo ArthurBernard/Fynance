@@ -30,9 +30,20 @@ class CalmarLoss(BaseLoss):
     Drawdowns are :math:`O(\text{returns})`, so a fixed absolute ``eps``
     (e.g. ``1e-8``) is dimensionally wrong: on a low- or zero-drawdown
     batch the ratio would explode and dominate gradients. The drawdown is
-    therefore floored with a **returns-scaled** epsilon,
-    ``eps * |equity|.mean()``, keeping the loss finite and bounded while
-    preserving its sign convention (minimizing it maximizes the ratio).
+    therefore floored with a **returns-scaled** value
+    ``|equity|.mean() / MAX_RATIO`` (plus a bare ``eps`` backstop for the
+    degenerate all-zero batch), capping the ratio at roughly ``MAX_RATIO``
+    in the low-drawdown regime regardless of the return scale.
+
+    The ratio is then passed through a **smooth saturating map**,
+    ``MAX_RATIO * tanh(ratio / MAX_RATIO)``, instead of a hard clamp. A
+    hard clamp pins the loss to a constant on a near-zero-drawdown batch
+    and so zeroes the gradient in exactly the strong-uptrend regime
+    training still wants to push on; ``tanh`` is near-linear for
+    normal-regime ratios (leaving their numerics unchanged) yet keeps a
+    residual, non-zero gradient when the ratio is large. This keeps the
+    loss finite and bounded while preserving its sign convention
+    (minimizing it maximizes the ratio).
 
     """
 
@@ -47,11 +58,13 @@ class CalmarLoss(BaseLoss):
         annual_return = y_pred.mean() * self.period
         # Returns-scaled floor: a fixed absolute eps is dimensionally wrong for
         # an O(returns) drawdown and lets the ratio explode on a low-drawdown
-        # batch. Scaling by the equity magnitude keeps the floor on the right
-        # scale; the bare eps backstop guards the degenerate all-zero-return
-        # case and the final clamp bounds the magnitude when the drawdown is
-        # near zero (so the loss stays finite with well-scaled gradients).
-        floor = self.eps * equity.abs().mean() + self.eps
+        # batch. Scaling by ``|equity|.mean() / MAX_RATIO`` caps the ratio at
+        # ~MAX_RATIO in the near-zero-drawdown regime; the bare eps backstop
+        # guards the degenerate all-zero-return case.
+        floor = equity.abs().mean() / _MAX_RATIO + self.eps
         ratio = annual_return / torch.clamp(max_drawdown, min=floor)
 
-        return -torch.clamp(ratio, min=-_MAX_RATIO, max=_MAX_RATIO)
+        # Smooth saturating map instead of a hard clamp: tanh is near-linear for
+        # normal-regime ratios (numerics unchanged) but keeps a non-zero
+        # gradient when the ratio is large, unlike a clamp that zeroes it.
+        return -_MAX_RATIO * torch.tanh(ratio / _MAX_RATIO)

@@ -28,8 +28,18 @@ class OmegaLoss(BaseLoss):
     Both gains and losses are :math:`O(|r - L|)`, so a fixed absolute
     ``eps`` is dimensionally wrong: on an all-gains batch (zero losses) the
     ratio would explode (e.g. ``-1e6``) and dominate gradients. The
-    denominator is therefore floored with a **returns-scaled** epsilon,
-    ``eps * |r - L|.mean()``, keeping the loss finite and bounded while
+    denominator is therefore floored with a **returns-scaled** value
+    ``|r - L|.mean() / MAX_RATIO`` (plus a bare ``eps`` backstop for the
+    degenerate all-zero-diff batch), capping the ratio at roughly
+    ``MAX_RATIO`` in the low-loss regime regardless of the return scale.
+
+    The ratio is then passed through a **smooth saturating map**,
+    ``MAX_RATIO * tanh(ratio / MAX_RATIO)``, instead of a hard clamp. A
+    hard clamp pins the loss to a constant on an all-gains batch and so
+    zeroes the gradient in exactly the regime training still wants to push
+    on; ``tanh`` is near-linear for normal-regime ratios (leaving their
+    numerics unchanged) yet keeps a residual, non-zero gradient when the
+    ratio is large. This keeps the loss finite and bounded while
     preserving the sign convention (minimizing it maximizes the ratio).
 
     Parameters
@@ -55,9 +65,13 @@ class OmegaLoss(BaseLoss):
         losses = torch.relu(-diff).mean()
         # Returns-scaled floor: a fixed absolute eps is dimensionally wrong for
         # O(|r - L|) losses and lets the ratio explode on an all-gains batch.
-        # The bare eps backstop guards the degenerate all-zero-diff case and
-        # the final clamp bounds the magnitude when losses are near zero.
-        floor = self.eps * diff.abs().mean() + self.eps
+        # Scaling by ``|r - L|.mean() / MAX_RATIO`` caps the ratio at ~MAX_RATIO
+        # in the low-loss regime; the bare eps backstop guards the degenerate
+        # all-zero-diff case.
+        floor = diff.abs().mean() / _MAX_RATIO + self.eps
         ratio = gains / torch.clamp(losses, min=floor)
 
-        return -torch.clamp(ratio, min=-_MAX_RATIO, max=_MAX_RATIO)
+        # Smooth saturating map instead of a hard clamp: tanh is near-linear for
+        # normal-regime ratios (numerics unchanged) but keeps a non-zero
+        # gradient when the ratio is large, unlike a clamp that zeroes it.
+        return -_MAX_RATIO * torch.tanh(ratio / _MAX_RATIO)
