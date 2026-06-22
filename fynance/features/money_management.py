@@ -48,18 +48,19 @@ def iso_vol(series, target_vol=0.20, leverage=1., period=252, half_life=11):
     --------
     >>> series = np.array([95, 100, 85, 105, 110, 90]).astype(np.float64)
     >>> iso_vol(series, target_vol=0.5, leverage=2, period=12, half_life=3)
-    array([1.        , 1.        , 2.        , 1.11289534, 0.88580571,
-           1.20664917])
+    array([1.        , 1.        , 2.        , 1.28407693, 0.78278978,
+           1.07186485])
 
     """
     # Set iso-vol vector
     iv = np.ones([series.size])
-    # Compute squared daily return vector
-    ret2 = np.square(series[:-1] / series[1:] - 1)
+    # Compute squared daily return vector (standard return s_t / s_{t-1} - 1)
+    ret2 = np.square(series[1:] / series[:-1] - 1)
     # Compute volatility vector
     vol = np.sqrt(period * ema(ret2, w=half_life))
     vol[vol <= 0.] = 1e-8
-    # Compute iso-vol coefficient
+    # Compute iso-vol coefficient (iv[t] uses only vol[t - 2], i.e. data up to
+    # series[t - 1] -- strictly causal w.r.t. the signal applied at t)
     iv[2:] = target_vol / vol[:-1]
     # Cap with the max leverage available
     iv[iv > leverage] = leverage

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+import warnings
+
 import numpy as np
-import pytest
 
 from fynance.features.indicators import (
     bollinger_band,
@@ -12,13 +13,6 @@ from fynance.features.indicators import (
     macd_line,
     rsi,
     signal_line,
-)
-
-# bollinger_band keeps a 1.1.0-era DeprecationWarning until v2.0; silence it
-# locally so the strict `error::DeprecationWarning` filter (pyproject.toml)
-# stays effective for genuinely new deprecations.
-pytestmark = pytest.mark.filterwarnings(
-    "ignore:Since version 1.1.0, bollinger_band:DeprecationWarning"
 )
 
 N = 100
@@ -46,6 +40,16 @@ def test_bollinger_band_no_nan_after_warmup():
     upper, lower = bollinger_band(X, w=10)
     assert not np.any(np.isnan(upper[10:]))
     assert not np.any(np.isnan(lower[10:]))
+
+
+def test_bollinger_band_emits_no_warning():
+    # The dead 1.1.0-era DeprecationWarning was removed: a normal two-tuple call
+    # must not warn at all.
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        upper, lower = bollinger_band(X, w=20)
+    assert upper.shape == (N,)
+    assert lower.shape == (N,)
 
 
 # =========================================================================== #

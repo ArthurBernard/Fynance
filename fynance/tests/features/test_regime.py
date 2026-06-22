@@ -5,7 +5,7 @@
 
 import numpy as np
 
-from fynance.features.regime import detect_regimes
+from fynance.features.regime import _vol_order, detect_regimes, regime_features
 
 
 def _two_regime_series(seed=0):
@@ -33,3 +33,30 @@ def test_deterministic_with_seed():
     a = detect_regimes(X, n_regimes=2, w=15, seed=42)
     b = detect_regimes(X, n_regimes=2, w=15, seed=42)
     assert np.array_equal(a, b)
+
+
+def test_vol_order_empty_cluster_safe():
+    # An empty cluster yields a nan mean; it must sort last (treated as +inf),
+    # never corrupt the order of the populated clusters.
+    vol = np.array([0.1, 0.5, 0.3, 0.2])
+    labels = np.array([0, 2, 0, 2])  # cluster 1 is empty
+    order = _vol_order(vol, labels, n_regimes=3)
+    # Populated means: 0 -> 0.2, 2 -> 0.35; empty 1 -> +inf -> last.
+    assert order.tolist() == [0, 2, 1]
+
+
+def test_vol_order_matches_naive_when_all_populated():
+    rng = np.random.RandomState(7)
+    vol = rng.rand(50)
+    labels = rng.randint(0, 3, 50)
+    order = _vol_order(vol, labels, n_regimes=3)
+    naive = np.argsort([vol[labels == k].mean() for k in range(3)])
+    assert order.tolist() == naive.tolist()
+
+
+def test_regime_features_warmup_row_is_zero():
+    # Row 0 is the documented deterministic warmup: (vol, mean log-return) = (0, 0).
+    X = _two_regime_series()
+    f = regime_features(X, w=15)
+    assert f[0, 0] == 0.0
+    assert f[0, 1] == 0.0

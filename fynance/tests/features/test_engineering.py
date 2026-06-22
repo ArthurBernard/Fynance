@@ -41,6 +41,24 @@ def test_granger_too_short_raises():
         granger_causality(np.arange(3.0), np.arange(3.0), lag=1)
 
 
+def test_granger_detects_causality_lag2():
+    # y_t driven by x_{t-2}: lag=2 must pick up the two-step-ahead causality.
+    rng = np.random.RandomState(5)
+    x = rng.standard_normal(400)
+    y = np.r_[0.0, 0.0, 0.7 * x[:-2]] + 0.1 * rng.standard_normal(400)
+    f, p = granger_causality(x, y, lag=2)
+    assert f > 0.0
+    assert p < 0.01
+
+
+def test_granger_independent_not_significant_lag2():
+    rng = np.random.RandomState(0)
+    _, p = granger_causality(
+        rng.standard_normal(400), rng.standard_normal(400), lag=2
+    )
+    assert p > 0.05
+
+
 def test_incremental_moments_matches_numpy():
     rng = np.random.RandomState(2)
     data = rng.standard_normal(100)
@@ -56,3 +74,23 @@ def test_incremental_moments_matches_numpy():
 def test_incremental_update_returns_self():
     im = IncrementalMoments()
     assert im.update(1.0) is im
+
+
+def test_incremental_single_observation_zero_variance():
+    # After a single observation the variance/std are well-defined and zero (no
+    # division-by-zero, no nan), and the mean equals that observation.
+    im = IncrementalMoments()
+    im.update(3.5)
+    assert im.n == 1
+    assert im.mean == 3.5
+    assert im.var == 0.0
+    assert im.std == 0.0
+
+
+def test_incremental_empty_is_zero():
+    # Before any observation, the moments default to zero rather than raising.
+    im = IncrementalMoments()
+    assert im.n == 0
+    assert im.mean == 0.0
+    assert im.var == 0.0
+    assert im.std == 0.0
