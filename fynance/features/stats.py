@@ -340,7 +340,7 @@ def mad(X: NDArray, axis: int = 0, dtype=None) -> NDArray:
     roll_mad
 
     """
-    return np.mean(np.abs(X.T - np.mean(X, axis=axis)).T, axis=axis)
+    return np.mean(np.abs(X - np.mean(X, axis=axis, keepdims=True)), axis=axis)
 
 
 @WrapperArray('dtype', 'axis', 'window')

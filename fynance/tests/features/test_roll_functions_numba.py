@@ -44,3 +44,37 @@ def test_roll_min_default_window_is_expanding():
     X = np.array([3.0, 1.0, 2.0, 0.5, 4.0])
     # w=None -> full length -> expanding min
     assert np.allclose(roll_min(X, dtype=np.float64), np.minimum.accumulate(X))
+
+
+def _multi_col():
+    # Time on axis 1, non-square (3, 6).
+    return np.array([
+        [70., 100., 80., 120., 160., 80.],
+        [60., 90., 110., 70., 130., 100.],
+        [50., 80., 60., 90., 120., 70.],
+    ])
+
+
+def test_roll_min_axis1_matches_per_row():
+    X = _multi_col()
+    out = roll_min(X, w=3, axis=1, dtype=np.float64)
+    expected = np.vstack([_ref(X[i], 3, np.min) for i in range(X.shape[0])])
+    assert np.allclose(out, expected)
+
+
+def test_roll_max_axis1_matches_per_row():
+    X = _multi_col()
+    out = roll_max(X, w=3, axis=1, dtype=np.float64)
+    expected = np.vstack([_ref(X[i], 3, np.max) for i in range(X.shape[0])])
+    assert np.allclose(out, expected)
+
+
+def test_roll_min_axis1_window_greater_than_n_columns():
+    # Window 4 > leading axis length 3 must validate against the time axis.
+    X = _multi_col()
+    out = roll_min(X, w=4, axis=1, dtype=np.float64)
+    expected = np.vstack([_ref(X[i], 4, np.min) for i in range(X.shape[0])])
+    assert np.allclose(out, expected)
+    assert not np.allclose(
+        out, np.vstack([_ref(X[i], 3, np.min) for i in range(X.shape[0])])
+    )
