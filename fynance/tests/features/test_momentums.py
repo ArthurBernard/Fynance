@@ -242,3 +242,92 @@ def test_mad_axis1_matches_per_row():
     assert np.allclose(
         mad(X, axis=0), [mad(X[:, j]) for j in range(X.shape[1])]
     )
+
+
+# --------------------------------------------------------------------------- #
+#   wrap_axis: negative axes (roadmap 1.2)                                     #
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.parametrize("name", ["sma", "wma", "smstd", "wmstd"])
+def test_negative_axis_matches_positive(name):
+    # axis=-1 used to slip through the wrap_axis checks and the kernel, which
+    # ignores `axis`, silently returned the axis=0 result. It must now resolve
+    # to the last axis (axis=1 for a 2-D array).
+    f = getattr(fy, name)
+    X = np.array([
+        [1., 2., 3., 4.],
+        [5., 7., 9., 11.],
+        [2., 4., 8., 16.],
+    ])
+    assert np.allclose(f(X, w=2, axis=-1), f(X, w=2, axis=1))
+    assert not np.allclose(f(X, w=2, axis=-1), f(X, w=2, axis=0))
+
+
+@pytest.mark.parametrize("name", ["sma", "wma", "smstd", "wmstd"])
+def test_negative_axis_1d_matches_axis0(name):
+    # On a 1-D array axis=-1 must resolve to axis 0 (the only axis).
+    f = getattr(fy, name)
+    x = np.array([1., 3., 2., 5., 4., 6.])
+    assert np.allclose(f(x, w=2, axis=-1), f(x, w=2, axis=0))
+
+
+# --------------------------------------------------------------------------- #
+#   stats.accuracy / directional_accuracy: 2-D axis=1 (roadmap 1.2)           #
+# --------------------------------------------------------------------------- #
+
+
+@pytest.fixture()
+def accuracy_pair():
+    # Two distinct rows, time on axis 1.
+    y_true = np.array([
+        [1., -.5, .5, -.2],
+        [.3, -.1, .8, -.4],
+    ])
+    y_pred = np.array([
+        [.5, -.2, -.5, .1],
+        [.2, .1, .7, -.3],
+    ])
+    return y_true, y_pred
+
+
+@pytest.mark.parametrize("sign", [True, False])
+def test_accuracy_axis1_matches_per_row(accuracy_pair, sign):
+    # wrap_axis only transposes the first positional arg, leaving y_pred
+    # mis-oriented for axis=1; accuracy used to raise a broadcast ValueError.
+    from fynance.features.stats import accuracy
+    y_true, y_pred = accuracy_pair
+    out = accuracy(y_true, y_pred, sign=sign, axis=1)
+    expected = np.array([
+        accuracy(y_true[i], y_pred[i], sign=sign)
+        for i in range(y_true.shape[0])
+    ])
+    assert np.allclose(out, expected)
+
+
+def test_directional_accuracy_axis1_matches_per_row(accuracy_pair):
+    from fynance.features.stats import directional_accuracy
+    y_true, y_pred = accuracy_pair
+    out = directional_accuracy(y_true, y_pred, axis=1)
+    expected = np.array([
+        directional_accuracy(y_true[i], y_pred[i])
+        for i in range(y_true.shape[0])
+    ])
+    assert np.allclose(out, expected)
+
+
+def test_accuracy_axis0_unchanged(accuracy_pair):
+    # The default axis=0 path (per-column) must keep working.
+    from fynance.features.stats import accuracy, directional_accuracy
+    y_true, y_pred = accuracy_pair
+    assert np.allclose(
+        accuracy(y_true, y_pred, axis=0),
+        [accuracy(y_true[:, j], y_pred[:, j]) for j in range(y_true.shape[1])],
+    )
+    assert np.allclose(
+        directional_accuracy(y_true, y_pred, axis=0),
+        [
+            directional_accuracy(y_true[:, j], y_pred[:, j])
+            for j in range(y_true.shape[1])
+        ],
+    )
