@@ -102,3 +102,47 @@ class TestRecurrentNeuralNetwork:
         assert torch.allclose(H_base[idx], H_pert[idx], atol=1e-5)
         # the perturbed row itself does change
         assert not torch.allclose(Y_base[3], Y_pert[3])
+
+    def test_fit_predict_signalmodel_contract(self):
+        """ fit(X, y) / predict(X) work end-to-end with zero-init state. """
+        model = _make_rnn()
+        out = model.fit(X_np, y_np, epochs=2)
+        assert out is model  # fit returns self for chaining
+        Y = model.predict(X_np)
+        # single-arg predict returns only the prediction tensor
+        assert isinstance(Y, torch.Tensor)
+        assert Y.shape == (T, N_OUT)
+        assert not Y.requires_grad
+
+    def test_fit_matches_explicit_zero_state(self):
+        """ fit(X, y) is equivalent to threading an explicit zero state. """
+        torch.manual_seed(0)
+        model_a = _make_rnn()
+        torch.manual_seed(0)
+        model_b = _make_rnn()
+        # path A: SignalModel fit
+        model_a.fit(X_t, y_t, epochs=3)
+        # path B: explicit zero-state threading
+        H = torch.zeros(T, model_b.H)
+        for _ in range(3):
+            _, H = model_b.train_on(X_t, y_t, H)
+        with torch.no_grad():
+            Y_a = model_a.predict(X_t)
+            Y_b, _ = model_b.predict(X_t, torch.zeros(T, model_b.H))
+        assert torch.allclose(Y_a, Y_b, atol=1e-6)
+
+    def test_predict_explicit_state_still_returns_tuple(self):
+        """ predict(X, H) keeps the explicit-state (Y, H) contract. """
+        model = _make_rnn()
+        H = torch.zeros(T, model.H)
+        Y, H_out = model.predict(X_t, H)
+        assert Y.shape == (T, N_OUT)
+        assert H_out.shape == (T, model.H)
+
+    def test_predict_moves_input_to_model_device(self):
+        """ predict coerces / moves X to the model's parameter device. """
+        model = _make_rnn()
+        device = next(model.parameters()).device
+        # numpy input (not yet a tensor, not on device) must still work
+        Y = model.predict(X_np)
+        assert Y.device == device

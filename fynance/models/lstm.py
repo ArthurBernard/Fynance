@@ -319,6 +319,52 @@ class LongShortTermMemory(_OutputLayerMixin, LSTMCell):
 
         return Y, H, C
 
+    def fit(self, X, y, epochs: int = 1, x_type=None, y_type=None):
+        """ Fit the model on ``(X, y)`` for ``epochs`` full-batch steps.
+
+        Conforms to the :class:`~fynance.core.protocols.SignalModel`
+        contract. The hidden state ``H`` and cell state ``C`` are both
+        zero-initialized once and threaded across epochs (detached
+        between steps). An optimizer must have been registered with
+        :meth:`~fynance.models._base.BaseNeuralNet.set_optimizer`.
+
+        Parameters
+        ----------
+        X, y : array-like
+            Input and output data (numpy / torch / polars), shapes
+            ``(T, N)`` and ``(T, M)``.
+        epochs : int
+            Number of full-batch training steps.
+        x_type, y_type : torch.dtype, optional
+            Target dtypes forwarded to
+            :meth:`~fynance.models._base.BaseNeuralNet.set_data`.
+
+        Returns
+        -------
+        LongShortTermMemory
+            ``self``, to allow chaining.
+
+        """
+        self.set_data(X, y, x_type=x_type, y_type=y_type)
+        H = self._init_state(self.X)
+        C = self._init_cell_state(self.X)
+
+        for _ in range(epochs):
+            _, H, C = self.train_on(self.X, self.y, H, C)
+
+        return self
+
+    def _init_cell_state(self, X: torch.Tensor) -> torch.Tensor:
+        """ Build a zero cell state matching ``X`` (rows, dtype, device). """
+        try:
+            param = next(self.parameters())
+            device, dtype = param.device, param.dtype
+
+        except StopIteration:
+            device, dtype = X.device, X.dtype
+
+        return torch.zeros(X.shape[0], self.C, dtype=dtype, device=device)
+
     @torch.enable_grad()
     def train_on(self, X: torch.Tensor, y: torch.Tensor, H: torch.Tensor, C: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:  # type: ignore[override]
         """ Trains the neural network model.
@@ -352,28 +398,64 @@ class LongShortTermMemory(_OutputLayerMixin, LSTMCell):
         return loss, H.detach(), C.detach()
 
     @torch.no_grad()
-    def predict(self, X: torch.Tensor, H: torch.Tensor, C: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:  # type: ignore[override]
+    def predict(self, X, H: torch.Tensor | None = None, C: torch.Tensor | None = None):  # type: ignore[override]
         """ Predicts outputs of neural network model.
+
+        Two calling conventions are supported:
+
+        - ``predict(X)`` — conforms to the
+          :class:`~fynance.core.protocols.SignalModel` contract: ``X``
+          may be array-like (coerced to a tensor), the hidden state and
+          cell state are zero-initialized, and **only** the prediction
+          tensor ``Y`` is returned.
+        - ``predict(X, H, C)`` — explicit-state form: the updated states
+          are threaded back, returning the ``(Y, H, C)`` tuple. ``C`` is
+          zero-initialized when omitted.
+
+        In both cases ``X`` (and any supplied state) is moved to the
+        model's device.
 
         Parameters
         ----------
-        X : torch.Tensor
+        X : array-like or torch.Tensor
             Inputs to compute prediction.
-        H : torch.Tensor
-            States of the model.
-        C : torch.Tensor
-            Cell memory of the model.
+        H : torch.Tensor, optional
+            States of the model. If ``None`` (default), a zero state is
+            used and only the prediction is returned.
+        C : torch.Tensor, optional
+            Cell memory of the model. Zero-initialized when ``None``.
 
         Returns
         -------
         torch.Tensor
-            Outputs prediction.
-        torch.Tensor
-            Updated states of the model.
-        torch.Tensor
-            Cell memory of the model.
+            Outputs prediction (when ``H`` is ``None``).
+        tuple of torch.Tensor
+            ``(Y, H, C)`` outputs prediction and updated states (when
+            ``H`` is provided).
 
         """
+        return_state = H is not None
+
+        if not isinstance(X, torch.Tensor):
+            X = self._set_data(X)
+
+        try:
+            device = next(self.parameters()).device
+            X = X.to(device)
+            if H is not None:
+                H = H.to(device)
+            if C is not None:
+                C = C.to(device)
+
+        except StopIteration:
+            pass
+
+        if H is None:
+            H = self._init_state(X)
+
+        if C is None:
+            C = self._init_cell_state(X)
+
         was_training = self.training
         self.eval()
         try:
@@ -382,4 +464,8 @@ class LongShortTermMemory(_OutputLayerMixin, LSTMCell):
         finally:
             self.train(was_training)
 
-        return Y.detach(), H.detach(), C.detach()
+        if return_state:
+
+            return Y.detach(), H.detach(), C.detach()
+
+        return Y.detach()
