@@ -34,7 +34,13 @@ def train_test_split(
     n : int
         Number of observations.
     test_size : float or int
-        Fraction (``0 < x < 1``) or absolute count of the trailing test set.
+        Trailing test set size. A value strictly inside ``(0, 1)`` is read as a
+        **fraction** of ``n`` (e.g. ``0.2`` -> ``round(0.2 * n)``); any other
+        value -- including the bounds ``0.0`` and ``1.0`` -- is read as an
+        **absolute count** (``int(test_size)``). In particular ``1.0`` means a
+        single observation (count ``1``), not the whole series, and ``0.0``
+        means an empty test set; pass a fraction strictly between the bounds to
+        get a proportional split.
     gap : int
         Embargo: observations dropped between train end and test start.
 
@@ -84,7 +90,25 @@ def walk_forward(
     (train_idx, test_idx) : tuple of numpy.ndarray
         Index arrays with ``test_idx`` strictly after ``train_idx``.
 
+    Raises
+    ------
+    ValueError
+        If ``train <= 0`` or ``purge >= train``: either would yield empty train
+        windows (``[t-train : t-purge]`` becomes empty), which silently breaks a
+        downstream ``fit`` with an opaque error instead of failing here.
+
     """
+    if train <= 0:
+
+        raise ValueError(f"train must be > 0, got {train}")
+
+    if purge >= train:
+
+        raise ValueError(
+            f"purge must be < train, got purge={purge}, train={train} "
+            "(otherwise every train window is empty)"
+        )
+
     if step is None:
         step = test
 

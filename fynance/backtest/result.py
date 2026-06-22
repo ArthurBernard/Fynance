@@ -42,6 +42,12 @@ class BacktestResult:
     index : numpy.ndarray, optional
         Temporal index carried from the input.
 
+    Methods
+    -------
+    to_numpy
+    to_price_series
+    summary
+
     """
 
     equity: NDArray
