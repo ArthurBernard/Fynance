@@ -54,6 +54,15 @@ def test_zero_length_edge_cases():
     assert regime_switching(1, s0=100.0, seed=0).to_numpy().tolist() == [100.0]
 
 
+@pytest.mark.parametrize("gen", [gbm, regime_switching])
+@pytest.mark.parametrize("n", [0, -1, -5])
+def test_non_positive_length_raises(gen, n):
+    # n < 1 used to silently return a length-1 path ([s0]) instead of erroring;
+    # it must now raise rather than fabricate an observation out of no data.
+    with pytest.raises(ValueError, match="positive integer"):
+        gen(n, seed=0)
+
+
 def test_regime_switching_initial_state_is_drawn():
     # With p_switch=0 the only regime randomness is the *initial* state. It used
     # to be hard-coded to regime 0 (biasing short paths); now it is drawn, so
