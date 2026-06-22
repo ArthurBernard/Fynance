@@ -61,7 +61,13 @@ def wrap_axis(func):
                 stacklevel=2,
             )
 
-        if X.ndim <= axis:
+        # Normalize negative axes (e.g. -1 -> ndim - 1) before the checks
+        # below, otherwise a negative axis would slip through and the kernel,
+        # which ignores `axis`, would silently return the axis=0 result.
+        if axis < 0:
+            axis += X.ndim
+
+        if X.ndim <= axis or axis < 0:
 
             raise np.exceptions.AxisError(axis, X.ndim)
 
