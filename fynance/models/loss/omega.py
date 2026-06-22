@@ -9,6 +9,7 @@ from __future__ import annotations
 import torch
 
 # Local packages
+from ._base import MAX_RATIO as _MAX_RATIO
 from ._base import BaseLoss
 
 __all__ = ['OmegaLoss']
@@ -21,6 +22,15 @@ class OmegaLoss(BaseLoss):
     the ratio of expected gains to expected losses relative to a threshold
     ``L``. Fully differentiable through :func:`torch.relu`. Minimizing the
     loss maximizes the Omega ratio.
+
+    Notes
+    -----
+    Both gains and losses are :math:`O(|r - L|)`, so a fixed absolute
+    ``eps`` is dimensionally wrong: on an all-gains batch (zero losses) the
+    ratio would explode (e.g. ``-1e6``) and dominate gradients. The
+    denominator is therefore floored with a **returns-scaled** epsilon,
+    ``eps * |r - L|.mean()``, keeping the loss finite and bounded while
+    preserving the sign convention (minimizing it maximizes the ratio).
 
     Parameters
     ----------
@@ -43,5 +53,11 @@ class OmegaLoss(BaseLoss):
         diff = y_pred - self.threshold
         gains = torch.relu(diff).mean()
         losses = torch.relu(-diff).mean()
+        # Returns-scaled floor: a fixed absolute eps is dimensionally wrong for
+        # O(|r - L|) losses and lets the ratio explode on an all-gains batch.
+        # The bare eps backstop guards the degenerate all-zero-diff case and
+        # the final clamp bounds the magnitude when losses are near zero.
+        floor = self.eps * diff.abs().mean() + self.eps
+        ratio = gains / torch.clamp(losses, min=floor)
 
-        return -(gains / (losses + self.eps))
+        return -torch.clamp(ratio, min=-_MAX_RATIO, max=_MAX_RATIO)

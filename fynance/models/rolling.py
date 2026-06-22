@@ -9,6 +9,11 @@ window. The pattern enforces strict temporal ordering, eliminating
 lookahead bias and matching how a strategy would actually be retrained
 in production.
 
+Each step trains on ``X[t-n:t]`` and yields two slices: ``eval_set =
+slice(t-r, t)`` — the last ``r`` bars of the **training** window, used
+for an in-sample fit-quality check — and ``test_set = slice(t, t+s)`` —
+the next strictly out-of-sample window.
+
 A concrete :class:`RollMultiLayerPerceptron` combines this iterator
 with :class:`fynance.models.mlp.MultiLayerPerceptron`. The
 same pattern is applied to portfolio allocation in
@@ -17,7 +22,8 @@ same pattern is applied to portfolio allocation in
 Main entry points
 -----------------
 - :class:`_RollingBasis` — iterator that yields ``(eval_set,
-  test_set)`` slices and tracks training/evaluation/test losses.
+  test_set)`` slices (in-sample tail + out-of-sample window) and tracks
+  training/evaluation/test losses.
 - :class:`RollMultiLayerPerceptron` — walk-forward MLP, ready to use
   via :meth:`RollMultiLayerPerceptron.set_roll_period` and
   :meth:`RollMultiLayerPerceptron.run`.
@@ -27,7 +33,6 @@ Main entry points
 from __future__ import annotations
 
 # Built-in packages
-from multiprocessing import Process
 from typing import Callable
 
 # External packages
@@ -126,7 +131,9 @@ class _RollingBasis:
         end : int, optional
             Ending observation, default is last observation.
         roll_period : int, optional
-            Size of the rolling period, default equals ``test_period``.
+            Size of the rolling period, default equals ``test_period``. Must
+            not exceed ``train_period`` — the in-sample ``eval_set`` is the
+            last ``roll_period`` bars of the training window.
         eval_period : int, optional
             Size of the evaluating period (unused, kept for API compat).
         batch_size : int, optional
@@ -138,6 +145,12 @@ class _RollingBasis:
         -------
         _RollingBasis
 
+        Raises
+        ------
+        ValueError
+            If ``roll_period`` exceeds ``train_period`` (would push the
+            in-sample evaluation window outside the training window).
+
         """
         self.n = train_period
         self.s = test_period
@@ -145,8 +158,23 @@ class _RollingBasis:
         self.b = batch_size
         self.e = epochs
 
+        # Causality guards. The eval window is the last ``r`` bars of the
+        # training window (``slice(t - r, t)``), so a roll larger than the
+        # train length (``r > n``) would make the eval window reach outside
+        # the in-sample window. Combined with a negative ``t0`` it also turns
+        # the eval / train slices into negative indices that wrap to the tail
+        # of the array — i.e. silently leak FUTURE bars into training and
+        # evaluation. Reject ``r > n`` and clamp the window start to ``>= 0``.
+        if self.r > self.n:
+            raise ValueError(
+                f"roll_period ({self.r}) must not exceed train_period "
+                f"({self.n}): the evaluation window is the last roll_period "
+                "bars of the training window, so r > n would reach outside "
+                "the in-sample window (lookahead leak)."
+            )
+
         self.T = self.T if end is None else min(self.T, end)
-        self.t0 = max(self.n - self.r, min(start, self.T - self.n - self.s))
+        self.t0 = max(0, self.n - self.r, min(start, self.T - self.n - self.s))
         self.n_iter = (self.T - self.t0 - self.s) // self.r * self.e
         self.log = []
 
@@ -174,6 +202,9 @@ class _RollingBasis:
             self.t += self.r
             self.t_idx = np.arange(self.t - self.n, self.t)
 
+        # ``eval_set`` is the last ``r`` bars of the *training* window
+        # (in-sample): an enforced ``r <= n`` keeps it inside ``[t - n, t)``.
+        # ``test_set`` is the next, strictly out-of-sample window.
         eval_set = slice(self.t - self.r, self.t)
         test_set = slice(self.t, self.t + self.s)
 
@@ -334,6 +365,7 @@ class _RollingBasis:
 
     def _training(self):
         loss_epoch = 0.
+        n_batches = 0
         np.random.shuffle(self.t_idx)
         for t in range(0, self.n, self.b):
             s = min(t + self.b, self.n)
@@ -343,8 +375,14 @@ class _RollingBasis:
                 y=self.f(self.y[train_slice]),
             )
             loss_epoch += lo.item()
+            n_batches += 1
 
-        self.loss_train[self.i] = loss_epoch / s
+        # ``lo`` is already a per-batch *mean* loss, so the epoch loss is the
+        # mean over batches — divide by the batch count, not by the train
+        # length ``n`` (the stale ``s`` from the last batch) which made the
+        # reported loss depend on the batch size and span a different scale
+        # than a single-batch loss.
+        self.loss_train[self.i] = loss_epoch / n_batches
 
     def run(self, backtest_plot=True, backtest_kpi=True, figsize=(9, 6),
             func=np.sign):
@@ -371,7 +409,6 @@ class _RollingBasis:
 
         self.bnn = BacktestNeuralNet(figsize)
         self.log = []
-        p_print = None
 
         for eval_set, test_set in self:
             self._training()
@@ -398,14 +435,13 @@ class _RollingBasis:
                     r[test_set], func(self.y_test[test_set]), v0=v0
                 )
 
+            # Render in-process. A forked multiprocessing.Process is not
+            # fork-safe here: it would share live torch tensors and the
+            # matplotlib figure across the fork. Display is cheap and purely
+            # a side effect, so do it inline.
             if self.t > self.t0 + self.r:
-                if p_print is None or not p_print.is_alive():
-                    p_print = Process(
-                        target=self._print,
-                        args=(self.t, self.i, r, y_perf, func,
-                              backtest_plot, backtest_kpi)
-                    )
-                    p_print.start()
+                self._print(self.t, self.i, r, y_perf, func,
+                            backtest_plot, backtest_kpi)
 
         self._print(self.t, self.i, r, y_perf, func, backtest_plot,
                     backtest_kpi)
@@ -434,8 +470,10 @@ class _RollingBasis:
         pct = t - self.n - self.s
         pct = pct / (self.T - self.n - self.T % self.s)
         txt = '{:5.2%} is done | '.format(pct)
-        txt += 'Eval loss is {:5.2} | '.format(self.loss_eval[-1])
-        txt += 'Test loss is {:5.2} | '.format(self.loss_test[-1])
+        # Use the current iteration index ``self.i`` — ``[-1]`` is the last
+        # array slot, which stays 0 until the final iteration.
+        txt += 'Eval loss is {:5.2} | '.format(self.loss_eval[self.i])
+        txt += 'Test loss is {:5.2} | '.format(self.loss_test[self.i])
         print(txt, end='\r')
 
     def _display_plot_loss(self, bnn, i):
@@ -459,10 +497,12 @@ class RollMultiLayerPerceptron(MultiLayerPerceptron, _RollingBasis):
 
     End-to-end walk-forward training pipeline for an MLP: at each step
     the model is fitted on a sliding window of length ``n``, evaluated
-    on the previous out-of-sample slice, then used to predict the next
-    slice. Losses (train, eval, test) and out-of-sample predictions are
-    accumulated step by step in ``self.log``, ``self.y_eval`` and
-    ``self.y_test`` for downstream analysis.
+    on the last ``r`` bars of that **training** window (the in-sample
+    ``eval_set = slice(t-r, t)``, a fit-quality check — *not* out-of-sample
+    data), then used to predict the next, strictly out-of-sample slice
+    ``test_set = slice(t, t+s)``. Losses (train, eval, test) and
+    out-of-sample predictions are accumulated step by step in ``self.log``,
+    ``self.y_eval`` and ``self.y_test`` for downstream analysis.
 
     Use :meth:`set_roll_period` to configure window sizes and batch
     options, then :meth:`run` to execute the loop. ``run`` can also
