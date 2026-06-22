@@ -19,3 +19,17 @@ z-score, and mean absolute deviation.
    roll_z_score
    mad
    roll_mad
+
+Money management
+================
+
+Volatility-targeted position sizing as a **causal** feature: the
+:func:`~fynance.features.money_management.iso_vol` leverage scales an exposure so
+its realized volatility tracks a target, using only the past.
+
+.. currentmodule:: fynance.features.money_management
+
+.. autosummary::
+   :toctree: generated/
+
+   iso_vol

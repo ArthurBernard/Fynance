@@ -53,6 +53,24 @@ def test_reproducible_with_seed():
     assert np.allclose(a, b)
 
 
+def test_warm_started_refit_is_reproducible():
+    # The net warm-starts across successive fit() calls (walk-forward refit).
+    # Two equal-seed refit sequences over the same data must yield identical
+    # predictions -- no hidden non-determinism in the online adaptation.
+    X1, r1 = _edge_data(n=300, seed=1)
+    X2, r2 = _edge_data(n=300, seed=2)
+
+    def refit_sequence():
+        m = ObjectiveModel(layers=(8,), epochs=15, lr=5e-3, seed=11)
+        m.fit(X1, r1)        # first walk-forward window
+        m.fit(X2, r2)        # warm-started refit on the next window
+        return np.asarray(m.predict(X2))
+
+    a = refit_sequence()
+    b = refit_sequence()
+    assert np.allclose(a, b)
+
+
 def test_accepts_custom_net_and_loss():
     X, returns = _edge_data(n=300)
     net = torch.nn.Sequential(torch.nn.Linear(2, 4), torch.nn.ReLU(),

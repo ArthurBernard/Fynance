@@ -16,6 +16,13 @@ import torch.nn
 
 __all__ = ['BaseLoss']
 
+#: Hard magnitude bound for ratio-style losses (Sharpe / Sortino / Calmar /
+#: Omega). It is far above any plausible real ratio (which are O(1)-O(10)), so
+#: it never touches a normal-case value; it only caps the runaway that a
+#: collapsing risk denominator would otherwise produce, keeping the loss finite
+#: and its gradients well-scaled.
+MAX_RATIO: float = 1e3
+
 
 class BaseLoss(torch.nn.Module):
     """ Base class for differentiable financial loss functions.
@@ -41,7 +48,16 @@ class BaseLoss(torch.nn.Module):
         self.rf = rf
         self.period = period
         self.eps = eps
-        self._rf_per_period: float = rf / period
+
+    @property
+    def _rf_per_period(self) -> float:
+        """ Per-period risk-free rate, recomputed from the live ``rf``/``period``.
+
+        Computed as a property (not cached in ``__init__``) so that mutating
+        ``loss.rf`` or ``loss.period`` after construction takes effect on the
+        next :meth:`forward` instead of being a silent no-op.
+        """
+        return self.rf / self.period
 
     def _check_tensor(self, x: object) -> None:
         """ Raise TypeError if *x* is not a :class:`torch.Tensor`. """

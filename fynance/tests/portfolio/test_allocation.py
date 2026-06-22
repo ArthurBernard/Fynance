@@ -73,6 +73,34 @@ def test_ivp_equal_variance():
     np.testing.assert_allclose(w, np.full(4, 0.25), atol=1e-4)
 
 
+def test_ivp_proportional_to_inverse_variance():
+    """ Unequal-variance assets: weights ∝ 1/σ² (the documented formula). """
+    rng = np.random.default_rng(1)
+    vols = np.array([0.01, 0.04, 0.16])  # 1x / 4x / 16x
+    X = rng.normal(0.0, 1.0, size=(4000, 3)) * vols
+    var = np.diag(np.cov(X, rowvar=False))
+    expected = (1.0 / var) / np.sum(1.0 / var)
+
+    w = IVP(X).flatten()
+    np.testing.assert_allclose(w, expected, rtol=1e-10)
+
+    # normalize=True must preserve the inverse-variance ordering (no asset
+    # zeroed by a subtract-min step) and keep a valid distribution.
+    w_norm = IVP(X, normalize=True).flatten()
+    assert np.all(w_norm > 0)
+    assert abs(w_norm.sum() - 1.0) < 1e-9
+    # With default box bounds the distribution is unchanged.
+    np.testing.assert_allclose(w_norm, expected, rtol=1e-10)
+
+
+def test_ivp_single_asset():
+    """ N == 1 must not crash on the 0-d covariance and return [[1.]]. """
+    X = RNG.normal(0.0, 0.01, size=(50, 1))
+    w = IVP(X)
+    assert w.shape == (1, 1)
+    np.testing.assert_allclose(w, [[1.0]])
+
+
 # ---------------------------------------------------------------------------
 # MVP
 # ---------------------------------------------------------------------------
@@ -89,6 +117,27 @@ def test_mvp_normalized_positive(returns):
     assert abs(w.sum() - 1.0) < 1e-6
 
 
+def test_mvp_single_asset():
+    """ N == 1 must not crash on the 0-d covariance and return [[1.]]. """
+    X = RNG.normal(0.0, 0.01, size=(50, 1))
+    w = MVP(X)
+    assert w.shape == (1, 1)
+    np.testing.assert_allclose(w, [[1.0]])
+
+
+def test_mvp_singular_covariance_pinv():
+    """ Linearly dependent columns trigger the pseudo-inverse fallback. """
+    rng = np.random.default_rng(11)
+    a = rng.normal(0.0, 0.01, size=(200, 1))
+    b = rng.normal(0.0, 0.01, size=(200, 1))
+    # Third column is an exact linear combination → singular covariance.
+    X = np.column_stack([a, b, 2.0 * a - 3.0 * b])
+    w = MVP(X).flatten()
+    assert w.shape == (3,)
+    assert abs(w.sum() - 1.0) < 1e-6
+    assert np.all(np.isfinite(w))
+
+
 # ---------------------------------------------------------------------------
 # MVP_uc
 # ---------------------------------------------------------------------------
@@ -103,6 +152,35 @@ def test_mvp_uc_bounds(returns):
     w = MVP_uc(returns).flatten()
     assert np.all(w >= -1e-6)
     assert np.all(w <= 1.0 + 1e-6)
+
+
+def test_mvp_uc_matches_closed_form_unequal_variance():
+    """ On a long-only feasible set MVP_uc must match the closed-form MVP.
+
+    Regression for the ftol/scaling bug: on small return-scale variances the
+    objective w'Σw fell below SLSQP's default ftol and the optimizer returned
+    the 1/N start instead of the minimum-variance weights.
+    """
+    rng = np.random.default_rng(0)
+    vols = np.array([0.01, 0.04, 0.16])  # 1x / 4x / 16x, uncorrelated
+    X = rng.normal(0.0, 1.0, size=(5000, 3)) * vols
+
+    w_uc = MVP_uc(X).flatten()
+    w_cf = MVP(X).flatten()
+    # The closed-form solution here is long-only (positive), so it is feasible
+    # for the box-constrained problem and the two must coincide.
+    assert np.all(w_cf >= 0)
+    np.testing.assert_allclose(w_uc, w_cf, atol=1e-4)
+    # And it is clearly not the 1/N start (the old buggy output).
+    assert not np.allclose(w_uc, np.full(3, 1 / 3), atol=1e-2)
+
+
+def test_mvp_uc_single_asset():
+    """ N == 1 must not crash on the 0-d covariance and return [[1.]]. """
+    X = RNG.normal(0.0, 0.01, size=(50, 1))
+    w = MVP_uc(X)
+    assert w.shape == (1, 1)
+    np.testing.assert_allclose(w, [[1.0]])
 
 
 # ---------------------------------------------------------------------------
@@ -129,6 +207,40 @@ def test_erc_equal_risk_uncorrelated():
     np.testing.assert_allclose(w, np.full(4, 0.25), atol=0.05)
 
 
+def test_erc_equalizes_risk_contributions_unequal_variance():
+    """ ERC must equalize risk contributions, not return the 1/N start.
+
+    Regression for the ftol/scaling bug: the quartic risk-contribution
+    surrogate on return-scale covariances was ~1e-16, below SLSQP's default
+    ftol, so the optimizer stopped at iteration 1 and returned 1/N. On
+    uncorrelated assets with vols 1x/4x/16x that gave risk contributions of
+    roughly [0.006, 0.058, 0.936] instead of equalized thirds.
+    """
+    rng = np.random.default_rng(0)
+    vols = np.array([0.01, 0.04, 0.16])  # 1x / 4x / 16x
+    X = rng.normal(0.0, 1.0, size=(5000, 3)) * vols
+    sigma = np.cov(X, rowvar=False)
+
+    w = ERC(X).flatten()
+    # Risk contributions RC_i = w_i (Σ w)_i, normalized to sum to one.
+    rc = w * (sigma @ w)
+    rc = rc / rc.sum()
+    # Equal risk contributions: each asset carries 1/N of total risk.
+    np.testing.assert_allclose(rc, np.full(3, 1 / 3), atol=1e-3)
+    # The solution must not be the 1/N starting guess.
+    assert not np.allclose(w, np.full(3, 1 / 3), atol=1e-2)
+    # Lower-variance assets must carry more weight (ERC tilts toward them).
+    assert w[0] > w[1] > w[2]
+
+
+def test_erc_single_asset():
+    """ N == 1 must not crash on the 0-d covariance and return [[1.]]. """
+    X = RNG.normal(0.0, 0.01, size=(50, 1))
+    w = ERC(X)
+    assert w.shape == (1, 1)
+    np.testing.assert_allclose(w, [[1.0]])
+
+
 # ---------------------------------------------------------------------------
 # MDP
 # ---------------------------------------------------------------------------
@@ -142,6 +254,32 @@ def test_mdp_shape_and_sum(returns):
 def test_mdp_positive(returns):
     w = MDP(returns).flatten()
     assert np.all(w >= -1e-6)
+
+
+def test_mdp_beats_equal_weight_diversification():
+    """ MDP weights must achieve a higher diversification ratio than 1/N. """
+    from fynance.metrics import diversified_ratio
+
+    rng = np.random.default_rng(3)
+    # Two correlated blocks with different volatilities: 1/N is sub-optimal.
+    f1 = rng.normal(0.0, 0.01, size=(600, 1))
+    f2 = rng.normal(0.0, 0.01, size=(600, 1))
+    idio = rng.normal(0.0, 0.003, size=(600, 4))
+    vols = np.array([1.0, 1.0, 4.0, 4.0])
+    X = np.column_stack([f1, f1, f2, f2]) * vols + idio
+
+    w = MDP(X).flatten()
+    dr_mdp = float(np.asarray(diversified_ratio(X, W=w)).item())
+    dr_eq = float(np.asarray(diversified_ratio(X)).item())
+    assert dr_mdp > dr_eq
+
+
+def test_mdp_single_asset():
+    """ N == 1 must not crash and return [[1.]]. """
+    X = RNG.normal(0.0, 0.01, size=(50, 1))
+    w = MDP(X)
+    assert w.shape == (1, 1)
+    np.testing.assert_allclose(w, [[1.0]])
 
 
 # ---------------------------------------------------------------------------
@@ -164,6 +302,42 @@ def test_hrp_correlated(correlated_returns):
     w = HRP(correlated_returns)
     assert w.shape == (N, 1)
     assert abs(w.sum() - 1.0) < 1e-6
+
+
+def test_hrp_splits_risk_across_blocks():
+    """ On two correlated blocks HRP must spread risk between the blocks.
+
+    Block A (assets 0-1) is low-volatility, block B (assets 2-3) is high
+    volatility. HRP's inverse-variance bisection should give block A more
+    total weight than block B, yet keep both blocks meaningfully funded
+    (unlike a pure minimum-variance solution that piles into the low-vol
+    block).
+    """
+    rng = np.random.default_rng(5)
+    fa = rng.normal(0.0, 0.01, size=(800, 1))
+    fb = rng.normal(0.0, 0.01, size=(800, 1))
+    idio = rng.normal(0.0, 0.002, size=(800, 4))
+    vols = np.array([1.0, 1.0, 3.0, 3.0])
+    X = np.column_stack([fa, fa, fb, fb]) * vols + idio
+
+    w = HRP(X).flatten()
+    block_a = w[0] + w[1]
+    block_b = w[2] + w[3]
+    # Low-vol block gets more weight than the high-vol block.
+    assert block_a > block_b
+    # But the high-vol block is still funded, not crushed to zero.
+    assert block_b > 0.05
+    # Within each block, the two near-identical assets are split evenly.
+    np.testing.assert_allclose(w[0], w[1], rtol=0.2)
+    np.testing.assert_allclose(w[2], w[3], rtol=0.2)
+
+
+def test_hrp_single_asset():
+    """ N == 1 must not crash on the 0-d covariance and return [[1.]]. """
+    X = RNG.normal(0.0, 0.01, size=(50, 1))
+    w = HRP(X)
+    assert w.shape == (1, 1)
+    np.testing.assert_allclose(w, [[1.0]])
 
 
 # ---------------------------------------------------------------------------
@@ -209,6 +383,17 @@ def test_normalize_clamps_weights():
     w_norm = _normalize(w.copy(), low_bound=0.1, up_bound=0.4)
     assert np.all(w_norm >= 0.1 - 1e-9)
     assert np.all(w_norm <= 0.4 + 1e-9)
+
+
+def test_normalize_does_not_mutate_input():
+    """ _normalize must copy its input, never mutate the caller's array. """
+    w = np.array([0.5, 0.3, 0.15, 0.05])
+    original = w.copy()
+    out = _normalize(w, low_bound=0.1, up_bound=0.4)
+    # Caller's array untouched.
+    np.testing.assert_array_equal(w, original)
+    # And a genuinely new array was returned.
+    assert out is not w
 
 
 def test_normalize_max_iter_warning(capsys):

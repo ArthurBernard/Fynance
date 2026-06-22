@@ -94,8 +94,8 @@ class _GRUCell(_RecurrentBase):
             hidden_state_size=hidden_state_size,
         )
 
-        self.W_u = nn.Linear(self.N + self.H, self.H)
-        self.W_r = nn.Linear(self.N + self.H, self.H)
+        self.W_u = nn.Linear(self.N + self.H, self.H, bias=bias)
+        self.W_r = nn.Linear(self.N + self.H, self.H, bias=bias)
 
         self.f_u = update_activation()
         self.f_r = reset_activation()
@@ -173,13 +173,18 @@ class GRUCell(_GRUCell):
 
 
 class GatedRecurrentUnit(_OutputLayerMixin, GRUCell):  # type: ignore[misc]
-    """ Gated Recurrent Unit neural network.
+    """ Gated Recurrent Unit cell with output projection.
 
-    Full GRU model: :class:`_GRUCell` gating logic followed by a
-    forward output projection. Mitigates vanishing gradients compared to
-    :class:`~fynance.models.rnn.RecurrentNeuralNetwork` via reset and
-    update gates. Use :class:`~fynance.models.lstm.LongShortTermMemory`
-    when you need an explicit memory cell state (longer dependencies).
+    GRU gating logic (:class:`_GRUCell`) followed by a forward output
+    projection. Like :class:`~fynance.models.rnn.RecurrentNeuralNetwork`,
+    this is a *stateless* gated feed-forward cell: each of the ``T`` rows
+    of ``X`` is processed independently against the supplied hidden state
+    ``H``, and no state is threaded across rows. The gating mitigates the
+    vanishing-gradient pathology *within* a step but does not, on its
+    own, model temporal dependencies — the caller must thread ``H``
+    explicitly. For built-in sequence modeling use
+    :class:`~fynance.models.tcn.TemporalConvNet` or
+    :class:`~fynance.models.transformer.Transformer`.
 
     Parameters
     ----------
@@ -188,9 +193,13 @@ class GatedRecurrentUnit(_OutputLayerMixin, GRUCell):  # type: ignore[misc]
         - If it's an integer, respectively dimension of inputs and outputs.
     drop : float, optional
         Probability of an element to be zeroed.
+    bias : bool, optional
+        If ``True`` (default), the linear layers learn an additive bias.
     forward_activation, hidden_activation : torch.nn.Module, optional
-        Activation functions, default is respectively Softmax and Tanh
-        function.
+        Activation functions, default is respectively Identity and Tanh
+        function. The output activation defaults to Identity so the cell
+        produces unconstrained regression outputs (pass ``nn.Softmax`` for
+        a probability-simplex output).
     hidden_state_size : int, optional
         Size of hidden states, default is the same size than input.
     reset_activation, update_activation : torch.nn.Module, optional
@@ -217,7 +226,7 @@ class GatedRecurrentUnit(_OutputLayerMixin, GRUCell):  # type: ignore[misc]
 
     def __init__(
         self, X, y, drop=None, x_type=None, y_type=None, bias=True,
-        forward_activation=nn.Softmax, hidden_activation=nn.Tanh,
+        forward_activation=nn.Identity, hidden_activation=nn.Tanh,
         hidden_state_size=None, reset_activation=nn.Sigmoid,
         update_activation=nn.Sigmoid,
     ):

@@ -58,12 +58,25 @@ def test_refit_is_causal_and_changes_results():
     refit = garch_volatility(r, min_train=500, refit=200)
     # refit produces a (generally) different series ...
     assert not np.allclose(once[500:], refit[500:])
-    # ... but stays causal: a value is unchanged when the series is extended,
-    # as long as the truncation lands on a refit checkpoint (500 + k*200).
-    t = 900   # = 500 + 2 * 200
+    # ... but stays causal at EVERY index, not only on refit checkpoints: within
+    # the block [start, end) the value sigma_t is filtered with params fit on
+    # r[:start] (start <= t), so it never sees r[t:]. A value is therefore
+    # unchanged when the series is extended, regardless of where we truncate.
+    t = 850   # mid-block (500 + 2*200 = 900 is the next checkpoint)
     a = garch_volatility(r[:t], min_train=500, refit=200)[-1]
     b = garch_volatility(r[:t + 50], min_train=500, refit=200)[t - 1]
     assert a == b
+
+
+def test_per_index_causality_sweep_with_refit():
+    # The strong causality guarantee: sigma_t is F_{t-1}-measurable at *every* t,
+    # including between refit checkpoints. Truncating the series just after t
+    # leaves sigma_t bit-identical -- no future leakage anywhere.
+    r, _ = _simulate_garch(T=900)
+    full = garch_volatility(r, min_train=500, refit=150)
+    for t in range(500, r.size):
+        trunc = garch_volatility(r[:t + 1], min_train=500, refit=150)
+        assert trunc[t] == full[t], t
 
 
 def test_bad_min_train_raises():

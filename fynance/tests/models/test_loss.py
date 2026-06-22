@@ -63,6 +63,17 @@ class TestSharpeLoss:
         assert not torch.isnan(loss)
         assert not torch.isinf(loss)
 
+    def test_rf_change_takes_effect(self):
+        # _rf_per_period is recomputed in forward (a property), so mutating rf
+        # after construction must change the loss instead of being a no-op.
+        loss_fn = SharpeLoss()
+        before = loss_fn(RETURNS).item()
+        loss_fn.rf = 0.10
+        after = loss_fn(RETURNS).item()
+        assert after != before
+        # Matches building a fresh loss with the same rf.
+        assert after == pytest.approx(SharpeLoss(rf=0.10)(RETURNS).item())
+
 
 class TestSortinoLoss:
     def test_forward_scalar(self):
@@ -86,16 +97,45 @@ class TestSortinoLoss:
         assert not torch.isnan(loss)
         assert not torch.isinf(loss)
 
+    def test_all_positive_finite_bounded_and_scale_invariant(self):
+        # On an all-gains batch the downside is ~0. A *fixed absolute* eps inside
+        # the sqrt is dimensionally wrong: the loss then scales with the return
+        # magnitude (10x returns -> 10x loss) instead of being scale-invariant
+        # like a true Sortino ratio, and explodes. A returns-scaled floor keeps
+        # the loss finite, bounded, and scale-invariant.
+        r = torch.abs(RETURNS) + 0.001   # strictly positive → downside = 0
+        loss = SortinoLoss(eps=1e-8)(r)
+        loss_10x = SortinoLoss(eps=1e-8)(10.0 * r)
+        assert torch.isfinite(loss)
+        assert abs(loss.item()) <= 1e3 + 1.0          # bounded
+        # scale invariance (old absolute-eps code is off by ~10x here)
+        assert loss_10x.item() == pytest.approx(loss.item(), rel=1e-2)
+
+    def test_positive_when_negative_mean(self):
+        # Sign convention (like SharpeLoss): a negative-mean return series has a
+        # negative Sortino ratio, so the negated loss must be positive.
+        loss = SortinoLoss()(RETURNS_NEG)
+        assert loss.item() > 0
+
+    def test_rf_change_takes_effect(self):
+        # _rf_per_period is a property (not cached in __init__), so mutating rf
+        # after construction must change the computed loss.
+        loss_fn = SortinoLoss()
+        before = loss_fn(RETURNS).item()
+        loss_fn.rf = 5.0   # huge rf -> excess turns negative -> loss flips sign
+        after = loss_fn(RETURNS).item()
+        assert before != after
+
     def test_downside_only_penalized(self):
         # Two series identical except one has large upside: Sortino should
-        # be lower (better) for the one with large upside because upside
-        # doesn't count against the denominator.
+        # be strictly lower (better) for the one with large upside because
+        # upside doesn't count against the denominator.
         r_base = torch.tensor([-0.01, 0.005, -0.008, 0.003, -0.006])
         r_upside = torch.tensor([-0.01, 0.500, -0.008, 0.003, -0.006])
         loss_base = SortinoLoss()(r_base)
         loss_upside = SortinoLoss()(r_upside)
         # Large upside improves mean without worsening downside → lower loss
-        assert loss_upside.item() <= loss_base.item()
+        assert loss_upside.item() < loss_base.item()
 
 
 class TestDirectionalAccuracyLoss:
@@ -151,6 +191,23 @@ class TestCalmarLoss:
         with pytest.raises(TypeError):
             CalmarLoss()(np.zeros(10))
 
+    def test_no_drawdown_loss_is_bounded(self):
+        from fynance.models.loss import CalmarLoss
+        # Monotonically increasing equity -> zero drawdown. A fixed absolute
+        # eps (1e-8) on an O(returns) drawdown made the ratio explode (e.g.
+        # -3.78e7). A returns-scaled floor keeps it finite and bounded.
+        r = torch.full((100,), 0.01)   # constant gains -> no drawdown
+        loss = CalmarLoss(eps=1e-8)(r)
+        assert torch.isfinite(loss)
+        assert abs(loss.item()) < 1e4
+
+    def test_all_zero_returns_is_finite(self):
+        from fynance.models.loss import CalmarLoss
+        # Degenerate all-zero series: numerator and drawdown are both 0; the
+        # bare-eps backstop in the floor must keep the loss finite (not NaN).
+        loss = CalmarLoss(eps=1e-8)(torch.zeros(50))
+        assert torch.isfinite(loss)
+
 
 class TestOmegaLoss:
     def test_known_value(self):
@@ -168,6 +225,22 @@ class TestOmegaLoss:
         loss = OmegaLoss(threshold=0.01)(r)
         loss.backward()
         assert r.grad is not None
+
+    def test_all_gains_loss_is_bounded(self):
+        from fynance.models.loss import OmegaLoss
+        # All returns above the threshold -> zero losses. A fixed absolute eps
+        # made the ratio explode (e.g. -1e6); a returns-scaled floor bounds it.
+        r = torch.full((100,), 0.01)   # all gains, no losses below threshold
+        loss = OmegaLoss(eps=1e-8)(r)
+        assert torch.isfinite(loss)
+        assert abs(loss.item()) < 1e4
+
+    def test_all_zero_diff_is_finite(self):
+        from fynance.models.loss import OmegaLoss
+        # Returns exactly at threshold: gains == losses == 0; the bare-eps
+        # backstop must keep the loss finite (not NaN).
+        loss = OmegaLoss(threshold=0.0, eps=1e-8)(torch.zeros(50))
+        assert torch.isfinite(loss)
 
 
 class TestHybridLoss:

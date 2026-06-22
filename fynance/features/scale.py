@@ -280,7 +280,8 @@ class Scale:
             axis = self.axis
 
         if axis == 1:
-            self.func(X.T, **self.params).T
+
+            return self._apply(self.func, X)
 
         return self.func(X, **self.params)
 
@@ -302,9 +303,40 @@ class Scale:
             axis = self.axis
 
         if axis == 1:
-            self.revert_func(X.T, **self.params).T
+
+            return self._apply(self.revert_func, X)
 
         return self.revert_func(X, **self.params)
+
+    def _apply(self, func, X):
+        """ Apply `func` along axis 1 with fitted parameters.
+
+        The fitted parameters were computed along ``axis=1`` and therefore
+        share the orientation of ``X``. The data is transposed so that the
+        time axis lands on axis 0; any array-valued parameter that matches
+        the dimensionality of ``X`` is transposed as well to keep the
+        orientation consistent before broadcasting.
+
+        Parameters
+        ----------
+        func : callable
+            The scale (or revert) function to apply.
+        X : np.ndarray[dtype, ndim=1 or 2]
+            Data to transform along axis 1.
+
+        Returns
+        -------
+        np.ndarray[dtype, ndim=1 or 2]
+            The transformed data, with the original orientation restored.
+
+        """
+        params = dict(self.params)
+        for key in ("m", "s"):
+            value = params.get(key)
+            if isinstance(value, np.ndarray) and value.ndim == X.ndim:
+                params[key] = value.T
+
+        return func(X.T, **params).T
 
 
 def standardize(X, a=0, b=1, axis=0):

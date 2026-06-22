@@ -61,3 +61,44 @@ class TestRecurrentNeuralNetwork:
         H = torch.zeros(T, 32)
         Y, H_out = model(X_t, H)
         assert H_out.shape == (T, 32)
+
+    def test_bias_false_removes_biases(self):
+        """ bias=False must drop the bias on the recurrent and output layers. """
+        model = RecurrentNeuralNetwork(N_IN, N_OUT, hidden_state_size=8, bias=False)
+        assert model.W_h.bias is None
+        assert model.W_y.bias is None
+        model_b = RecurrentNeuralNetwork(N_IN, N_OUT, hidden_state_size=8)
+        assert model_b.W_h.bias is not None
+        assert model_b.W_y.bias is not None
+
+    def test_default_output_is_not_simplex(self):
+        """ Default forward_activation is Identity, not Softmax. """
+        torch.manual_seed(0)
+        model = RecurrentNeuralNetwork(N_IN, N_OUT, hidden_state_size=8)
+        H = torch.zeros(T, model.H)
+        Y, _ = model(X_t, H)
+        # a Softmax default would force every row to sum to exactly 1
+        assert not torch.allclose(Y.sum(dim=-1), torch.ones(T))
+
+    def test_rows_processed_independently(self):
+        """ Honest stateless contract: each row depends only on its own row.
+
+        These cells do NOT thread state across the leading dimension, so
+        perturbing one row of (X, H) must leave the other rows' outputs
+        unchanged. This pins the documented stateless behaviour.
+        """
+        torch.manual_seed(0)
+        model = RecurrentNeuralNetwork(N_IN, N_OUT, hidden_state_size=5)
+        model.eval()
+        X = torch.randn(7, N_IN)
+        H = torch.randn(7, model.H)
+        with torch.no_grad():
+            Y_base, H_base = model(X, H)
+            X_pert = X.clone()
+            X_pert[3] += 100.0  # perturb a single row only
+            Y_pert, H_pert = model(X_pert, H)
+        idx = [i for i in range(7) if i != 3]
+        assert torch.allclose(Y_base[idx], Y_pert[idx], atol=1e-5)
+        assert torch.allclose(H_base[idx], H_pert[idx], atol=1e-5)
+        # the perturbed row itself does change
+        assert not torch.allclose(Y_base[3], Y_pert[3])

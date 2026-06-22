@@ -208,6 +208,71 @@ class TestMLP:
         model.set_optimizer(nn.MSELoss, torch.optim.Adam, params=[model], lr=1e-3)
         assert model.optimizer is not None
 
+    def test_dtype_request_is_applied(self):
+        """ A float32 request on float64 data yields float32 tensors. """
+        X64 = np.zeros((10, N_IN), dtype=np.float64)
+        y64 = np.zeros((10, N_OUT), dtype=np.float64)
+        model = MultiLayerPerceptron(N_IN, N_OUT, layers=[8])
+        model.set_data(X64, y64, x_type=torch.float32, y_type=torch.float32)
+        assert model.X.dtype == torch.float32
+        assert model.y.dtype == torch.float32
+
+    def test_float64_numpy_trains_without_astype(self):
+        """ Plain float64 numpy input must fit/predict without manual cast. """
+        rng = np.random.default_rng(0)
+        X64 = rng.standard_normal((20, N_IN))  # float64 by default
+        y64 = rng.standard_normal((20, N_OUT))
+        assert X64.dtype == np.float64
+        model = MultiLayerPerceptron(X64, y64, layers=[8])
+        model.set_optimizer(nn.MSELoss, torch.optim.SGD, lr=1e-3)
+        # Coerced to the default (float32) so it matches the float32 params.
+        assert model.X.dtype == torch.get_default_dtype()
+        loss = model.train_on(model.X, model.y)  # must not raise on dtype
+        assert torch.isfinite(loss)
+        pred = model.predict(model.X)
+        assert pred.shape == (20, N_OUT)
+
+    def test_set_data_does_not_alias_numpy(self):
+        """ set_data must not let later edits to the tensor mutate the source. """
+        X = np.zeros((10, N_IN), dtype=np.float32)
+        model = MultiLayerPerceptron(N_IN, N_OUT, layers=[8])
+        t = model._set_data(X)
+        t[0, 0] = 123.0
+        assert X[0, 0] == 0.0
+
+    def test_predict_deterministic_with_dropout(self):
+        """ With dropout>0, predict is deterministic and restores train mode. """
+        torch.manual_seed(0)
+        model = MultiLayerPerceptron(X_t, y_t, layers=[16], drop=0.5)
+        model.set_optimizer(nn.MSELoss, torch.optim.Adam, lr=1e-3)
+        assert model.training  # starts in train mode
+        p1 = model.predict(X_t)
+        p2 = model.predict(X_t)
+        assert torch.allclose(p1, p2)
+        # eval mode must be restored to training after predict
+        assert model.training
+
+    def test_train_on_sets_train_mode(self):
+        """ train_on must put the model back into training mode. """
+        model = MultiLayerPerceptron(X_t, y_t, layers=[16], drop=0.5)
+        model.set_optimizer(nn.MSELoss, torch.optim.Adam, lr=1e-3)
+        model.eval()
+        model.train_on(X_t, y_t)
+        assert model.training
+
+    def test_overfit_tiny_batch_loss_decreases(self):
+        """ Sanity: MLP can overfit a tiny batch (loss decreases). """
+        torch.manual_seed(0)
+        rng = np.random.default_rng(0)
+        X = torch.from_numpy(rng.standard_normal((8, N_IN)).astype(np.float32))
+        y = torch.from_numpy(rng.standard_normal((8, N_OUT)).astype(np.float32))
+        model = MultiLayerPerceptron(X, y, layers=[32, 32], activation=nn.ReLU)
+        model.set_optimizer(nn.MSELoss, torch.optim.Adam, lr=1e-2)
+        first = model.train_on(X, y).item()
+        for _ in range(200):
+            last = model.train_on(X, y).item()
+        assert last < first
+
 
 # ---------------------------------------------------------------------------
 # GatedRecurrentUnit
@@ -255,6 +320,28 @@ class TestGRU:
     def test_hidden_state_size_default(self):
         model = GatedRecurrentUnit(X_t, y_t)
         assert model.H == N_IN
+
+    def test_bias_false_removes_biases(self):
+        """ bias=False must drop the bias on every linear layer. """
+        model = GatedRecurrentUnit(N_IN, N_OUT, hidden_state_size=8, bias=False)
+        assert model.W_h.bias is None
+        assert model.W_u.bias is None
+        assert model.W_r.bias is None
+        assert model.W_y.bias is None
+        # default keeps biases
+        model_b = GatedRecurrentUnit(N_IN, N_OUT, hidden_state_size=8)
+        assert model_b.W_h.bias is not None
+        assert model_b.W_y.bias is not None
+
+    def test_default_activation_is_not_simplex(self):
+        """ Default output must not be a probability simplex (no Softmax). """
+        torch.manual_seed(0)
+        model = GatedRecurrentUnit(N_IN, N_OUT, hidden_state_size=8)
+        H = torch.zeros(T, model.H)
+        Y, _ = model(X_t, H)
+        row_sums = Y.sum(dim=-1)
+        # a Softmax default would force every row sum to exactly 1
+        assert not torch.allclose(row_sums, torch.ones(T))
 
 
 # ---------------------------------------------------------------------------
@@ -313,6 +400,36 @@ class TestLSTM:
     def test_hidden_state_size_default(self):
         model = LongShortTermMemory(X_t, y_t)
         assert model.H == N_IN
+
+    def test_bias_false_removes_biases(self):
+        """ bias=False must drop the bias on every linear layer. """
+        model = LongShortTermMemory(
+            N_IN, N_OUT, hidden_state_size=8, bias=False
+        )
+        for w in (model.W_f, model.W_i, model.W_c, model.W_o,
+                  model.W_h, model.W_y):
+            assert w.bias is None
+
+    def test_default_activation_is_not_simplex(self):
+        """ Default output must not be a probability simplex (no Softmax). """
+        torch.manual_seed(0)
+        model = LongShortTermMemory(N_IN, N_OUT, hidden_state_size=8)
+        H = torch.zeros(T, model.H)
+        C = torch.zeros(T, model.H)
+        Y, _, _ = model(X_t, H, C)
+        assert not torch.allclose(Y.sum(dim=-1), torch.ones(T))
+
+    def test_predict_deterministic_with_dropout(self):
+        """ predict with dropout>0 is deterministic and restores train mode. """
+        torch.manual_seed(0)
+        model = LongShortTermMemory(X_t, y_t, hidden_state_size=8, drop=0.5)
+        model.set_optimizer(nn.MSELoss, torch.optim.Adam, lr=1e-3)
+        H = torch.zeros(T, model.H)
+        C = torch.zeros(T, model.H)
+        Y1, _, _ = model.predict(X_t, H, C)
+        Y2, _, _ = model.predict(X_t, H, C)
+        assert torch.allclose(Y1, Y2)
+        assert model.training
 
 
 # ---------------------------------------------------------------------------
@@ -419,6 +536,36 @@ class TestAttention:
     def test_mha_invalid_heads(self):
         with pytest.raises(ValueError):
             MultiHeadAttention(d_model=33, num_heads=4)
+
+    def test_sdpa_mask_zeros_weight(self):
+        """ Masked positions (mask == 0) get ~0 attention weight. """
+        torch.manual_seed(0)
+        attn = ScaledDotProductAttention()
+        B, T_seq, d = 2, 4, 8
+        Q = torch.randn(B, T_seq, d)
+        K = torch.randn(B, T_seq, d)
+        V = torch.randn(B, T_seq, d)
+        mask = torch.ones(B, T_seq, T_seq)
+        mask[:, :, -1] = 0  # forbid attending to the last key position
+        _, weights = attn(Q, K, V, mask=mask)
+        # weight on masked positions must be (near) zero
+        assert torch.allclose(weights[:, :, -1], torch.zeros(B, T_seq), atol=1e-6)
+        # unmasked rows still sum to one
+        np.testing.assert_allclose(
+            weights.sum(dim=-1).numpy(), np.ones((B, T_seq)), atol=1e-5
+        )
+
+    def test_mha_mask_zeros_weight(self):
+        """ MultiHeadAttention honours the mask: masked keys get ~0 weight. """
+        torch.manual_seed(0)
+        mha = MultiHeadAttention(d_model=16, num_heads=2)
+        x = torch.randn(2, 5, 16)
+        mask = torch.ones(2, 1, 5, 5)
+        mask[:, :, :, -1] = 0  # forbid attending to the last position
+        _, attn = mha(x, mask=mask)
+        assert torch.allclose(
+            attn[:, :, :, -1], torch.zeros(2, mha.num_heads, 5), atol=1e-6
+        )
 
 
 # ---------------------------------------------------------------------------

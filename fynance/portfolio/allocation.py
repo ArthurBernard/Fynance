@@ -93,7 +93,7 @@ def ERC(
     X : array_like
         Each column is a series of price or return's asset.
     w0 : array_like, optional
-        Initial weights to maximize.
+        Initial weights for the optimizer.
     up_bound, low_bound : float, optional
         Respectively maximum and minimum values of weights, such that low_bound
         :math:`\leq w_i \leq` up_bound :math:`\forall i`. Default is 0 and 1.
@@ -109,8 +109,21 @@ def ERC(
 
     """
     T, N = X.shape
-    SIGMA = np.cov(X, rowvar=False)
+    SIGMA = np.atleast_2d(np.cov(X, rowvar=False))
+    if N == 1:
+        return np.ones([1, 1])
+
     up_bound = max(up_bound, 1 / N)
+    # The risk-contribution surrogate is quartic in the covariance, so on
+    # return-scale inputs (values ~1e-4) it collapses to ~1e-16, far below
+    # SLSQP's default ftol and the optimizer stops at the 1/N start. Rescale
+    # the covariance to unit trace so the objective is O(1) regardless of the
+    # input scale; this leaves the argmin (the weights) unchanged.
+    scale = np.trace(SIGMA) / N
+    if scale <= 0:
+        return np.ones([N, 1]) / N
+
+    SIGMA = SIGMA / scale
 
     def f_ERC(w):
         w = w.reshape([N, 1])
@@ -129,7 +142,8 @@ def ERC(
         w0,
         method='SLSQP',
         constraints=[const_sum],
-        bounds=const_ind
+        bounds=const_ind,
+        options={'ftol': 1e-12, 'maxiter': 1000},
     )
 
     return result.x.reshape([N, 1])
@@ -307,10 +321,13 @@ def HRP(
     """
     X = np.asarray(X, dtype=np.float64)
     T, N = X.shape
+    if N == 1:
+        return np.ones([1, 1])
+
     up_bound = max(up_bound, 1.0 / N)
     low_bound = min(low_bound, 1.0 / N)
 
-    mat_cov = np.cov(X, rowvar=False)
+    mat_cov = np.atleast_2d(np.cov(X, rowvar=False))
     diag_cov = np.sqrt(np.diag(mat_cov))
     outer_diag = np.outer(diag_cov, diag_cov)
     with np.errstate(invalid='ignore', divide='ignore'):
@@ -358,8 +375,11 @@ def IVP(
     X : array_like
         Each column is a price or return's asset series.
     normalize : bool, optional
-        If True normalize the weights such that :math:`\sum_{i=1}^{N} w_i = 1`
-        and :math:`0 \leq w_i \leq 1`. Default is False.
+        If True clip the weights to the ``[low_bound, up_bound]`` box and
+        renormalize them to sum to one (via :func:`_normalize`), preserving
+        the inverse-variance ordering. If False (default) return the raw
+        inverse-variance weights :math:`w_i \propto 1 / \sigma_i^2`, which
+        already sum to one and lie in :math:`[0, 1]`.
     low_bound, up_bound : float, optional
         Respectively minimum and maximum values of weights, such that low_bound
         :math:`\leq w_i \leq` up_bound :math:`\forall i`. Default is 0 and 1.
@@ -374,20 +394,19 @@ def IVP(
     .. [3] https://en.wikipedia.org/wiki/Inverse-variance_weighting
 
     """
-    mat_cov = np.cov(X, rowvar=False)
+    mat_cov = np.atleast_2d(np.cov(X, rowvar=False))
+    N = mat_cov.shape[0]
+    if N == 1:
+        return np.ones([1, 1])
+
     w = _get_IVP(mat_cov)
-    up_bound = max(up_bound, 1 / X.shape[1])
-    low_bound = min(low_bound, 1 / X.shape[1])
 
     if normalize:
-        w = w - np.min(w)
-        w = w / np.sum(w)
+        up_bound = max(up_bound, 1 / N)
+        low_bound = min(low_bound, 1 / N)
+        w = _normalize(w, up_bound=up_bound, low_bound=low_bound)
 
-    #    return w.reshape([mat_cov.shape[0], 1])
-    w = _normalize(w, up_bound=up_bound, low_bound=low_bound)
-    # w = w * (up_bound - low_bound) + low_bound
-
-    return w.reshape([mat_cov.shape[0], 1])
+    return w.reshape([N, 1])
 
 
 # =========================================================================== #
@@ -443,16 +462,16 @@ def MVP(
     HRP
 
     """
-    mat_cov = np.cov(X, rowvar=False)
+    mat_cov = np.atleast_2d(np.cov(X, rowvar=False))
+    if mat_cov.shape[0] == 1:
+        return np.ones([1, 1])
+
     # Inverse variance matrix
     try:
         iv = np.linalg.inv(mat_cov)
 
     except np.linalg.LinAlgError:
-        try:
-            iv = np.linalg.pinv(mat_cov)
-        except np.linalg.LinAlgError:
-            raise
+        iv = np.linalg.pinv(mat_cov)
 
     e = np.ones([iv.shape[0], 1])
     w = (iv @ e) / (e.T @ iv @ e)
@@ -497,7 +516,7 @@ def MVP_uc(
     X : array_like
         Each column is a series of price or return's asset.
     w0 : array_like, optional
-        Initial weights to maximize.
+        Initial weights for the optimizer.
     up_bound, low_bound : float, optional
         Respectively maximum and minimum values of weights, such that low_bound
         :math:`\leq w_i \leq` up_bound :math:`\forall i`. Default is 0 and 1.
@@ -508,9 +527,21 @@ def MVP_uc(
         Weights that minimize the variance of the portfolio.
 
     """
-    mat_cov = np.cov(X, rowvar=False)
+    mat_cov = np.atleast_2d(np.cov(X, rowvar=False))
     N = X.shape[1]
+    if N == 1:
+        return np.ones([1, 1])
+
     up_bound = max(up_bound, 1 / N)
+    # On return-scale inputs the portfolio variance w'Sigma w is ~1e-4 or
+    # smaller, which can sit below SLSQP's default ftol so the optimizer stops
+    # at the 1/N start. Rescale the covariance to unit trace so the objective
+    # is O(1); the variance-minimizing weights are invariant to this scaling.
+    scale = np.trace(mat_cov) / N
+    if scale <= 0:
+        return np.ones([N, 1]) / N
+
+    mat_cov = mat_cov / scale
 
     def f_MVP(w):
         w = w.reshape([N, 1])
@@ -528,7 +559,8 @@ def MVP_uc(
         w0,
         method='SLSQP',
         constraints=[const_sum],
-        bounds=const_ind
+        bounds=const_ind,
+        options={'ftol': 1e-12, 'maxiter': 1000},
     )
 
     return result.x.reshape([N, 1])
@@ -564,7 +596,7 @@ def MDP(
     X : array_like
         Each column is a series of price or return's asset.
     w0 : array_like, optional
-        Initial weights to maximize.
+        Initial weights for the optimizer.
     up_bound, low_bound : float, optional
         Respectively maximum and minimum values of weights, such that low_bound
         :math:`\leq w_i \leq` up_bound :math:`\forall i`. Default is 0 and 1.
@@ -586,11 +618,14 @@ def MDP(
 
     """
     T, N = X.shape
+    if N == 1:
+        return np.ones([1, 1])
+
     up_bound = max(up_bound, 1 / N)
 
     # Set function to minimze
     def f_max_divers_weights(w):
-        return - diversified_ratio(X, W=w).flatten()
+        return -diversified_ratio(X, W=w)
 
     # Set inital weights
     if w0 is None:
@@ -780,7 +815,9 @@ def _perf_alloc(X: NDArray[np.float64], w: NDArray[np.float64], drift: bool = Tr
 
 
 def _normalize(w: NDArray[np.float64], low_bound: float = 0., up_bound: float = 1., sum_w: float = 1., max_iter: int = 1000) -> NDArray[np.float64]:
-    # Iterative algorithm to set bounds
+    # Iterative algorithm to set bounds. Copy the input so the caller's array
+    # is never mutated in place.
+    w = np.array(w, dtype=np.float64)
     if up_bound < sum_w / w.size or low_bound > sum_w / w.size:
 
         raise ValueError('Low or up bound exceeded sum weight constraint.')

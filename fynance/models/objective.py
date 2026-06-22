@@ -18,7 +18,9 @@ protocol (``fit``/``predict``), so it drops into the harness via the precomputed
     run_experiment(strat, prices, X=features, y=returns, walk_forward=...)
 
 ``fit(X, y)`` interprets ``y`` as the **realized per-bar returns** aligned with
-``X``; ``predict(X)`` returns positions in ``[-1, 1]`` (via ``tanh``).
+``X``; ``predict(X)`` returns positions. With the default ``position_fn``
+(``tanh``) these are bounded in ``[-1, 1]``; a custom ``position_fn`` may be
+unbounded.
 
 """
 
@@ -209,7 +211,11 @@ class ObjectiveModel:
 
     @torch.no_grad()
     def predict(self, X: NDArray) -> NDArray:
-        """ Return positions in ``[-1, 1]`` for each row of ``X``. """
+        """ Return a position for each row of ``X``.
+
+        With the default ``position_fn`` (``tanh``) positions are bounded in
+        ``[-1, 1]``; a custom ``position_fn`` may produce unbounded values.
+        """
         self.net.eval()  # type: ignore[union-attr]
         Xt = torch.as_tensor(np.asarray(X, dtype=np.float32))
 

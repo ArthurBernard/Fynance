@@ -72,6 +72,33 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-06-22 — Full code audit + remediation (PRs #188–#196)  [accepted]
+
+A deep correctness/tests/docs audit (the 5 gates were already green) found logic
+bugs, weak/missing tests and doc drift the gates miss. Remediated in 9 atomic
+PRs (one concern each, parallel worktrees): features `axis=1` path, portfolio
+optimizers, metrics/econometrics, models training+losses, NN base/recurrent
+contract, data/core/signal/backtest, research guards, and doc drift. Roadmap §1
+held the backlog; closed here. Test count 658 → 819.
+
+Two choices worth recording as standing knowledge:
+
+- **`RNN`/`GRU`/`LSTM` are *not* temporal recurrent nets — kept as stateless
+  gated feed-forward cells and documented as such.** They feed the time axis to
+  `nn.Linear` as the batch dim; no state crosses time. Implementing genuine
+  recurrence (a `(T, S, N)` loop carrying hidden state) would change `forward`,
+  batch semantics and `set_data`, rippling into `rolling`/`objective`. We chose
+  the low-risk correct path: remove the false `(T, S, N)` contract, fix the
+  concrete bugs, and pin the stateless behavior with a test. **Negative
+  knowledge: do not "fix" these into recurrence casually — it is a deliberate,
+  separable enhancement, not a bug.**
+- **Optimizer-scale invariants made explicit.** ERC/MVP_uc rescale the
+  covariance to unit trace before SLSQP (the objective otherwise sinks below
+  `ftol` on return-scale data and the solver returns the 1/N start); the result
+  is argmin-invariant. Zero-denominator ratio conventions were unified
+  (`calmar` → `+inf` like `sharpe`).
+
+
 ### 2026-06-21 — Library-bricks epic: roadmap §1 shipped (PRs #177–#182)  [accepted]
 - **Choice**: ship the data-agnostic "library bricks" (roadmap §1) as six atomic
   PRs and **re-scope** the roadmap — real-data strategy research moves to the

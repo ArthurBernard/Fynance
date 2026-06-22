@@ -157,3 +157,41 @@ def test_roll_rank_2d_columnwise():
     out = np.asarray(roll_rank(X2, w=3))
     assert out.shape == (5, 2)
     assert np.allclose(out[:, 0], roll_rank(X, w=3))
+
+
+# --------------------------------------------------------------------------- #
+#   Genuine multi-column axis=1 parity (roadmap 1.A)                           #
+# --------------------------------------------------------------------------- #
+
+
+@pytest.fixture()
+def multi_col():
+    # Time on axis 1, distinct rows, non-square (3, 4).
+    return np.array([
+        [1., 2., 3., 4.],
+        [6., 5., 7., 8.],
+        [2., 9., 1., 3.],
+    ])
+
+
+@pytest.mark.parametrize(
+    "kind, base_func",
+    [("std", "standardize"), ("norm", "normalize")],
+)
+def test_scale_axis1_matches_per_row(multi_col, kind, base_func):
+    # Scale(axis=1) must equal stacking the 1-D transform of each row, and
+    # must round-trip through revert. Previously the axis=1 branch discarded
+    # its result (missing return) and silently fell back to axis=0 behaviour.
+    f = getattr(fy, base_func)
+    s = fy.Scale(multi_col, kind=kind, axis=1, a=0, b=1)
+    out = s.scale(multi_col)
+    expected = np.vstack([f(multi_col[i]) for i in range(multi_col.shape[0])])
+    assert np.allclose(out, expected)
+    assert np.allclose(s.revert(out), multi_col)
+
+
+@pytest.mark.parametrize("kind", ["std", "norm"])
+def test_scale_axis1_differs_from_axis0(multi_col, kind):
+    s1 = fy.Scale(multi_col, kind=kind, axis=1, a=0, b=1)
+    s0 = fy.Scale(multi_col, kind=kind, axis=0, a=0, b=1)
+    assert not np.allclose(s1.scale(multi_col), s0.scale(multi_col))

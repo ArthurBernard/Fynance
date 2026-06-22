@@ -18,6 +18,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.10.0] - 2026-06-22
+
+### Breaking Changes
+
+### Added
+
+### Changed
+
+- **`RNN`/`GRU`/`LSTM` are documented as stateless gated feed-forward cells**,
+  not temporal recurrent nets — they process each timestep independently and do
+  not thread state across a time axis. The unsatisfiable `(T, S, N)` sequence
+  contract was removed from the docstrings, and the default `forward_activation`
+  is now `Identity` (was `Softmax`, which forced regression outputs onto a
+  probability simplex). `bias=False` is now honored.
+- **`model.predict()` runs in eval mode** (dropout disabled, deterministic) and
+  `set_data`/`fit` honor the requested `dtype`; float64 numpy input no longer
+  crashes against float32 parameters.
+- **`calmar`/`roll_calmar` return `+inf`** (not `0.0`) for a profitable
+  drawdown-free curve, consistent with `sharpe`/`sortino`.
+- **`features.money_management.iso_vol`** now uses the standard return
+  `s_t / s_{t-1} - 1` (was the reciprocal `s_{t-1} / s_t - 1`).
+- **`research.Ledger`** is strictly append-only (`append` raises on a duplicate
+  name) and `Ledger.deflated_sharpe` de-annualizes the Sharpe before the DSR so
+  the guard is no longer saturated.
+
+### Fixed
+
+- **2-D `axis=1` path across `fynance.features`.** `Scale.scale`/`Scale.revert`
+  silently ignored `axis=1` (missing `return`); the rolling-window size was
+  clamped against the series axis instead of the time axis; `mad(axis=1)` raised
+  a broadcast error; `np.AxisError` no longer exists under NumPy 2. All fixed,
+  with genuine multi-column parity tests (the old tests used degenerate
+  single-column arrays).
+- **`portfolio.ERC` / `MVP_uc` returned the equal-weight starting guess.** The
+  SLSQP objective fell below the default `ftol` on return-scale inputs; the
+  covariance is now rescaled to unit trace so they converge. Single-asset inputs
+  no longer crash the covariance-based optimizers; `IVP(normalize=True)` no
+  longer distorts the inverse-variance weights.
+- **Custom losses** (`CalmarLoss`/`OmegaLoss`/`SortinoLoss`) no longer explode
+  to huge magnitudes on low-denominator (e.g. drawdown-free) batches.
+- **`_RollingBasis` walk-forward** now rejects `roll_period > train_period`
+  (which previously wrapped negative indices into future data — a lookahead
+  leak); train-loss normalization, per-step KPI indexing, and fork-unsafe
+  plotting in `run()` are fixed.
+- **`signal.rank`** raises `ValueError` on overlapping or negative legs
+  (previously produced silently non-dollar-neutral weights).
+- **`econometric_models.ARMA`/`ARMA_GARCH`/`ARMAX_GARCH`** accept list inputs;
+  `estimator.loglikelihood` no longer mutates its input array;
+  `diversified_ratio` returns a scalar.
+- **`data.align.resample`** validates the index dtype with a clear error;
+  `data.split.walk_forward` rejects empty-train configs;
+  `core.PriceSeries.to_returns` rejects non-positive prices for log/pct returns.
+- **`backtest` transaction-cost timing** on prices input;
+  `research.run_experiment` no longer mutates the caller's `strategy.cost`;
+  `leaderboard` sorts a NaN metric to the bottom.
+- Removed a dead `bollinger_band` deprecation warning; corrected numerous
+  docstring formulas/typos and `Raises` sections.
+
+### Deprecated
+
+### Removed
+
 ## [2.9.0] - 2026-06-21
 
 ### Breaking Changes

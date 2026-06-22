@@ -90,19 +90,45 @@ def resample(
 ) -> PriceSeries | dict[str, PriceSeries]:
     """ Downsample a series to a coarser frequency.
 
+    The series index must be a NumPy ``datetime64`` array; polars'
+    ``group_by_dynamic`` resampling is defined only over a temporal axis. An
+    integer or object-dtype (e.g. ``datetime.datetime``) index is rejected with
+    an explanatory :class:`ValueError` rather than surfacing an opaque polars
+    error.
+
     Parameters
     ----------
     ps : PriceSeries
-        Series with a datetime index.
+        Series with a ``datetime64`` index.
     freq : str
         Target polars frequency (e.g. ``"1w"``, ``"1mo"``).
     agg : {"last", "mean", "ohlc"}
         Aggregation. ``ohlc`` returns a mapping with open/high/low/close.
 
+    Returns
+    -------
+    PriceSeries or dict of str to PriceSeries
+        The resampled series (or an open/high/low/close mapping for ``ohlc``).
+
+    Raises
+    ------
+    ValueError
+        If the index is not a ``datetime64`` array, or if ``agg`` is unknown.
+
     """
     import polars as pl
 
-    df = pl.DataFrame({"_t": ps.index, "_v": ps.values}).sort("_t")
+    index = np.asarray(ps.index)
+
+    if index.dtype.kind != "M":
+
+        raise ValueError(
+            "resample requires a datetime64 index, got an index of dtype "
+            f"{index.dtype!r}; convert the index to numpy datetime64 first "
+            "(integer and object/datetime.datetime indexes are not supported)"
+        )
+
+    df = pl.DataFrame({"_t": index, "_v": ps.values}).sort("_t")
     gb = df.group_by_dynamic("_t", every=freq)
 
     if agg == "last":

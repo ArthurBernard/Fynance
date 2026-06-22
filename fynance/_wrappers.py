@@ -61,13 +61,13 @@ def wrap_axis(func):
                 stacklevel=2,
             )
 
-        if shape[axis] < min_size:
+        if X.ndim <= axis:
+
+            raise np.exceptions.AxisError(axis, X.ndim)
+
+        elif shape[axis] < min_size:
 
             raise ArraySizeError(shape[axis], axis=axis, min_size=min_size)
-
-        elif X.ndim <= axis:
-
-            raise np.AxisError(axis, len(X.shape))
 
         elif axis == 1 and X.ndim == 2:
 
@@ -105,8 +105,13 @@ def wrap_window(func):
     """ Check if the lagged window `w` is available for `X` array. """
     @wraps(func)
     def check_window(X, w=None, **kwargs):
+        # The window must be validated against the time axis. `wrap_window`
+        # runs before `wrap_axis` transposes the array, so the time axis is
+        # still `axis` (default 0) of the input array here.
+        axis = kwargs.get('axis', 0)
+        size = X.shape[axis] if axis < X.ndim else X.shape[0]
         if w == 0 or w is None:
-            w = X.shape[0]
+            w = size
 
         elif 'min_size' in kwargs.keys() and w < kwargs['min_size']:
 
@@ -118,14 +123,14 @@ def wrap_window(func):
             raise ValueError('lagged window of size {} is not available, \
                 must be positive.'.format(w))
 
-        elif w > X.shape[0]:
+        elif w > size:
             warn(
                 'lagged window of size {} is out of bounds with time axis '
-                'of size {}'.format(w, X.shape[0]),
+                'of size {}'.format(w, size),
                 category=UserWarning,
                 stacklevel=2,
             )
-            w = X.shape[0]
+            w = size
 
         return func(X, w=int(w), **kwargs)
 

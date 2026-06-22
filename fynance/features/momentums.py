@@ -296,7 +296,10 @@ def wma(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDArray:
 
     .. math::
 
-        wma^w_t(X) = \frac{2}{w (w-1)} \sum^{w-1}_{i=0} (w-i) \times X_{t-i}
+        wma^w_t(X) = \frac{2}{w (w+1)} \sum^{w-1}_{i=0} (w-i) \times X_{t-i}
+
+    The weights :math:`(w - i)` decrease linearly with the lag and sum to
+    :math:`w (w + 1) / 2`, which is the normalizer applied above.
 
     Parameters
     ----------
@@ -498,9 +501,12 @@ def wmstd(X: NDArray, w: int | None = None, axis: int = 0, dtype=None) -> NDArra
 
     .. math::
 
-        wma^w_t(X) = \frac{2}{w (w-1)} \sum^{w-1}_{i=0} (w-i) \times X_{t-i} \\
-        wmstd^w_t(X) = \sqrt{\frac{2}{w(w-1)} \sum^{w-1}_{i=0}
+        wma^w_t(X) = \frac{2}{w (w+1)} \sum^{w-1}_{i=0} (w-i) \times X_{t-i} \\
+        wmstd^w_t(X) = \sqrt{\frac{2}{w(w+1)} \sum^{w-1}_{i=0}
         (w-i) \times (X_{t-i} - wma^w_t(X))^2}
+
+    As for :func:`wma`, the linearly decreasing weights :math:`(w - i)` sum
+    to :math:`w (w + 1) / 2`.
 
     Parameters
     ----------
@@ -552,8 +558,12 @@ def emstd(X: NDArray, alpha: float = 0.94, w: int | None = None, axis: int = 0, 
 
     .. math::
 
-        emstd^{\alpha}_t(X) = \sqrt{\alpha\times emstd^{\alpha}_{t-1}^2 +
-        (1-\alpha) \times X_t^2}
+        emstd^{\alpha}_t(X) = \sqrt{\alpha \times {emstd^{\alpha}_{t-1}}^2 +
+        (1-\alpha) \times (X_t - ema^{\alpha}_t(X))^2}
+
+    Where :math:`ema^{\alpha}_t(X)` is the exponential moving average (see
+    :func:`ema`); the squared deviation is taken around it rather than around
+    zero.
 
     Parameters
     ----------

@@ -58,18 +58,28 @@ def permutation_test(
     the asset's returns (which destroys any temporal structure). If the strategy
     scores as well on shuffled data as on the real data, its edge is not real.
 
+    The price series must be strictly positive: the null is built on log-returns
+    (``np.diff(np.log(prices))``), so a non-positive price would yield ``nan`` /
+    ``-inf`` returns.
+
+    Each run is seeded with a **distinct** seed derived from ``seed`` (the
+    observed run and every permutation), so a stochastic strategy does not see
+    the *same* model RNG draws on every path — which would bias the null
+    variance. The whole test stays reproducible for a fixed ``seed``.
+
     Parameters
     ----------
     strategy : fynance.strategy.Strategy
         The strategy to evaluate.
     data : PriceSeries or array-like
-        Price series.
+        Strictly positive price series (``np.log`` is taken).
     metric : str
         Metric key from the run summary (default ``"sharpe"``).
     n_permutations : int
         Number of shuffles forming the null distribution.
     seed : int
-        Seed for the shuffles and the runs.
+        Master seed for the shuffles and the runs (per-run seeds are derived
+        from it, so the test is fully reproducible).
 
     Returns
     -------
@@ -85,8 +95,13 @@ def permutation_test(
     log_ret = np.diff(np.log(prices))
     s0 = float(prices[0])
 
+    # Draw distinct per-run seeds from the master seed so stochastic strategies
+    # do not replay identical RNG draws on every path (which biases the null).
+    seed_rng = np.random.default_rng(seed)
+    run_seeds = seed_rng.integers(0, 2**31 - 1, size=n_permutations + 1)
+
     observed = run_experiment(strategy, prices, name="observed",
-                              seed=seed).metrics[metric]
+                              seed=int(run_seeds[0])).metrics[metric]
 
     rng = np.random.default_rng(seed)
     null = np.empty(n_permutations, dtype=np.float64)
@@ -94,7 +109,7 @@ def permutation_test(
         shuffled = rng.permutation(log_ret)
         path = s0 * np.exp(np.concatenate([[0.0], np.cumsum(shuffled)]))
         null[i] = run_experiment(strategy, path, name="perm",
-                                 seed=seed).metrics[metric]
+                                 seed=int(run_seeds[i + 1])).metrics[metric]
 
     # Smoothed p-value (never exactly 0): (#{null >= observed} + 1) / (n + 1).
     p_value = float((np.sum(null >= observed) + 1) / (n_permutations + 1))
@@ -167,7 +182,9 @@ def deflated_sharpe_ratio(
     Parameters
     ----------
     sr : float
-        Observed (non-annualized) Sharpe ratio of the selected strategy.
+        Observed **per-observation** (non-annualized) Sharpe ratio of the
+        selected strategy. An annualized Sharpe must be divided by
+        ``sqrt(period)`` first, or the DSR saturates to ~1.
     n_obs : int
         Number of return observations.
     n_trials : int
@@ -175,7 +192,11 @@ def deflated_sharpe_ratio(
     skew, kurt : float
         Skewness / kurtosis of the selected strategy's returns.
     sr_variance : float
-        Variance of the Sharpe estimates **across the trials**.
+        Variance of the (per-observation) Sharpe estimates **across the
+        trials**. The default ``1.0`` is a conservative placeholder — it
+        overstates the expected-maximum benchmark and so understates the DSR;
+        pass the empirical variance of the trial Sharpes whenever available
+        (as :meth:`fynance.research.Ledger.deflated_sharpe` does).
 
     Returns
     -------

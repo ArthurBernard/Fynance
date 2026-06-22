@@ -269,7 +269,7 @@ def calmar(X: NDArray, period: int = 252, axis: int = 0, dtype=None, ddof: int =
 
     Notes
     -----
-    Calmar ratio [3]_ is the compouned annual return
+    Calmar ratio [3]_ is the compounded annual return
     (:func:`~fynance.metrics.annual_return`) over the maximum drawdown
     (:func:`~fynance.metrics.mdd`). Let :math:`T` the number of time
     observations, DD the vector of drawdown:
@@ -278,11 +278,16 @@ def calmar(X: NDArray, period: int = 252, axis: int = 0, dtype=None, ddof: int =
 
         calmarRatio = \frac{annualReturn}{MDD}
 
-    With, :math:`annualReturn = \frac{X_T}{X_1}^{\frac{period}{T}} - 1` and
-    :math:`MDD = max(DD_{1:T})`.
+    With, :math:`annualReturn = \left(\frac{X_T}{X_1}\right)^{\frac{period}{T}}
+    - 1` and :math:`MDD = max(DD_{1:T})`.
 
     Where, :math:`DD_t = 1 - \frac{X_t}{max(X_{1:t})}`,
     :math:`\forall t \in [1:T]`.
+
+    A drawdown-free curve has a zero maximum drawdown, which leaves the ratio
+    undefined: it is ``+inf`` when the annual return is positive (a riskless
+    gain) and ``0`` when the annual return is also zero (a flat curve). This is
+    the same zero-denominator convention as :func:`sharpe` and :func:`sortino`.
 
     Parameters
     ----------
@@ -315,9 +320,14 @@ def calmar(X: NDArray, period: int = 252, axis: int = 0, dtype=None, ddof: int =
 
     >>> X = np.array([70, 100, 80, 120, 160, 105, 80]).astype(np.float64)
     >>> calmar(X, period=12, ddof=1)
-    array(0.6122449)
+    0.6122448979591835
     >>> calmar(X.reshape([7, 1]), period=12)
     array([0.51446018])
+
+    A drawdown-free (monotonically increasing) curve yields ``inf``:
+
+    >>> calmar(np.array([100., 101., 102., 103., 104.]), period=12)
+    inf
 
     See Also
     --------
@@ -327,11 +337,8 @@ def calmar(X: NDArray, period: int = 252, axis: int = 0, dtype=None, ddof: int =
     ret = _annual_return(X, period, ddof)
     dd = _drawdown(X, False)
     mdd = np.max(dd, axis=axis)
-    calmar = np.zeros(ret.shape)
-    slice_bool = (mdd != 0)
-    calmar[slice_bool] = ret[slice_bool] / mdd[slice_bool]
 
-    return calmar
+    return _safe_ratio(ret, mdd)
 
 
 @WrapperArray('axis')
@@ -341,7 +348,7 @@ def diversified_ratio(X: NDArray, W: NDArray | None = None, std_method: str = 's
     Notes
     -----
     Diversification ratio, denoted D, is defined as the ratio of the
-    portfolio's weighted average volatility to its overll volatility,
+    portfolio's weighted average volatility to its overall volatility,
     developed by Choueifaty and Coignard [4]_.
 
     .. math:: D(P) = \\frac{P' \\Sigma}{\\sqrt{P'VP}}
@@ -364,7 +371,7 @@ def diversified_ratio(X: NDArray, W: NDArray | None = None, std_method: str = 's
 
     Returns
     -------
-    np.float64
+    float
         Value of diversification ratio of the portfolio.
 
     References
@@ -386,7 +393,7 @@ def diversified_ratio(X: NDArray, W: NDArray | None = None, std_method: str = 's
     sigma = np.std(X, axis=0).reshape([N, 1])
     V = np.cov(X, rowvar=False, bias=True).reshape([N, N])
 
-    return (W.T @ sigma) / np.sqrt(W.T @ V @ W)
+    return ((W.T @ sigma) / np.sqrt(W.T @ V @ W)).item()
 
 
 @WrapperArray('dtype', 'axis', 'null', 'window', 'ddof', min_size=3)
@@ -566,7 +573,7 @@ def roll_calmar(X: NDArray, period: float = 252., w: int | None = None, axis: in
 
     Notes
     -----
-    Calmar ratio [3]_ is the rolling compouned annual return
+    Calmar ratio [3]_ is the rolling compounded annual return
     (:func:`~fynance.metrics.roll_annual_return`) over the rolling
     maximum drawdown (:func:`~fynance.metrics.roll_mdd`). Let
     :math:`T` the number of time observations, DD the vector of drawdown,
@@ -576,9 +583,13 @@ def roll_calmar(X: NDArray, period: float = 252., w: int | None = None, axis: in
 
         calmarRatio_t = \frac{annualReturn_t}{MDD_t} \\ \\
 
-    With, :math:`annualReturn_t = \frac{X_t}{X_1}^{\frac{period}{t}} - 1` and
-    :math:`MDD_t = max(DD_t)`, where
+    With, :math:`annualReturn_t = \left(\frac{X_t}{X_1}\right)^{\frac{period}{t}}
+    - 1` and :math:`MDD_t = max(DD_t)`, where
     :math:`DD_t = 1 - \frac{X_t}{max(X_{1:t})}`.
+
+    As for :func:`calmar`, a drawdown-free window has a zero maximum drawdown
+    and the ratio is ``+inf`` when its annual return is positive and ``0`` when
+    that return is also zero — the same convention as :func:`roll_sharpe`.
 
     Parameters
     ----------
@@ -614,7 +625,7 @@ def roll_calmar(X: NDArray, period: float = 252., w: int | None = None, axis: in
 
     >>> X = np.array([70, 100, 80, 120, 160, 80]).astype(np.float64)
     >>> roll_calmar(X, period=12)
-    array([ 0.        ,  0.        ,  3.52977926, 20.18950437, 31.35989887,
+    array([ 0.        ,         inf,  3.52977926, 20.18950437, 31.35989887,
             0.6122449 ])
 
     See Also
@@ -624,9 +635,6 @@ def roll_calmar(X: NDArray, period: float = 252., w: int | None = None, axis: in
     """
     ret = _roll_annual_return(X, period, w, ddof)
     mdd = _roll_mdd(X, w, False)
-    calmar = np.zeros(X.shape)
-    slice_bool = (mdd != 0)
-    calmar[slice_bool] = ret[slice_bool] / mdd[slice_bool]
 
-    return calmar
+    return _safe_ratio(ret, mdd)
 

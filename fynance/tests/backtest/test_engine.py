@@ -69,3 +69,49 @@ def test_two_asset_book():
 def test_returns_result_type():
     res = backtest(np.array([0.01, 0.02]), np.array([1.0, 1.0]))
     assert isinstance(res, BacktestResult)
+
+
+def test_prices_input_cost_turnover_timing():
+    # On a prices input the engine drops the first position (it predates the
+    # first return). The cost model must still see the full book so the initial
+    # trade is charged once and a *constant* book then incurs no further cost.
+    prices = np.array([100.0, 110.0, 99.0, 108.9])
+    positions = np.ones(prices.size)          # constant full long
+    cost = ProportionalCost(fee=0.01)
+    res = backtest(prices, positions, cost=cost, returns_input=False, shift=True)
+    # 3 returns; only the initial entry is charged, no spurious re-entry.
+    assert res.costs.shape == res.returns.shape
+    assert np.allclose(res.costs, [0.01, 0.0, 0.0])
+
+
+def test_prices_input_cost_matches_returns_input():
+    # The prices path and the equivalent returns path must agree on cost timing.
+    prices = np.array([100.0, 110.0, 99.0, 108.9, 120.0])
+    positions = np.array([1.0, 1.0, -1.0, -1.0, 0.0])
+    cost = ProportionalCost(fee=0.02)
+
+    res_p = backtest(prices, positions, cost=cost,
+                     returns_input=False, shift=True)
+
+    returns = prices[1:] / prices[:-1] - 1.0
+    # Equivalent returns-input call uses the same surviving positions and the
+    # full book (including the dropped first entry) as the cost reference.
+    res_r = backtest(returns, positions[1:], cost=cost,
+                     returns_input=True, shift=True)
+    expected_costs = cost(positions[:-1])      # turnover into earning positions
+    assert np.allclose(res_p.costs, expected_costs)
+    assert np.allclose(res_p.gross_returns, res_r.gross_returns)
+
+
+def test_prices_input_cost_preserves_no_lookahead():
+    # Re-assert causality on the prices+cost path (no regression of the shift).
+    prices = np.array([100.0, 101.0, 102.0, 99.0, 105.0, 110.0])
+    positions = np.array([1.0, -1.0, 1.0, -1.0, 1.0, -1.0])
+    cost = ProportionalCost(fee=0.01)
+    base = backtest(prices, positions, cost=cost,
+                    returns_input=False, shift=True).equity.copy()
+    pert = prices.copy()
+    pert[-1] = 999.0                            # perturb the future only
+    res = backtest(pert, positions, cost=cost,
+                   returns_input=False, shift=True).equity
+    assert np.allclose(base[:-1], res[:-1])

@@ -11,6 +11,11 @@ The **anti-churn** mappers — :func:`ema_smooth`, :func:`deadband`,
 strictly causal; compose them to cut turnover where transaction costs would
 otherwise eat the edge (high fees / high frequency).
 
+Initial-state convention: the stateful mappers seed their running state from
+the first input (``out[0] == pred[0]``) rather than from zero, so the first
+bar is passed through unchanged and the smoothing/holding logic starts from a
+realistic position rather than an artificial flat one.
+
 """
 
 from __future__ import annotations
@@ -75,12 +80,28 @@ def rank(pred: NDArray, top: int, bottom: int) -> NDArray[np.float64]:
     pred : array-like, shape (T, n_assets)
         Cross-sectional predictions.
     top, bottom : int
-        Number of assets in the long and short legs.
+        Number of assets in the long and short legs. Both must be ``>= 0`` and
+        ``top + bottom`` must not exceed ``n_assets`` -- otherwise the legs
+        would overlap and the long assignment would silently overwrite the
+        short, breaking dollar-neutrality.
 
     Returns
     -------
     numpy.ndarray
         Weights of shape ``(T, n_assets)``.
+
+    Raises
+    ------
+    ValueError
+        If ``pred`` is not 2-D, if ``top`` or ``bottom`` is negative, or if
+        ``top + bottom`` exceeds the number of assets.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> w = rank(np.array([[1.0, 2.0, 3.0, 4.0]]), top=1, bottom=1)
+    >>> w.sum()  # dollar-neutral
+    0.0
 
     """
     p = np.asarray(pred, dtype=np.float64)
@@ -88,6 +109,21 @@ def rank(pred: NDArray, top: int, bottom: int) -> NDArray[np.float64]:
     if p.ndim != 2:
 
         raise ValueError("rank expects a 2-D (T, n_assets) prediction")
+
+    if top < 0 or bottom < 0:
+
+        raise ValueError(
+            f"top and bottom must be >= 0, got top={top}, bottom={bottom}"
+        )
+
+    n_assets = p.shape[1]
+
+    if top + bottom > n_assets:
+
+        raise ValueError(
+            f"overlapping legs: top + bottom = {top + bottom} > "
+            f"n_assets = {n_assets}; the long and short legs would overlap"
+        )
 
     weights = np.zeros_like(p)
     order = np.argsort(p, axis=1)

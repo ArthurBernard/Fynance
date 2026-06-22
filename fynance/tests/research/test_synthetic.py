@@ -52,3 +52,26 @@ def test_zero_length_edge_cases():
     # n == 1 -> a single starting price, no returns.
     assert gbm(1, s0=100.0, seed=0).to_numpy().tolist() == [100.0]
     assert regime_switching(1, s0=100.0, seed=0).to_numpy().tolist() == [100.0]
+
+
+def test_regime_switching_initial_state_is_drawn():
+    # With p_switch=0 the only regime randomness is the *initial* state. It used
+    # to be hard-coded to regime 0 (biasing short paths); now it is drawn, so
+    # across seeds both regimes must appear. Distinct sigmas make the active
+    # regime visible in the first log-return's magnitude.
+    regimes = ((0.0, 0.001), (0.0, 0.5))
+    high_vol = []
+    for s in range(40):
+        p = regime_switching(2, regimes=regimes, p_switch=0.0, seed=s).to_numpy()
+        first_ret = np.diff(np.log(p))[0]
+        high_vol.append(abs(first_ret) > 0.05)  # True => started in regime 1
+
+    assert any(high_vol)          # regime 1 was sometimes the initial state
+    assert any(not h for h in high_vol)  # regime 0 too -> genuinely drawn
+
+
+def test_regime_switching_initial_state_reproducible():
+    a = regime_switching(50, p_switch=0.1, seed=9).to_numpy()
+    b = regime_switching(50, p_switch=0.1, seed=9).to_numpy()
+
+    assert np.allclose(a, b)
