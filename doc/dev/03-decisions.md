@@ -72,6 +72,29 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-06-22 — Audit round 2: regression + residual bugs (PRs #201–#207, v2.10.1)  [accepted]
+
+A second audit pass after v2.10.0 caught **one regression** the first remediation
+introduced — `RollMultiLayerPerceptron.run(backtest_kpi=True)` (the default path)
+raised `IndexError` because `__next__` bumps `self.i` past the last filled slot
+before `StopIteration`; fixed by clamping the KPI index — plus residual
+pre-existing bugs the first pass missed. Shipped in 7 atomic PRs (parallel
+worktrees). Test count 880 (with doctests). Two decisions worth recording:
+
+- **`RNN`/`GRU`/`LSTM` are now drop-in `SignalModel`s via a zero-initialized
+  state.** Since these are stateless gated cells (each row independent), `H`/`C`
+  carry no meaning across a call, so `fit(X, y)`/`predict(X)` default the state to
+  zeros; the explicit-state forms remain for callers that thread state. Chosen
+  over making them raise (they advertised `SignalModel` but `.fit` previously
+  `TypeError`'d).
+- **Training losses saturate smoothly, not by a hard clamp.** The v2.10.0
+  `MAX_RATIO` clamp made the loss finite but zeroed the gradient on low-risk
+  batches; replaced with `MAX_RATIO * tanh(ratio / MAX_RATIO)` + a scale-invariant
+  floor so a residual gradient always survives. **Lesson: parallel-worktree
+  agents must not use `git stash` (shared stash stack collides) — verify
+  fail-before via a temp copy.**
+
+
 ### 2026-06-22 — Full code audit + remediation (PRs #188–#196)  [accepted]
 
 A deep correctness/tests/docs audit (the 5 gates were already green) found logic

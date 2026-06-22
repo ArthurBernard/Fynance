@@ -66,11 +66,11 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
 - **Numerical kernels on Numba `@njit`** — no Cython anywhere; the build is
   pure-Python (no `setup.py`, no compile step). Every kernel has a golden-value
   parity test (1e-9/1e-10) captured from the former Cython.
-- **Quality gates (all 4 enforced in CI)**: ~660 tests collected (~570 unit/
+- **Quality gates (all 4 enforced in CI)**: ~880 tests collected (~790 unit/
   benchmark + doctests on every module via `--doctest-modules`), incl. property
   tests (kernel parity + no-lookahead); `ruff`; `interrogate` (docstring coverage
-  ≥ 80%, currently ~93.6%); Sphinx build `-W`; **`mypy` clean (0 errors)**.
-- **Released**: `v2.9.0` on `master` + PyPI; `Production/Stable`. CI matrix
+  ≥ 80%, currently ~94.7%); Sphinx build `-W`; **`mypy` clean (0 errors)**.
+- **Released**: `v2.10.1` on `master` + PyPI; `Production/Stable`. CI matrix
   3.10–3.13; release builds a pure-Python universal wheel + sdist and creates the
   GitHub Release from the CHANGELOG on tag.
 
@@ -78,10 +78,12 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
 
 Nothing is currently in flight (`develop` is clean). The v2.9.0 **library
 bricks** all shipped (OHLCV indicators, causal GARCH-volatility feature,
-adaptive windows, `RegimeMoE`, `MarketImpactCost`). Remaining open work is the
-**2026-06 audit remediation** (correctness/tests/docs the CI gates don't catch —
-roadmap §1), an optional **Streamlit ledger explorer** (roadmap §2), and minor
-**CI/badge hygiene** (roadmap §3). See `07-roadmap.md`.
+adaptive windows, `RegimeMoE`, `MarketImpactCost`), and the **2026-06 audit**
+was fully remediated across two passes (v2.10.0: PRs #188–#196; v2.10.1: PRs
+#201–#207 — correctness/tests/docs the CI gates don't catch, incl. one KPI
+regression). The CI/badge hygiene chores are resolved (CI runs on `develop` PRs;
+badges green). The only remaining open item is the optional **Streamlit ledger
+explorer** (roadmap §2). See `07-roadmap.md`.
 
 **Out of scope here**: strategy research on **real data** (empirical loss /
 architecture / normalization benchmarks, out-of-sample Sharpe, online regimes,
