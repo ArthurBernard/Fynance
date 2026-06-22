@@ -16,6 +16,12 @@ Main entry points
   proxy; only penalizes negative excess returns).
 - :class:`DirectionalAccuracyLoss` — sigmoid surrogate for directional
   accuracy (differentiable approximation of sign-prediction rate).
+- :class:`CalmarLoss` — negative Calmar ratio (return per unit of
+  maximum drawdown).
+- :class:`OmegaLoss` — negative Omega ratio (expected gains over
+  expected losses relative to a threshold).
+- :class:`HybridLoss` — convex combination of two losses with a fixed or
+  learnable weight.
 
 Notes
 -----

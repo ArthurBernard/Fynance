@@ -10,6 +10,7 @@ import torch
 import torch.nn.functional as F
 
 # Local packages
+from ._base import MAX_RATIO as _MAX_RATIO
 from ._base import BaseLoss
 
 __all__ = ['SortinoLoss']
@@ -38,6 +39,13 @@ class SortinoLoss(BaseLoss):
     **This is a training proxy** — the value is not comparable to the
     numpy :func:`~fynance.metrics.sortino` evaluation metric.
 
+    The downside deviation is :math:`O(\text{returns})`, so a fixed
+    absolute ``eps`` inside the square root is dimensionally wrong: on an
+    all-gains batch (zero downside) the loss would explode (e.g. ``-100``).
+    The downside is therefore floored with a **returns-scaled** epsilon
+    proportional to the excess-return magnitude, keeping the loss finite
+    and bounded while preserving the sign convention.
+
     Parameters
     ----------
     rf : float, optional
@@ -45,7 +53,8 @@ class SortinoLoss(BaseLoss):
     period : int, optional
         Number of periods per year. Default is 252.
     eps : float, optional
-        Numerical stabilizer added inside the square root. Default is 1e-8.
+        Relative numerical stabilizer scaling the downside-deviation floor
+        (see Notes). Default is 1e-8.
 
     Examples
     --------
@@ -88,5 +97,13 @@ class SortinoLoss(BaseLoss):
         """
         self._check_tensor(y_pred)
         excess = y_pred - self._rf_per_period
-        downside = torch.sqrt(torch.mean(F.relu(-excess) ** 2) + self.eps)
-        return -(excess.mean() / downside)
+        downside = torch.sqrt(torch.mean(F.relu(-excess) ** 2))
+        # Floor the downside relative to the return scale: a fixed absolute eps
+        # inside the sqrt is dimensionally wrong for an O(returns) downside and
+        # lets the ratio explode on an all-gains batch. ``eps`` backstops the
+        # degenerate all-zero case; the final clamp bounds the magnitude in the
+        # near-zero-downside regime (where pushing for more gains is fine, so
+        # saturating the gradient there is harmless for this training proxy).
+        floor = self.eps * excess.abs().mean() + self.eps
+        ratio = excess.mean() / torch.clamp(downside, min=floor)
+        return -torch.clamp(ratio, min=-_MAX_RATIO, max=_MAX_RATIO)
