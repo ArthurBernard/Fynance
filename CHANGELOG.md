@@ -12,7 +12,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **`RNN`/`GRU`/`LSTM` honor the `SignalModel` contract.** `fit(X, y)` and
+  `predict(X)` now work with a zero-initialized hidden (and cell) state — the
+  natural default for these stateless gated cells. The explicit-state forms
+  (`train_on(X, y, H[, C])`, `predict(X, H[, C])`) are unchanged.
+- **Custom losses use a smooth saturating map.** `CalmarLoss`/`OmegaLoss`/
+  `SortinoLoss` replace the hard `MAX_RATIO` clamp (which zeroed the gradient on
+  low-risk batches) with `MAX_RATIO * tanh(ratio / MAX_RATIO)` plus a
+  scale-invariant floor — finite loss, gradient preserved, normal-regime
+  numerics unchanged.
+
 ### Fixed
+
+- **`roll_standardize`/`roll_normalize` with `axis=1`** on genuine multi-column
+  input (the 2.10.0 `axis=1` repair had only covered the `Scale` class).
+- **`RollMultiLayerPerceptron.run(backtest_kpi=True)`** (the default) raised
+  `IndexError` on the final post-loop print; the KPI index is now clamped.
+- **`_safe_ratio` returns `-inf`** (not `+inf`) for a negative excess over a
+  zero denominator — a riskless loss is no longer scored as the best ratio;
+  `roll_sharpe` is unified onto the same `_safe_ratio` convention.
+- **`_wrappers` negative axis** (`axis=-1`) now resolves correctly instead of
+  silently computing `axis=0`; `accuracy`/`directional_accuracy` work on 2-D
+  `axis=1`.
+- **`data.split.walk_forward(step<=0)`** infinite loop and `train_test_split`
+  negative `test_size` (out-of-bounds indices) now raise; `align.resample`
+  handles `datetime64` resolutions beyond `[D]/[ms]/[us]/[ns]`; `align` rejects a
+  duplicate index; `PriceSeries.to_returns(dropna=False)`/`pnl()` handle empty
+  input.
+- **Portfolio `ERC`/`MVP_uc` clamp `low_bound`** (feasible, sum-to-one weights);
+  `research.synthetic.gbm`/`regime_switching` reject `n < 1`;
+  `research.compare` leaderboard unions metric columns across rows;
+  `features.money_management.iso_vol` accepts list input.
 
 ### Deprecated
 
