@@ -468,12 +468,18 @@ class _RollingBasis:
 
     def _display_kpi(self, t):
         pct = t - self.n - self.s
-        pct = pct / (self.T - self.n - self.T % self.s)
+        # Guard the denominator: ``T - n - T % s`` can be 0 (e.g. T=45, n=40,
+        # s=10) which would raise ``ZeroDivisionError``. Floor it at 1.
+        pct = pct / max(self.T - self.n - self.T % self.s, 1)
         txt = '{:5.2%} is done | '.format(pct)
         # Use the current iteration index ``self.i`` — ``[-1]`` is the last
-        # array slot, which stays 0 until the final iteration.
-        txt += 'Eval loss is {:5.2} | '.format(self.loss_eval[self.i])
-        txt += 'Test loss is {:5.2} | '.format(self.loss_test[self.i])
+        # array slot, which stays 0 until the final iteration. ``__next__``
+        # bumps ``self.i`` before the ``StopIteration`` check, so after the
+        # loop ``self.i == loss_eval.size``; clamp to the last filled slot to
+        # avoid an out-of-bounds read on the final out-of-loop print.
+        i = min(self.i, self.loss_eval.size - 1)
+        txt += 'Eval loss is {:5.2} | '.format(self.loss_eval[i])
+        txt += 'Test loss is {:5.2} | '.format(self.loss_test[i])
         print(txt, end='\r')
 
     def _display_plot_loss(self, bnn, i):
