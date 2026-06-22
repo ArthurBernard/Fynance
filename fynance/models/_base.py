@@ -63,21 +63,23 @@ class BaseNeuralNet(torch.nn.Module):
 
     **Public API contract (stable for the 1.x series)**
 
-    - **Shapes** — feed-forward subclasses (e.g.
-      :class:`~fynance.models.mlp.MultiLayerPerceptron`)
-      expect ``X`` of shape ``(T, N)`` and ``y`` of shape ``(T, M)``,
-      where ``T`` is the number of observations, ``N`` the number of
-      input features and ``M`` the number of targets. Recurrent
-      subclasses in :mod:`fynance.models.rnn`,
-      :mod:`fynance.models.gru`, :mod:`fynance.models.lstm`
-      consume ``X`` of shape ``(T, S, N)``, where ``S`` is the sequence
-      length.
+    - **Shapes** — all current subclasses (the feed-forward
+      :class:`~fynance.models.mlp.MultiLayerPerceptron`, the gated
+      cells in :mod:`fynance.models.rnn`, :mod:`fynance.models.gru`,
+      :mod:`fynance.models.lstm`, and the convolutional / attention
+      models) expect ``X`` of shape ``(T, N)`` and ``y`` of shape
+      ``(T, M)``, where ``T`` is the number of observations, ``N`` the
+      number of input features and ``M`` the number of targets. The
+      gated "recurrent" cells process each of the ``T`` rows
+      independently (they are stateless gated feed-forward cells — see
+      their own class docstrings); they do **not** thread a hidden state
+      across a time axis.
     - **Dtypes** — :meth:`set_data` coerces inputs through
-      :meth:`_set_data`. The expected default for both ``X`` and ``y``
-      is a floating tensor (``torch.float32`` is the de-facto convention
-      in the project doctests). Pass ``x_type`` / ``y_type`` explicitly
-      to override; mismatched dtypes between ``X``, ``y`` and the model
-      parameters will raise at the first ``forward`` pass.
+      :meth:`_set_data`, which casts floating-point inputs to
+      ``torch.get_default_dtype()`` (``float32`` by default) so plain
+      ``float64`` NumPy arrays train without manual ``.astype``. Integer
+      inputs keep their dtype. Pass ``x_type`` / ``y_type`` explicitly to
+      force a specific dtype.
     - **Device** — the wrapper does **not** move tensors automatically.
       Models live on CPU unless the caller explicitly calls ``.to(device)``
       on both the module and the data tensors before training.
@@ -134,7 +136,7 @@ class BaseNeuralNet(torch.nn.Module):
 
         Parameters
         ----------
-        criterion : Callabletorch.nn.modules.loss
+        criterion : Callable, torch.nn.modules.loss
             A loss function.
         optimizer : torch.optim.Optimizer
             An optimizer algorithm.
@@ -200,11 +202,12 @@ class BaseNeuralNet(torch.nn.Module):
         """ Trains the neural network model on a single batch.
 
         Runs one forward / backward / optimizer-step cycle on the batch
-        ``(X, y)``. As a side effect, gradients of all parameters are
-        zeroed before the forward pass and the optimizer state is
-        advanced afterwards. If a learning-rate scheduler has been
-        registered via :meth:`set_lr_scheduler`, its ``step`` is also
-        called.
+        ``(X, y)``. The module is switched to training mode (so dropout
+        and batch-norm behave as expected) before the forward pass. As a
+        side effect, gradients of all parameters are zeroed before the
+        forward pass and the optimizer state is advanced afterwards. If a
+        learning-rate scheduler has been registered via
+        :meth:`set_lr_scheduler`, its ``step`` is also called.
 
         Parameters
         ----------
@@ -225,6 +228,7 @@ class BaseNeuralNet(torch.nn.Module):
             If :meth:`set_optimizer` has not been called yet.
 
         """
+        self.train()
         self.optimizer.zero_grad()  # type: ignore[attr-defined]
         outputs = self(X)
         loss = self.criterion(outputs, y)
@@ -271,11 +275,15 @@ class BaseNeuralNet(torch.nn.Module):
     def predict(self, X) -> torch.Tensor:
         """ Predicts outputs of neural network model.
 
-        Runs ``self.forward(X)`` under :func:`torch.no_grad`, so no
-        autograd graph is built. The returned tensor is detached and
-        lives on the same device as the model parameters. Array-like inputs
-        (numpy / polars) are coerced to a tensor first, so the method also
-        satisfies the :class:`~fynance.core.protocols.SignalModel` contract.
+        Runs ``self.forward(X)`` under :func:`torch.no_grad` with the
+        module switched to evaluation mode, so no autograd graph is built
+        and stochastic layers (dropout, batch-norm) behave
+        deterministically. The previous training/eval mode is restored on
+        exit. The returned tensor is detached and lives on the same device
+        as the model parameters; the coerced input is moved to that device
+        too. Array-like inputs (numpy / polars) are coerced to a tensor
+        first, so the method also satisfies the
+        :class:`~fynance.core.protocols.SignalModel` contract.
 
         Parameters
         ----------
@@ -292,7 +300,22 @@ class BaseNeuralNet(torch.nn.Module):
         if not isinstance(X, torch.Tensor):
             X = self._set_data(X)
 
-        return self(X).detach()
+        try:
+            device = next(self.parameters()).device
+            X = X.to(device)
+
+        except StopIteration:
+            pass
+
+        was_training = self.training
+        self.eval()
+        try:
+            output = self(X).detach()
+
+        finally:
+            self.train(was_training)
+
+        return output
 
     def set_data(self, X: NDArray | torch.Tensor | pl.DataFrame, y: NDArray | torch.Tensor | pl.DataFrame, x_type=None, y_type=None):
         """ Set data inputs and outputs.
@@ -311,7 +334,9 @@ class BaseNeuralNet(torch.nn.Module):
             ``(T, M)`` respectively.
         x_type, y_type : torch.dtype, optional
             Target dtypes for the resulting tensors. Default is `None`,
-            which preserves the input dtype.
+            which casts floating-point inputs to
+            ``torch.get_default_dtype()`` (``float32`` by default) and
+            leaves integer inputs unchanged. See :meth:`_set_data`.
 
         Returns
         -------
@@ -345,41 +370,96 @@ class BaseNeuralNet(torch.nn.Module):
     def set_seed(self, seed_torch=None, seed_numpy=None):
         r""" Set seed for PyTorch and NumPy random number generator.
 
+        Each generator is only (re)seeded when its argument is provided:
+        passing ``seed_torch`` alone leaves the global NumPy RNG
+        untouched, and vice versa.
+
         Parameters
         ----------
         seed_torch, seed_numpy : bool or int, optional
-            If `seed` is an int :math:`0 < seed < 2^32` set respectively
-            PyTorch and NumPy seed with the number. Otherwise if is True
-            then choose a random number, else doesn't set seed.
+            If an int :math:`0 \leq seed < 2^{32}`, seed respectively the
+            PyTorch and NumPy generator with that number. If ``True``,
+            draw a random seed. If ``None`` (default), leave that
+            generator untouched.
+
+        Examples
+        --------
+        >>> from fynance.models.mlp import MultiLayerPerceptron
+        >>> model = MultiLayerPerceptron(3, 1, layers=[4])
+        >>> model.set_seed(seed_torch=42)
+        >>> model.seed_torch
+        42
+        >>> model.seed_numpy is None
+        True
 
         """
-        self.seed_torch = self._set_seed(seed_torch)
-        self.seed_numpy = self._set_seed(seed_numpy)
-        torch.manual_seed(self.seed_torch)
-        np.random.seed(self.seed_numpy)
+        if seed_torch is not None:
+            self.seed_torch = self._set_seed(seed_torch)
+            torch.manual_seed(self.seed_torch)
+
+        if seed_numpy is not None:
+            self.seed_numpy = self._set_seed(seed_numpy)
+            np.random.seed(self.seed_numpy)
 
     def _set_seed(self, seed):
-        if isinstance(seed, int) and 0 <= seed < 2 ** 32:
+        if isinstance(seed, int) and not isinstance(seed, bool) and 0 <= seed < 2 ** 32:
 
             return seed
 
         return np.random.randint(0, 2 ** 32)
 
     def _set_data(self, X, dtype=None):
-        """ Convert array-like data to tensor. """
-        if isinstance(X, np.ndarray):
+        """ Convert array-like data to a tensor of a consistent dtype.
 
-            return torch.from_numpy(X)
+        Coerces ``X`` (NumPy array, polars ``DataFrame`` or tensor) to a
+        :class:`torch.Tensor`. When ``dtype`` is given the tensor is cast
+        to it. When ``dtype`` is ``None`` and the input is floating point,
+        the tensor is cast to ``torch.get_default_dtype()`` (``float32``
+        by default) so that plain ``float64`` NumPy input does not clash
+        with the model's ``float32`` parameters at the first ``forward``
+        pass. Integer inputs keep their dtype when ``dtype`` is ``None``.
+
+        Parameters
+        ----------
+        X : numpy.ndarray, polars.DataFrame or torch.Tensor
+            Array-like data to convert.
+        dtype : torch.dtype, optional
+            Target dtype. Default is ``None`` (see above).
+
+        Returns
+        -------
+        torch.Tensor
+            The converted tensor.
+
+        Raises
+        ------
+        ValueError
+            If ``X`` is not one of the accepted types.
+
+        """
+        if isinstance(X, np.ndarray):
+            # ``torch.from_numpy`` aliases the caller's memory; clone so a
+            # later in-place edit on the tensor cannot mutate the source.
+            tensor = torch.from_numpy(X).clone()
 
         elif isinstance(X, pl.DataFrame):
-            return torch.from_numpy(X.to_numpy())
+            tensor = torch.from_numpy(X.to_numpy()).clone()
 
         elif isinstance(X, torch.Tensor):
-
-            return X
+            tensor = X
 
         else:
             raise ValueError('Unkwnown data type: {}'.format(type(X)))
+
+        if dtype is not None:
+
+            return tensor.to(dtype)
+
+        if tensor.is_floating_point() and tensor.dtype != torch.get_default_dtype():
+
+            return tensor.to(torch.get_default_dtype())
+
+        return tensor
 
     def save_model(self, path, save_optimizer=False):
         """ Save the model with this weights and parameters.
@@ -399,7 +479,7 @@ class BaseNeuralNet(torch.nn.Module):
         torch.save(state_dict, path)
 
     def load_model(self, path, load_optimizer=False):
-        """ Save the model with this weights and parameters.
+        """ Load the model weights and parameters from a file.
 
         Parameters
         ----------

@@ -108,19 +108,19 @@ class _LSTMCell(_RecurrentBase):
         self.C = self.H if memory_state_size is None else memory_state_size
 
         # Forget gate
-        self.W_f = nn.Linear(self.N + self.H, self.C)
+        self.W_f = nn.Linear(self.N + self.H, self.C, bias=bias)
         self.f_f = forget_activation()
 
         # Update gate
-        self.W_i = nn.Linear(self.N + self.H, self.C)
+        self.W_i = nn.Linear(self.N + self.H, self.C, bias=bias)
         self.f_i = update_activation()
 
         # Candidate value
-        self.W_c = nn.Linear(self.N + self.H, self.C)
+        self.W_c = nn.Linear(self.N + self.H, self.C, bias=bias)
         self.f_c = memory_activation()
 
         # Output gate
-        self.W_o = nn.Linear(self.N + self.H, self.C)
+        self.W_o = nn.Linear(self.N + self.H, self.C, bias=bias)
         self.f_o = output_activation()
 
         # Hidden activation (applied to cell state before output gate)
@@ -210,17 +210,19 @@ class LSTMCell(_LSTMCell):
 
 
 class LongShortTermMemory(_OutputLayerMixin, LSTMCell):
-    """ Long Short-Term Memory neural network.
+    """ Long Short-Term Memory cell with output projection.
 
-    Full LSTM model: :class:`_LSTMCell` four-gate architecture followed
-    by a forward output projection. The cell state ``C`` and hidden
-    state ``H`` are threaded through the sequence, allowing the model to
-    carry information across many time steps without the
-    vanishing-gradient pathology that limits
-    :class:`~fynance.models.rnn.RecurrentNeuralNetwork`. Use it for
-    sequence modeling tasks where dependencies span dozens of steps
-    (intraday return series, multi-day momentum signals, regime
-    detection).
+    LSTM four-gate architecture (:class:`_LSTMCell`) followed by a
+    forward output projection. The caller supplies the hidden state ``H``
+    and cell state ``C``; :meth:`forward` returns updated ``(Y, H, C)``.
+    Like the other gated cells in this package, **each of the ``T`` rows
+    of ``X`` is processed independently** — the cell does *not* loop over
+    a time axis or thread ``H`` / ``C`` across rows on its own, so it is a
+    *stateless* gated feed-forward cell. To model temporal dependencies
+    the caller must thread ``H`` and ``C`` across successive steps
+    explicitly. For built-in, causal sequence modeling prefer
+    :class:`~fynance.models.tcn.TemporalConvNet` or
+    :class:`~fynance.models.transformer.Transformer`.
 
     Parameters
     ----------
@@ -229,8 +231,11 @@ class LongShortTermMemory(_OutputLayerMixin, LSTMCell):
         - If it's an integer, respectively dimension of inputs and outputs.
     drop : float, optional
         Probability of an element to be zeroed.
+    bias : bool, optional
+        If ``True`` (default), the linear layers learn an additive bias.
     forward_activation : torch.nn.Module, optional
-        Activation functions, default is Softmax.
+        Output activation, default is Identity (unconstrained regression
+        output; pass ``nn.Softmax`` for a probability-simplex output).
     hidden_activation, memory_activation : torch.nn.Module, optional
         Activation functions for respectively hidden and memory state,
         default both are Tanh function.
@@ -266,7 +271,7 @@ class LongShortTermMemory(_OutputLayerMixin, LSTMCell):
 
     def __init__(
         self, X, y, drop=None, x_type=None, y_type=None, bias=True,
-        forward_activation=nn.Softmax, hidden_activation=nn.Tanh,
+        forward_activation=nn.Identity, hidden_activation=nn.Tanh,
         hidden_state_size=None, memory_activation=nn.Tanh,
         memory_state_size=None, forget_activation=nn.Sigmoid,
         update_activation=nn.Sigmoid, output_activation=nn.Sigmoid,
@@ -334,6 +339,7 @@ class LongShortTermMemory(_OutputLayerMixin, LSTMCell):
             Cell memory of the model.
 
         """
+        self.train()
         self.optimizer.zero_grad()  # type: ignore[attr-defined]
         outputs, H, C = self(X, H, C)
         loss = self.criterion(outputs, y)
@@ -368,6 +374,12 @@ class LongShortTermMemory(_OutputLayerMixin, LSTMCell):
             Cell memory of the model.
 
         """
-        Y, H, C = self(X, H, C)
+        was_training = self.training
+        self.eval()
+        try:
+            Y, H, C = self(X, H, C)
+
+        finally:
+            self.train(was_training)
 
         return Y.detach(), H.detach(), C.detach()
