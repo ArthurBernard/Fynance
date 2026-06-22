@@ -7,7 +7,7 @@
 import numpy as np
 
 # Local
-from fynance.metrics import sharpe, sortino
+from fynance.metrics import calmar, roll_calmar, sharpe, sortino
 from fynance.metrics.ratios import _safe_ratio
 from fynance.metrics.summary import summary
 
@@ -43,3 +43,33 @@ def test_summary_on_flat_curve():
     out = summary(np.full(30, 100.0))
     assert out["sharpe"] == 0.0
     assert np.isfinite(out["max_drawdown"])
+
+
+def test_calmar_zero_mdd_is_inf_not_zero():
+    # A profitable, drawdown-free curve has zero maximum drawdown. Calmar must
+    # follow the same zero-denominator convention as sharpe/sortino (+inf for a
+    # riskless gain), not return 0.0 (the worst possible Calmar).
+    up = np.array([100., 101., 102., 103., 104., 105.])
+    assert np.isposinf(calmar(up, period=12))
+    # a flat curve (zero return over zero drawdown) stays 0.0
+    assert calmar(np.full(10, 100.0), period=12) == 0.0
+
+
+def test_calmar_zero_mdd_2d_columns():
+    up = np.array([100., 101., 102., 103., 104., 105.])
+    drawdown = np.array([100., 90., 95., 80., 85., 70.])
+    X = np.column_stack([up, drawdown])
+    res = calmar(X, period=12)
+    assert res.shape == (2,)
+    assert np.isposinf(res[0])      # drawdown-free profitable column
+    assert np.isfinite(res[1])      # column with a real drawdown
+
+
+def test_roll_calmar_zero_mdd_is_inf_not_zero():
+    # Same convention for the rolling variant: a window that has gained without
+    # any drawdown yet must score +inf, not 0.0.
+    X = np.array([70., 100., 80., 120., 160., 80.])
+    rc = roll_calmar(X, period=12)
+    # index 1 = strictly increasing so far (70 -> 100), zero MDD, positive ret.
+    assert np.isposinf(rc[1])
+    assert rc[0] == 0.0             # first point: zero return over zero MDD

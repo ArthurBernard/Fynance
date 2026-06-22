@@ -50,7 +50,48 @@ def estimation(y, x0, p=0, q=0, Q=0, P=0, cons=True, model='arch'):
 
 
 def target_function(params, y, p=0, q=0, Q=0, P=0, cons=True, model='arch'):
-    """ Target function """
+    """ Objective (cost) to minimise when fitting an ARMA/GARCH model.
+
+    Splits the flat ``params`` vector with :func:`get_parameters`, runs the
+    selected model recursion over ``y`` to obtain the residuals ``u`` (and the
+    conditional volatility ``h`` for GARCH models), then returns the negative
+    Gaussian log-likelihood (see :func:`loglikelihood`). Smaller is better, so
+    the value can be handed straight to a minimiser.
+
+    Parameters
+    ----------
+    params : np.ndarray[np.float64, ndim=1]
+        Flat parameter vector laid out as expected by :func:`get_parameters`
+        for the given ``p, q, Q, P, cons`` configuration.
+    y : np.ndarray[np.float64, ndim=1]
+        Time series to fit.
+    p, q : int, optional
+        Orders of the AR and MA parts of the ARMA mean equation. Default is 0.
+    Q, P : int, optional
+        Orders of the ARCH and GARCH parts of the conditional variance.
+        Default is 0.
+    cons : bool, optional
+        Whether ``params`` includes a leading constant term. Default is True.
+    model : {'arch', 'garch', 'arma'}, optional
+        Model family driving the residual recursion. ``'arch'`` and
+        ``'garch'`` both use the ARMA-GARCH recursion; ``'arma'`` uses the ARMA
+        recursion with unit conditional volatility. Default is ``'arch'``.
+
+    Returns
+    -------
+    np.float64
+        Negative Gaussian log-likelihood of the residuals (cost to minimise).
+
+    Raises
+    ------
+    ValueError
+        If ``model`` is not one of ``'arch'``, ``'garch'`` or ``'arma'``.
+
+    See Also
+    --------
+    loglikelihood, get_parameters
+
+    """
     phi, theta, alpha, beta, c, omega = get_parameters(
         params, p, q, Q, P, cons
     )
@@ -86,23 +127,38 @@ def _loglikelihood(u, h):
 
 
 def loglikelihood(u, h):
-    """ Normal log-likelihood function.
+    r""" Negative Gaussian log-likelihood (a cost to minimise).
+
+    Despite its name, this function returns the *negative* of the Normal
+    log-likelihood of the residuals, i.e. a cost suitable for direct
+    minimisation by an optimiser (smaller is better). The likelihood itself is
+    the opposite of the returned value.
+
+    .. math::
+
+        -\ln \mathcal{L} = \frac{1}{2}\left(T \ln(2\pi)
+        + \sum_t \ln(h_t^2) + \sum_t \left(\frac{u_t}{h_t}\right)^2\right)
+
+    The input ``h`` is left unchanged: a working copy is used and its zero
+    entries are floored to ``1e-8`` to avoid division by zero.
 
     Parameters
     ----------
     u : np.ndarray[dtype=np.float64, ndim=1]
         Standardized residuals series.
     h : np.ndarray[dtype=np.float64, ndim=1]
-        Conditional standard deviation series of residuals.
+        Conditional standard deviation series of residuals. Not modified in
+        place.
 
     Returns
     -------
     np.float64
-        Normal log likelihood of residuals.
+        Negative Gaussian log-likelihood of the residuals (cost to minimise).
 
     """
     l_sq_pi = np.log(2 * np.pi)
     T = h.size
+    h = np.array(h, dtype=np.float64, copy=True)
     h[h == 0] = 1e-8
     L = T * l_sq_pi + np.sum(np.log(np.square(h))) + np.sum(np.square(u / h))
 

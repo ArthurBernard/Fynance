@@ -590,7 +590,7 @@ def MDP(
 
     # Set function to minimze
     def f_max_divers_weights(w):
-        return - diversified_ratio(X, W=w).flatten()
+        return -diversified_ratio(X, W=w)
 
     # Set inital weights
     if w0 is None:
