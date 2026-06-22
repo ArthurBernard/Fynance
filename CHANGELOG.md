@@ -12,6 +12,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [2.10.1] - 2026-06-22
+
+### Breaking Changes
+
+### Added
+
+### Changed
+
 - **`RNN`/`GRU`/`LSTM` honor the `SignalModel` contract.** `fit(X, y)` and
   `predict(X)` now work with a zero-initialized hidden (and cell) state — the
   natural default for these stateless gated cells. The explicit-state forms
