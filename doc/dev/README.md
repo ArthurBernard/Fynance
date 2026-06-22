@@ -20,8 +20,8 @@ live in the repo-root `CLAUDE.md`.
    Numba kernels (golden-value parity), the rolling/walk-forward pattern, the
    estimator→models pipeline.
 3. [`03-decisions.md`](03-decisions.md) — the design choices and *why* (Numba over
-   new Cython, PyTorch over Keras, the loss-function split, NumPy over polars),
-   plus the running ADR journal.
+   new Cython, PyTorch over Keras, the loss-function split, polars at the edges
+   with NumPy at the core), plus the running ADR journal.
 4. [`04-subpackages.md`](04-subpackages.md) — the per-subpackage map, public API
    surface, and the stability/modernisation policy that governs each.
 5. [`05-testing.md`](05-testing.md) — the testing layers (pytest + doctests +

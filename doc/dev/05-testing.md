@@ -4,7 +4,7 @@
 
 | Layer | Command | Catches |
 |-------|---------|---------|
-| **Unit** | `pytest` | logic, shapes, regressions (518 tests under `fynance/tests/`) |
+| **Unit** | `pytest` | logic, shapes, regressions (~570 unit/benchmark tests under `fynance/tests/`; ~660 collected with doctests) |
 | **Doctests** | `pytest --doctest-modules` (on by default in `pyproject.toml`) | every docstring `>>>` example — they are part of the suite |
 | **Benchmarks** | `pytest-benchmark` (e.g. `test_filters_benchmark.py`) | perf regressions on hot paths |
 | **Coverage** | `pytest --cov=fynance --cov-report=term-missing` | untested branches |

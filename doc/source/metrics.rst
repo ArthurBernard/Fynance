@@ -54,3 +54,10 @@ Aggregated report
    :toctree: generated/
 
    summary
+
+:func:`summary` is driven by the ``METRICS`` registry — a name → callable
+mapping (``annual_return``, ``annual_volatility``, ``sharpe``, ``sortino``,
+``calmar``, ``max_drawdown``) you can read or extend.
+
+.. autodata:: METRICS
+   :no-value:

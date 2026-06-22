@@ -17,3 +17,16 @@ alignment/resampling, and no-lookahead temporal splits.
    resample
    train_test_split
    walk_forward
+
+Custom sources
+==============
+
+The registry extension API: subclass :class:`BaseDataSource`, `register` it under
+a file extension, and :func:`load` (or :func:`get_source`) will dispatch to it.
+
+.. autosummary::
+   :toctree: generated/
+
+   BaseDataSource
+   register
+   get_source
