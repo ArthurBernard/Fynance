@@ -153,7 +153,9 @@ class MultiLayerPerceptron(BaseNeuralNet):
             return lambda x: x
 
     def _set_dropout(self, drop):
-        # Set dropout parameters
+        # Set dropout parameters. Use a ModuleList (with nn.Identity for
+        # the no-dropout slots) so the dropout layers are registered as
+        # submodules and respond to ``model.eval()`` / ``model.train()``.
         if isinstance(drop, list):
 
             if len(drop) != self.n_layers:
@@ -161,15 +163,17 @@ class MultiLayerPerceptron(BaseNeuralNet):
                 raise ValueError('if you pass a list of drop parameters '
                                  'this one must be of size of layers list + 1')
 
-            return [torch.nn.Dropout(p=p) for p in drop]
+            modules = [torch.nn.Dropout(p=p) for p in drop]
 
         elif drop is not None:
 
-            return [torch.nn.Dropout(p=drop) for _ in range(self.n_layers)]
+            modules = [torch.nn.Dropout(p=drop) for _ in range(self.n_layers)]
 
         else:
 
-            return [lambda x: x for _ in range(self.n_layers)]
+            modules = [torch.nn.Identity() for _ in range(self.n_layers)]
+
+        return torch.nn.ModuleList(modules)
 
     def forward(self, x):
         """ Forward computation. """

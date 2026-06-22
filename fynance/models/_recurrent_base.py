@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-""" Internal building blocks for recurrent neural network models.
+""" Internal building blocks for the gated cell models.
 
-Defines two private classes used by all RNN variants:
+Defines two private classes shared by the gated-cell variants
+(:mod:`fynance.models.rnn`, :mod:`fynance.models.gru`,
+:mod:`fynance.models.lstm`):
 
-- :class:`_RecurrentBase` — shared backbone that sets up the recurrent
-  weight matrix ``W_h``, the hidden activation ``f_h``, and dropout.
-  Its ``forward(X, H)`` implements the vanilla Elman RNN step
-  (concatenate input with hidden state, apply linear + activation).
-  :class:`~fynance.models.gru._GRUCell` and
+- :class:`_RecurrentBase` — shared backbone that sets up the weight
+  matrix ``W_h``, the hidden activation ``f_h``, and dropout. Its
+  ``forward(X, H)`` implements one Elman-style step (concatenate input
+  with the supplied hidden state, apply linear + activation). **Each row
+  of the input is processed independently**: the backbone does not loop
+  over a time axis or thread state across rows — it is a *stateless*
+  gated feed-forward cell. :class:`~fynance.models.gru._GRUCell` and
   :class:`~fynance.models.lstm._LSTMCell` override ``forward`` to add
   their gating logic on top of this backbone.
 
@@ -37,12 +41,15 @@ from fynance.models._base import BaseNeuralNet
 
 
 class _RecurrentBase(BaseNeuralNet):
-    """ Shared recurrent backbone for all RNN-flavored models.
+    """ Shared backbone for the gated cell models.
 
-    Sets up the recurrent weight matrix ``W_h``, the hidden-state
-    activation ``f_h``, and the dropout layer. Its ``forward(X, H)``
-    implements the vanilla Elman RNN step: concatenate input with hidden
-    state, apply ``W_h`` + ``f_h``.
+    Sets up the weight matrix ``W_h``, the hidden-state activation
+    ``f_h``, and the dropout layer. Its ``forward(X, H)`` implements one
+    Elman-style step: concatenate input with the supplied hidden state,
+    apply ``W_h`` + ``f_h``. Each row of ``X`` is processed
+    independently against the matching row of ``H``; no state is threaded
+    across rows, so this is a *stateless* gated feed-forward cell rather
+    than a sequence model.
 
     :class:`~fynance.models.gru._GRUCell` and
     :class:`~fynance.models.lstm._LSTMCell` subclass this and override
@@ -61,6 +68,8 @@ class _RecurrentBase(BaseNeuralNet):
         projection (e.g. :class:`~fynance.models.gru.GRUCell`).
     drop : float, optional
         Probability of an element to be zeroed.
+    bias : bool, optional
+        If ``True`` (default), the linear layers learn an additive bias.
     hidden_activation : torch.nn.Module, optional
         Activation functions, default is Tanh function.
     hidden_state_size : int, optional
@@ -107,9 +116,10 @@ class _RecurrentBase(BaseNeuralNet):
         else:
             self.set_data(X=X, y=y, x_type=x_type, y_type=y_type)  # type: ignore[arg-type]
 
+        self.bias = bias
         self.H = self.N if hidden_state_size is None else hidden_state_size
 
-        self.W_h = nn.Linear(self.N + self.H, self.H)
+        self.W_h = nn.Linear(self.N + self.H, self.H, bias=bias)
 
         self.f_h = hidden_activation()
 
@@ -161,8 +171,8 @@ class _OutputLayerMixin:
 
     """
 
-    def __init__(self, forward_activation=nn.Softmax):
-        self.W_y = nn.Linear(self.H, self.M)
+    def __init__(self, forward_activation=nn.Identity):
+        self.W_y = nn.Linear(self.H, self.M, bias=getattr(self, 'bias', True))
         self.f_y = nn.Softmax(dim=-1) if forward_activation is nn.Softmax else forward_activation()
 
     @torch.enable_grad()
@@ -182,6 +192,7 @@ class _OutputLayerMixin:
             Updated states of the model.
 
         """
+        self.train()  # type: ignore[attr-defined]
         self.optimizer.zero_grad()  # type: ignore[attr-defined]
         outputs, H = self(X, H)  # type: ignore[operator]
         loss = self.criterion(outputs, y)  # type: ignore[attr-defined]
@@ -212,6 +223,12 @@ class _OutputLayerMixin:
            Updated states of the model.
 
         """
-        Y, H = self(X, H)  # type: ignore[operator]
+        was_training = self.training  # type: ignore[attr-defined]
+        self.eval()  # type: ignore[attr-defined]
+        try:
+            Y, H = self(X, H)  # type: ignore[operator]
+
+        finally:
+            self.train(was_training)  # type: ignore[attr-defined]
 
         return Y.detach(), H.detach()
