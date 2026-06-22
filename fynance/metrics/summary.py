@@ -69,11 +69,16 @@ def summary(prices: NDArray, period: int = 252, rf: float = 0.0) -> dict[str, fl
     """
     p = np.asarray(prices, dtype=np.float64)
 
+    # ``sharpe`` and ``sortino`` default to ``log=False``; report the volatility
+    # under the same convention so the displayed vol is the one implied by the
+    # displayed Sharpe ratio.
+    log = False
+
     return {
         'annual_return': float(annual_return(p, period=period)),
-        'annual_volatility': float(annual_volatility(p, period=period)),
-        'sharpe': float(sharpe(p, period=period, rf=rf)),
-        'sortino': float(sortino(p, period=period)),
+        'annual_volatility': float(annual_volatility(p, period=period, log=log)),
+        'sharpe': float(sharpe(p, period=period, rf=rf, log=log)),
+        'sortino': float(sortino(p, period=period, log=log)),
         'calmar': float(calmar(p, period=period)),
         'max_drawdown': float(mdd(p)),
     }

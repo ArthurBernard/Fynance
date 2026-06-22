@@ -41,6 +41,31 @@ def test_loglikelihood_handles_zero_h():
     assert np.isfinite(loglikelihood(u, h))
 
 
+def test_loglikelihood_does_not_mutate_input_h():
+    # The zero-flooring must happen on a copy: the caller's h is preserved
+    # (in particular its zero entries are not overwritten by 1e-8).
+    u = np.array([0.0, 1.0, -1.0])
+    h = np.array([0.0, 1.0, 2.0])
+    h_before = h.copy()
+    loglikelihood(u, h)
+    assert np.array_equal(h, h_before)
+    assert h[0] == 0.0
+
+
+def test_loglikelihood_returns_negative_log_likelihood():
+    # Documented as the negative LL (a cost): it equals -(true Gaussian LL),
+    # which for non-degenerate residuals is a positive number.
+    rng = np.random.RandomState(0)
+    u = rng.randn(50)
+    h = np.abs(rng.randn(50)) + 0.5
+    true_ll = -0.5 * (
+        u.size * np.log(2 * np.pi)
+        + np.sum(np.log(np.square(h)))
+        + np.sum(np.square(u / h))
+    )
+    assert np.isclose(loglikelihood(u, h), -true_ll)
+
+
 def test_target_function_arma_returns_finite():
     import numpy as np
 

@@ -105,6 +105,14 @@ def test_diversified_ratio():
     w = np.array([0.4, 0.3, 0.3])
     result = fy.diversified_ratio(X, W=w)
     assert result > 0
+    # Must be a Python float scalar (not a (1, 1) ndarray), matching the
+    # documented ``-> float`` return type.
+    assert isinstance(result, float)
+    assert not isinstance(result, np.ndarray)
+
+    # Equal weights (default W) should also return a plain float scalar.
+    result_eq = fy.diversified_ratio(X)
+    assert isinstance(result_eq, float)
 
 
 def test_drawdown_zero_initial_warns():

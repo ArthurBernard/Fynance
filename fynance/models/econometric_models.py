@@ -297,7 +297,8 @@ def ARMA(y, phi, theta, c, p, q):
 
     """
     # Set type variables and parameters
-    y = np.asarray(y, dtype=np.float64).reshape([y.size])
+    y = np.asarray(y, dtype=np.float64)
+    y = y.reshape([y.size])
     theta = np.asarray(theta, dtype=np.float64)
     phi = np.asarray(phi, dtype=np.float64)
 
@@ -361,7 +362,8 @@ def ARMA_GARCH(y, phi, theta, alpha, beta, c, omega, p, q, Q, P):
     ARMAX_GARCH, ARMA, MA.
 
     """
-    y = np.asarray(y, dtype=np.float64).reshape([y.size])
+    y = np.asarray(y, dtype=np.float64)
+    y = y.reshape([y.size])
     theta = np.asarray(theta, dtype=np.float64)
     phi = np.asarray(phi, dtype=np.float64)
     alpha = np.asarray(alpha, dtype=np.float64)
@@ -380,7 +382,8 @@ def ARMAX_GARCH(y, x, phi, psi, theta, alpha, beta, c, omega, p, q, Q, P):
 
     .. math::
 
-        y_t = c + \phi_1 * y_{t-1} + ... + \phi_p * y_{t-p} + \psi_t * x_t
+        y_t = c + \phi_1 * y_{t-1} + ... + \phi_p * y_{t-p}
+        + \sum_k \psi_k * x_{t,k}
         + \theta_1 * u_{t-1} + ... + \theta_q * u_{t-q} + u_t
 
     With Generalized AutoRegressive Conditional Heteroskedasticity volatility
@@ -409,7 +412,9 @@ def ARMAX_GARCH(y, x, phi, psi, theta, alpha, beta, c, omega, p, q, Q, P):
     beta : np.ndarray[np.float64, ndim=1]
         Coefficients of AR part of GARCH.
     c : np.float64
-        Constant of the model.
+        Constant of ARMA model.
+    omega : np.float64
+        Constant of GARCH model.
     p : int
         Order of AR(p) model.
     q : int
@@ -432,7 +437,8 @@ def ARMAX_GARCH(y, x, phi, psi, theta, alpha, beta, c, omega, p, q, Q, P):
 
     """
     # Set array variables
-    y = np.asarray(y, dtype=np.float64).reshape([y.size])
+    y = np.asarray(y, dtype=np.float64)
+    y = y.reshape([y.size])
     x = np.asarray(x, dtype=np.float64)
     theta = np.asarray(theta, dtype=np.float64)
     phi = np.asarray(phi, dtype=np.float64)

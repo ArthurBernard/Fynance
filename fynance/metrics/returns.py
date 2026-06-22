@@ -19,19 +19,19 @@ __all__ = ['annual_return', 'perf_index', 'perf_returns', 'roll_annual_return']
 
 @WrapperArray('dtype', 'axis', 'ddof', min_size=2)
 def annual_return(X: NDArray, period: int = 252, axis: int = 0, dtype=None, ddof: int = 0) -> NDArray:
-    r""" Compute compouned annual returns of each `X`' series.
+    r""" Compute compounded annual returns of each `X`' series.
 
     The annualised return [1]_ is the process of converting returns on a whole
     period to returns per year.
 
     Notes
     -----
-    Let T the number of timeframes in `X`' series, the annual compouned returns
+    Let T the number of timeframes in `X`' series, the annual compounded returns
     is computed such that:
 
     .. math::
 
-        annualReturn = \frac{X_T}{X_1}^{\frac{period}{T}} - 1
+        annualReturn = \left(\frac{X_T}{X_1}\right)^{\frac{period}{T}} - 1
 
     Parameters
     ----------
@@ -40,7 +40,7 @@ def annual_return(X: NDArray, period: int = 252, axis: int = 0, dtype=None, ddof
     period : int, optional
         Number of period per year, default is 252 (trading days per year).
     axis : {0, 1}, optional
-        Axis along wich the computation is done. Default is 0.
+        Axis along which the computation is done. Default is 0.
     dtype : np.dtype, optional
         The type of the output array.  If `dtype` is not given, infer the data
         type from `X` input.
@@ -52,7 +52,7 @@ def annual_return(X: NDArray, period: int = 252, axis: int = 0, dtype=None, ddof
     Returns
     -------
     dtype or np.ndarray[dtype, ndim=1]
-        Values of compouned annual returns of each series.
+        Values of compounded annual returns of each series.
 
     References
     ----------
@@ -322,19 +322,19 @@ def returns_strat(X: NDArray, S: NDArray | None = None, kind: str = 'pct', base:
 
 @WrapperArray('dtype', 'axis', 'window', 'ddof', min_size=2)
 def roll_annual_return(X: NDArray, period: int = 252, w: int | None = None, axis: int = 0, dtype=None, ddof: int = 0) -> NDArray:
-    r""" Compute rolling compouned annual returns of each `X`' series.
+    r""" Compute rolling compounded annual returns of each `X`' series.
 
     The annualised return [1]_ is the process of converting returns on a whole
     period to returns per year.
 
     Notes
     -----
-    The rolling annual compouned returns is computed such that :math:`\forall t
+    The rolling annual compounded returns is computed such that :math:`\forall t
     \in [1: T]`:
 
     .. math::
 
-        annualReturn_t = \frac{X_t}{X_1}^{\frac{period}{t}} - 1
+        annualReturn_t = \left(\frac{X_t}{X_1}\right)^{\frac{period}{t}} - 1
 
     Parameters
     ----------
@@ -346,7 +346,7 @@ def roll_annual_return(X: NDArray, period: int = 252, w: int | None = None, axis
         Size of the lagged window of the rolling function, must be positive. If
         ``w is None`` or ``w=0``, then ``w=X.shape[axis]``. Default is None.
     axis : {0, 1}, optional
-        Axis along wich the computation is done. Default is 0.
+        Axis along which the computation is done. Default is 0.
     dtype : np.dtype, optional
         The type of the output array.  If `dtype` is not given, infer the data
         type from `X` input.
@@ -358,7 +358,7 @@ def roll_annual_return(X: NDArray, period: int = 252, w: int | None = None, axis
     Returns
     -------
     np.ndarray[dtype, ndim=1 or 2]
-        Values of rolling compouned annual returns of each series.
+        Values of rolling compounded annual returns of each series.
 
     References
     ----------
