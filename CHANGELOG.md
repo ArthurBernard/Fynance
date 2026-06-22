@@ -12,6 +12,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [2.10.0] - 2026-06-22
+
+### Breaking Changes
+
+### Added
+
+### Changed
+
 - **`RNN`/`GRU`/`LSTM` are documented as stateless gated feed-forward cells**,
   not temporal recurrent nets — they process each timestep independently and do
   not thread state across a time axis. The unsatisfiable `(T, S, N)` sequence
