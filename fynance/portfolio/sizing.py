@@ -73,7 +73,7 @@ def vol_target(
 
     Leverage that scales inversely with the *past* realized volatility so the
     strategy targets a constant annualized volatility ``target_vol``:
-    :math:`\\ell_t = target\\_vol / \\hat\\sigma_t`, capped at ``max_leverage``.
+    :math:`\ell_t = target\_vol / \hat\sigma_t`, capped at ``max_leverage``.
     Strictly causal — uses :func:`fynance.features.indicators.realized_volatility`.
 
     Parameters
@@ -109,7 +109,7 @@ def transaction_cost(
     r""" Per-step transaction cost from weight turnover.
 
     Cost at each step is ``fee`` times the traded amount (turnover):
-    :math:`c_t = fee \\cdot \\sum_i |w_{t,i} - w_{t-1,i}|`, with the first step
+    :math:`c_t = fee \cdot \sum_i |w_{t,i} - w_{t-1,i}|`, with the first step
     charging the initial position.
 
     Parameters
