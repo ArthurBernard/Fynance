@@ -33,13 +33,14 @@ library's core invariant, enforced in tests.
 
 ## Current state (snapshot)
 
-- **Version `2.8.0`** (in `pyproject.toml`, static), released on `master` and
+- **Version `2.9.0`** (in `pyproject.toml`, static), released on `master` and
   published to PyPI; `Development Status :: 5 - Production/Stable`.
 - **Python 3.10–3.13** (CI matrix). Build is **pure-Python** (setuptools, no
   compile step) — numerical kernels are Numba `@njit`. No Cython.
-- **518 tests** under `fynance/tests/` (mirrors the package), **plus doctests**
-  run on every module via `--doctest-modules` — docstring examples are part of
-  the suite and must stay runnable.
+- **~570 unit/benchmark tests** under `fynance/tests/` (mirrors the package),
+  **plus doctests** run on every module via `--doctest-modules` — docstring
+  examples are part of the suite and must stay runnable (~660 collected in
+  total).
 - **Four CI gates**: pytest (3.10–3.13), `ruff`, `interrogate` (docstring
   coverage ≥ 80%), Sphinx build `-W`, and `mypy` clean.
 - **Core stack**: NumPy, SciPy, Numba (`@njit`), **PyTorch** (the ML backend —

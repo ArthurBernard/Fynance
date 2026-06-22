@@ -8,12 +8,13 @@ git clone https://github.com/ArthurBernard/Fynance.git
 cd Fynance
 pip install -e ".[dev]"
 
-# Compile Cython extensions
-python setup.py build_ext --inplace
-
 # Activate the project git hooks (run once per clone)
 git config core.hooksPath .githooks
 ```
+
+The build is **pure-Python** — there is no compile step and no `setup.py`.
+Numerical kernels are Numba `@njit` (JIT-compiled on first call), and
+`pyproject.toml` is the authoritative build config.
 
 ## Git Flow
 
@@ -34,12 +35,12 @@ master          ← stable releases only (tagged vX.Y.Z, published to PyPI)
 - `develop` → `master` happens only at release time (version bump + tag).
 
 **Branch naming:** `feat/`, `fix/`, `chore/`, `docs/` + short kebab-case description.
-Examples: `feat/transformer-model`, `fix/cython3-compat`, `chore/pyproject-migration`.
+Examples: `feat/transformer-model`, `fix/numpy2-compat`, `chore/pyproject-migration`.
 
 **Commit style:** [Conventional Commits](https://www.conventionalcommits.org/)
 ```
 feat: add TCN model to fynance/models/
-fix: replace ** operator in momentums_cy.pyx for Cython 3 compat
+fix: clamp adaptive window to avoid lookahead on short series
 chore: migrate setup.py metadata to pyproject.toml
 docs: add Git Flow section to CONTRIBUTING.md
 ```
@@ -48,15 +49,20 @@ docs: add Git Flow section to CONTRIBUTING.md
 
 | Subpackage | Description | Policy |
 |---|---|---|
-| `fynance.features` | Metrics, indicators, filters (Cython + Python) | Extend only — never rewrite Cython |
-| `fynance.algorithms` | Portfolio allocation (HRP, MVP, ERC, IVP, MDP) | Stable public API — deprecation path required |
-| `fynance.models` | PyTorch neural networks (MLP, GRU, LSTM, Transformer) | Modernize freely |
-| `fynance.backtest` | Performance evaluation, loss series | Improve freely |
-| `fynance.estimator` | Cython ARMA/GARCH parameter estimation | Do not duplicate in Python layer |
+| `fynance.features` | Indicators, momentums, filters, scaling, regime, money management (Numba kernels) | Extend freely — kernels are Numba `@njit` |
+| `fynance.metrics` | Risk-adjusted ratios, drawdown, returns, `summary` | Extend freely |
+| `fynance.portfolio` | Portfolio allocation (HRP, MVP, ERC, IVP, MDP) + sizing | Stable public API — deprecation path required |
+| `fynance.models` | PyTorch nets (MLP, RNN/GRU/LSTM, attention, TCN, Transformer) + econometric ARMA/GARCH + losses | Modernize freely |
+| `fynance.backtest` | Vectorized engine, cost models, `BacktestResult` | Improve freely |
+| `fynance.estimator` / `fynance.models.econometric_models` | Numba ARMA/GARCH parameter estimation | Single implementation — do not duplicate parameter logic |
+
+See [`doc/dev/04-subpackages.md`](doc/dev/04-subpackages.md) for the full
+policy matrix (including `core`, `data`, `signal`, `plot`, `strategy`,
+`research`).
 
 ## Code conventions
 
-**Numerical code:** new performance-critical functions go in the `.py` file using Numba `@njit`. Do not add new Cython files — Cython is only for wrapping C libraries.
+**Numerical code:** new performance-critical functions go in the `.py` file using Numba `@njit`. There is **no Cython** in the package (since 2.1 the former `*_cy.pyx` kernels were ported to Numba); only add Cython to wrap a C library.
 
 **ML:** PyTorch only. Do not extend the legacy Keras/TensorFlow code.
 
@@ -81,16 +87,6 @@ pytest --cov=fynance --cov-report=term-missing
 
 Tests must pass before opening a PR. No lookahead bias in time-series tests (no shuffling, no future data leaking into training windows).
 
-## Cython extensions
-
-When editing a `.pyx` file, recompile before running tests:
-
-```bash
-python setup.py build_ext --inplace
-```
-
-Do not add new Cython files. New numerical code goes in the `.py` counterpart using Numba `@njit`.
-
 ## Linting
 
 ```bash
@@ -99,16 +95,24 @@ ruff check fynance/
 
 ## Stability and deprecations
 
-The symbols re-exported from `fynance.models`, `fynance.algorithms.allocation`,
-`fynance.features` and `fynance.estimator` form the **public API for the 1.x
-series**. Within 1.x:
+> **2.0 was a breaking release** (layered architecture, import-path map in
+> [`doc/MIGRATION-2.0.md`](doc/MIGRATION-2.0.md) — e.g. `fynance.algorithms` →
+> `fynance.portfolio`, performance metrics → `fynance.metrics`). The notes below
+> describe the stability contract **within the 2.x series**.
 
-- public function and class signatures are frozen — no removals, no
+Per-subpackage change budgets are governed by the policy matrix in
+[`doc/dev/04-subpackages.md`](doc/dev/04-subpackages.md). The headline rule:
+`fynance.portfolio.allocation` (ERC/HRP/IVP/MDP/MVP) and
+`fynance.estimator` / `fynance.models.econometric_models` are the **stable
+public surface** — within 2.x:
+
+- public function and class signatures there are frozen — no removals, no
   backward-incompatible signature changes;
 - behavioural changes that would break user code go through **one
   release** of `DeprecationWarning` before becoming the default;
-- internal helpers (names prefixed with `_`) and `fynance.backtest`
-  remain free to evolve without a deprecation cycle.
+- internal helpers (names prefixed with `_`) and the freely-evolving layers
+  (`features`/`metrics`/`models`/`backtest`/`plot`/`strategy`/`research`) may
+  change without a deprecation cycle, additively.
 
 Active deprecations are tracked in [CHANGELOG.md](CHANGELOG.md).
 
@@ -118,7 +122,7 @@ Active deprecations are tracked in [CHANGELOG.md](CHANGELOG.md).
 import warnings
 
 warnings.warn(
-    "old_function() is deprecated and will be removed in fynance 2.0; "
+    "old_function() is deprecated and will be removed in fynance 3.0; "
     "use new_function() instead.",
     category=DeprecationWarning,
     stacklevel=2,
@@ -142,7 +146,7 @@ def test_old_function_still_works():
 
 ### Silencing fynance deprecations (downstream users)
 
-If you depend on a deprecated path and need to stay on 1.x while you
+If you depend on a deprecated path and need to stay on 2.x while you
 migrate, opt out **explicitly**:
 
 ```python

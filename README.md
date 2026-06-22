@@ -60,9 +60,11 @@ alignment/resampling, and no-lookahead temporal splits (`train_test_split`,
 `walk_forward`).
 
 **Features** `fynance.features` — technical indicators (Bollinger, RSI, MACD, ROC,
-realized volatility, rolling skew/kurtosis/autocorr, …), momentums (SMA, EMA, WMA),
-scaling (incl. rolling rank), statistics, feature engineering (multi-resolution,
-Granger causality) and market-regime detection.
+realized volatility, rolling skew/kurtosis/autocorr, …), OHLCV indicators (ATR,
+ADX, Williams %R, OBV, VWAP), a causal GARCH(1,1) conditional-volatility feature,
+momentums (SMA, EMA, WMA) and adaptive windows, scaling (incl. rolling rank),
+statistics, feature engineering (multi-resolution, Granger causality) and
+market-regime detection.
 
 **Metrics** `fynance.metrics` — performance/evaluation metrics (Sharpe, Sortino,
 Calmar, drawdown, …) and a one-call `summary`.
@@ -74,15 +76,17 @@ Calmar, drawdown, …) and a one-call `summary`.
 sizing (fractional Kelly, volatility targeting, transaction costs).
 
 **Backtest** `fynance.backtest` — vectorized engine (`backtest`: positions +
-returns/prices + cost → `BacktestResult`) and cost models.
+returns/prices + cost → `BacktestResult`) and cost models (`ProportionalCost`
+and the non-linear `MarketImpactCost`).
 
 **Plot** `fynance.plot` — composable matplotlib figures and a one-call
 `tearsheet` report.
 
 **Models** `fynance.models` — econometric models (MA, ARMA, ARMA-GARCH) and
 PyTorch nets (MLP, RNN, GRU, LSTM, MultiHeadAttention, TCN, Transformer), a
-direction+magnitude stacking ensemble, differentiable losses (Sharpe, Sortino,
-Calmar, Omega, directional, hybrid), and robust-training utilities.
+direction+magnitude stacking ensemble, `RegimeMoE` (regime-conditioned
+mixture-of-experts), differentiable losses (Sharpe, Sortino, Calmar, Omega,
+directional, hybrid), and robust-training utilities.
 
 **Strategy** `fynance.strategy` — optional orchestrator composing the maillons
 end-to-end, with single-run and walk-forward evaluation.

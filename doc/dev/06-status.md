@@ -16,17 +16,21 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
 - **Data**: `load()` dispatcher + CSV/Parquet adapters, causal `align`/`resample`,
   and no-lookahead `train_test_split`/`walk_forward` (embargo/purge).
 - **Features**: technical indicators (RSI/MACD/Bollinger/CCI/HMA/ROC/realized-vol/
-  skew/kurt/autocorr), momentums (SMA/EMA/WMA + std variants), scaling (z-score,
-  rolling rank), statistics, feature engineering (multi-resolution, Granger,
+  skew/kurt/autocorr), **OHLCV indicators** (ATR/ADX/Williams %R/OBV/VWAP),
+  **causal GARCH(1,1) conditional volatility** as a feature (`garch_volatility`),
+  momentums (SMA/EMA/WMA + std variants), **adaptive windows** (`adaptive_roll`/
+  `adaptive_volatility`), scaling (z-score, rolling rank), statistics, money
+  management (`iso_vol`), feature engineering (multi-resolution, Granger,
   incremental moments) and k-means market-regime detection.
 - **Metrics**: `fynance.metrics` (Sharpe/Sortino/Calmar/diversified-ratio,
   annual return/vol, drawdown/mdd, perf_*, roll_*) + one-call `summary`.
 - **Models**: econometric (ARMA/GARCH) + neural (MLP, RNN/GRU/LSTM, attention,
   TCN, Transformer) on PyTorch; `StackingEnsemble` (direction+magnitude OOF
-  meta-model); differentiable losses (Sharpe/Sortino/Calmar/Omega/directional/
-  hybrid) in `models/loss/`; robust-training utils (purged CV, early stopping,
-  sample weighting) in `models/training.py`. All NN models conform to
-  `SignalModel` (`fit`/`predict`).
+  meta-model); **`RegimeMoE`** (regime-conditioned mixture-of-experts — an
+  objective-aligned net gated on a **causal** regime label); differentiable
+  losses (Sharpe/Sortino/Calmar/Omega/directional/hybrid) in `models/loss/`;
+  robust-training utils (purged CV, early stopping, sample weighting) in
+  `models/training.py`. All NN models conform to `SignalModel` (`fit`/`predict`).
 - **Objective-aligned training** (`models/objective.py`): `ObjectiveModel` trains
   any `nn.Module` (MLP by default) **directly on a differentiable financial
   objective** (`SharpeLoss`/`SortinoLoss`/…) — the net outputs positions, the loss
@@ -38,9 +42,11 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
   vol-targeting + **anti-churn** `ema_smooth`/`deadband`/`min_hold` +
   `SignalPipeline`); `portfolio/` allocation (ERC/HRP/IVP/MDP/MVP) + sizing
   (fractional Kelly, vol-targeting, transaction costs).
-- **Backtest / Plot**: vectorized `backtest()` engine → `BacktestResult`,
-  `ProportionalCost`; reporting via `fynance.plot` (`tearsheet`, composable
-  figures, lazy matplotlib so `import fynance` stays matplotlib-free).
+- **Backtest / Plot**: vectorized `backtest()` engine → `BacktestResult`, cost
+  models (`ProportionalCost` + **`MarketImpactCost`** — a convex, super-linear
+  market-impact term on top of the linear fee); reporting via `fynance.plot`
+  (`tearsheet`, composable figures, lazy matplotlib so `import fynance` stays
+  matplotlib-free).
 - **Research harness** (`fynance.research`, S1–S3 complete): `Experiment`
   (serializable spec + code + seed + metrics + curves), `run_experiment` (seeded,
   cost-aware, walk-forward; no-lookahead probe; records a **provenance** block —
@@ -60,21 +66,22 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
 - **Numerical kernels on Numba `@njit`** — no Cython anywhere; the build is
   pure-Python (no `setup.py`, no compile step). Every kernel has a golden-value
   parity test (1e-9/1e-10) captured from the former Cython.
-- **Quality gates (all 4 enforced in CI)**: 593 tests collected (unit + doctests
-  on every module via `--doctest-modules`), incl. property tests (kernel parity + no-lookahead);
-  `ruff`; `interrogate` (docstring coverage ≥ 80%, currently ~93.6%); Sphinx
-  build `-W`; **`mypy` clean (0 errors)**.
-- **Released**: `v2.8.0` on `master` + PyPI; `Production/Stable`. CI matrix
+- **Quality gates (all 4 enforced in CI)**: ~660 tests collected (~570 unit/
+  benchmark + doctests on every module via `--doctest-modules`), incl. property
+  tests (kernel parity + no-lookahead); `ruff`; `interrogate` (docstring coverage
+  ≥ 80%, currently ~93.6%); Sphinx build `-W`; **`mypy` clean (0 errors)**.
+- **Released**: `v2.9.0` on `master` + PyPI; `Production/Stable`. CI matrix
   3.10–3.13; release builds a pure-Python universal wheel + sdist and creates the
   GitHub Release from the CHANGELOG on tag.
 
 ## In progress / active surface
 
-Nothing is currently in flight (`develop` is clean). The 2.x library is
-feature-complete for its current scope; remaining open work is **library bricks**
-only — multi-series OHLCV indicators, regime-conditioned architecture, adaptive
-windows, a richer backtest, and an optional Streamlit ledger explorer. See the
-roadmap (§1–§2) and the **Deferred** section below.
+Nothing is currently in flight (`develop` is clean). The v2.9.0 **library
+bricks** all shipped (OHLCV indicators, causal GARCH-volatility feature,
+adaptive windows, `RegimeMoE`, `MarketImpactCost`). Remaining open work is the
+**2026-06 audit remediation** (correctness/tests/docs the CI gates don't catch —
+roadmap §1), an optional **Streamlit ledger explorer** (roadmap §2), and minor
+**CI/badge hygiene** (roadmap §3). See `07-roadmap.md`.
 
 **Out of scope here**: strategy research on **real data** (empirical loss /
 architecture / normalization benchmarks, out-of-sample Sharpe, online regimes,
@@ -110,10 +117,24 @@ which depends on fynance. This public repo stays data-agnostic and result-free.
 
 ## Deferred
 
-Larger axes parked for later: realistic backtesting beyond proportional cost
-(non-linear slippage / market impact), market-regime conditioning of the
-architecture, adaptive windows, and multi-series OHLCV indicators (ATR/ADX/OBV/
-VWAP) requiring a multi-series input API. Tracked in the roadmap; not bugs.
+The library bricks that were parked here — realistic backtesting beyond
+proportional cost (non-linear market impact), market-regime conditioning of the
+architecture, adaptive windows, and multi-series OHLCV indicators
+(ATR/ADX/OBV/VWAP) — **all shipped in v2.9.0**. The only library axis still
+deferred is the optional **Streamlit ledger explorer** (roadmap §2). Tracked in
+the roadmap; not bugs.
+
+## 2026-06-22 — library bricks shipped (v2.9.0); audit remediation opened
+
+The data-agnostic **library bricks** that the re-scoped roadmap kept all landed
+in **v2.9.0**: an `OHLCV` container + multi-series indicators
+(ATR/ADX/Williams %R/OBV/VWAP), the **causal GARCH(1,1) conditional-volatility
+feature** (`garch_volatility`), **adaptive windows** (`adaptive_roll`/
+`adaptive_volatility`), regime-conditioned architecture (`RegimeMoE`), and a
+non-linear **`MarketImpactCost`**. A full audit (2026-06-22) — all five gates
+(pytest/ruff/mypy/interrogate/sphinx) already green — surfaced correctness bugs,
+test gaps and doc drift the gates don't catch; tracked as the parallelizable
+remediation backlog in roadmap §1.
 
 ## 2026-06-21 — research line shipped (v2.2 → v2.8); roadmap re-scoped
 
