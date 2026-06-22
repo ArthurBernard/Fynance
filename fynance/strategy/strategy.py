@@ -160,6 +160,17 @@ class Strategy:
         positions are stitched together and backtested. Strictly no-lookahead.
         This per-window refit *is* the rolling-NN pattern when ``model`` is a net.
 
+        .. note::
+           The **first realized return of every test block is discarded** (set
+           to ``0``): within a block the return at bar ``k`` is computed from
+           prices ``k-1`` and ``k``, so the opening bar has no in-block prior
+           and earns nothing. With the default ``step == test`` this drops one
+           bar per block (roughly ``1 / test`` of the out-of-sample sample);
+           the dropped return is the gap return across the block join, which
+           would require carrying the previous block's closing position to
+           realize causally. This conservative choice avoids any cross-block
+           lookahead at the cost of a slightly truncated OOS sample.
+
         Parameters
         ----------
         data : PriceSeries or array-like
@@ -211,8 +222,10 @@ class Strategy:
 
             pos = np.asarray(self.signal(preds), dtype=np.float64).reshape(-1)
 
-            # Return realized over each test step (causal: position at t earns r_t
-            # within the OOS block; the engine applies the one-step shift).
+            # Return realized over each test step (causal: position at t earns
+            # r_t within the OOS block; the engine applies the one-step shift).
+            # The opening bar has no in-block prior price, so its return is
+            # discarded (NaN -> 0 below). See the method docstring note.
             block = prices[te]
             ret = np.empty(block.shape[0])
             ret[0] = np.nan

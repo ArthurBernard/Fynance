@@ -42,7 +42,10 @@ def set_text_stats(
     Parameters
     ----------
     underly : np.ndarray[ndim=1, dtype=np.float64]
-        Series of underlying prices.
+        Series of underlying **log-returns** (not prices). The price path is
+        reconstructed internally as ``np.exp(np.cumsum(underly))``, and each
+        strategy's simple return is recovered as ``np.exp(underly) - 1`` before
+        applying the position and fees.
     period : int, optional
         Number of period per day, default is 252.
     accur : bool, optional

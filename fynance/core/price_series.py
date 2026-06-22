@@ -268,6 +268,16 @@ class PriceSeries:
             The return series (strictly causal: ``r_t`` uses only ``p_t`` and
             ``p_{t-1}``).
 
+        Raises
+        ------
+        ValueError
+            For ``kind="pct"`` or ``"log"`` when any price is non-positive
+            (``<= 0``). Both conventions divide by the previous price (and
+            ``log`` takes its logarithm), so a zero or negative price would
+            otherwise yield silent ``inf``/``nan`` with only a bare
+            ``RuntimeWarning``. Use ``kind="raw"`` for series that legitimately
+            cross or touch zero.
+
         Examples
         --------
         >>> PriceSeries([100., 110., 99.]).to_returns("pct").values
@@ -277,9 +287,25 @@ class PriceSeries:
         p = self.values
 
         if kind == "pct":
+            if np.any(p <= 0.0):
+
+                raise ValueError(
+                    "to_returns(kind='pct') requires strictly positive prices; "
+                    "a zero or negative price yields inf/nan. Use kind='raw' "
+                    "for series that touch or cross zero."
+                )
+
             r = p[1:] / p[:-1] - 1.0
 
         elif kind == "log":
+            if np.any(p <= 0.0):
+
+                raise ValueError(
+                    "to_returns(kind='log') requires strictly positive prices; "
+                    "log of a non-positive ratio is undefined. Use kind='raw' "
+                    "for series that touch or cross zero."
+                )
+
             r = np.log(p[1:] / p[:-1])
 
         elif kind == "raw":
@@ -313,7 +339,11 @@ class PriceSeries:
         Returns
         -------
         PriceSeries
-            Price path of length ``len(self) + 1``.
+            Price path of length ``len(self) + 1``. The index is **reset** to
+            the default ``0..n`` range: the reconstructed path has one extra
+            leading point (the ``base`` price) with no corresponding timestamp
+            in the original return index, so a meaningful index cannot be
+            carried through. Re-attach an index explicitly if needed.
 
         """
         r = self.values
@@ -425,5 +455,13 @@ class PriceSeries:
         return out
 
     def apply(self, func: Callable[[float], float]) -> PriceSeries:
-        """ Apply an element-wise function to the values. """
+        """ Apply an element-wise function to the values.
+
+        On an empty series this short-circuits to an empty result (``np.vectorize``
+        cannot infer an output dtype from zero inputs).
+        """
+        if self.values.size == 0:
+
+            return self._new(self.values.copy())
+
         return self._new(np.vectorize(func)(self.values))

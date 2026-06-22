@@ -75,6 +75,64 @@ def test_to_returns_dropna_false_keeps_length():
     assert np.isnan(r.values[0])
 
 
+def test_to_returns_unknown_kind_raises():
+    ps = PriceSeries([100.0, 110.0, 99.0])
+    with pytest.raises(ValueError, match="unknown kind"):
+        ps.to_returns("geometric")
+
+
+@pytest.mark.parametrize("kind", ["pct", "log"])
+def test_to_returns_rejects_nonpositive_prices(kind):
+    # A zero or negative price would silently yield inf/-inf/nan.
+    with pytest.raises(ValueError, match="positive"):
+        PriceSeries([0.0, 10.0, 20.0]).to_returns(kind)
+    with pytest.raises(ValueError, match="positive"):
+        PriceSeries([100.0, -10.0, 20.0]).to_returns(kind)
+
+
+def test_to_returns_raw_allows_nonpositive_prices():
+    # raw differences are well-defined through zero / negatives.
+    r = PriceSeries([0.0, -5.0, 5.0]).to_returns("raw")
+    assert np.allclose(r.values, [-5.0, 10.0])
+
+
+def test_to_prices_inverts_returns_and_resets_index():
+    ps = PriceSeries([100.0, 110.0, 99.0], index=[10, 11, 12])
+    r = ps.to_returns("pct")               # index [11, 12]
+    rebuilt = r.to_prices(base=100.0, kind="pct")
+    assert np.allclose(rebuilt.values, [100.0, 110.0, 99.0])
+    # one extra leading point with no timestamp -> default 0..n index
+    assert np.array_equal(rebuilt.index, np.arange(len(rebuilt)))
+
+
+def test_to_prices_unknown_kind_raises():
+    r = PriceSeries([0.1, -0.1])
+    with pytest.raises(ValueError, match="unknown kind"):
+        r.to_prices(kind="geometric")
+
+
+def test_cumulative_equity_curve():
+    r = PriceSeries([0.1, -0.1, 0.05])
+    eq = r.cumulative()
+    assert np.allclose(eq.values, np.cumprod([1.1, 0.9, 1.05]))
+    # cumulative preserves the index
+    assert np.array_equal(eq.index, r.index)
+
+
+def test_apply_elementwise():
+    ps = PriceSeries([1.0, 2.0, 3.0], index=[7, 8, 9])
+    out = ps.apply(lambda x: x ** 2)
+    assert np.allclose(out.values, [1.0, 4.0, 9.0])
+    assert np.array_equal(out.index, [7, 8, 9])
+
+
+def test_apply_empty_series():
+    ps = PriceSeries([])
+    out = ps.apply(lambda x: x + 1.0)
+    assert len(out) == 0
+    assert out.values.dtype == np.float64
+
+
 def test_returns_prices_roundtrip():
     rng = np.random.default_rng(0)
     prices = 100.0 * np.cumprod(1.0 + rng.normal(0, 0.01, 50))

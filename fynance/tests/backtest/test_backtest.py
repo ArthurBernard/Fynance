@@ -101,3 +101,21 @@ def test_set_text_stats_no_strategies(synthetic_returns):
     txt = set_text_stats(synthetic_returns)
     assert isinstance(txt, str)
     assert 'Performance' in txt
+
+
+def test_set_text_stats_underly_is_log_returns():
+    # Documented convention: `underly` is a LOG-RETURNS series, reconstructed
+    # internally as exp(cumsum(underly)). A constant positive log-return must
+    # yield a positive underlying performance line; the same series with the
+    # sign flipped (a losing path) must yield a negative one.
+    period = 252
+    up = np.full(period, np.log(1.001))      # +0.1% compounded each step
+    down = -up
+    txt_up = set_text_stats(up, period=period, accur=False, vol=False,
+                            sharp=False, calma=False)
+    txt_down = set_text_stats(down, period=period, accur=False, vol=False,
+                              sharp=False, calma=False)
+    # A rising log-return path -> positive annualized performance ('+' or no '-')
+    assert '-' not in txt_up.split('Underlying')[1].split('\n')[0]
+    # A falling path -> negative performance.
+    assert '-' in txt_down.split('Underlying')[1].split('\n')[0]

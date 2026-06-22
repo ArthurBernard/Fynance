@@ -30,8 +30,10 @@ class LossSeries:
 
     Methods
     -------
+    append
+    reset
     set_plot
-    plot
+    update_plot
 
     """
 

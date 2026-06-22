@@ -61,6 +61,13 @@ def backtest(
     arr = np.asarray(data, dtype=np.float64)
     pos = np.asarray(positions, dtype=np.float64)
 
+    # ``cost_book`` is the full position book the cost model sees: it must
+    # retain the initial trade so turnover is charged from the first entry. On
+    # a prices input the trailing position earns no return and is dropped, but
+    # its turnover is never incurred either, so we drop it from the cost book
+    # too (charging only trades into positions that actually earn a return).
+    cost_book = pos
+
     if returns_input:
         returns = arr
 
@@ -68,7 +75,11 @@ def backtest(
         returns = arr[1:] / arr[:-1] - 1.0
 
         if pos.shape[0] == arr.shape[0]:
+            # Drop the first position (it predates the first return): the
+            # decision at price index k earns the return over [k, k+1].
             pos = pos[1:]
+            # The last decision earns no return; charge turnover up to it only.
+            cost_book = cost_book[:-1]
 
     if pos.shape[0] != returns.shape[0]:
 
@@ -91,7 +102,7 @@ def backtest(
         gross = gross.sum(axis=1)
 
     costs = (
-        np.asarray(cost(pos), dtype=np.float64)
+        np.asarray(cost(cost_book), dtype=np.float64)
         if cost is not None
         else np.zeros(returns.shape[0], dtype=np.float64)
     )

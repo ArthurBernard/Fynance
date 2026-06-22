@@ -48,6 +48,31 @@ def test_rank_requires_2d():
         rank(np.array([1.0, 2.0, 3.0]), top=1, bottom=1)
 
 
+def test_rank_rejects_overlapping_legs():
+    # top + bottom > n_assets would let the long leg overwrite the short leg,
+    # silently producing a non-dollar-neutral book (sum 0.667 in the report).
+    import pytest
+    with pytest.raises(ValueError):
+        rank(np.array([[1.0, 2.0, 3.0, 4.0]]), top=3, bottom=3)
+
+
+def test_rank_rejects_negative_legs():
+    import pytest
+    for top, bottom in ((-1, 1), (1, -1)):
+        with pytest.raises(ValueError):
+            rank(np.array([[1.0, 2.0, 3.0, 4.0]]), top=top, bottom=bottom)
+
+
+def test_rank_dollar_neutral_when_legs_fit():
+    # Any valid split (top + bottom <= n_assets) must be exactly dollar-neutral.
+    pred = np.array([[1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+                     [6.0, 5.0, 4.0, 3.0, 2.0, 1.0]])
+    for top, bottom in ((1, 1), (2, 2), (3, 3), (2, 1), (1, 4)):
+        w = rank(pred, top=top, bottom=bottom)
+        assert np.allclose(w.sum(axis=1), 0.0)        # row-wise dollar-neutral
+        assert np.allclose(w[w > 0].sum(), top * w.shape[0] * (1.0 / top))
+
+
 def test_vol_target_position_is_causal():
     rng = np.random.default_rng(0)
     prices = 100.0 * np.cumprod(1.0 + rng.normal(0, 0.01, 100))
