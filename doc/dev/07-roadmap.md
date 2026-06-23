@@ -38,3 +38,49 @@ Le harnais `fynance.research` est **livré** (S1–S3) : `Experiment`,
 
 - [ ] Explorateur **Streamlit** au-dessus du Ledger (parcourir / filtrer / comparer
   les runs persistés) — interactif, plus tardif.
+
+## 3. Harnais R&D multi-actifs / panel (signalé à l'usage par `fynance-research`)
+
+`fynance-research` passe du mono-actif (ETH/BTC) à des stratégies **multi-pair** : un
+modèle qui voit `N` paires × `M` features, prédit **signal + magnitude par paire à `H`
+horizons**, puis une **règle** (allocation / ranking) décide quoi long/short. Audit du
+harnais : le **moteur de backtest gère déjà un book** `(T, N)` (`backtest/engine.py`,
+`gross.sum(axis=1)`) et l'**allocation** est livrée (`portfolio.allocation` :
+`ERC/HRP/IVP/MVP/MDP` + `rolling_allocation` ; `portfolio.sizing` : `vol_target`,
+`kelly_fraction`). **Mais toute la couche R&D au-dessus est câblée mono-actif** — c'est le
+blocage. Tâches ordonnées par dépendance ; rétro-compat mono-actif (`N=1`) à préserver.
+
+- [ ] **`ObjectiveModel` — entraînement panel (le cœur de l'enabler).** Aujourd'hui
+  `fit(X (T,F), y (T,))`, `out = net(X).reshape(-1)`, `predict → (-1, 1)` : une seule
+  colonne de position. Le rendre capable de consommer `X` panel `(T, N, M)` (ou `(T, N·M)`)
+  et de sortir un **book de positions** `(T, N)`, avec cible `y` panel `(T, N)` voire
+  multi-horizon `(T, N, H)`. Sans ça, aucun modèle cross-actifs n'est entraînable.
+- [ ] **Losses book-aware (objectif = portefeuille).** Les `*Loss` (`SharpeLoss`,
+  `Sortino`, `Calmar`, …) sont calculées sur un return 1-D. Les rendre capables d'agréger
+  le **return du book** `Σ_i pos_i·r_i − coût` avant de scorer, pour qu'on entraîne sur la
+  perf du portefeuille et non d'un actif. Ajouter (optionnel) une **loss cross-sectionnelle
+  / ranking** différentiable (long top-k vs bottom-k) pour la tête de prédiction. Dépend du
+  1er item.
+- [ ] **Walk-forward + `run_experiment` multi-actifs.** `Strategy.run` /
+  `run_walk_forward(data, y, …)` et `run_experiment` supposent une série de prix unique
+  (`n = prices.shape[0]`, une equity, un tearsheet). Accepter `data` **panel** `(T, N)`
+  (returns/prix), stitcher un **book OOS**, backtester via le moteur book (déjà OK) et
+  renvoyer une **equity de book + attribution par actif**. `run_experiment` : chemin panel
+  + provenance (X 3-D, `N` actifs). Dépend du 1er item.
+- [ ] **Métrique Information Coefficient / rank-IC + cible multi-horizon.** `fynance.metrics`
+  n'a aucune corrélation prédiction↔réalisé. Ajouter `information_coefficient` (Spearman de
+  rang, **par horizon**) en évaluation **non-chevauchante** (les labels à `H` barres se
+  chevauchent → sinon la skill est surestimée). C'est le **garde-fou predict-then-rule** :
+  mesurer la qualité du signal OOS *avant* tout trade, pour distinguer « signal mort »
+  (IC≈0) de « signal vivant mangé par les frais / la règle » (IC>0, PnL<0). Optionnel :
+  helper `horizon_returns` panel côté `research` / `features`. Indépendant (métrique pure).
+- [ ] **Report / tearsheet de book.** Étendre `write_report` + tearsheet (l'axe temporel en
+  dates vient d'atterrir, `feat/tearsheet-date-axis`) pour un run multi-actifs : equity
+  agrégée + contribution & turnover **par actif**. Dépend du walk-forward panel.
+
+> **Reste côté `fynance-research` (thin, pas ici).** Le réseau bespoke (transformer axial :
+> attention temporelle causale + attention cross-actifs) vit dans
+> `fynance-research/strategies/nets.py` et ne consomme que le harnais ci-dessus ; les règles
+> A/B/C (trend diversifié, cross-sectionnel, stat-arb cointégration) sont des modules
+> stratégie. *Si* la brique d'attention cross-sectionnelle s'avère réutilisable et
+> data-agnostique, elle pourra remonter en modèle de librairie — à trancher à l'usage.
