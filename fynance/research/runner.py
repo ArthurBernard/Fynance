@@ -245,6 +245,10 @@ def run_experiment(
     asset_contrib = getattr(result, "asset_gross_returns", None)
     if asset_contrib is not None:
         series["asset_contrib"] = np.asarray(asset_contrib, dtype=float).tolist()
+        # Persist the position book too so the report can show per-asset turnover.
+        book_positions = np.asarray(result.positions, dtype=float)
+        if book_positions.ndim == 2:
+            series["positions"] = book_positions.tolist()
 
     experiment = Experiment(
         name=name,

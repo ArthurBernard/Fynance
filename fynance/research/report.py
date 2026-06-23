@@ -55,7 +55,10 @@ def _provenance_table(spec: dict | None) -> str:
         span = ""
         if data.get("start") is not None or data.get("end") is not None:
             span = f" ({data.get('start')} → {data.get('end')})"
-        rows.append(("data", f"{data.get('kind')} · n={data.get('n')}{span}"))
+        n_assets = data.get("n_assets")
+        assets = f" · {n_assets} assets" if n_assets and n_assets > 1 else ""
+        rows.append(
+            ("data", f"{data.get('kind')} · n={data.get('n')}{assets}{span}"))
         if data.get("desc"):
             rows.append(("data desc", str(data["desc"])))
     elif data is not None:
@@ -97,15 +100,23 @@ def _write_png(experiment: Experiment, png_path: Path, period: int) -> bool:
     from fynance.plot import tearsheet
 
     equity = np.asarray(experiment.series["equity"], dtype=float)
-    # Duck-type a result carrying both the curve and its dates so the plot layer
-    # (via as_equity) draws against real dates; fall back to the bare curve (bar
-    # numbers) when the experiment has no datetime index.
-    result: Any = equity
+    # Duck-type a result carrying the curve, its dates and (for a multi-asset
+    # book) the per-asset attribution, so the plot layer draws against real dates
+    # and the tearsheet adds the book panels. Fall back to the bare curve (bar
+    # numbers, no book panels) when those are absent.
+    ns: dict[str, Any] = {"equity": equity}
     date_index = experiment.series.get("index")
     if date_index:
         index = np.asarray(date_index, dtype="datetime64[ns]")
         if index.shape[0] == equity.shape[0]:
-            result = SimpleNamespace(equity=equity, index=index)
+            ns["index"] = index
+    asset_contrib = experiment.series.get("asset_contrib")
+    if asset_contrib:
+        ns["asset_gross_returns"] = np.asarray(asset_contrib, dtype=float)
+    book_positions = experiment.series.get("positions")
+    if book_positions:
+        ns["positions"] = np.asarray(book_positions, dtype=float)
+    result: Any = SimpleNamespace(**ns) if len(ns) > 1 else equity
     fig = tearsheet(result, period=period)
     fig.savefig(png_path, dpi=110, bbox_inches="tight")
     plt.close(fig)
