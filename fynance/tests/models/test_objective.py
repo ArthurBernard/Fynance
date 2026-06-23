@@ -79,6 +79,107 @@ def test_accepts_custom_net_and_loss():
     assert np.asarray(model.predict(X)).shape == (300, 1)
 
 
+def _panel_edge(n=1500, n_assets=3, m_features=2, seed=0):
+    """ A learnable panel edge: each asset's own feature predicts its return.
+
+    Returns ``X`` of shape ``(n, n_assets, m_features)`` (the first feature of
+    each asset is its sign signal, the rest are noise) and ``y`` of shape
+    ``(n, n_assets)`` (each asset's realized per-bar return).
+    """
+    rng = np.random.default_rng(seed)
+    feats, rets = [], []
+    for _ in range(n_assets):
+        s = rng.choice([-1.0, 1.0], size=n)
+        r = (s * 0.01 + rng.standard_normal(n) * 0.01).astype(np.float32)
+        cols = [s] + [rng.standard_normal(n) for _ in range(m_features - 1)]
+        feats.append(np.column_stack(cols).astype(np.float32))
+        rets.append(r)
+    X = np.stack(feats, axis=1)                     # (n, n_assets, m_features)
+    y = np.column_stack(rets).astype(np.float32)    # (n, n_assets)
+
+    return X, y
+
+
+def _book_turnover(pos):
+    """ Mean per-bar turnover aggregated across the book's asset columns. """
+    pos = np.asarray(pos)
+    return float(np.abs(np.diff(pos, axis=0, prepend=0.0)).sum(axis=1).mean())
+
+
+def test_panel_predict_shape_3d_and_flat():
+    # A 3-D panel (T, N, M) and its pre-flattened (T, N*M) form must both be
+    # accepted and yield the *same* position book of shape (T, N).
+    X, y = _panel_edge(n=300, n_assets=3, m_features=2)
+    model = ObjectiveModel(layers=(8,), epochs=20, lr=5e-3, seed=0).fit(X, y)
+    pos = np.asarray(model.predict(X))
+    assert pos.shape == (300, 3)
+    assert model.n_assets == 3
+
+    Xflat = X.reshape(X.shape[0], -1)
+    model2 = ObjectiveModel(n_assets=3, layers=(8,), epochs=20, lr=5e-3,
+                            seed=0).fit(Xflat, y)
+    pos2 = np.asarray(model2.predict(Xflat))
+    assert pos2.shape == (300, 3)
+    assert np.allclose(pos, pos2)
+
+
+def test_panel_positions_are_bounded():
+    # With tanh, each per-asset position stays within [-1, 1].
+    X, y = _panel_edge(n=300, n_assets=3)
+    pos = np.asarray(ObjectiveModel(epochs=10, seed=0).fit(X, y).predict(X))
+    assert pos.shape == (300, 3)
+    assert np.all(np.abs(pos) <= 1.0 + 1e-6)
+
+
+def test_panel_book_learns_a_known_edge():
+    # Each of the N=3 assets has its own learnable edge; the aggregated book
+    # return should achieve a clearly positive Sharpe.
+    X, y = _panel_edge(n_assets=3, seed=0)
+    model = ObjectiveModel(layers=(8,), epochs=150, lr=5e-3, seed=0).fit(X, y)
+    pos = np.asarray(model.predict(X))
+    assert pos.shape == (1500, 3)
+
+    book_ret = (pos * y).sum(axis=1)
+    assert sharpe(np.cumprod(1 + book_ret), period=252) > 1.0
+
+
+def test_panel_cost_reduces_book_turnover():
+    # On a fast-flipping panel, the turnover-penalized book churns less than the
+    # cost-free one (aggregated across asset columns).
+    s = np.where(np.arange(1500) % 2 == 0, 1.0, -1.0)
+    rng = np.random.default_rng(0)
+    feats, rets = [], []
+    for _ in range(3):
+        r = (s * 0.01 + rng.standard_normal(1500) * 0.005).astype(np.float32)
+        feats.append(np.column_stack([s, rng.standard_normal(1500)]
+                                     ).astype(np.float32))
+        rets.append(r)
+    X = np.stack(feats, axis=1)
+    y = np.column_stack(rets).astype(np.float32)
+
+    free = ObjectiveModel(layers=(8,), epochs=200, lr=5e-3, seed=0).fit(X, y)
+    pricey = ObjectiveModel(layers=(8,), epochs=200, lr=5e-3, cost=0.1,
+                            seed=0).fit(X, y)
+
+    assert _book_turnover(pricey.predict(X)) < _book_turnover(free.predict(X))
+
+
+def test_n1_explicit_matches_inferred():
+    # Strict N=1 non-regression: an explicit n_assets=1 run, the inferred path
+    # from a 1-D y, and a 2-D (T, 1) y must all give identical positions, with a
+    # (T, 1) shape -- the single-asset behaviour is unchanged.
+    X, returns = _edge_data(n=400)
+    inferred = ObjectiveModel(epochs=20, seed=42).fit(X, returns).predict(X)
+    explicit = ObjectiveModel(n_assets=1, epochs=20,
+                              seed=42).fit(X, returns).predict(X)
+    twod_y = ObjectiveModel(epochs=20, seed=42).fit(
+        X, returns.reshape(-1, 1)).predict(X)
+
+    assert inferred.shape == (400, 1)
+    assert np.array_equal(inferred, explicit)
+    assert np.array_equal(inferred, twod_y)
+
+
 def _alternating_edge(n=1500, seed=0):
     """ Sign flips every bar: the no-cost optimum churns (turnover ~2/bar). """
     s = np.where(np.arange(n) % 2 == 0, 1.0, -1.0)
