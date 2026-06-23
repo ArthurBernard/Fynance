@@ -8,8 +8,12 @@ from __future__ import annotations
 # Built-in packages
 from typing import Any
 
+# Third-party packages
+import numpy as np
+
 # Local packages
 from fynance.plot._helpers import as_equity
+from fynance.plot.attribution import plot_contribution, plot_turnover
 from fynance.plot.equity import plot_drawdown, plot_equity
 from fynance.plot.returns import plot_rolling_sharpe
 
@@ -52,8 +56,20 @@ def tearsheet(result: Any, period: int = 252, figsize: tuple = (11, 7)) -> Any:
     """
     import matplotlib.pyplot as plt
 
-    fig = plt.figure(figsize=figsize)
-    gs = fig.add_gridspec(2, 2)
+    # A multi-asset book carries per-asset attribution: add a contribution and a
+    # turnover panel below the core 2x2 report (single-asset stays a 2x2).
+    asset_gross = getattr(result, "asset_gross_returns", None)
+    positions = getattr(result, "positions", None)
+    index = getattr(result, "index", None)
+    is_book = (
+        asset_gross is not None
+        and np.asarray(asset_gross).ndim == 2
+        and np.asarray(asset_gross).shape[1] > 1
+    )
+
+    n_rows = 3 if is_book else 2
+    fig = plt.figure(figsize=(figsize[0], figsize[1] * (1.4 if is_book else 1.0)))
+    gs = fig.add_gridspec(n_rows, 2)
 
     plot_equity(result, ax=fig.add_subplot(gs[0, 0]))
     plot_drawdown(result, ax=fig.add_subplot(gs[0, 1]))
@@ -69,6 +85,11 @@ def tearsheet(result: Any, period: int = 252, figsize: tuple = (11, 7)) -> Any:
     table.set_fontsize(9)
     table.scale(1.0, 1.3)
     ax_table.set_title("Summary")
+
+    if is_book:
+        plot_contribution(asset_gross, index=index, ax=fig.add_subplot(gs[2, 0]))
+        if positions is not None and np.asarray(positions).ndim == 2:
+            plot_turnover(positions, index=index, ax=fig.add_subplot(gs[2, 1]))
 
     fig.tight_layout()
 
