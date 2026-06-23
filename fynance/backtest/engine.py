@@ -96,10 +96,12 @@ def backtest(
     else:
         pos_eff = pos
 
-    gross = pos_eff * returns
+    gross_book = pos_eff * returns
 
-    if gross.ndim == 2:
-        gross = gross.sum(axis=1)
+    # For a multi-asset book the per-asset gross contributions (which sum to the
+    # book gross return) are kept as attribution before aggregating to 1-D.
+    asset_gross_returns = gross_book if gross_book.ndim == 2 else None
+    gross = gross_book.sum(axis=1) if gross_book.ndim == 2 else gross_book
 
     costs = (
         np.asarray(cost(cost_book), dtype=np.float64)
@@ -115,4 +117,5 @@ def backtest(
         gross_returns=gross,
         positions=pos,
         costs=costs,
+        asset_gross_returns=asset_gross_returns,
     )

@@ -115,3 +115,23 @@ def test_prices_input_cost_preserves_no_lookahead():
     res = backtest(pert, positions, cost=cost,
                    returns_input=False, shift=True).equity
     assert np.allclose(base[:-1], res[:-1])
+
+
+def test_book_attribution_sums_to_gross():
+    # A 2-D position book yields per-asset gross contributions that sum to the
+    # aggregated book gross return.
+    rng = np.random.default_rng(0)
+    returns = rng.normal(0.0, 0.01, (50, 3))
+    positions = rng.choice([-1.0, 1.0], size=(50, 3))
+    res = backtest(returns, positions, shift=True)
+    assert res.asset_gross_returns is not None
+    assert res.asset_gross_returns.shape == (50, 3)
+    assert np.allclose(res.asset_gross_returns.sum(axis=1), res.gross_returns)
+
+
+def test_single_asset_has_no_attribution():
+    rng = np.random.default_rng(1)
+    returns = rng.normal(0.0, 0.01, 50)
+    res = backtest(returns, np.ones(50), shift=True)
+    assert res.asset_gross_returns is None
+    assert res.gross_returns.ndim == 1
