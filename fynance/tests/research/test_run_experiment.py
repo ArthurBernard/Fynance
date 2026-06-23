@@ -139,3 +139,28 @@ def test_non_datetime_index_yields_no_date_axis():
     exp = run_experiment(momentum(), gbm(200, seed=2), name="bars")
 
     assert "index" not in exp.series
+
+
+def test_run_experiment_panel(tmp_path):
+    # A 2-D (T, N) panel runs end to end: book equity, per-asset attribution
+    # persisted, and N recorded in the provenance.
+    rng = np.random.default_rng(4)
+    prices = 100.0 * np.cumprod(1.0 + rng.normal(0.0003, 0.01, (300, 3)), axis=0)
+
+    def panel_momentum(p):
+        r = np.zeros_like(p)
+        r[1:] = np.sign(p[1:] - p[:-1])
+        return r
+
+    strat = Strategy(features=panel_momentum, signal=lambda x: x)
+    exp = run_experiment(strat, prices, name="panel", output_dir=tmp_path)
+
+    assert exp.spec["data"]["n_assets"] == 3
+    assert "asset_contrib" in exp.series
+    assert exp.series["equity"]
+
+
+def test_run_experiment_single_asset_provenance():
+    exp = run_experiment(momentum(), gbm(200, seed=2), name="single")
+    assert exp.spec["data"]["n_assets"] == 1
+    assert "asset_contrib" not in exp.series

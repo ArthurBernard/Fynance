@@ -168,3 +168,54 @@ def test_walk_forward_no_lookahead():
     prefix = cut - 100 - 40  # conservative: before any window touching the tail
     assert prefix > 0
     assert np.allclose(base.positions[:prefix], pert.positions[:prefix])
+
+
+def _panel_prices(n=300, n_assets=3, seed=0):
+    rng = np.random.default_rng(seed)
+    rets = rng.normal(0.0003, 0.01, (n, n_assets))
+    return 100.0 * np.cumprod(1.0 + rets, axis=0)
+
+
+def _panel_momentum(prices):
+    # Per-asset sign of the last price change -> a (T, N) position book.
+    r = np.zeros_like(prices)
+    r[1:] = np.sign(prices[1:] - prices[:-1])
+    return r
+
+
+def test_run_panel_book_attribution():
+    strat = Strategy(features=_panel_momentum, signal=lambda x: x)
+    res = strat.run(_panel_prices())
+    assert isinstance(res, BacktestResult)
+    assert res.asset_gross_returns is not None
+    assert res.asset_gross_returns.shape[1] == 3
+    assert np.allclose(res.asset_gross_returns.sum(axis=1), res.gross_returns)
+
+
+def test_run_single_asset_unchanged():
+    # The single-asset path keeps a 1-D book and carries no attribution.
+    def momentum(prices):
+        r = np.zeros_like(prices)
+        r[1:] = np.sign(prices[1:] - prices[:-1])
+        return r
+
+    res = Strategy(features=momentum, signal=lambda x: x).run(_prices())
+    assert res.asset_gross_returns is None
+    assert res.gross_returns.ndim == 1
+
+
+def test_walk_forward_panel_book_and_no_lookahead():
+    prices = _panel_prices(n=400, n_assets=3, seed=1)
+    strat = Strategy(features=_panel_momentum, signal=lambda x: x)
+    res = strat.run_walk_forward(prices, y=np.zeros(len(prices)), train=100, test=50)
+    assert res.asset_gross_returns is not None
+    assert res.asset_gross_returns.shape[1] == 3
+    assert np.allclose(res.asset_gross_returns.sum(axis=1), res.gross_returns)
+
+    # No lookahead: perturbing the tail leaves the earlier OOS prefix unchanged.
+    pert = prices.copy()
+    cut = int(len(prices) * 0.7)
+    pert[cut:] *= 1.05
+    res2 = strat.run_walk_forward(pert, y=np.zeros(len(pert)), train=100, test=50)
+    k = res.returns.shape[0] // 3
+    assert np.allclose(res.returns[:k], res2.returns[:k])
