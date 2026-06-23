@@ -92,7 +92,8 @@ class SortinoLoss(BaseLoss):
         Parameters
         ----------
         y_pred : torch.Tensor
-            Predicted return series, shape ``(T,)`` or ``(T, M)``.
+            Predicted return series ``(T,)``. A 2-D ``(T, N)`` position book is
+            aggregated to the book return (sum across assets) before scoring.
         y_true : torch.Tensor, optional
             Not used; accepted for API compatibility with PyTorch criterions.
 
@@ -108,6 +109,7 @@ class SortinoLoss(BaseLoss):
 
         """
         self._check_tensor(y_pred)
+        y_pred = self._book_return(y_pred)
         excess = y_pred - self._rf_per_period
         downside = torch.sqrt(torch.mean(F.relu(-excess) ** 2))
         # Floor the downside relative to the return scale: a fixed absolute eps
