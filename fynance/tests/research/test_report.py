@@ -6,6 +6,7 @@
 # Built-in
 import importlib.util
 from pathlib import Path
+from types import SimpleNamespace
 
 # Third-party
 import numpy as np
@@ -85,3 +86,48 @@ def test_notebook_execution(tmp_path, experiment):
     parsed = nbformat.read(out["notebook"], as_version=4)
     code_cells = [c for c in parsed.cells if c.cell_type == "code"]
     assert any(c.get("outputs") for c in code_cells)
+
+
+@pytest.fixture
+def dated_experiment():
+    """ A real experiment whose price series carries a datetime index. """
+    from fynance.core import PriceSeries
+
+    n = 400
+    values = gbm(n, seed=7).to_numpy()
+    dates = np.datetime64("2019-01-01") + np.arange(n)
+    ps = PriceSeries(values, index=dates, name="dated")
+    strat = Strategy(features=lambda p: np.diff(p, prepend=p[0]))
+
+    return run_experiment(strat, ps, name="dated")
+
+
+def test_report_uses_date_axis_when_indexed(tmp_path, dated_experiment):
+    # The dated experiment persists an index; the tearsheet PNG is written from
+    # it without error (drawn against dates rather than bar numbers).
+    assert "index" in dated_experiment.series
+
+    out = write_report(dated_experiment, tmp_path, notebook=False)
+    png = tmp_path / "dated" / "tearsheet.png"
+
+    assert out["png"] == png and png.is_file() and png.stat().st_size > 0
+
+
+def test_tearsheet_plots_dates_for_indexed_curve():
+    # Threading a datetime index through to the plot layer yields a date axis
+    # (datetime64 x-data + a date locator) instead of integer bar numbers.
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.dates as mdates
+
+    from fynance.plot.equity import plot_equity
+
+    dates = np.datetime64("2021-01-01") + np.arange(60)
+    equity = np.linspace(1.0, 1.3, dates.size)
+
+    ax = plot_equity(SimpleNamespace(equity=equity, index=dates))
+    xdata = np.asarray(ax.get_lines()[0].get_xdata())
+
+    assert np.issubdtype(xdata.dtype, np.datetime64)
+    assert isinstance(ax.xaxis.get_major_locator(), mdates.AutoDateLocator)

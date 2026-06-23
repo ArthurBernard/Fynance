@@ -51,6 +51,24 @@ def _index_bound(data: Any, pos: int) -> Any:
     return value.item() if hasattr(value, "item") else value
 
 
+def _series_index(data: Any, n: int) -> list[str] | None:
+    """ Tail-aligned datetime index (ISO strings) for an ``n``-point curve.
+
+    Returns the last ``n`` index entries as ISO-8601 strings when ``data`` carries
+    a genuine ``datetime64`` index long enough to cover the result curve; ``None``
+    otherwise (the report then falls back to bar numbers). Right-aligned because a
+    walk-forward equity curve covers the chronological *tail* of the series.
+    """
+    index = getattr(data, "index", None)
+    if index is None:
+        return None
+    arr = np.asarray(index).reshape(-1)
+    if not np.issubdtype(arr.dtype, np.datetime64) or arr.shape[0] < n:
+        return None
+
+    return [str(v) for v in arr[-n:]]
+
+
 def _callable_name(fn: Any) -> str | None:
     """ Best-effort readable name for a signal/feature callable. """
     if fn is None:
@@ -205,10 +223,16 @@ def run_experiment(
         "seed": seed,
     }
 
-    series = {
+    series: dict[str, list[Any]] = {
         "equity": np.asarray(result.equity, dtype=float).tolist(),
         "returns": np.asarray(result.returns, dtype=float).tolist(),
     }
+    # Persist the datetime index (tail-aligned to the curve) so the report can
+    # plot against real dates rather than bar numbers; omitted when the series
+    # carries no temporal index.
+    date_index = _series_index(data, len(series["equity"]))
+    if date_index is not None:
+        series["index"] = date_index
 
     experiment = Experiment(
         name=name,
