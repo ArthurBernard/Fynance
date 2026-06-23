@@ -10,6 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [2.11.0] - 2026-06-23
+
+### Breaking Changes
+
+### Added
+
 - **Multi-asset / panel research harness.** `ObjectiveModel` trains a position
   **book** `(T, N)` from a panel `X` `(T, N, M)` (or `(T, N·M)`) with a per-asset
   target `y` `(T, N)`, scored on the aggregated book objective; `Strategy.run`/
