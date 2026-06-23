@@ -72,6 +72,37 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-06-23 — Multi-asset / panel R&D harness (PRs #215–#219, epic)  [accepted]
+
+Took the research harness from single-asset to **multi-pair**: a model predicts a
+position **book** `(T, N)`, a rule allocates, the book is backtested and reported
+with per-asset attribution. Five atomic leaves: #216 (IC), #215 (`ObjectiveModel`
+panel), #217 (book-aware losses), #218 (walk-forward + attribution), #219 (book
+report). Test count 946 (with doctests). Decisions worth recording:
+
+- **Book aggregation lives in the model *and* (additively) in the losses.**
+  `ObjectiveModel` sums the per-asset net returns to the 1-D book return before
+  the loss, so the existing 1-D losses keep working unchanged; the ratio losses
+  were *also* made book-aware (sum a `(T, N)` input across assets) so a custom
+  architecture can feed per-asset returns directly. Both reduce to the same
+  scalar, and `(T, 1)`/1-D are bit-identical to before (verified: `N=1`
+  max-abs-diff `0.0`).
+- **A 3-D panel `X (T, N, M)` is flattened to `(T, N·M)`** for the default dense
+  net, with `N` remembered for the `Linear(dim, N)` head; a custom `net=` receives
+  the flattened matrix (3-D pass-through to a custom net is deferred).
+- **Per-asset attribution is gross-contribution only.** `BacktestResult`
+  carries an optional `asset_gross_returns` `(T, N)` (summing to the book gross
+  return); the cost model already returns book-aggregated turnover, so per-asset
+  *net* costs are not split — turnover is shown per asset from the position book.
+  `None` for a single-asset run (strict back-compat).
+- **IC defaults to cross-sectional-per-bar** for a `(T, N)` panel (the ranking
+  use-case; `axis=1` gives the per-asset time-series IC), and **horizon labels are
+  non-overlapping by default** (overlapping H-bar labels inflate the IC).
+- **Rejected alternatives**: re-touching `ObjectiveModel` to pass per-asset returns
+  to the loss (kept the model's pre-aggregation, made losses additively book-aware
+  instead); extending `BacktestResult` with per-asset *net* costs (out of scope —
+  the cost model is book-level).
+
 ### 2026-06-22 — Audit round 2: regression + residual bugs (PRs #201–#207, v2.10.1)  [accepted]
 
 A second audit pass after v2.10.0 caught **one regression** the first remediation
