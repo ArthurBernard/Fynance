@@ -12,6 +12,7 @@ import numpy as np
 # Local
 import fynance
 from fynance.backtest import ProportionalCost
+from fynance.core import PriceSeries
 from fynance.research import Experiment, gbm, run_experiment
 from fynance.strategy import Strategy
 
@@ -110,3 +111,31 @@ def test_no_lookahead_walk_forward():
 
     k = len(base.series["returns"]) // 3
     assert np.allclose(base.series["returns"][:k], pert_exp.series["returns"][:k])
+
+
+def test_datetime_index_captured_tail_aligned():
+    # A PriceSeries carrying a real datetime index makes run_experiment persist a
+    # tail-aligned ISO date index, so the report plots against dates not bars.
+    n = 300
+    values = gbm(n, seed=11).to_numpy()
+    dates = np.datetime64("2020-01-01") + np.arange(n)
+    ps = PriceSeries(values, index=dates, name="dated")
+
+    exp = run_experiment(momentum(), ps, name="dated")
+
+    idx = exp.series.get("index")
+    assert idx is not None
+    # One date per equity point, right-aligned (ends on the last observation).
+    assert len(idx) == len(exp.series["equity"])
+    assert np.datetime64(idx[-1]) == dates[-1]
+    assert np.datetime64(idx[0]) == dates[-len(idx)]
+    # ISO strings survive the JSON round-trip.
+    assert Experiment.from_dict(exp.to_dict()).series["index"] == idx
+
+
+def test_non_datetime_index_yields_no_date_axis():
+    # gbm's default 0..n-1 integer index is not temporal: no index is stored, so
+    # the report falls back to bar numbers (unchanged behavior).
+    exp = run_experiment(momentum(), gbm(200, seed=2), name="bars")
+
+    assert "index" not in exp.series
