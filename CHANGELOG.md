@@ -12,6 +12,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [2.10.2] - 2026-06-23
+
+### Breaking Changes
+
+### Added
+
+### Changed
+
 - **Research reports plot against dates.** When the `PriceSeries` passed to
   `run_experiment` carries a `datetime64` index, the experiment now persists a
   tail-aligned date index and `write_report`'s tearsheet draws equity, drawdown
