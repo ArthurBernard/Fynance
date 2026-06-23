@@ -16,6 +16,8 @@ from __future__ import annotations
 
 import warnings
 from pathlib import Path
+from types import SimpleNamespace
+from typing import Any
 
 # Third-party
 import numpy as np
@@ -95,7 +97,16 @@ def _write_png(experiment: Experiment, png_path: Path, period: int) -> bool:
     from fynance.plot import tearsheet
 
     equity = np.asarray(experiment.series["equity"], dtype=float)
-    fig = tearsheet(equity, period=period)
+    # Duck-type a result carrying both the curve and its dates so the plot layer
+    # (via as_equity) draws against real dates; fall back to the bare curve (bar
+    # numbers) when the experiment has no datetime index.
+    result: Any = equity
+    date_index = experiment.series.get("index")
+    if date_index:
+        index = np.asarray(date_index, dtype="datetime64[ns]")
+        if index.shape[0] == equity.shape[0]:
+            result = SimpleNamespace(equity=equity, index=index)
+    fig = tearsheet(result, period=period)
     fig.savefig(png_path, dpi=110, bbox_inches="tight")
     plt.close(fig)
 
@@ -124,11 +135,18 @@ def _build_notebook(experiment: Experiment, target: Path, period: int,
         new_code_cell(
             "import json\n"
             "import numpy as np\n"
+            "from types import SimpleNamespace\n"
             "from fynance.plot import tearsheet\n"
             "\n"
             "exp = json.load(open('experiment.json'))\n"
-            "equity = np.asarray(exp['series']['equity'], dtype=float)\n"
-            f"fig = tearsheet(equity, period={period})\n"
+            "series = exp['series']\n"
+            "equity = np.asarray(series['equity'], dtype=float)\n"
+            "idx = series.get('index')\n"
+            "# Plot against dates when the experiment carries a datetime index.\n"
+            "result = (SimpleNamespace(equity=equity,\n"
+            "                          index=np.asarray(idx, dtype='datetime64[ns]'))\n"
+            "          if idx else equity)\n"
+            f"fig = tearsheet(result, period={period})\n"
             "fig"
         ),
     ]
