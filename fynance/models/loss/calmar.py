@@ -52,6 +52,7 @@ class CalmarLoss(BaseLoss):
     ) -> torch.Tensor:
         """ Compute the negative Calmar ratio (scalar). """
         self._check_tensor(y_pred)
+        y_pred = self._book_return(y_pred)
         equity = torch.cumsum(y_pred, dim=0)
         running_max, _ = torch.cummax(equity, dim=0)
         max_drawdown = (running_max - equity).max()

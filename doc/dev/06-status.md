@@ -23,7 +23,14 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
   management (`iso_vol`), feature engineering (multi-resolution, Granger,
   incremental moments) and k-means market-regime detection.
 - **Metrics**: `fynance.metrics` (Sharpe/Sortino/Calmar/diversified-ratio,
-  annual return/vol, drawdown/mdd, perf_*, roll_*) + one-call `summary`.
+  annual return/vol, drawdown/mdd, perf_*, roll_*, **`information_coefficient`**
+  rank-IC) + one-call `summary`.
+- **Multi-asset / panel harness**: `ObjectiveModel` trains a position book
+  `(T, N)` from a panel `X`; book-aware ratio losses + `RankingLoss`;
+  `Strategy`/`run_walk_forward`/`run_experiment` accept a `(T, N)` panel and return
+  a book equity with per-asset attribution (`BacktestResult.asset_gross_returns`);
+  `horizon_returns` non-overlapping labels; book tearsheet (per-asset contribution
+  + turnover). The single-asset `N=1` path is unchanged.
 - **Models**: econometric (ARMA/GARCH) + neural (MLP, RNN/GRU/LSTM, attention,
   TCN, Transformer) on PyTorch; `StackingEnsemble` (direction+magnitude OOF
   meta-model); **`RegimeMoE`** (regime-conditioned mixture-of-experts — an

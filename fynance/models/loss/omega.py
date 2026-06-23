@@ -60,6 +60,7 @@ class OmegaLoss(BaseLoss):
     ) -> torch.Tensor:
         """ Compute the negative Omega ratio (scalar). """
         self._check_tensor(y_pred)
+        y_pred = self._book_return(y_pred)
         diff = y_pred - self.threshold
         gains = torch.relu(diff).mean()
         losses = torch.relu(-diff).mean()

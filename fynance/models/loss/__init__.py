@@ -20,6 +20,8 @@ Main entry points
   maximum drawdown).
 - :class:`OmegaLoss` — negative Omega ratio (expected gains over
   expected losses relative to a threshold).
+- :class:`RankingLoss` — differentiable cross-sectional long-short
+  ranking objective for a panel of assets.
 - :class:`HybridLoss` — convex combination of two losses with a fixed or
   learnable weight.
 
@@ -40,8 +42,9 @@ from .calmar import CalmarLoss
 from .directional import DirectionalAccuracyLoss
 from .hybrid import HybridLoss
 from .omega import OmegaLoss
+from .ranking import RankingLoss
 from .sharpe import SharpeLoss
 from .sortino import SortinoLoss
 
 __all__ = ['BaseLoss', 'CalmarLoss', 'DirectionalAccuracyLoss', 'HybridLoss',
-           'OmegaLoss', 'SharpeLoss', 'SortinoLoss']
+           'OmegaLoss', 'RankingLoss', 'SharpeLoss', 'SortinoLoss']

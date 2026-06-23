@@ -67,3 +67,20 @@ class BaseLoss(torch.nn.Module):
                 "Convert numpy arrays with torch.from_numpy() before passing "
                 "to this loss."
             )
+
+    @staticmethod
+    def _book_return(y_pred: torch.Tensor) -> torch.Tensor:
+        r""" Aggregate a position-book return ``(T, N)`` into a 1-D book return.
+
+        A 2-D ``y_pred`` is read as the per-asset net-of-cost returns of a
+        position book; the book return at each step is their sum across assets
+        (:math:`\sum_i pos_i \cdot r_i`), so the ratio losses score the
+        **portfolio** return rather than a pooled per-asset return. A 1-D
+        ``y_pred`` (single asset) is returned unchanged, and a ``(T, 1)`` book
+        reduces to the same series as the single-asset case.
+        """
+        if y_pred.dim() == 2:
+
+            return y_pred.sum(dim=1)
+
+        return y_pred

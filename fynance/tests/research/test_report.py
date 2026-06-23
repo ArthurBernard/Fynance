@@ -131,3 +131,32 @@ def test_tearsheet_plots_dates_for_indexed_curve():
 
     assert np.issubdtype(xdata.dtype, np.datetime64)
     assert isinstance(ax.xaxis.get_major_locator(), mdates.AutoDateLocator)
+
+
+@pytest.fixture
+def panel_experiment():
+    """ A real multi-asset (panel) experiment. """
+    rng = np.random.default_rng(7)
+    prices = 100.0 * np.cumprod(1.0 + rng.normal(0.0003, 0.01, (300, 3)), axis=0)
+
+    def panel_momentum(p):
+        r = np.zeros_like(p)
+        r[1:] = np.sign(p[1:] - p[:-1])
+        return r
+
+    strat = Strategy(features=panel_momentum, signal=lambda x: x)
+
+    return run_experiment(strat, prices, name="panel")
+
+
+def test_report_book_writes_attribution(tmp_path, panel_experiment):
+    # A panel experiment persists per-asset attribution; the tearsheet PNG is
+    # written and the provenance table records the asset count.
+    assert "asset_contrib" in panel_experiment.series
+
+    out = write_report(panel_experiment, tmp_path, notebook=False)
+    png = tmp_path / "panel" / "tearsheet.png"
+
+    assert out["png"] == png and png.is_file() and png.stat().st_size > 0
+    text = (tmp_path / "panel" / "report.md").read_text()
+    assert "3 assets" in text

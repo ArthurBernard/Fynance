@@ -28,11 +28,17 @@ __all__ = ['run_experiment']
 
 
 def _to_array(data: Any) -> NDArray[np.float64]:
-    """ Coerce a PriceSeries / array-like to a 1-D float64 array. """
+    """ Coerce a PriceSeries / array-like to a float64 array.
+
+    A 2-D ``(T, N)`` panel (multi-asset prices/returns) is preserved; anything
+    else is flattened to a 1-D series.
+    """
     if isinstance(data, PriceSeries):
         return data.to_numpy()
 
-    return np.asarray(data, dtype=np.float64).reshape(-1)
+    arr = np.asarray(data, dtype=np.float64)
+
+    return arr if arr.ndim == 2 else arr.reshape(-1)
 
 
 def _index_bound(data: Any, pos: int) -> Any:
@@ -197,6 +203,7 @@ def run_experiment(
     data_block: dict[str, Any] = {
         "kind": getattr(data, "name", None) or type(data).__name__,
         "n": int(n),
+        "n_assets": int(prices.shape[1]) if prices.ndim == 2 else 1,
         "start": _index_bound(data, 0),
         "end": _index_bound(data, -1),
         "desc": data_desc,
@@ -233,6 +240,15 @@ def run_experiment(
     date_index = _series_index(data, len(series["equity"]))
     if date_index is not None:
         series["index"] = date_index
+    # Persist per-asset gross contributions of a multi-asset book so the report
+    # can attribute the book return by asset; absent for a single-asset run.
+    asset_contrib = getattr(result, "asset_gross_returns", None)
+    if asset_contrib is not None:
+        series["asset_contrib"] = np.asarray(asset_contrib, dtype=float).tolist()
+        # Persist the position book too so the report can show per-asset turnover.
+        book_positions = np.asarray(result.positions, dtype=float)
+        if book_positions.ndim == 2:
+            series["positions"] = book_positions.tolist()
 
     experiment = Experiment(
         name=name,

@@ -111,7 +111,20 @@ class Strategy:
         else:
             preds = feats
 
-        return np.asarray(self.signal(preds), dtype=np.float64).reshape(-1)
+        return self._signal_positions(preds)
+
+    def _signal_positions(self, preds: NDArray) -> NDArray:
+        """ Map predictions to positions, preserving a ``(T, N)`` book.
+
+        A genuine multi-asset book ``(T, N)`` is kept 2-D; only a trailing
+        singleton asset axis (the single-asset model output ``(T, 1)``) is
+        collapsed to 1-D so the single-asset path is unchanged.
+        """
+        pos = np.asarray(self.signal(preds), dtype=np.float64)
+        if pos.ndim == 2 and pos.shape[1] == 1:
+            pos = pos.reshape(-1)
+
+        return pos
 
     def run(self, data: Any, y: NDArray | None = None,
             X: NDArray | None = None) -> BacktestResult:
@@ -200,8 +213,8 @@ class Strategy:
         X_arr = None if X is None else np.asarray(X)  # preserve caller dtype
         n = prices.shape[0]
 
-        oos_pos: list[float] = []
-        oos_ret: list[float] = []
+        oos_pos: list[NDArray] = []
+        oos_ret: list[NDArray] = []
 
         for tr, te in walk_forward(n, train=train, test=test, step=step,
                                    purge=purge):
@@ -220,21 +233,24 @@ class Strategy:
             else:
                 preds = feats_te
 
-            pos = np.asarray(self.signal(preds), dtype=np.float64).reshape(-1)
+            pos = self._signal_positions(preds)
 
             # Return realized over each test step (causal: position at t earns
             # r_t within the OOS block; the engine applies the one-step shift).
             # The opening bar has no in-block prior price, so its return is
-            # discarded (NaN -> 0 below). See the method docstring note.
+            # discarded (NaN -> 0 below). For a panel the whole opening row is
+            # discarded. See the method docstring note.
             block = prices[te]
-            ret = np.empty(block.shape[0])
+            ret = np.empty_like(block, dtype=np.float64)
             ret[0] = np.nan
             ret[1:] = block[1:] / block[:-1] - 1.0
 
-            oos_pos.extend(pos.tolist())
-            oos_ret.extend(ret.tolist())
+            oos_pos.append(pos)
+            oos_ret.append(ret)
 
-        positions = np.asarray(oos_pos)
-        returns = np.nan_to_num(np.asarray(oos_ret), nan=0.0)
+        # Stitch the out-of-sample blocks: 1-D for a single asset, (T_oos, N)
+        # for a panel book.
+        positions = np.concatenate(oos_pos, axis=0)
+        returns = np.nan_to_num(np.concatenate(oos_ret, axis=0), nan=0.0)
 
         return backtest(returns, positions, cost=self.cost, shift=True)

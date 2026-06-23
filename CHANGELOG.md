@@ -18,6 +18,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.11.0] - 2026-06-23
+
+### Breaking Changes
+
+### Added
+
+- **Multi-asset / panel research harness.** `ObjectiveModel` trains a position
+  **book** `(T, N)` from a panel `X` `(T, N, M)` (or `(T, N·M)`) with a per-asset
+  target `y` `(T, N)`, scored on the aggregated book objective; `Strategy.run`/
+  `run_walk_forward` and `run_experiment` accept a `(T, N)` panel, stitch a
+  per-asset book and return a book equity with per-asset attribution
+  (`BacktestResult.asset_gross_returns`); the book tearsheet adds per-asset
+  **contribution** and **turnover** panels. The single-asset `N=1` path is
+  numerically unchanged throughout.
+- **`information_coefficient`** (rank-IC / Pearson; cross-sectional per bar or
+  per-asset time-series) and **`horizon_returns`** (non-overlapping forward
+  labels) — a predict-then-rule guardrail to gauge signal quality before trading.
+- **`RankingLoss`** — a differentiable cross-sectional long-short ranking loss.
+
+### Changed
+
+- **Ratio losses are book-aware.** `SharpeLoss`/`SortinoLoss`/`CalmarLoss`/
+  `OmegaLoss` aggregate a 2-D `(T, N)` position book to the 1-D book return
+  (`Σ_i posᵢ·rᵢ`) before scoring; 1-D and `(T, 1)` inputs are numerically
+  unchanged.
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
 ## [2.10.2] - 2026-06-23
 
 ### Breaking Changes

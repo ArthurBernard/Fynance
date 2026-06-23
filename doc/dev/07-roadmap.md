@@ -12,14 +12,18 @@ shipped, `03-decisions.md` for *why*. Keep it short and true.
 > Loop : `/pick-task` → `/plan` (arbre dans `plans/`) → `/execute-leaf` →
 > `/finish-task`. Release : `/release` quand `[Unreleased]` est suffisamment rempli.
 
-> **fynance 2.x livré** (v2.9.0 sur `master`/PyPI). Le refactor en couches, le port
+> **fynance 2.x livré** (v2.10.2 sur `master`/PyPI). Le refactor en couches, le port
 > Cython→Numba (build pure-Python), le harnais R&D `fynance.research` (S1–S3), la
 > brique d'entraînement aligné-objectif (`ObjectiveModel`) et les **bricks de
 > librairie** (conteneur `OHLCV` + indicateurs ATR/ADX/Williams %R/OBV/VWAP, feature
 > GARCH causale, `RegimeMoE`, fenêtres adaptatives, coût market-impact non-linéaire)
 > sont **terminés** — voir `CHANGELOG.md` / `03-decisions.md`. Deux passages d'audit (2026-06-22) ont été **entièrement remédiés** : 9 PR
 > (#188–#196, v2.10.0) puis 7 PR (#201–#207, v2.10.1, dont une régression KPI).
-> Voir `CHANGELOG.md` / `03-decisions.md`. Il ne reste que l'item optionnel ci-dessous.
+> Voir `CHANGELOG.md` / `03-decisions.md`. L'épic **harnais R&D multi-actifs /
+> panel** (2026-06-23) est **livré** : 5 PR (#215–#219) — `ObjectiveModel` panel,
+> losses book-aware + `RankingLoss`, `information_coefficient`/`horizon_returns`,
+> walk-forward + attribution par actif, report de book. Il ne reste que l'item
+> optionnel ci-dessous.
 
 > ⚠️ **Hors scope ici** : la recherche de stratégie sur **vraie data** (benchmarks
 > empiriques loss / architecture / normalisation, évaluation Sharpe out-of-sample,

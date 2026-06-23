@@ -41,6 +41,9 @@ class BacktestResult:
         Per-step transaction costs.
     index : numpy.ndarray, optional
         Temporal index carried from the input.
+    asset_gross_returns : numpy.ndarray, optional
+        Per-asset gross return contributions ``(T, N)`` for a multi-asset book
+        (they sum to :attr:`gross_returns`); ``None`` for a single-asset run.
 
     Methods
     -------
@@ -56,6 +59,7 @@ class BacktestResult:
     positions: NDArray
     costs: NDArray
     index: NDArray | None = None
+    asset_gross_returns: NDArray | None = None
 
     def to_numpy(self) -> NDArray:
         """ Return the equity curve as a numpy array. """

@@ -12,7 +12,10 @@ import torch
 
 # Local packages
 from fynance.models.loss import (
+    CalmarLoss,
     DirectionalAccuracyLoss,
+    OmegaLoss,
+    RankingLoss,
     SharpeLoss,
     SortinoLoss,
 )
@@ -356,3 +359,88 @@ def test_train_model_with_calmar_loss():
     model.set_optimizer(CalmarLoss, torch.optim.Adam, lr=1e-2)
     loss = model.train_on(model.X, model.y)
     assert torch.isfinite(loss)
+
+
+# Book-aware aggregation: a 2-D (T, N) position book is summed across assets
+# into the 1-D book return before the ratio is scored. ObjectiveModel already
+# pre-aggregates, so this is additive; it must leave 1-D / (T, 1) unchanged.
+_RATIO_LOSSES = [SharpeLoss, SortinoLoss, CalmarLoss, OmegaLoss]
+
+
+class TestBookAwareLosses:
+    @pytest.mark.parametrize("loss_cls", _RATIO_LOSSES)
+    def test_book_equals_summed_book_return(self, loss_cls):
+        # loss((T, N)) == loss(book.sum(axis=1)) for every ratio loss.
+        book = torch.from_numpy(
+            RNG.standard_normal((T, 3)).astype(np.float32) * 0.01)
+        loss_fn = loss_cls()
+        assert torch.allclose(loss_fn(book), loss_fn(book.sum(dim=1)))
+
+    @pytest.mark.parametrize("loss_cls", _RATIO_LOSSES)
+    def test_single_column_matches_1d(self, loss_cls):
+        # A (T, 1) book reduces to exactly the single-asset 1-D series (no
+        # behaviour change for the existing single-asset path).
+        r = torch.from_numpy(RNG.standard_normal(T).astype(np.float32) * 0.01)
+        loss_fn = loss_cls()
+        assert torch.allclose(loss_fn(r), loss_fn(r.reshape(T, 1)))
+
+    @pytest.mark.parametrize("loss_cls", _RATIO_LOSSES)
+    def test_book_gradient_finite_and_nonzero(self, loss_cls):
+        # The book objective stays differentiable: a finite, non-zero gradient
+        # flows back to every per-asset return on a normal panel batch.
+        book = torch.from_numpy(
+            RNG.standard_normal((T, 3)).astype(np.float32) * 0.01
+        ).requires_grad_(True)
+        loss = loss_cls()(book)
+        loss.backward()
+        assert book.grad is not None
+        assert torch.isfinite(book.grad).all()
+        assert book.grad.abs().sum() > 0
+
+
+class TestRankingLoss:
+    def _panel(self, n_assets=4):
+        scores = torch.from_numpy(
+            RNG.standard_normal((T, n_assets)).astype(np.float32))
+        real = scores * 0.01  # returns aligned with the scores' ranking
+        return scores, real
+
+    def test_aligned_beats_inverted(self):
+        scores, real = self._panel()
+        loss_fn = RankingLoss()
+        aligned = loss_fn(scores, real)
+        inverted = loss_fn(-scores, real)
+        assert aligned.shape == torch.Size([])
+        assert aligned.item() < inverted.item()
+
+    def test_aligned_beats_random(self):
+        scores, real = self._panel()
+        random_scores = torch.from_numpy(
+            RNG.standard_normal((T, scores.shape[1])).astype(np.float32))
+        loss_fn = RankingLoss()
+        assert loss_fn(scores, real).item() < loss_fn(random_scores, real).item()
+
+    def test_gradient_finite_and_nonzero(self):
+        scores, real = self._panel()
+        scores = scores.requires_grad_(True)
+        loss = RankingLoss()(scores, real)
+        loss.backward()
+        assert scores.grad is not None
+        assert torch.isfinite(scores.grad).all()
+        assert scores.grad.abs().sum() > 0
+
+    def test_requires_2d_panel(self):
+        with pytest.raises(ValueError):
+            RankingLoss()(torch.randn(T), torch.randn(T))
+
+    def test_requires_at_least_two_assets(self):
+        with pytest.raises(ValueError):
+            RankingLoss()(torch.randn(T, 1), torch.randn(T, 1))
+
+    def test_shape_mismatch_raises(self):
+        with pytest.raises(ValueError):
+            RankingLoss()(torch.randn(T, 3), torch.randn(T, 4))
+
+    def test_non_tensor_raises(self):
+        with pytest.raises(TypeError):
+            RankingLoss()(np.zeros((T, 3)), np.zeros((T, 3)))
