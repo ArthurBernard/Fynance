@@ -53,9 +53,10 @@ class Experiment:
         Master seed driving every stochastic step.
     metrics : dict of str to float, optional
         Summary metrics (``sharpe``/``sortino``/…); empty until a run fills it.
-    series : dict of str to list, optional
+    series : dict of str to (list or dict), optional
         JSON-friendly curves (e.g. ``equity``/``returns`` of float, plus an
-        optional ``index`` of ISO-8601 date strings) for the report.
+        optional ``index`` of ISO-8601 date strings and an optional
+        ``cost_components`` mapping of per-step cost breakdowns) for the report.
     created_at : str
         ISO-8601 UTC creation time (set automatically).
     fynance_version : str
@@ -76,7 +77,7 @@ class Experiment:
     code: str | None = None
     seed: int = 0
     metrics: dict[str, float] = field(default_factory=dict)
-    series: dict[str, list[Any]] | None = None
+    series: dict[str, Any] | None = None
     created_at: str = field(default_factory=_utc_now)
     fynance_version: str = field(default_factory=_fynance_version)
 

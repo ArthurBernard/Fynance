@@ -108,6 +108,18 @@ def backtest(
         if cost is not None
         else np.zeros(returns.shape[0], dtype=np.float64)
     )
+
+    # When the cost model exposes a per-step breakdown (optional ``components``
+    # convention), carry it through so the report can stack a cumulative-fees
+    # panel. The components sum to ``costs`` by the model's own contract.
+    cost_components = None
+    if cost is not None and hasattr(cost, "components"):
+        comps = cost.components(cost_book)
+        if comps:
+            cost_components = {
+                str(k): np.asarray(v, dtype=np.float64) for k, v in comps.items()
+            }
+
     net = gross - costs
     equity = capital * np.cumprod(1.0 + net)
 
@@ -118,4 +130,5 @@ def backtest(
         positions=pos,
         costs=costs,
         asset_gross_returns=asset_gross_returns,
+        cost_components=cost_components,
     )

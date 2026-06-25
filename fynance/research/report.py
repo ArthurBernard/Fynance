@@ -116,6 +116,11 @@ def _write_png(experiment: Experiment, png_path: Path, period: int) -> bool:
     book_positions = experiment.series.get("positions")
     if book_positions:
         ns["positions"] = np.asarray(book_positions, dtype=float)
+    cost_components = experiment.series.get("cost_components")
+    if cost_components:
+        ns["cost_components"] = {
+            k: np.asarray(v, dtype=float) for k, v in cost_components.items()
+        }
     result: Any = SimpleNamespace(**ns) if len(ns) > 1 else equity
     fig = tearsheet(result, period=period)
     fig.savefig(png_path, dpi=110, bbox_inches="tight")

@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and per-asset for a book — the round-trip churn a turnover-blind `total_cost`
   hides. `BacktestResult.summary()` now reports `n_sign_changes` and
   `trades_per_year`, so they flow into the research report automatically.
+- **Cost decomposition.** Cost models may expose an optional
+  `components(weights)` breakdown (`ProportionalCost` → `transaction`;
+  `MarketImpactCost` → `transaction` + `market_impact`); the engine carries it
+  on `BacktestResult.cost_components`, the research runner persists it, and the
+  tearsheet stacks a full-width **cumulative-fees** panel (cost in % of capital
+  by source) via the new `plot_cost_decomposition`.
 
 ### Changed
 

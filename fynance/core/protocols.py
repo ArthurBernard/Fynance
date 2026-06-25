@@ -92,7 +92,12 @@ class Allocator(Protocol):
 class CostModel(Protocol):
     """ Map a weight book to per-step transaction costs.
 
-    Concrete models live in :mod:`fynance.backtest.cost`.
+    Concrete models live in :mod:`fynance.backtest.cost`. A model *may* also
+    expose an optional ``components(weights) -> dict[str, NDArray]`` returning a
+    per-step breakdown whose values sum to ``__call__`` (e.g. ``transaction`` vs
+    ``market_impact``); the engine carries it through to the tearsheet's
+    cumulative-fees panel when present. It is not part of the required
+    interface — only ``__call__`` is.
     """
 
     def __call__(self, weights: NDArray) -> NDArray:

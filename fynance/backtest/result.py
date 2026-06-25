@@ -44,6 +44,10 @@ class BacktestResult:
     asset_gross_returns : numpy.ndarray, optional
         Per-asset gross return contributions ``(T, N)`` for a multi-asset book
         (they sum to :attr:`gross_returns`); ``None`` for a single-asset run.
+    cost_components : dict of str to numpy.ndarray, optional
+        Per-step cost broken down by component (e.g. ``transaction`` vs
+        ``market_impact``); the values sum to :attr:`costs`. Populated when the
+        cost model exposes the optional ``components`` convention, else ``None``.
 
     Methods
     -------
@@ -60,6 +64,7 @@ class BacktestResult:
     costs: NDArray
     index: NDArray | None = None
     asset_gross_returns: NDArray | None = None
+    cost_components: dict[str, NDArray] | None = None
 
     def to_numpy(self) -> NDArray:
         """ Return the equity curve as a numpy array. """

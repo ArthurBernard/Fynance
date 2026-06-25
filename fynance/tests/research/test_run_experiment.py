@@ -164,3 +164,15 @@ def test_run_experiment_single_asset_provenance():
     exp = run_experiment(momentum(), gbm(200, seed=2), name="single")
     assert exp.spec["data"]["n_assets"] == 1
     assert "asset_contrib" not in exp.series
+
+
+def test_cost_components_persisted_and_round_trip():
+    # momentum() carries a ProportionalCost -> a single "transaction" component.
+    exp = run_experiment(momentum(), gbm(300, seed=9), name="costs")
+    comps = exp.series.get("cost_components")
+    assert comps is not None
+    assert set(comps) == {"transaction"}
+    # The component(s) sum to the aggregate total cost reported in the summary.
+    assert np.isclose(np.sum(comps["transaction"]), exp.metrics["total_cost"])
+    # JSON round-trip preserves the breakdown.
+    assert Experiment.from_dict(exp.to_dict()).series["cost_components"] == comps

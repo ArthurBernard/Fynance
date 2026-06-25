@@ -230,7 +230,7 @@ def run_experiment(
         "seed": seed,
     }
 
-    series: dict[str, list[Any]] = {
+    series: dict[str, Any] = {
         "equity": np.asarray(result.equity, dtype=float).tolist(),
         "returns": np.asarray(result.returns, dtype=float).tolist(),
     }
@@ -249,6 +249,14 @@ def run_experiment(
         book_positions = np.asarray(result.positions, dtype=float)
         if book_positions.ndim == 2:
             series["positions"] = book_positions.tolist()
+    # Persist the per-step cost breakdown so the report can stack a
+    # cumulative-fees panel; present only when the cost model decomposes it.
+    cost_components = getattr(result, "cost_components", None)
+    if cost_components:
+        series["cost_components"] = {
+            str(k): np.asarray(v, dtype=float).tolist()
+            for k, v in cost_components.items()
+        }
 
     experiment = Experiment(
         name=name,
