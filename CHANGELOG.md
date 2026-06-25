@@ -10,6 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [2.11.1] - 2026-06-25
+
+### Added
+
 - **Tearsheet equity readability.** `plot_equity` / `tearsheet` gained two
   display-only options: `base` (rescale the curve to start at e.g. `100` for a
   base-100 reading) and `logy` (`"auto"` switches to a log y-axis on
