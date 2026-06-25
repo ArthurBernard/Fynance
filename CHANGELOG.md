@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Tearsheet equity readability.** `plot_equity` / `tearsheet` gained two
+  display-only options: `base` (rescale the curve to start at e.g. `100` for a
+  base-100 reading) and `logy` (`"auto"` switches to a log y-axis on
+  wide-amplitude curves — a x3-x30 trajectory stays readable and drawdowns stay
+  comparable across time — overridable with `True`/`False`).
+
 ### Changed
 
 ### Fixed
