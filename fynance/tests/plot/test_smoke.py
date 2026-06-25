@@ -53,3 +53,34 @@ def test_tearsheet_text_matches_summary():
     txt = tearsheet_text(res)
     assert "sharpe" in txt
     assert "max_drawdown" in txt
+
+
+def test_plot_equity_base_rescales_start():
+    # base=100 must rescale the displayed curve to start at 100 (display only).
+    res = _result()
+    ax = plot_equity(res, base=100.0)
+    ydata = ax.get_lines()[0].get_ydata()
+    assert abs(float(ydata[0]) - 100.0) < 1e-9
+    plt.close("all")
+
+
+def test_plot_equity_logy_auto_switches_on_wide_amplitude():
+    # A x20 ramp trips the auto log-scale; a near-flat curve stays linear.
+    ax = plot_equity(np.linspace(1.0, 20.0, 100))
+    assert ax.get_yscale() == "log"
+    plt.close("all")
+
+    ax = plot_equity(np.linspace(1.0, 1.2, 100))
+    assert ax.get_yscale() == "linear"
+    plt.close("all")
+
+
+def test_plot_equity_logy_explicit_overrides_auto():
+    # logy=False forces linear even when auto would have gone log.
+    ax = plot_equity(np.linspace(1.0, 20.0, 100), logy=False)
+    assert ax.get_yscale() == "linear"
+    plt.close("all")
+    # logy=True forces log even on a flat curve (still strictly positive).
+    ax = plot_equity(np.linspace(1.0, 1.2, 100), logy=True)
+    assert ax.get_yscale() == "log"
+    plt.close("all")
