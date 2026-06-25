@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Trading-profile metrics.** `sign_changes` / `trades_per_year`
+  (`fynance.metrics`) count position direction flips (long↔flat↔short), total
+  and per-asset for a book — the round-trip churn a turnover-blind `total_cost`
+  hides. `BacktestResult.summary()` now reports `n_sign_changes` and
+  `trades_per_year`, so they flow into the research report automatically.
+
 ### Changed
 
 ### Fixed
