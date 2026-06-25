@@ -73,14 +73,20 @@ class BacktestResult:
         """ Standard performance summary.
 
         Delegates the risk-adjusted ratios and drawdown to
-        :func:`fynance.metrics.summary` (computed on the equity curve) and adds
-        the hit-rate and total transaction cost from the strategy's own data.
+        :func:`fynance.metrics.summary` (computed on the equity curve) and adds,
+        from the strategy's own data, the hit-rate, total transaction cost and
+        the trading-profile churn (``n_sign_changes`` / ``trades_per_year``,
+        summed over the book — see :func:`fynance.metrics.sign_changes`).
         """
         from fynance.metrics import summary as _metric_summary
+        from fynance.metrics.trading import sign_changes, trades_per_year
 
         out = _metric_summary(self.equity, period=period)
         r = self.returns[~np.isnan(self.returns)]
         out["hit_rate"] = float((r > 0).mean()) if r.size else 0.0
         out["total_cost"] = float(np.nansum(self.costs))
+        out["n_sign_changes"] = float(np.sum(sign_changes(self.positions)))
+        out["trades_per_year"] = float(
+            np.sum(trades_per_year(self.positions, period=period)))
 
         return out

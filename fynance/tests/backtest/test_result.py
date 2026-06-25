@@ -18,9 +18,19 @@ def test_summary_keys_and_finiteness():
     res = backtest(returns, positions, shift=True)
     s = res.summary()
     for key in ("annual_return", "annual_volatility", "sharpe", "sortino",
-                "max_drawdown", "calmar", "hit_rate", "total_cost"):
+                "max_drawdown", "calmar", "hit_rate", "total_cost",
+                "n_sign_changes", "trades_per_year"):
         assert key in s
         assert np.isfinite(s[key])
+
+
+def test_summary_trade_profile_counts_sign_changes():
+    # Positions flip direction every bar -> a sign change at each step.
+    positions = np.array([1.0, -1.0, 1.0, -1.0, 1.0, -1.0])
+    res = backtest(np.zeros(6), positions, shift=False)
+    s = res.summary(period=252)
+    assert s["n_sign_changes"] == 5.0
+    assert np.isclose(s["trades_per_year"], 5.0 / 6.0 * 252.0)
 
 
 def test_to_price_series():

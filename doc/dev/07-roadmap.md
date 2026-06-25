@@ -42,3 +42,13 @@ Le harnais `fynance.research` est **livré** (S1–S3) : `Experiment`,
 
 - [ ] Explorateur **Streamlit** au-dessus du Ledger (parcourir / filtrer / comparer
   les runs persistés) — interactif, plus tardif.
+
+## 3. Métriques de profil de trading & coûts (signalé à l'usage par `fynance-research`)
+
+Métriques génériques utiles à tout report de stratégie (calculées à la main côté usage
+aujourd'hui ; remontables en librairie data-agnostique) :
+
+- [ ] **Décomposition des coûts dans le tearsheet** — un panneau « cumulative fees » ventilant
+  les composantes de coût (frais de transaction vs funding/borrow vs market-impact) en % du
+  capital. Aujourd'hui `BacktestResult` ne porte que le coût agrégé ; exposer les composantes
+  par pas (quand le `CostModel` en distingue) puis les empiler dans `write_report`.
