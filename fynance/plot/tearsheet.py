@@ -33,7 +33,8 @@ def _summary(result: Any, period: int) -> dict[str, float]:
     return summary(equity, period=period)
 
 
-def tearsheet(result: Any, period: int = 252, figsize: tuple = (11, 7)) -> Any:
+def tearsheet(result: Any, period: int = 252, figsize: tuple = (11, 7), *,
+              base: float | None = None, logy: bool | str = "auto") -> Any:
     """ Build a full performance report figure.
 
     Composes the equity curve, drawdown, rolling Sharpe, return distribution
@@ -48,6 +49,12 @@ def tearsheet(result: Any, period: int = 252, figsize: tuple = (11, 7)) -> Any:
         Annualization factor.
     figsize : tuple
         Figure size.
+    base : float, optional
+        Rescale the equity panel to start at ``base`` (e.g. ``100`` for the
+        familiar base-100 reading); display only, see :func:`plot_equity`.
+    logy : bool or {"auto"}, default "auto"
+        Log y-axis policy for the equity panel; ``"auto"`` switches to log on
+        wide-amplitude curves, see :func:`plot_equity`.
 
     Returns
     -------
@@ -71,7 +78,7 @@ def tearsheet(result: Any, period: int = 252, figsize: tuple = (11, 7)) -> Any:
     fig = plt.figure(figsize=(figsize[0], figsize[1] * (1.4 if is_book else 1.0)))
     gs = fig.add_gridspec(n_rows, 2)
 
-    plot_equity(result, ax=fig.add_subplot(gs[0, 0]))
+    plot_equity(result, ax=fig.add_subplot(gs[0, 0]), base=base, logy=logy)
     plot_drawdown(result, ax=fig.add_subplot(gs[0, 1]))
     plot_rolling_sharpe(result, window=period, ax=fig.add_subplot(gs[1, 0]))
 
