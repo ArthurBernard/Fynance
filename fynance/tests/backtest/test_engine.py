@@ -8,7 +8,7 @@ import numpy as np
 
 # Local packages
 from fynance.backtest import BacktestResult, backtest
-from fynance.backtest.cost import ProportionalCost
+from fynance.backtest.cost import MarketImpactCost, ProportionalCost
 
 
 def test_buy_and_hold_matches_price_path():
@@ -135,3 +135,20 @@ def test_single_asset_has_no_attribution():
     res = backtest(returns, np.ones(50), shift=True)
     assert res.asset_gross_returns is None
     assert res.gross_returns.ndim == 1
+
+
+def test_cost_components_captured_and_sum_to_total():
+    returns = np.array([0.01, 0.02, 0.03, -0.01])
+    positions = np.array([1.0, 0.0, 1.0, -1.0])
+    cost = MarketImpactCost(fee=0.001, impact=0.05, exponent=1.5)
+    res = backtest(returns, positions, cost=cost, shift=True)
+    assert res.cost_components is not None
+    assert set(res.cost_components) == {"transaction", "market_impact"}
+    stacked = sum(res.cost_components.values())
+    assert np.allclose(stacked, res.costs)
+
+
+def test_cost_components_none_without_cost_model():
+    # No cost model -> no breakdown to carry.
+    res = backtest(np.array([0.01, 0.02]), np.array([1.0, 1.0]))
+    assert res.cost_components is None
