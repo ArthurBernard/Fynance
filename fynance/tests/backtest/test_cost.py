@@ -83,6 +83,25 @@ def test_impact_bad_exponent_raises():
         MarketImpactCost(exponent=0.0)
 
 
+def test_proportional_components_sum_to_total():
+    cost = ProportionalCost(fee=0.002, slippage=0.001)
+    w = np.array([[1.0, 0.0], [0.5, 0.5], [0.0, 1.0]])
+    comps = cost.components(w)
+    assert set(comps) == {"transaction"}
+    assert np.allclose(comps["transaction"], cost(w))
+
+
+def test_impact_components_split_and_sum_to_total():
+    cost = MarketImpactCost(fee=0.001, impact=0.05, exponent=1.5)
+    w = np.array([[1.0, 0.0], [0.0, 1.0], [0.0, 1.0]])
+    comps = cost.components(w)
+    assert set(comps) == {"transaction", "market_impact"}
+    # The two components add up to the aggregate per-step cost.
+    assert np.allclose(comps["transaction"] + comps["market_impact"], cost(w))
+    # The convex impact term is strictly positive on a real trade.
+    assert comps["market_impact"][0] > 0.0
+
+
 def test_impact_lowers_net_equity_in_backtest():
     rng = np.random.default_rng(0)
     T = 300

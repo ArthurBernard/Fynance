@@ -13,7 +13,9 @@ import matplotlib.pyplot as plt  # noqa: E402
 
 # Local packages
 from fynance.backtest import backtest  # noqa: E402
+from fynance.backtest.cost import MarketImpactCost  # noqa: E402
 from fynance.plot import (  # noqa: E402
+    plot_cost_decomposition,
     plot_drawdown,
     plot_equity,
     plot_returns_hist,
@@ -83,4 +85,26 @@ def test_plot_equity_logy_explicit_overrides_auto():
     # logy=True forces log even on a flat curve (still strictly positive).
     ax = plot_equity(np.linspace(1.0, 1.2, 100), logy=True)
     assert ax.get_yscale() == "log"
+    plt.close("all")
+
+
+def test_plot_cost_decomposition_returns_axes():
+    comps = {"transaction": np.full(20, 0.001),
+             "market_impact": np.full(20, 0.0005)}
+    ax = plot_cost_decomposition(comps)
+    assert ax is not None
+    plt.close("all")
+
+
+def test_tearsheet_adds_cost_panel_when_components_present():
+    rng = np.random.default_rng(0)
+    returns = rng.normal(0.0005, 0.01, 200)
+    positions = np.sign(rng.normal(size=200))
+    res_cost = backtest(returns, positions,
+                        cost=MarketImpactCost(fee=0.001, impact=0.05), shift=True)
+    res_plain = backtest(returns, positions, shift=True)
+    # The cumulative-fees panel adds exactly one (full-width) axis.
+    fig_cost = tearsheet(res_cost, period=50)
+    fig_plain = tearsheet(res_plain, period=50)
+    assert len(fig_cost.axes) == len(fig_plain.axes) + 1
     plt.close("all")

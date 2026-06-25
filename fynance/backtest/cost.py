@@ -61,6 +61,15 @@ class ProportionalCost:
 
         return transaction_cost(weights, fee=rate)
 
+    def components(self, weights: NDArray) -> dict[str, NDArray[np.float64]]:
+        """ Per-step cost broken down by component (here a single one).
+
+        Returns ``{"transaction": fee+slippage turnover cost}``; the values sum
+        to :meth:`__call__`. The optional ``components`` convention lets the
+        engine carry a cost breakdown for the tearsheet's cumulative-fees panel.
+        """
+        return {"transaction": self(weights)}
+
 
 class MarketImpactCost:
     """ Non-linear market-impact cost: linear fee + convex impact term.
@@ -120,3 +129,18 @@ class MarketImpactCost:
         turnover = transaction_cost(weights, fee=1.0)
 
         return self.fee * turnover + self.impact * turnover ** self.exponent
+
+    def components(self, weights: NDArray) -> dict[str, NDArray[np.float64]]:
+        """ Per-step cost split into its linear and convex parts.
+
+        Returns ``{"transaction": fee turnover, "market_impact": convex term}``;
+        the values sum to :meth:`__call__`. The optional ``components``
+        convention lets the engine carry a cost breakdown for the tearsheet's
+        cumulative-fees panel.
+        """
+        turnover = transaction_cost(weights, fee=1.0)
+
+        return {
+            "transaction": self.fee * turnover,
+            "market_impact": self.impact * turnover ** self.exponent,
+        }
