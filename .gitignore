@@ -27,8 +27,11 @@ __pycache__/
 .coverage
 htmlcov/
 
-# Claude Code harness settings stay local; CLAUDE.md is tracked (mirrors dccd)
-.claude/
+# Claude Code workflow — local-only state. The shared workflow.json / settings.json
+# and hooks ARE committed; per-machine overrides and finished plan trees are not.
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.claude/worktrees/
 
 # Task tracking (local only)
 todo/
