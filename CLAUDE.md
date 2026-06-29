@@ -92,14 +92,11 @@ test + verify) → `/finish-task` (tests, ADR, CHANGELOG, PR, archive the leaf) 
 `/abandon-task` salvages the lesson + closes a bad PR; `/groom-docs` keeps
 `doc/dev/` lean and true.
 
-**Model per task** (advisory — set via `/model` or a plan leaf's `complexity`:
-`low→haiku`, `medium→sonnet`, `high→opus`):
-
-| Model | For |
-|-------|-----|
-| `opus` | judgement, design, decisions, planning, review |
-| `sonnet` | implementation — code, tests, docstrings |
-| `haiku` | mechanical fan-out (doc scans, checklists) |
+**Model: `opus`, always.** Per the maintainer's standing preference, **all work on
+this repo runs on `opus`** — interactive sessions *and* every spawned subagent
+(including `/execute-leaf`), regardless of a leaf's `complexity`. The `complexity`
+tag still records effort/risk and orders the execution queue, but it **does not
+downgrade the model**: treat `low | medium | high` all as `opus`.
 
 ## Architecture
 
