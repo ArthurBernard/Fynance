@@ -23,9 +23,11 @@ stays self-contained:
   `Co-Authored-By` trailers** (personal repo).
 - **One PR = one concern**, small and disposable — a big plan ships as several small
   atomic PRs, never one catch-all branch.
-- **Model: the session model, always** — interactive sessions and every spawned
-  subagent inherit it (set in `~/.claude/settings.json`); a plan leaf's
-  `complexity` is effort/ordering only and never selects or downgrades the model.
+- **Model: session model for judgement, tiered execution** — sessions,
+  orchestration and the judgement skills run on the session model (set in
+  `~/.claude/settings.json`); plan-leaf execution runs at the tier derived from
+  the leaf's `complexity` (`low→haiku / medium→sonnet / high→session model`),
+  escalating one tier on failed tests/verification.
 - **Before every commit** — `pytest` and `ruff check fynance/` must pass.
 
 ## Commands
