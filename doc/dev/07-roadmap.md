@@ -45,3 +45,22 @@ Le harnais `fynance.research` est **livré** (S1–S3) : `Experiment`,
 
 - [ ] Explorateur **Streamlit** au-dessus du Ledger (parcourir / filtrer / comparer
   les runs persistés) — interactif, plus tardif.
+
+## 3. Multi-actifs non-crypto — calendrier & coûts (prérequis d'honnêteté)
+
+Déposé 2026-07-04 par fynance-research : sa prochaine campagne (book trend /
+cross-section sur un univers ETF, données via dccd) est **bloquée** par deux
+hypothèses crypto câblées dans le harnais. Code de librairie data-agnostique —
+c'est bien ici que ça vit, la campagne elle-même reste dans le repo privé.
+
+- [ ] **Calendrier de sessions.** Le walk-forward et les features supposent une
+  grille continue 24/7 ; les marchés actions ont des sessions, jours fériés,
+  demi-séances, timezones — et le gap overnight n'est pas un rendement intraday
+  comme un autre. Il faut un calendrier de marché injectable (sessions valides,
+  agrégation intra-session, coupure train/test sur frontières de séance) sans
+  régresser le chemin crypto 24/7 par défaut.
+- [ ] **Modèle de coûts actions.** Remplacer (par configuration, pas par fork) le
+  couple taker-fee + funding-perp par : commission par ordre, **coût d'emprunt du
+  short** (borrow, variable — l'équivalent économique du funding mais asymétrique)
+  et intérêt de marge sur le levier. Sans ça, aucun backtest actions n'est honnête
+  — même exigence que le 0.26 %/side côté crypto.
