@@ -72,7 +72,7 @@ Template:
 
 <!-- new entries below, newest first -->
 
-### 2026-07-05 — Cross-sectional factor research epic (PRs #243–#246, epic)  [accepted]
+### 2026-07-05 — Cross-sectional factor research epic (PRs #243–#247, epic)  [accepted]
 
 Gives fynance the *input half* of the factor workflow the v2.11 panel harness
 consumes. Six parallel leaves, key choices:
