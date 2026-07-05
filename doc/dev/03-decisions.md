@@ -72,6 +72,25 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-07-05 — Conditioned covariance estimators as interchangeable callables (PR #235)  [accepted]
+
+- **Choice**: ship covariance conditioning as a standalone
+  `portfolio.covariance` module of `(T, N) -> (N, N)` callables — closed-form
+  Ledoit-Wolf (three targets), RiskMetrics EWMA on a Numba kernel, PCA factor
+  model, Marchenko-Pastur clipping — rather than baking estimators into each
+  allocator. The allocators gain an opt-in `cov=` callable in the next leaf,
+  `None` keeping today's `np.cov` path bit-for-bit.
+- **Why**: raw `np.cov` on short windows is the dominant source of MVP/ERC
+  weight instability; the closed forms need numpy only (no new dependency);
+  a callable seam preserves the frozen `portfolio.allocation` API and makes
+  the estimators reusable elsewhere (risk attribution, future risk tools).
+  Verified OOS on synthetic two-block panels: condition number 97.4 -> 91.1
+  (LW) / 82.5 (denoised); mean MVP OOS vol 0.005909 -> 0.005790 over 20 seeds.
+- **Rejected alternatives**: depending on scikit-learn (heavy dependency for a
+  ~40-line closed form); nonlinear/oracle shrinkage (unwarranted complexity —
+  can land later as just another callable); per-allocator estimator flags
+  (couples the stable API to an estimator zoo).
+
 ### 2026-06-23 — Multi-asset / panel R&D harness (PRs #215–#219, epic)  [accepted]
 
 Took the research harness from single-asset to **multi-pair**: a model predicts a
