@@ -10,10 +10,12 @@ from fynance.portfolio.allocation import (
     MDP,
     MVP,
     MVP_uc,
+    _diversified_ratio_from_cov,
     _normalize,
     _perf_alloc,
     rolling_allocation,
 )
+from fynance.portfolio.covariance import ledoit_wolf
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -465,3 +467,114 @@ def test_rolling_allocation_regression():
                        [100.12393727, 99.78491062, 100.0663682])
     assert np.allclose(w_mat[-1],
                        [0.89803244, 0.09117386, 0.02558488, -0.01479118])
+
+
+# ---------------------------------------------------------------------------
+# cov= seam (opt-in covariance estimator)
+# ---------------------------------------------------------------------------
+
+_ALLOCATORS = [ERC, HRP, IVP, MVP, MVP_uc, MDP]
+
+
+@pytest.fixture(scope="module")
+def cov_returns():
+    """ Seeded (120, 6) returns panel dedicated to the cov= seam tests. """
+    rng = np.random.default_rng(123)
+    return rng.normal(0.0, 0.01, size=(120, 6))
+
+
+@pytest.mark.parametrize("f", _ALLOCATORS, ids=lambda f: f.__name__)
+def test_cov_none_is_bit_for_bit_with_default(cov_returns, f):
+    """ cov=None must reproduce today's behavior exactly (stable-API contract). """
+    w_default = f(cov_returns)
+    w_explicit_none = f(cov_returns, cov=None)
+    assert np.array_equal(w_default, w_explicit_none)
+
+
+@pytest.mark.parametrize("f", [ERC, HRP, IVP, MVP, MVP_uc], ids=lambda f: f.__name__)
+def test_cov_sample_wrapper_matches_default(cov_returns, f):
+    """ A callable that just re-implements np.cov must match the default path. """
+    w_default = f(cov_returns)
+    w_via_callable = f(cov_returns, cov=lambda x: np.cov(x, rowvar=False))
+    np.testing.assert_allclose(w_via_callable, w_default, rtol=1e-10)
+
+
+def test_mdp_cov_sample_wrapper_matches_default_weights(cov_returns):
+    """ MDP: cov= path lands on the same argmax as diversified_ratio(X, W=w).
+
+    The ratio is invariant to a uniform rescaling of sigma, so a callable
+    computing the (unbiased, ddof=1) sample covariance once must yield the
+    same optimum as the default path recomputing diversified_ratio's
+    (biased, ddof=0) sample covariance at every iteration — only the
+    evaluation path differs.
+    """
+    w_default = MDP(cov_returns)
+    w_via_callable = MDP(cov_returns, cov=lambda x: np.cov(x, rowvar=False))
+    np.testing.assert_allclose(w_via_callable, w_default, atol=1e-6)
+
+
+@pytest.mark.parametrize("f", _ALLOCATORS, ids=lambda f: f.__name__)
+def test_cov_ledoit_wolf_valid_weights(cov_returns, f):
+    """ With cov=ledoit_wolf: weights sum to ~1, box respected, no NaN. """
+    w = f(cov_returns, cov=ledoit_wolf).flatten()
+    assert not np.any(np.isnan(w))
+    assert abs(w.sum() - 1.0) < 1e-4
+    assert np.all(w >= -1e-6)
+    assert np.all(w <= 1.0 + 1e-6)
+
+
+def test_mdp_fixed_sigma_beats_equal_weight():
+    """ MDP cov= path: the optimum's ratio (fixed sigma) >= the 1/N ratio. """
+    rng = np.random.default_rng(3)
+    f1 = rng.normal(0.0, 0.01, size=(600, 1))
+    f2 = rng.normal(0.0, 0.01, size=(600, 1))
+    idio = rng.normal(0.0, 0.003, size=(600, 4))
+    vols = np.array([1.0, 1.0, 4.0, 4.0])
+    X = np.column_stack([f1, f1, f2, f2]) * vols + idio
+
+    w = MDP(X, cov=ledoit_wolf).flatten()
+    sigma = ledoit_wolf(X)
+    dr_mdp = _diversified_ratio_from_cov(w, sigma)
+    dr_eq = _diversified_ratio_from_cov(np.full(4, 0.25), sigma)
+    assert dr_mdp >= dr_eq
+
+
+@pytest.mark.parametrize("f", _ALLOCATORS, ids=lambda f: f.__name__)
+def test_cov_callable_wrong_shape_raises(cov_returns, f):
+    """ A callable returning a mismatched-shape matrix raises ValueError. """
+    with pytest.raises(ValueError, match=r"\(6, 6\)"):
+        f(cov_returns, cov=lambda x: np.eye(4))
+
+
+@pytest.mark.parametrize("f", _ALLOCATORS, ids=lambda f: f.__name__)
+def test_cov_callable_asymmetric_raises(cov_returns, f):
+    """ A callable returning an asymmetric matrix raises ValueError. """
+    def asymmetric_cov(x):
+        sigma = np.cov(x, rowvar=False)
+        sigma[0, 1] += 10.0  # break symmetry well above the 1e-8 tolerance
+
+        return sigma
+
+    with pytest.raises(ValueError, match="non-symmetric"):
+        f(cov_returns, cov=asymmetric_cov)
+
+
+def test_rolling_allocation_cov_seam():
+    """ rolling_allocation forwards cov= to the allocator through **kwargs. """
+    rng = np.random.default_rng(9)
+    fac = rng.normal(0.0, 1.0, size=(300, 1))
+    vols = np.linspace(0.01, 0.03, 5)
+    returns = (0.5 * fac + rng.normal(0.0, 1.0, size=(300, 5))) * vols
+    prices = 100 * np.cumprod(1 + returns, axis=0)
+
+    portfolio, w_mat = rolling_allocation(ERC, prices, n=60, s=20, cov=ledoit_wolf)
+    portfolio_ref, w_mat_ref = rolling_allocation(ERC, prices, n=60, s=20)
+
+    # Same shapes as the cov=None path (no signature/behavior change to the
+    # rolling wrapper itself, cov= just rides through **kwargs).
+    assert portfolio.shape == portfolio_ref.shape
+    assert w_mat.shape == w_mat_ref.shape
+
+    active = np.flatnonzero(np.abs(w_mat).sum(axis=1) > 1e-9)
+    assert active.size > 0
+    assert np.allclose(w_mat[active].sum(axis=1), 1.0, atol=1e-4)

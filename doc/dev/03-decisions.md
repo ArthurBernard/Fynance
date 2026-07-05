@@ -78,8 +78,10 @@ Template:
   `portfolio.covariance` module of `(T, N) -> (N, N)` callables — closed-form
   Ledoit-Wolf (three targets), RiskMetrics EWMA on a Numba kernel, PCA factor
   model, Marchenko-Pastur clipping — rather than baking estimators into each
-  allocator. The allocators gain an opt-in `cov=` callable in the next leaf,
-  `None` keeping today's `np.cov` path bit-for-bit.
+  allocator. The allocators gain an opt-in `cov=` callable (landed in PR #236),
+  `None` keeping today's `np.cov` path bit-for-bit; `MDP`'s `cov=` path
+  evaluates the diversification ratio from the fixed matrix instead of
+  recomputing `np.cov` per optimizer iteration.
 - **Why**: raw `np.cov` on short windows is the dominant source of MVP/ERC
   weight instability; the closed forms need numpy only (no new dependency);
   a callable seam preserves the frozen `portfolio.allocation` API and makes
