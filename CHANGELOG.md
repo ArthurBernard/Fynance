@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Exposure-constraint overlay.** New `fynance.portfolio.constraints`
+  module: `project_weights` projects a weight vector or `(T, N)` book onto a
+  feasible set — per-asset box, gross-leverage cap, net-exposure range, named
+  group bounds — as a least-distance SLSQP projection (split `v = p - m`
+  formulation), with a fast clip-and-scale path for box+gross and an
+  interval-arithmetic infeasibility pre-check.
 - **Risk-budgeting allocation.** New `RBP(X, budgets=None, ...)` allocator
   (generalized ERC, Roncalli least-squares objective): weights whose risk
   contributions match an arbitrary budget vector; `budgets=None` reproduces

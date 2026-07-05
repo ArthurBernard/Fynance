@@ -72,6 +72,24 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-07-05 — Constraint overlay as least-distance projection (PR #239)  [accepted]
+
+- **Choice**: enforce book-level limits (box / gross / net / group) as a
+  *post-hoc least-distance projection* (`portfolio.constraints.project_weights`,
+  SLSQP on the split `v = p - m` so `sum(|v|)` becomes linear), with a fast
+  clip-and-scale path when only box+gross are active, rather than baking the
+  constraints into each allocator's optimizer.
+- **Why**: an overlay composes with *any* weight source (allocators, signal
+  mappers, `ObjectiveModel` books) and keeps the frozen allocation API
+  untouched; the split formulation keeps the QP smooth for SLSQP (already the
+  house optimizer); the fast path covers the common case ~322x faster
+  (measured on a (500, 12) book).
+- **Rejected alternatives**: per-allocator constraint parameters (N x API
+  surface, still leaves signal-side books unconstrained); a dedicated QP
+  solver dependency like cvxpy/osqp (heavy dependency for one projection);
+  exact soft-thresholding closed form for the gross cap (only valid without
+  box/net/group interactions).
+
 ### 2026-07-05 — Risk budgeting as a separate `RBP` allocator (PR #238)  [accepted]
 
 - **Choice**: ship risk budgeting as a new `RBP(X, budgets=None, cov=None)`

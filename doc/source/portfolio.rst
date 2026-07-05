@@ -25,6 +25,13 @@ Portfolio allocation algorithms and rolling walk-forward wrappers.
       Marginal and absolute risk contributions of assets to portfolio
       volatility, with causal rolling decomposition.
 
+   .. grid-item-card:: :octicon:`shield-lock;1.2em;sd-mr-1` Constraint projection
+      :link: portfolio.constraints
+      :link-type: doc
+
+      Least-distance projection of weights onto a box, gross-leverage
+      cap, net-exposure range and named group bounds.
+
    .. grid-item-card:: :octicon:`pin;1.2em;sd-mr-1` Position sizing
       :link: portfolio.sizing
       :link-type: doc
@@ -44,5 +51,6 @@ Portfolio allocation algorithms and rolling walk-forward wrappers.
 
    portfolio.allocation
    portfolio.attribution
+   portfolio.constraints
    portfolio.covariance
    portfolio.sizing

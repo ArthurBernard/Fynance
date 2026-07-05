@@ -16,6 +16,7 @@
 
    portfolio.allocation
    portfolio.attribution
+   portfolio.constraints
    portfolio.covariance
    portfolio.sizing
 
@@ -26,13 +27,15 @@
 # Third party packages
 
 # Local packages
-from . import allocation, attribution, covariance, sizing
+from . import allocation, attribution, constraints, covariance, sizing
 from .allocation import *
 from .attribution import *
+from .constraints import *
 from .covariance import *
 from .sizing import *
 
 __all__ = allocation.__all__
 __all__ += attribution.__all__
+__all__ += constraints.__all__
 __all__ += covariance.__all__
 __all__ += sizing.__all__
