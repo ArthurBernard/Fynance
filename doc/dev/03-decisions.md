@@ -129,6 +129,10 @@ Template:
   ~40-line closed form); nonlinear/oracle shrinkage (unwarranted complexity —
   can land later as just another callable); per-allocator estimator flags
   (couples the stable API to an estimator zoo).
+- **Epic closed** in PR #240 with `book_vol_target` (the multi-asset
+  counterpart of `vol_target`, `W[t-1] -> r[t]` timing), completing roadmap
+  §3 (covariance seam #235/#236, attribution #237, `RBP` #238, constraint
+  overlay #239).
 
 ### 2026-06-23 — Multi-asset / panel R&D harness (PRs #215–#219, epic)  [accepted]
 

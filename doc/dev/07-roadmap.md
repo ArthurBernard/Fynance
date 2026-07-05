@@ -46,16 +46,6 @@ Le harnais `fynance.research` est **livré** (S1–S3) : `Experiment`,
 - [ ] Explorateur **Streamlit** au-dessus du Ledger (parcourir / filtrer / comparer
   les runs persistés) — interactif, plus tardif.
 
-## 3. Portfolio risk & covariance (épic `portfolio-risk`)
-
-- [ ] Covariance robuste (`portfolio/covariance.py`) : Ledoit-Wolf closed-form,
-  EWMA (Numba), factor cov PCA, denoising Marchenko-Pastur ; seam opt-in `cov=`
-  sur les allocateurs (défaut inchangé = `np.cov`).
-- [ ] Attribution de risque : contribution marginale / composante au risque.
-- [ ] Risk budgeting : ERC généralisé (budgets de risque arbitraires).
-- [ ] Overlay d'exposition book-level : projection sous caps gross/net/groupe +
-  `book_vol_target` (vol targeting du book entier).
-
 ## 4. Cross-sectional factor research (épic `factor-research`)
 
 - [ ] Opérateurs cross-sectionnels NaN-aware (`features/cross_section.py`) :

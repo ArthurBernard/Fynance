@@ -47,8 +47,14 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
   Plugs into the harness via the `X` path with `signal=identity`, `y=returns`.
 - **Signal / Portfolio**: `signal/` mappers (`sign`/`threshold`/`rank`/
   vol-targeting + **anti-churn** `ema_smooth`/`deadband`/`min_hold` +
-  `SignalPipeline`); `portfolio/` allocation (ERC/HRP/IVP/MDP/MVP) + sizing
-  (fractional Kelly, vol-targeting, transaction costs).
+  `SignalPipeline`); `portfolio/` allocation (ERC/HRP/IVP/MDP/MVP + **`RBP`**
+  risk budgeting) + sizing (fractional Kelly, vol-targeting — single-series
+  `vol_target` and book-level **`book_vol_target`** — transaction costs);
+  **portfolio-risk bricks (2026-07, PRs #235–#240)**: conditioned covariance
+  estimators (`covariance` — Ledoit-Wolf/EWMA/factor/Marchenko-Pastur) behind
+  an opt-in `cov=` seam on every allocator, ex-ante/rolling risk
+  **attribution**, and a least-distance exposure-**constraints** overlay
+  (`project_weights`).
 - **Backtest / Plot**: vectorized `backtest()` engine → `BacktestResult`, cost
   models (`ProportionalCost` + **`MarketImpactCost`** — a convex, super-linear
   market-impact term on top of the linear fee); reporting via `fynance.plot`
@@ -83,7 +89,9 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
 
 ## In progress / active surface
 
-Nothing is currently in flight (`develop` is clean). The v2.9.0 **library
+The **2026-07 feature backlog** (roadmap §2–§10, from the judge-scored
+ideation catalog) is being executed epic by epic; `portfolio-risk` (§3) is
+**done** (PRs #235–#240). The v2.9.0 **library
 bricks** all shipped (OHLCV indicators, causal GARCH-volatility feature,
 adaptive windows, `RegimeMoE`, `MarketImpactCost`), and the **2026-06 audit**
 was fully remediated across two passes (v2.10.0: PRs #188–#196; v2.10.1: PRs
