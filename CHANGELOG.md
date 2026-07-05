@@ -10,6 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [2.12.0] - 2026-07-05
+
+### Added
+
 - **Book-level vol targeting.** `book_vol_target(W, X, ...)` in
   `fynance.portfolio.sizing`: causal `(T,)` leverage series targeting a
   constant volatility for a whole `(T, N)` position book (weights decided at
