@@ -15,6 +15,7 @@
    :caption: Contents:
 
    portfolio.allocation
+   portfolio.attribution
    portfolio.covariance
    portfolio.sizing
 
@@ -25,11 +26,13 @@
 # Third party packages
 
 # Local packages
-from . import allocation, covariance, sizing
+from . import allocation, attribution, covariance, sizing
 from .allocation import *
+from .attribution import *
 from .covariance import *
 from .sizing import *
 
 __all__ = allocation.__all__
+__all__ += attribution.__all__
 __all__ += covariance.__all__
 __all__ += sizing.__all__

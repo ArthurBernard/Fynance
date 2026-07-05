@@ -18,6 +18,13 @@ Portfolio allocation algorithms and rolling walk-forward wrappers.
       (MDP), Minimum Variance Portfolio (MVP, MVP_uc) and a rolling
       walk-forward wrapper.
 
+   .. grid-item-card:: :octicon:`list-ordered;1.2em;sd-mr-1` Risk decomposition
+      :link: portfolio.attribution
+      :link-type: doc
+
+      Marginal and absolute risk contributions of assets to portfolio
+      volatility, with causal rolling decomposition.
+
    .. grid-item-card:: :octicon:`pin;1.2em;sd-mr-1` Position sizing
       :link: portfolio.sizing
       :link-type: doc
@@ -36,5 +43,6 @@ Portfolio allocation algorithms and rolling walk-forward wrappers.
    :hidden:
 
    portfolio.allocation
+   portfolio.attribution
    portfolio.covariance
    portfolio.sizing

@@ -85,7 +85,9 @@ Template:
 - **Why**: raw `np.cov` on short windows is the dominant source of MVP/ERC
   weight instability; the closed forms need numpy only (no new dependency);
   a callable seam preserves the frozen `portfolio.allocation` API and makes
-  the estimators reusable elsewhere (risk attribution, future risk tools).
+  the estimators reusable elsewhere (the `portfolio.attribution` diagnostics
+  landed in PR #237 on the same seam, validating that ERC equalizes
+  contributions).
   Verified OOS on synthetic two-block panels: condition number 97.4 -> 91.1
   (LW) / 82.5 (denoised); mean MVP OOS vol 0.005909 -> 0.005790 over 20 seeds.
 - **Rejected alternatives**: depending on scikit-learn (heavy dependency for a

@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Risk attribution.** New `fynance.portfolio.attribution` module:
+  `marginal_risk` (∂σₚ/∂w), `risk_contribution` (absolute or percentage,
+  summing to σₚ / 1) and the causal `roll_risk_contribution` walking a
+  `(T, N)` weight path against a trailing covariance window (accepts the
+  same `cov=` estimators as the allocators).
 - **Allocator `cov=` seam.** The six allocators (`ERC`/`HRP`/`IVP`/`MVP`/
   `MVP_uc`/`MDP`) accept an opt-in `cov=` callable mapping the `(T, N)`
   training window to an `(N, N)` covariance matrix (e.g.
