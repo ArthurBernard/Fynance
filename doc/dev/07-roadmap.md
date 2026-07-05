@@ -22,8 +22,11 @@ shipped, `03-decisions.md` for *why*. Keep it short and true.
 > Voir `CHANGELOG.md` / `03-decisions.md`. L'épic **harnais R&D multi-actifs /
 > panel** (2026-06-23) est **livré** : 5 PR (#215–#219) — `ObjectiveModel` panel,
 > losses book-aware + `RankingLoss`, `information_coefficient`/`horizon_returns`,
-> walk-forward + attribution par actif, report de book. Il ne reste que l'item
-> optionnel ci-dessous.
+> walk-forward + attribution par actif, report de book. Le backlog §3–§10 vient
+> du **workflow d'idéation 2026-07** (43 propositions générées sous 6 angles,
+> scorées valeur/fit/faisabilité par panel de juges, 29 retenues) — détail
+> complet (descriptions, API sketches, scores) dans
+> `plans/_feature-catalog-2026-07.md` (local).
 
 > ⚠️ **Hors scope ici** : la recherche de stratégie sur **vraie data** (benchmarks
 > empiriques loss / architecture / normalisation, évaluation Sharpe out-of-sample,
@@ -42,3 +45,76 @@ Le harnais `fynance.research` est **livré** (S1–S3) : `Experiment`,
 
 - [ ] Explorateur **Streamlit** au-dessus du Ledger (parcourir / filtrer / comparer
   les runs persistés) — interactif, plus tardif.
+
+## 3. Portfolio risk & covariance (épic `portfolio-risk`)
+
+- [ ] Covariance robuste (`portfolio/covariance.py`) : Ledoit-Wolf closed-form,
+  EWMA (Numba), factor cov PCA, denoising Marchenko-Pastur ; seam opt-in `cov=`
+  sur les allocateurs (défaut inchangé = `np.cov`).
+- [ ] Attribution de risque : contribution marginale / composante au risque.
+- [ ] Risk budgeting : ERC généralisé (budgets de risque arbitraires).
+- [ ] Overlay d'exposition book-level : projection sous caps gross/net/groupe +
+  `book_vol_target` (vol targeting du book entier).
+
+## 4. Cross-sectional factor research (épic `factor-research`)
+
+- [ ] Opérateurs cross-sectionnels NaN-aware (`features/cross_section.py`) :
+  `cs_rank`/`cs_zscore`/`cs_demean`/`cs_winsorize`/`cs_neutralize` sur panels (T,N).
+- [ ] Statistiques roulantes par paires : `roll_corr`/`roll_beta`/`cross_corr`
+  (lead-lag) — kernel réutilisé par les métriques benchmark (§6).
+- [ ] Suite d'analyse factorielle : quantile portfolios + spread, rolling IC,
+  IC decay, `factor_tearsheet()`.
+- [ ] Différentiation fractionnaire (FFD fixed-width).
+- [ ] Labeling triple-barrière + meta-labeling + poids d'unicité (AFML).
+- [ ] Feature importance par permutation walk-forward (MDA).
+
+## 5. Anti-overfitting guards (épic `anti-overfitting`)
+
+- [ ] Recherche d'hyperparamètres walk-forward purgée (grid/random, sans optuna) ;
+  expose `n_trials` → `deflated_sharpe_ratio`.
+- [ ] Diagnostic PBO / CSCV sur panel de configs (+ `returns_panel()` depuis le Ledger).
+- [ ] Bootstrap par blocs (circular + stationary) : IC de confiance sur métriques +
+  `block_permutation_test` (null préservant la dépendance sérielle).
+- [ ] Splitter CPCV (combinatorial purged cross-validation).
+
+## 6. Metrics & trade analytics (épic `metrics-analytics`)
+
+- [ ] Métriques de queue : VaR/CVaR (historique, gaussien, Cornish-Fisher), CDaR,
+  tail dependence ; variantes roulantes causales ; registry `summary()`.
+- [ ] Métriques benchmark-relative (`metrics/benchmark.py`) : alpha/beta, tracking
+  error, IR, capture ratios + overlay tearsheet.
+- [ ] Analytics turnover & exposition (métriques + panneau tearsheet).
+- [ ] Analytics par trade : extraction round-trips (Numba) + `trade_summary()`
+  (win rate, profit factor, expectancy, streaks).
+
+## 7. Backtest realism (épic `backtest-realism`)
+
+- [ ] Politiques de rebalancement + frictions : calendaire / no-trade band / budget
+  de turnover, `discretize()` (lots), `delay(steps)` — transforms composables.
+- [ ] Coûts de portage composables : borrow, financement, cash rate (stacking).
+- [ ] Analyse de capacité : Sharpe net vs AUM + breakeven cost rate (via
+  `MarketImpactCost`).
+- [ ] Utilitaires sessions & calendriers intraday.
+
+## 8. GARCH family (épic `garch-family`)
+
+- [ ] Famille GARCH complète (L) : kernels GJR/EGARCH Numba, innovations Student-t,
+  driver MLE `fit_volatility()` (params, std errors, AIC/BIC) + `.forecast(h)` /
+  `.simulate()` ; passthrough `model=`/`dist=` dans `features/garch.py`.
+  Comble le stub `estimator.estimation()`.
+
+## 9. ML bricks (épic `ml-bricks`)
+
+- [ ] Pretraining cross-asset pour `ObjectiveModel` : `pretrain_pooled`/
+  `clone_for_asset`/`finetune` + persistance `state_dict` (comble le gap save/load).
+- [ ] Forecasting distributionnel : pertes pinball / NLL gaussienne + tête
+  `QuantileModel`.
+- [ ] `DeepEnsemble` & `MCDropout` : wrappers `SignalModel` uncertainty-aware.
+- [ ] Conformal prediction causale pour signaux de trading.
+
+## 10. DX one-offs (épic `dx-oneoffs`)
+
+- [ ] `core/checks.py` : `check_conforms(obj, protocol)` + `assert_causal(func)` —
+  sonde de lookahead exécutable, dogfoodée dans les tests fynance.
+- [ ] Seams DataFrame duck-typées : `to_polars`/`from_pandas` sur `PriceSeries`/
+  `OHLCV`/`BacktestResult` (sans dépendance pandas/polars).
