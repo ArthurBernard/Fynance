@@ -21,5 +21,7 @@ adapters live downstream.
    permutation_test
    probabilistic_sharpe_ratio
    deflated_sharpe_ratio
+   ImportanceResult
+   walk_forward_mda
    gbm
    regime_switching
