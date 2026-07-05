@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Fractional differentiation.** `fracdiff(X, d, tol)` in
+  `fynance.features.engineering`: fixed-width-window fractional
+  differentiation (AFML ch. 5) on a Numba kernel — stationarize while
+  keeping maximal memory; strictly causal, NaN warm-up head.
 - **Cross-sectional operators.** New `fynance.features.cross_section`
   module: NaN-aware per-bar panel transforms `cs_rank` (average-tie
   percentile ranks), `cs_zscore`, `cs_demean` (optionally weighted),
