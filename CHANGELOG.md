@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Book-level vol targeting.** `book_vol_target(W, X, ...)` in
+  `fynance.portfolio.sizing`: causal `(T,)` leverage series targeting a
+  constant volatility for a whole `(T, N)` position book (weights decided at
+  `t-1` earn the return over `(t-1, t]`) — the multi-asset counterpart of
+  `vol_target`.
 - **Exposure-constraint overlay.** New `fynance.portfolio.constraints`
   module: `project_weights` projects a weight vector or `(T, N)` book onto a
   feasible set — per-asset box, gross-leverage cap, net-exposure range, named
