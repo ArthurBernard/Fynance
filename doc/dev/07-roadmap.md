@@ -26,7 +26,7 @@ shipped, `03-decisions.md` for *why*. Keep it short and true.
 > du **workflow d'idéation 2026-07** (43 propositions générées sous 6 angles,
 > scorées valeur/fit/faisabilité par panel de juges, 29 retenues) — détail
 > complet (descriptions, API sketches, scores) dans
-> `plans/_feature-catalog-2026-07.md` (local).
+> `plans/_catalog/feature-catalog-2026-07.md` (local).
 
 > ⚠️ **Hors scope ici** : la recherche de stratégie sur **vraie data** (benchmarks
 > empiriques loss / architecture / normalisation, évaluation Sharpe out-of-sample,

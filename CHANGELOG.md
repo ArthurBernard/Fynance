@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Conditioned covariance estimators.** New `fynance.portfolio.covariance`
+  module: `sample_cov`, closed-form `ledoit_wolf` shrinkage (identity /
+  constant-correlation / diagonal targets), RiskMetrics-style `ewma_cov`
+  (Numba kernel), PCA `factor_cov` (low-rank + diagonal, PSD by construction)
+  and Marchenko-Pastur `denoise_cov` — interchangeable `(T, N) → (N, N)`
+  callables, groundwork for the allocators' opt-in `cov=` seam.
+
 ### Changed
 
 ### Fixed

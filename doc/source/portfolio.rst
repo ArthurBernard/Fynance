@@ -24,9 +24,17 @@ Portfolio allocation algorithms and rolling walk-forward wrappers.
 
       Fractional Kelly, volatility targeting and transaction costs.
 
+   .. grid-item-card:: :octicon:`graph;1.2em;sd-mr-1` Conditioned covariance
+      :link: portfolio.covariance
+      :link-type: doc
+
+      Sample covariance, Ledoit-Wolf shrinkage, exponentially weighted,
+      factor-model and Marchenko-Pastur denoised estimators.
+
 .. toctree::
    :maxdepth: 1
    :hidden:
 
    portfolio.allocation
+   portfolio.covariance
    portfolio.sizing
