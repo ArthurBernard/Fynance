@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Walk-forward feature importance (MDA).** `walk_forward_mda` in
+  `fynance.research.importance`: permutation importance evaluated
+  out-of-fold on the purged walk-forward splitter — fit once per fold,
+  permute the test window only, seeded; returns an `ImportanceResult`
+  (per-feature mean/std score drop + baseline).
 - **Fractional differentiation.** `fracdiff(X, d, tol)` in
   `fynance.features.engineering`: fixed-width-window fractional
   differentiation (AFML ch. 5) on a Numba kernel — stationarize while
