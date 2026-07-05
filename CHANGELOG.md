@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Cross-sectional operators.** New `fynance.features.cross_section`
+  module: NaN-aware per-bar panel transforms `cs_rank` (average-tie
+  percentile ranks), `cs_zscore`, `cs_demean` (optionally weighted),
+  `cs_winsorize` and `cs_neutralize` (per-bar OLS residualization against
+  exposure panels) — the input half of the `(T, N)` factor workflow.
 - **Pairwise rolling statistics.** `roll_cov` / `roll_corr` / `roll_beta`
   (trailing two-series moments on Numba kernels, window inclusive of `t`)
   and `cross_corr` (lead-lag correlation profile) in
