@@ -11,11 +11,14 @@
 Risk-based and mean-variance methods that compute portfolio weights
 from a sample of asset returns. Each function takes a 2-D array where
 columns are asset price/return series and returns the optimal weights
-as a 1-D array summing to one.
+as a 1-D array summing to one. All of them accept an optional ``cov=``
+callable that replaces the sample-covariance estimation — see
+:mod:`fynance.portfolio.covariance` for ready-made estimators.
 
 A walk-forward wrapper, :func:`rolling_allocation`, applies any of
 these methods on a rolling training window — useful for backtesting
-allocation strategies without lookahead bias.
+allocation strategies without lookahead bias; a ``cov=`` estimator
+reaches the allocator unchanged through its ``**kwargs`` forwarding.
 
 Main entry points
 -----------------
@@ -26,6 +29,9 @@ Main entry points
 - :func:`MVP`, :func:`MVP_uc` — Minimum Variance Portfolio (constrained
   / unconstrained).
 - :func:`rolling_allocation` — walk-forward wrapper.
+- :mod:`fynance.portfolio.covariance` — covariance estimators (sample,
+  Ledoit-Wolf shrinkage, EWMA, factor model, Marchenko-Pastur denoising)
+  usable as the ``cov=`` parameter of the allocators above.
 
 """
 
@@ -48,6 +54,67 @@ __all__ = ['ERC', 'HRP', 'IVP', 'MDP', 'MVP', 'MVP_uc', 'rolling_allocation']
 
 
 # =========================================================================== #
+#                          covariance estimation seam                        #
+# =========================================================================== #
+
+
+def _estimate_cov(
+    X: NDArray[np.float64],
+    cov: Callable[[NDArray[np.float64]], NDArray[np.float64]] | None,
+) -> NDArray[np.float64]:
+    r""" Estimate the covariance matrix used by an allocator.
+
+    Opt-in seam shared by all the allocators below: when ``cov`` is
+    ``None`` this is a thin, behavior-preserving wrapper around
+    :func:`numpy.cov` (the historical estimator); when ``cov`` is a
+    callable it is called on ``X`` and the returned matrix is validated
+    (square, matching ``X``'s number of columns, symmetric within a tight
+    tolerance) before being handed back to the caller.
+
+    Parameters
+    ----------
+    X : array_like
+        Returns panel, shape ``(T, N)``.
+    cov : callable or None
+        Callable mapping the ``(T, N)`` array ``X`` to an ``(N, N)``
+        covariance matrix, e.g.
+        :func:`fynance.portfolio.covariance.ledoit_wolf`. If ``None``
+        (default), the sample covariance (:func:`numpy.cov`) is used.
+
+    Returns
+    -------
+    np.ndarray
+        Symmetric ``(N, N)`` covariance matrix.
+
+    Raises
+    ------
+    ValueError
+        If ``cov`` is a callable and its return value is not square, does
+        not match ``X``'s number of columns, or is not symmetric within
+        ``1e-8``.
+
+    """
+    if cov is None:
+        return np.atleast_2d(np.cov(X, rowvar=False))
+
+    N = np.asarray(X).shape[1]
+    sigma = np.atleast_2d(np.asarray(cov(X), dtype=np.float64))
+    if sigma.shape != (N, N):
+        raise ValueError(
+            f"cov callable must return an ({N}, {N}) covariance matrix "
+            f"matching X's {N} columns, got shape {sigma.shape}."
+        )
+
+    if not np.allclose(sigma, sigma.T, atol=1e-8):
+        raise ValueError(
+            f"cov callable returned a non-symmetric {sigma.shape} matrix "
+            f"(max |sigma - sigma.T| = {np.max(np.abs(sigma - sigma.T)):.3e})."
+        )
+
+    return sigma
+
+
+# =========================================================================== #
 #                         Equal Risk Contribution                             #
 # =========================================================================== #
 
@@ -57,6 +124,7 @@ def ERC(
     w0: NDArray[np.float64] | None = None,
     up_bound: float = 1.,
     low_bound: float = 0.,
+    cov: Callable[[NDArray[np.float64]], NDArray[np.float64]] | None = None,
 ) -> NDArray[np.float64]:
     r""" Get weights of Equal Risk Contribution portfolio allocation.
 
@@ -98,6 +166,11 @@ def ERC(
     up_bound, low_bound : float, optional
         Respectively maximum and minimum values of weights, such that low_bound
         :math:`\leq w_i \leq` up_bound :math:`\forall i`. Default is 0 and 1.
+    cov : callable, optional
+        Callable mapping the ``(T, N)`` training array to an ``(N, N)``
+        covariance matrix, e.g.
+        :func:`fynance.portfolio.covariance.ledoit_wolf`; default `None`
+        keeps the sample covariance.
 
     Returns
     -------
@@ -108,9 +181,21 @@ def ERC(
     ----------
     .. [1] http://thierry-roncalli.com/download/erc-slides.pdf
 
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from fynance.portfolio.covariance import ledoit_wolf
+    >>> rng = np.random.default_rng(0)
+    >>> X = rng.normal(0.0, 0.01, size=(200, 4))
+    >>> w = ERC(X, cov=ledoit_wolf)
+    >>> w.shape
+    (4, 1)
+    >>> bool(np.isclose(w.sum(), 1.0))
+    True
+
     """
     T, N = X.shape
-    SIGMA = np.atleast_2d(np.cov(X, rowvar=False))
+    SIGMA = _estimate_cov(X, cov)
     if N == 1:
         return np.ones([1, 1])
 
@@ -284,6 +369,7 @@ def HRP(
     metric: str = 'euclidean',
     low_bound: float = 0.,
     up_bound: float = 1.0,
+    cov: Callable[[NDArray[np.float64]], NDArray[np.float64]] | None = None,
 ) -> NDArray[np.float64]:
     r""" Get weights of the Hierarchical Risk Parity allocation.
 
@@ -314,6 +400,11 @@ def HRP(
     low_bound, up_bound : float
         Respectively minimum and maximum value of weights, such that low_bound
         :math:`\leq w_i \leq` up_bound :math:`\forall i`. Default is 0 and 1.
+    cov : callable, optional
+        Callable mapping the ``(T, N)`` training array to an ``(N, N)``
+        covariance matrix, e.g.
+        :func:`fynance.portfolio.covariance.ledoit_wolf`; default `None`
+        keeps the sample covariance.
 
     Returns
     -------
@@ -333,7 +424,7 @@ def HRP(
     up_bound = max(up_bound, 1.0 / N)
     low_bound = min(low_bound, 1.0 / N)
 
-    mat_cov = np.atleast_2d(np.cov(X, rowvar=False))
+    mat_cov = _estimate_cov(X, cov)
     diag_cov = np.sqrt(np.diag(mat_cov))
     outer_diag = np.outer(diag_cov, diag_cov)
     with np.errstate(invalid='ignore', divide='ignore'):
@@ -364,6 +455,7 @@ def IVP(
     normalize: bool = False,
     low_bound: float = 0.,
     up_bound: float = 1.0,
+    cov: Callable[[NDArray[np.float64]], NDArray[np.float64]] | None = None,
 ) -> NDArray[np.float64]:
     r""" Get weights of the Inverse Variance Portfolio allocation.
 
@@ -389,6 +481,11 @@ def IVP(
     low_bound, up_bound : float, optional
         Respectively minimum and maximum values of weights, such that low_bound
         :math:`\leq w_i \leq` up_bound :math:`\forall i`. Default is 0 and 1.
+    cov : callable, optional
+        Callable mapping the ``(T, N)`` training array to an ``(N, N)``
+        covariance matrix, e.g.
+        :func:`fynance.portfolio.covariance.ledoit_wolf`; default `None`
+        keeps the sample covariance.
 
     Returns
     -------
@@ -400,7 +497,7 @@ def IVP(
     .. [3] https://en.wikipedia.org/wiki/Inverse-variance_weighting
 
     """
-    mat_cov = np.atleast_2d(np.cov(X, rowvar=False))
+    mat_cov = _estimate_cov(X, cov)
     N = mat_cov.shape[0]
     if N == 1:
         return np.ones([1, 1])
@@ -423,6 +520,7 @@ def IVP(
 def MVP(
     X: NDArray[np.float64],
     normalize: bool = False,
+    cov: Callable[[NDArray[np.float64]], NDArray[np.float64]] | None = None,
 ) -> NDArray[np.float64]:
     r""" Get weights of the Minimum Variance Portfolio allocation.
 
@@ -453,6 +551,11 @@ def MVP(
     normalize : boolean, optional
         If True normalize the weigths such that :math:`0 \leq w_i \leq 1` and
         :math:`\sum_{i=1}^{N} w_i = 1`, :math:`\forall i`. Default is False.
+    cov : callable, optional
+        Callable mapping the ``(T, N)`` training array to an ``(N, N)``
+        covariance matrix, e.g.
+        :func:`fynance.portfolio.covariance.ledoit_wolf`; default `None`
+        keeps the sample covariance.
 
     Returns
     -------
@@ -468,7 +571,7 @@ def MVP(
     HRP
 
     """
-    mat_cov = np.atleast_2d(np.cov(X, rowvar=False))
+    mat_cov = _estimate_cov(X, cov)
     if mat_cov.shape[0] == 1:
         return np.ones([1, 1])
 
@@ -495,6 +598,7 @@ def MVP_uc(
     w0: NDArray[np.float64] | None = None,
     up_bound: float = 1.,
     low_bound: float = 0.,
+    cov: Callable[[NDArray[np.float64]], NDArray[np.float64]] | None = None,
 ) -> NDArray[np.float64]:
     r""" Get weights of the Minimum Variance Portfolio under constraints.
 
@@ -526,6 +630,11 @@ def MVP_uc(
     up_bound, low_bound : float, optional
         Respectively maximum and minimum values of weights, such that low_bound
         :math:`\leq w_i \leq` up_bound :math:`\forall i`. Default is 0 and 1.
+    cov : callable, optional
+        Callable mapping the ``(T, N)`` training array to an ``(N, N)``
+        covariance matrix, e.g.
+        :func:`fynance.portfolio.covariance.ledoit_wolf`; default `None`
+        keeps the sample covariance.
 
     Returns
     -------
@@ -533,7 +642,7 @@ def MVP_uc(
         Weights that minimize the variance of the portfolio.
 
     """
-    mat_cov = np.atleast_2d(np.cov(X, rowvar=False))
+    mat_cov = _estimate_cov(X, cov)
     N = X.shape[1]
     if N == 1:
         return np.ones([1, 1])
@@ -582,11 +691,43 @@ def MVP_uc(
 # =========================================================================== #
 
 
+def _diversified_ratio_from_cov(
+    w: NDArray[np.float64],
+    sigma: NDArray[np.float64],
+) -> float:
+    r""" Diversification ratio of weights `w` evaluated from a fixed covariance.
+
+    Same ratio as :func:`fynance.metrics.diversified_ratio`,
+    :math:`D(w) = (w' s) / \sqrt{w' \Sigma w}` with :math:`s =
+    \sqrt{\text{diag}(\Sigma)}`, but computed from a caller-supplied
+    :math:`\Sigma` instead of recomputing the sample covariance of the
+    returns panel on every call — the ``cov=`` path of :func:`MDP`.
+
+    Parameters
+    ----------
+    w : array_like
+        Portfolio weights, shape ``(N,)`` or ``(N, 1)``.
+    sigma : array_like
+        Covariance matrix, shape ``(N, N)``.
+
+    Returns
+    -------
+    float
+        Diversification ratio of `w` under `sigma`.
+
+    """
+    w = np.asarray(w, dtype=np.float64).reshape(-1, 1)
+    s = np.sqrt(np.diag(sigma)).reshape(-1, 1)
+
+    return ((w.T @ s) / np.sqrt(w.T @ sigma @ w)).item()
+
+
 def MDP(
     X: NDArray[np.float64],
     w0: NDArray[np.float64] | None = None,
     up_bound: float = 1.,
     low_bound: float = 0.,
+    cov: Callable[[NDArray[np.float64]], NDArray[np.float64]] | None = None,
 ) -> NDArray[np.float64]:
     r""" Get weights of Maximum Diversified Portfolio allocation.
 
@@ -611,6 +752,21 @@ def MDP(
     up_bound, low_bound : float, optional
         Respectively maximum and minimum values of weights, such that low_bound
         :math:`\leq w_i \leq` up_bound :math:`\forall i`. Default is 0 and 1.
+    cov : callable, optional
+        Callable mapping the ``(T, N)`` training array to an ``(N, N)``
+        covariance matrix, e.g.
+        :func:`fynance.portfolio.covariance.ledoit_wolf`; default `None`
+        keeps the sample covariance. When `None` (default) the objective
+        calls :func:`diversified_ratio`, which recomputes the (biased)
+        sample covariance of `X` at every optimizer iteration. When a
+        callable is given, the covariance is instead estimated **once**
+        via that callable and the diversification ratio is evaluated from
+        this fixed matrix at every iteration (see
+        :func:`_diversified_ratio_from_cov`) — the two evaluation paths
+        can therefore differ slightly even when `cov` reduces to the
+        sample covariance, because :func:`diversified_ratio` uses the
+        biased (``ddof=0``) sample covariance recomputed from `X` while
+        `cov` is called once upfront.
 
     Returns
     -------
@@ -634,9 +790,19 @@ def MDP(
 
     up_bound = max(up_bound, 1 / N)
 
-    # Set function to minimze
-    def f_max_divers_weights(w):
-        return -diversified_ratio(X, W=w)
+    if cov is None:
+        # Set function to minimize: diversified_ratio recomputes the
+        # (biased) sample covariance of X at every call, unchanged.
+        def f_max_divers_weights(w):
+            return -diversified_ratio(X, W=w)
+
+    else:
+        # Estimate the covariance once and maximize the diversification
+        # ratio evaluated from this fixed matrix at every iteration.
+        sigma = _estimate_cov(X, cov)
+
+        def f_max_divers_weights(w):
+            return -_diversified_ratio_from_cov(w, sigma)
 
     # Set inital weights
     if w0 is None:
@@ -691,6 +857,11 @@ def rolling_allocation(
 
     .. math::
         \forall t \in [n, T], w_{t:t+s} = f(X_{t-n:t})
+
+    A ``cov=`` covariance-estimator callable (see
+    :mod:`fynance.portfolio.covariance`) reaches the allocator ``f``
+    unchanged through ``**kwargs``, e.g.
+    ``rolling_allocation(MVP_uc, X, n=252, s=63, cov=ledoit_wolf)``.
 
     Parameters
     ----------

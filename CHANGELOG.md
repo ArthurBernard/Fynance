@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Allocator `cov=` seam.** The six allocators (`ERC`/`HRP`/`IVP`/`MVP`/
+  `MVP_uc`/`MDP`) accept an opt-in `cov=` callable mapping the `(T, N)`
+  training window to an `(N, N)` covariance matrix (e.g.
+  `portfolio.covariance.ledoit_wolf`); the default `None` keeps the
+  sample-covariance path bit-for-bit, and `rolling_allocation` forwards
+  `cov=` through its existing `**kwargs`.
 - **Conditioned covariance estimators.** New `fynance.portfolio.covariance`
   module: `sample_cov`, closed-form `ledoit_wolf` shrinkage (identity /
   constant-correlation / diagonal targets), RiskMetrics-style `ewma_cov`
