@@ -29,6 +29,12 @@ moving standard deviations and rolling functions.
 
       ATR, ADX, Williams %R (High/Low) and OBV, VWAP (Volume).
 
+   .. grid-item-card:: :octicon:`versions;1.2em;sd-mr-1` Cross-section
+      :link: features.cross_section
+      :link-type: doc
+
+      NaN-aware per-bar rank, z-score, demean, winsorize, neutralize.
+
    .. grid-item-card:: :octicon:`meter;1.2em;sd-mr-1` Statistics
       :link: features.stats
       :link-type: doc
@@ -100,6 +106,7 @@ Common parameters across modules:
    :maxdepth: 1
    :hidden:
 
+   features.cross_section
    features.engineering
    features.filters
    features.indicators
