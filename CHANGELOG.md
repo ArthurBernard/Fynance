@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Risk-budgeting allocation.** New `RBP(X, budgets=None, ...)` allocator
+  (generalized ERC, Roncalli least-squares objective): weights whose risk
+  contributions match an arbitrary budget vector; `budgets=None` reproduces
+  `ERC`, and the `cov=` seam / `rolling_allocation` forwarding apply.
 - **Risk attribution.** New `fynance.portfolio.attribution` module:
   `marginal_risk` (∂σₚ/∂w), `risk_contribution` (absolute or percentage,
   summing to σₚ / 1) and the causal `roll_risk_contribution` walking a
