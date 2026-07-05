@@ -72,6 +72,23 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-07-05 — Risk budgeting as a separate `RBP` allocator (PR #238)  [accepted]
+
+- **Choice**: ship risk budgeting as a new `RBP(X, budgets=None, cov=None)`
+  function with the Roncalli least-squares objective
+  `sum_i (w_i (Sigma w)_i - b_i w'Sigma w)^2`, sharing ERC's scaffolding
+  (unit-trace rescale, SLSQP, bound clamping) — not as a `budgets=` parameter
+  on `ERC`.
+- **Why**: `portfolio.allocation` is a frozen API — a new function is purely
+  additive and leaves ERC's contract untouched; `budgets=None` reproduces ERC
+  within optimizer tolerance (regression-tested at 1e-4), and budget matching
+  is verified through `portfolio.attribution` (ex-ante error ~8e-7 on
+  synthetic panels, ~7e-4 through the rolling path).
+- **Rejected alternatives**: extending `ERC`'s signature (behavior-drift risk
+  in the stable API); Roncalli's log-barrier / fixed-point formulation
+  (cleaner convexity but a second optimizer pattern to maintain for no
+  observed accuracy gain here).
+
 ### 2026-07-05 — Conditioned covariance estimators as interchangeable callables (PR #235)  [accepted]
 
 - **Choice**: ship covariance conditioning as a standalone

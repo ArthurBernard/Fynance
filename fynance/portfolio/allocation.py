@@ -23,6 +23,8 @@ reaches the allocator unchanged through its ``**kwargs`` forwarding.
 Main entry points
 -----------------
 - :func:`ERC` — Equal Risk Contribution (risk-parity).
+- :func:`RBP` — Risk Budgeting Portfolio (ERC generalized to arbitrary
+  per-asset risk budgets).
 - :func:`HRP` — Hierarchical Risk Parity.
 - :func:`IVP` — Inverse Variance Portfolio.
 - :func:`MDP` — Maximum Diversified Portfolio.
@@ -50,7 +52,7 @@ from scipy.optimize import Bounds, LinearConstraint, minimize
 # Local packages
 from fynance.metrics import diversified_ratio
 
-__all__ = ['ERC', 'HRP', 'IVP', 'MDP', 'MVP', 'MVP_uc', 'rolling_allocation']
+__all__ = ['ERC', 'HRP', 'IVP', 'MDP', 'MVP', 'MVP_uc', 'RBP', 'rolling_allocation']
 
 
 # =========================================================================== #
@@ -230,6 +232,214 @@ def ERC(
     const_ind = Bounds(low_bound * np.ones([N]), up_bound * np.ones([N]))
     result = minimize(
         f_ERC,
+        w0,
+        method='SLSQP',
+        constraints=[const_sum],
+        bounds=const_ind,
+        options={'ftol': 1e-12, 'maxiter': 1000},
+    )
+
+    return result.x.reshape([N, 1])
+
+
+# =========================================================================== #
+#                          Risk Budgeting Portfolio                           #
+# =========================================================================== #
+
+
+def _validate_budgets(budgets: NDArray[np.float64] | None, N: int) -> NDArray[np.float64]:
+    """ Validate and normalize a risk-budget vector.
+
+    Parameters
+    ----------
+    budgets : array_like or None
+        Candidate risk budgets, expected length ``N``. ``None`` means the
+        equal-budget default ``1 / N``.
+    N : int
+        Number of assets.
+
+    Returns
+    -------
+    np.ndarray
+        Length-``N`` budget vector, strictly positive and summing to
+        exactly 1.
+
+    Raises
+    ------
+    ValueError
+        If `budgets` does not have length `N`, contains a non-positive
+        entry, or its sum deviates from 1 by more than ``1e-8``.
+
+    """
+    if budgets is None:
+        return np.full(N, 1.0 / N)
+
+    b = np.asarray(budgets, dtype=np.float64).ravel()
+    if b.shape != (N,):
+        raise ValueError(
+            f"budgets must be a length-{N} vector, got shape {b.shape}."
+        )
+
+    if np.any(b <= 0):
+        raise ValueError("budgets entries must be strictly positive.")
+
+    total = b.sum()
+    if abs(total - 1.0) > 1e-8:
+        raise ValueError(
+            f"budgets must sum to 1 (within 1e-8), got sum={total!r}."
+        )
+
+    # Silently renormalize away any float rounding within the tolerance.
+    return b / total
+
+
+def RBP(
+    X: NDArray[np.float64],
+    budgets: NDArray[np.float64] | None = None,
+    w0: NDArray[np.float64] | None = None,
+    up_bound: float = 1.,
+    low_bound: float = 0.,
+    cov: Callable[[NDArray[np.float64]], NDArray[np.float64]] | None = None,
+) -> NDArray[np.float64]:
+    r""" Get weights of a Risk Budgeting Portfolio allocation.
+
+    Generalizes :func:`ERC` to arbitrary per-asset risk budgets: instead of
+    equalizing risk contributions, each asset ``i`` is allocated a target
+    share ``b_i`` of total portfolio variance, with :math:`\sum_i b_i = 1`.
+    Passing ``budgets=None`` falls back to the equal-budget case
+    :math:`b_i = 1/N \, \forall i`, which reproduces :func:`ERC`.
+
+    The optimizer (SLSQP) minimizes a smooth least-squares surrogate of the
+    gap between each asset's risk contribution and its target budget, under
+    sum-to-one and box constraints.
+
+    Notes
+    -----
+    Weights of the Risk Budgeting Portfolio, as described by T. Roncalli
+    [6]_, verify the following problem:
+
+    .. math::
+        w = \text{arg min } f(w) \\
+        u.c. \begin{cases}w'e = 1 \\
+                          0 \leq w_i \leq 1 \\
+             \end{cases}
+
+    With:
+
+    .. math::
+        f(w) = \sum_{i=1}^{N} \left( w_i (\Omega w)_i
+        - b_i \, w' \Omega w \right)^2
+
+    Where :math:`\Omega` is the variance-covariance matrix of `X`, :math:`N`
+    the number of assets and :math:`b` the target risk-budget vector (with
+    :math:`\sum_{i=1}^{N} b_i = 1`). With :math:`b_i = 1/N \, \forall i` this
+    objective shares the same minimizers as :func:`ERC`'s (both vanish
+    exactly when every asset's risk contribution matches its budget).
+
+    Parameters
+    ----------
+    X : array_like
+        Each column is a series of price or return's asset.
+    budgets : array_like, optional
+        Target risk budget per asset, length ``N``, strictly positive
+        entries summing to 1 (within ``1e-8``, silently renormalized inside
+        that tolerance). Default `None` spreads the budget equally
+        (:math:`b_i = 1/N`), reproducing :func:`ERC`.
+    w0 : array_like, optional
+        Initial weights for the optimizer.
+    up_bound, low_bound : float, optional
+        Respectively maximum and minimum values of weights, such that low_bound
+        :math:`\leq w_i \leq` up_bound :math:`\forall i`. Default is 0 and 1.
+    cov : callable, optional
+        Callable mapping the ``(T, N)`` training array to an ``(N, N)``
+        covariance matrix, e.g.
+        :func:`fynance.portfolio.covariance.ledoit_wolf`; default `None`
+        keeps the sample covariance.
+
+    Returns
+    -------
+    array_like
+        Weights whose risk contributions match `budgets`.
+
+    Raises
+    ------
+    ValueError
+        If `budgets` does not have length `N`, contains a non-positive
+        entry, or its sum deviates from 1 by more than ``1e-8``.
+
+    References
+    ----------
+    .. [6] T. Roncalli, "Introduction to Risk Parity and Budgeting", 2013,
+           https://arxiv.org/abs/1403.1889
+
+    See Also
+    --------
+    ERC
+    fynance.portfolio.attribution.risk_contribution
+
+    Examples
+    --------
+    Two independent assets with volatilities ``sigma_1=0.01`` and
+    ``sigma_2=0.03``: for a diagonal covariance the risk-budgeting
+    first-order condition reduces to :math:`w_i \sigma_i \propto
+    \sqrt{b_i}`, i.e. :math:`w_i \propto \sqrt{b_i} / \sigma_i`.
+
+    >>> import numpy as np
+    >>> rng = np.random.default_rng(0)
+    >>> sigma1, sigma2 = 0.01, 0.03
+    >>> X = np.column_stack([
+    ...     rng.normal(0.0, sigma1, 2000),
+    ...     rng.normal(0.0, sigma2, 2000),
+    ... ])
+    >>> b = np.array([0.8, 0.2])
+    >>> w = RBP(X, budgets=b)
+    >>> w.shape
+    (2, 1)
+    >>> bool(np.isclose(w.sum(), 1.0))
+    True
+    >>> expected = np.sqrt(b) / np.array([sigma1, sigma2])
+    >>> expected = expected / expected.sum()
+    >>> bool(np.allclose(w.flatten(), expected, atol=1e-2))
+    True
+
+    """
+    T, N = X.shape
+    b = _validate_budgets(budgets, N)
+    SIGMA = _estimate_cov(X, cov)
+    if N == 1:
+        return np.ones([1, 1])
+
+    up_bound = max(up_bound, 1 / N)
+    # Clamp low_bound so the box stays compatible with the sum-to-one
+    # constraint: with low_bound > 1/N every feasible weight already exceeds
+    # its share, the constraint is infeasible and SLSQP would silently return
+    # weights summing to more than one (as HRP/IVP already guard against).
+    low_bound = min(low_bound, 1 / N)
+    # Same scale-safety rationale as ERC: rescale the covariance to unit
+    # trace so the quartic objective is O(1) regardless of the input scale;
+    # this leaves the argmin (the weights) unchanged.
+    scale = np.trace(SIGMA) / N
+    if scale <= 0:
+        return np.ones([N, 1]) / N
+
+    SIGMA = SIGMA / scale
+    b_col = b.reshape([N, 1])
+
+    def f_RBP(w):
+        w = w.reshape([N, 1])
+        sigma_w = SIGMA @ w
+        port_var = w.T @ sigma_w
+
+        return np.sum((w * sigma_w - b_col * port_var) ** 2)
+
+    # Set inital weights
+    if w0 is None:
+        w0 = np.ones([N]) / N
+
+    const_sum = LinearConstraint(np.ones([1, N]), [1], [1])
+    const_ind = Bounds(low_bound * np.ones([N]), up_bound * np.ones([N]))
+    result = minimize(
+        f_RBP,
         w0,
         method='SLSQP',
         constraints=[const_sum],

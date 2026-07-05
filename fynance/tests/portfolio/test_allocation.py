@@ -9,12 +9,14 @@ from fynance.portfolio.allocation import (
     IVP,
     MDP,
     MVP,
+    RBP,
     MVP_uc,
     _diversified_ratio_from_cov,
     _normalize,
     _perf_alloc,
     rolling_allocation,
 )
+from fynance.portfolio.attribution import risk_contribution
 from fynance.portfolio.covariance import ledoit_wolf
 
 # ---------------------------------------------------------------------------
@@ -275,6 +277,115 @@ def test_erc_high_low_bound_still_sums_to_one(returns):
     """
     w = ERC(returns, low_bound=0.3).flatten()
     assert abs(w.sum() - 1.0) < 1e-4, f"weights sum to {w.sum():.6f}"
+
+
+# ---------------------------------------------------------------------------
+# RBP
+# ---------------------------------------------------------------------------
+
+def test_rbp_matches_erc_with_equal_budgets():
+    """ budgets=None must reproduce ERC exactly (equal-budget case). """
+    rng = np.random.default_rng(42)
+    X = rng.normal(0.0, 0.01, size=(300, 5))
+    w_rbp = RBP(X)
+    w_erc = ERC(X)
+    np.testing.assert_allclose(w_rbp, w_erc, atol=1e-4)
+
+
+def test_rbp_matches_target_budgets():
+    """ RBP's risk contributions must match an unequal budget vector. """
+    rng = np.random.default_rng(7)
+    X = rng.normal(0.0, 0.01, size=(400, 3))
+    b = np.array([0.5, 0.3, 0.2])
+    w = RBP(X, b).flatten()
+    sigma = np.cov(X, rowvar=False)
+    rc = risk_contribution(w, sigma, pct=True)
+    np.testing.assert_allclose(rc, b, atol=1e-3)
+
+
+def test_rbp_closed_form_diagonal_covariance():
+    """ Two independent assets: w_i must match sqrt(b_i) / sigma_i (closed form).
+
+    For a diagonal covariance the risk-budgeting first-order condition
+    reduces to w_i sigma_i^2 = b_i * (w' Sigma w), i.e. w_i sigma_i is
+    proportional to sqrt(b_i) across assets. `sigma_i` is taken from the
+    (near-diagonal, at this sample size) sample covariance RBP actually
+    optimizes against, not the true generating parameter, to isolate
+    optimizer correctness from sampling noise in the covariance estimate.
+    """
+    rng = np.random.default_rng(1)
+    sigma1, sigma2 = 0.01, 0.03
+    X = np.column_stack([
+        rng.normal(0.0, sigma1, 20000),
+        rng.normal(0.0, sigma2, 20000),
+    ])
+    b = np.array([0.8, 0.2])
+    w = RBP(X, b).flatten()
+    std = np.sqrt(np.diag(np.cov(X, rowvar=False)))
+    expected = np.sqrt(b) / std
+    expected = expected / expected.sum()
+    np.testing.assert_allclose(w, expected, atol=1e-3)
+
+
+def test_rbp_sums_to_one_and_bound_binds():
+    """ Weights sum to 1; a tight up_bound binds and sum-to-one still holds. """
+    rng = np.random.default_rng(7)
+    X = rng.normal(0.0, 0.01, size=(400, 3))
+    b = np.array([0.5, 0.3, 0.2])
+
+    w = RBP(X, b).flatten()
+    assert abs(w.sum() - 1.0) < 1e-8
+
+    w_bounded = RBP(X, b, up_bound=0.4).flatten()
+    assert w_bounded.max() <= 0.4 + 1e-8
+    assert abs(w_bounded.sum() - 1.0) < 1e-8
+
+
+def test_rbp_budgets_validation_errors():
+    """ Wrong length, non-positive entry, and a sum != 1 all raise. """
+    rng = np.random.default_rng(7)
+    X = rng.normal(0.0, 0.01, size=(400, 3))
+
+    with pytest.raises(ValueError):
+        RBP(X, np.array([0.5, 0.5]))  # wrong length
+
+    with pytest.raises(ValueError):
+        RBP(X, np.array([0.5, -0.1, 0.6]))  # non-positive entry
+
+    with pytest.raises(ValueError):
+        RBP(X, np.array([0.5, 0.5, 0.2]))  # sum = 1.2
+
+
+def test_rbp_cov_seam_and_rolling():
+    """ RBP works with a cov= callable and through rolling_allocation. """
+    rng = np.random.default_rng(9)
+    fac = rng.normal(0.0, 1.0, size=(300, 6))
+    vols = np.linspace(0.01, 0.03, 6)
+    returns_ = (0.5 * fac[:, :1] + rng.normal(0.0, 1.0, size=(300, 6))) * vols
+    prices = 100 * np.cumprod(1 + returns_, axis=0)
+    b = np.array([0.30, 0.25, 0.15, 0.10, 0.10, 0.10])
+
+    # cov= seam: runs and loosely matches budgets.
+    w = RBP(returns_, b, cov=ledoit_wolf).flatten()
+    sigma = ledoit_wolf(returns_)
+    rc = risk_contribution(w, sigma, pct=True)
+    np.testing.assert_allclose(rc, b, atol=5e-3)
+
+    # rolling_allocation: budgets forwarded via **kwargs.
+    portfolio, w_mat = rolling_allocation(RBP, prices, n=120, s=30, budgets=b)
+    assert portfolio.shape == (300,)
+    assert w_mat.shape == (300, 6)
+    active = np.flatnonzero(np.abs(w_mat).sum(axis=1) > 1e-9)
+    assert active.size > 0
+    assert np.allclose(w_mat[active].sum(axis=1), 1.0, atol=1e-4)
+
+
+def test_rbp_single_asset():
+    """ N == 1 must not crash and return [[1.]]. """
+    X = RNG.normal(0.0, 0.01, size=(50, 1))
+    w = RBP(X)
+    assert w.shape == (1, 1)
+    np.testing.assert_allclose(w, [[1.0]])
 
 
 # ---------------------------------------------------------------------------
