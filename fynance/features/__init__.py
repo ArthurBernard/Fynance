@@ -17,6 +17,7 @@ features.
 
    features.filters
    features.indicators
+   features.labels
    features.cross_section
    features.stats
    features.momentums
@@ -33,6 +34,7 @@ from . import (
     garch,
     horizon,
     indicators,
+    labels,
     momentums,
     money_management,
     ohlcv,
@@ -47,6 +49,7 @@ from .filters import *
 from .garch import *
 from .horizon import *
 from .indicators import *
+from .labels import *
 from .momentums import *
 from .money_management import *
 from .ohlcv import *
@@ -61,6 +64,7 @@ __all__ += regime.__all__
 __all__ += filters.__all__
 __all__ += garch.__all__
 __all__ += horizon.__all__
+__all__ += labels.__all__
 __all__ += momentums.__all__
 __all__ += indicators.__all__
 __all__ += money_management.__all__

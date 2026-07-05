@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **AFML labeling stack.** New `fynance.features.labels` module:
+  `triple_barrier` (path-aware profit-take / stop-loss / vertical-barrier
+  labels on a Numba scan, volatility-scaled barriers), `meta_labels`
+  (did-the-bet-pay binary target), `label_concurrency` and
+  `uniqueness_weights` (overlap-aware sample weights). Documented as
+  training TARGETS (they read future prices by design) to be consumed only
+  through purged splits.
 - **Factor analysis suite.** New `fynance.metrics.factor`
   (`quantile_returns` -> `QuantileResult`, `roll_information_coefficient`,
   `ic_decay` over non-overlapping horizons, `ic_summary` with ICIR/t-stat/
