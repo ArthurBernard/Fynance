@@ -15,6 +15,12 @@ API the notebook workflow and the optional Streamlit app both build on.
 from .attribution import plot_contribution, plot_turnover
 from .costs import plot_cost_decomposition
 from .equity import plot_drawdown, plot_equity
+from .factor import (
+    factor_tearsheet,
+    plot_ic_decay,
+    plot_ic_series,
+    plot_quantile_returns,
+)
 from .returns import plot_returns_hist, plot_rolling_sharpe
 from .tearsheet import tearsheet, tearsheet_text
 
@@ -26,6 +32,10 @@ __all__ = [
     'plot_contribution',
     'plot_turnover',
     'plot_cost_decomposition',
+    'plot_quantile_returns',
+    'plot_ic_series',
+    'plot_ic_decay',
+    'factor_tearsheet',
     'tearsheet',
     'tearsheet_text',
 ]

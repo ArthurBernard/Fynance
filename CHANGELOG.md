@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Factor analysis suite.** New `fynance.metrics.factor`
+  (`quantile_returns` -> `QuantileResult`, `roll_information_coefficient`,
+  `ic_decay` over non-overlapping horizons, `ic_summary` with ICIR/t-stat/
+  hit-rate, `factor_rank_autocorr`) and `fynance.plot.factor`
+  (`plot_quantile_returns`, `plot_ic_series`, `plot_ic_decay` and the
+  composed 2x2 `factor_tearsheet`) — alphalens-style factor evaluation on
+  data-agnostic `(T, N)` panels.
 - **Walk-forward feature importance (MDA).** `walk_forward_mda` in
   `fynance.research.importance`: permutation importance evaluated
   out-of-fold on the purged walk-forward splitter — fit once per fold,

@@ -47,6 +47,25 @@ Rolling versions
    roll_drawdown
    roll_mdd
 
+Factor analysis
+===============
+
+Alphalens-style evaluation of a cross-sectional factor on a data-agnostic
+``(T, N)`` panel. The alignment convention matches
+:func:`information_coefficient` — ``factor[t]`` is paired with the return
+realized *after* the factor is known.
+
+.. autosummary::
+   :toctree: generated/
+
+   information_coefficient
+   quantile_returns
+   roll_information_coefficient
+   ic_decay
+   ic_summary
+   factor_rank_autocorr
+   QuantileResult
+
 Aggregated report
 =================
 
