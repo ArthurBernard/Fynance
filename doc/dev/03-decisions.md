@@ -72,6 +72,29 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-07-05 — Cross-sectional factor research epic (PRs #243, epic)  [accepted]
+
+Gives fynance the *input half* of the factor workflow the v2.11 panel harness
+consumes. Six parallel leaves, key choices:
+
+- **Choice**: pairwise rolling kernels (`roll_cov/corr/beta`, `cross_corr`)
+  live in `features.roll_functions` (not metrics) so the future
+  benchmark-relative metrics can reuse them; windows are trailing and include
+  `t` (house convention, matches `roll_min`); cross-sectional operators
+  (`cs_*`) are NaN-aware per bar (panels with dead assets are the norm);
+  AFML labels (`triple_barrier`, `meta_labels`, uniqueness weights) are
+  documented as **training targets that read future prices by design** — to
+  be consumed only through purged splits; MDA importance fits once per fold
+  and permutes the test window only (no per-feature refit); the factor suite
+  splits metrics (`metrics.factor`) from figures (`plot.factor`) to keep
+  `import fynance` matplotlib-free.
+- **Why**: the mapped gap was blunt — everything was single-asset
+  time-series; the panel training stack (`ObjectiveModel`, `RankingLoss`,
+  per-bar IC) had no tooling to build/evaluate the factor panels it consumes.
+- **Rejected alternatives**: depending on alphalens (abandoned upstream,
+  pandas-first); pandas-based implementations (numpy is the lingua franca);
+  putting labels in `data/` (they are feature-layer transforms of prices).
+
 ### 2026-07-05 — Constraint overlay as least-distance projection (PR #239)  [accepted]
 
 - **Choice**: enforce book-level limits (box / gross / net / group) as a

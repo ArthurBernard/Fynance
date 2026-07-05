@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Pairwise rolling statistics.** `roll_cov` / `roll_corr` / `roll_beta`
+  (trailing two-series moments on Numba kernels, window inclusive of `t`)
+  and `cross_corr` (lead-lag correlation profile) in
+  `fynance.features.roll_functions`.
+
 ### Changed
 
 ### Fixed
