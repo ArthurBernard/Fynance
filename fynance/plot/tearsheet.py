@@ -16,6 +16,7 @@ from fynance.plot._helpers import as_equity
 from fynance.plot.attribution import plot_contribution, plot_turnover
 from fynance.plot.costs import plot_cost_decomposition
 from fynance.plot.equity import plot_drawdown, plot_equity
+from fynance.plot.exposure import plot_exposure
 from fynance.plot.returns import plot_rolling_sharpe
 
 __all__ = ['tearsheet', 'tearsheet_text']
@@ -35,7 +36,8 @@ def _summary(result: Any, period: int) -> dict[str, float]:
 
 
 def tearsheet(result: Any, period: int = 252, figsize: tuple = (11, 7), *,
-              base: float | None = None, logy: bool | str = "auto") -> Any:
+              base: float | None = None, logy: bool | str = "auto",
+              show_exposure: bool = False) -> Any:
     """ Build a full performance report figure.
 
     Composes the equity curve, drawdown, rolling Sharpe, return distribution
@@ -56,6 +58,10 @@ def tearsheet(result: Any, period: int = 252, figsize: tuple = (11, 7), *,
     logy : bool or {"auto"}, default "auto"
         Log y-axis policy for the equity panel; ``"auto"`` switches to log on
         wide-amplitude curves, see :func:`plot_equity`.
+    show_exposure : bool, default False
+        Add a full-width gross/net exposure panel (:func:`plot_exposure`)
+        when ``result`` carries a ``positions`` series. Off by default so the
+        report layout is unchanged unless explicitly requested.
 
     Returns
     -------
@@ -66,7 +72,8 @@ def tearsheet(result: Any, period: int = 252, figsize: tuple = (11, 7), *,
 
     # Optional extra panels grow the core 2x2 report by one row each:
     #  - a multi-asset book adds per-asset contribution + turnover;
-    #  - a cost breakdown adds a full-width cumulative-fees panel.
+    #  - a cost breakdown adds a full-width cumulative-fees panel;
+    #  - show_exposure=True adds a full-width gross/net exposure panel.
     asset_gross = getattr(result, "asset_gross_returns", None)
     positions = getattr(result, "positions", None)
     index = getattr(result, "index", None)
@@ -81,8 +88,9 @@ def tearsheet(result: Any, period: int = 252, figsize: tuple = (11, 7), *,
         np.nansum(np.asarray(v, dtype=float)) != 0.0
         for v in cost_components.values()
     )
+    has_exposure = show_exposure and positions is not None
 
-    n_rows = 2 + int(is_book) + int(has_costs)
+    n_rows = 2 + int(is_book) + int(has_costs) + int(has_exposure)
     fig = plt.figure(figsize=(figsize[0], figsize[1] * n_rows / 2.0))
     gs = fig.add_gridspec(n_rows, 2)
 
@@ -110,6 +118,9 @@ def tearsheet(result: Any, period: int = 252, figsize: tuple = (11, 7), *,
     if has_costs and cost_components is not None:
         plot_cost_decomposition(cost_components, index=index,
                                 ax=fig.add_subplot(gs[row, :]))
+        row += 1
+    if has_exposure:
+        plot_exposure(positions, index=index, ax=fig.add_subplot(gs[row, :]))
         row += 1
 
     fig.tight_layout()

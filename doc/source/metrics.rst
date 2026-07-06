@@ -106,6 +106,23 @@ realized *after* the factor is known.
    factor_rank_autocorr
    QuantileResult
 
+Trading exposure & turnover
+============================
+
+Position-level analytics — how a book trades (churn) and sits (leverage,
+long/short bias) — taking a weight/position series rather than an equity
+curve, so (like the factor helpers above) these are intentionally kept out
+of the ``METRICS`` registry.
+
+.. autosummary::
+   :toctree: generated/
+
+   turnover_series
+   annual_turnover
+   gross_exposure
+   net_exposure
+   exposure_summary
+
 Aggregated report
 =================
 

@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Turnover & exposure analytics.** `turnover_series`, `annual_turnover`,
+  `gross_exposure`, `net_exposure`, `exposure_summary` in
+  `fynance.metrics.trading`, plus `plot_exposure` and an opt-in
+  `show_exposure` tearsheet panel (default output unchanged).
 - **GJR-GARCH / EGARCH kernels.** Numba filters `_gjr_garch` / `_egarch`
   and `loglik_garch(params, y, model, dist)` (Gaussian and Student-t
   innovations, distribution-correct E|z| centering for EGARCH) in

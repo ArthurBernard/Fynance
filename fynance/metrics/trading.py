@@ -16,7 +16,15 @@ from __future__ import annotations
 import numpy as np
 from numpy.typing import NDArray
 
-__all__ = ['sign_changes', 'trades_per_year']
+__all__ = [
+    'annual_turnover',
+    'exposure_summary',
+    'gross_exposure',
+    'net_exposure',
+    'sign_changes',
+    'trades_per_year',
+    'turnover_series',
+]
 
 
 def sign_changes(positions: NDArray, *, axis: int = 0) -> NDArray | int:
@@ -103,3 +111,199 @@ def trades_per_year(positions: NDArray, period: int = 252, *,
     rate = np.asarray(sc, dtype=np.float64) / t * period
 
     return float(rate) if np.ndim(rate) == 0 else rate
+
+
+def _as_book(W: NDArray) -> NDArray:
+    """ Coerce to a 2-D ``(T, N)`` book (a 1-D series becomes a single column). """
+    w = np.asarray(W, dtype=np.float64)
+
+    return w if w.ndim == 2 else w.reshape(w.shape[0], -1)
+
+
+def turnover_series(W: NDArray) -> NDArray:
+    r""" One-way turnover per bar, :math:`\sum_i |w_{t,i} - w_{t-1,i}|`.
+
+    The first bar charges the initial position from flat (:math:`|w_{0,i}|`),
+    same convention as :func:`fynance.portfolio.sizing.transaction_cost` — in
+    fact ``turnover_series(W) * fee == transaction_cost(W, fee)`` exactly,
+    :func:`turnover_series` is just the fee-free churn underneath it.
+
+    Parameters
+    ----------
+    W : array_like
+        Weights held at each step, shape ``(T,)`` or ``(T, N)``. A 1-D input
+        is reshaped to ``(T, 1)``.
+
+    Returns
+    -------
+    numpy.ndarray
+        Turnover per bar, shape ``(T,)``.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> W = np.array([[1.0, 0.0], [0.5, -0.5], [-1.0, -1.0], [0.0, 0.0]])
+    >>> turnover_series(W)
+    array([1., 1., 2., 2.])
+
+    See Also
+    --------
+    annual_turnover : same churn, annualized to a single rate.
+    fynance.portfolio.sizing.transaction_cost : the fee-weighted counterpart.
+
+    """
+    w = _as_book(W)
+    turnover = np.empty(w.shape[0])
+    turnover[0] = np.abs(w[0]).sum()
+    turnover[1:] = np.abs(np.diff(w, axis=0)).sum(axis=1)
+
+    return turnover
+
+
+def annual_turnover(W: NDArray, period: int = 252) -> float:
+    r""" Annualized one-way turnover, ``mean(turnover_series(W)) * period``.
+
+    Parameters
+    ----------
+    W : array_like
+        Weights held at each step, shape ``(T,)`` or ``(T, N)``. A 1-D input
+        is reshaped to ``(T, 1)``.
+    period : int, optional
+        Annualization factor (bars per year, 252 for daily). Default 252.
+
+    Returns
+    -------
+    float
+        Annualized turnover rate.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> W = np.array([[1.0, 0.0], [0.5, -0.5], [-1.0, -1.0], [0.0, 0.0]])
+    >>> annual_turnover(W, period=252)
+    378.0
+
+    See Also
+    --------
+    turnover_series : the underlying per-bar turnover.
+
+    """
+    return float(np.mean(turnover_series(W)) * period)
+
+
+def gross_exposure(W: NDArray) -> NDArray:
+    r""" Gross exposure per bar, :math:`\sum_i |w_{t,i}|` (total book leverage).
+
+    Parameters
+    ----------
+    W : array_like
+        Weights held at each step, shape ``(T,)`` or ``(T, N)``. A 1-D input
+        is reshaped to ``(T, 1)``.
+
+    Returns
+    -------
+    numpy.ndarray
+        Gross exposure per bar, shape ``(T,)``.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> W = np.array([[1.0, 0.0], [0.5, -0.5], [-1.0, -1.0], [0.0, 0.0]])
+    >>> gross_exposure(W)
+    array([1., 1., 2., 0.])
+
+    See Also
+    --------
+    net_exposure : the signed (long/short bias) counterpart.
+
+    """
+    return np.abs(_as_book(W)).sum(axis=1)
+
+
+def net_exposure(W: NDArray) -> NDArray:
+    r""" Net exposure per bar, :math:`\sum_i w_{t,i}` (long/short bias).
+
+    Parameters
+    ----------
+    W : array_like
+        Weights held at each step, shape ``(T,)`` or ``(T, N)``. A 1-D input
+        is reshaped to ``(T, 1)``.
+
+    Returns
+    -------
+    numpy.ndarray
+        Net exposure per bar, shape ``(T,)``. Positive is net long, negative
+        net short, zero flat (fully hedged or no position).
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> W = np.array([[1.0, 0.0], [0.5, -0.5], [-1.0, -1.0], [0.0, 0.0]])
+    >>> net_exposure(W)
+    array([ 1.,  0., -2.,  0.])
+
+    See Also
+    --------
+    gross_exposure : the unsigned (total leverage) counterpart.
+
+    """
+    return _as_book(W).sum(axis=1)
+
+
+def exposure_summary(W: NDArray, period: int = 252) -> dict:
+    r""" One-shot summary of a book's turnover and exposure.
+
+    Combines :func:`annual_turnover`, :func:`gross_exposure` and
+    :func:`net_exposure` into the small set of numbers that describe how a
+    book trades (churn) and sits (leverage, long/short bias) — the position
+    -level analogue of :func:`fynance.metrics.summary.summary` for an equity
+    curve.
+
+    Parameters
+    ----------
+    W : array_like
+        Weights held at each step, shape ``(T,)`` or ``(T, N)``. A 1-D input
+        is reshaped to ``(T, 1)``.
+    period : int, optional
+        Annualization factor (bars per year, 252 for daily). Default 252.
+
+    Returns
+    -------
+    dict
+        ``{'annual_turnover', 'mean_gross', 'max_gross', 'mean_net',
+        'min_net', 'max_net', 'pct_long', 'pct_short', 'pct_flat'}``; the
+        ``pct_*`` entries are the percentage of bars with net exposure
+        ``> 0``, ``< 0`` and ``== 0`` respectively (they sum to 100).
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> W = np.array([[1.0, 0.0], [0.5, -0.5], [-1.0, -1.0], [0.0, 0.0]])
+    >>> out = exposure_summary(W, period=252)
+    >>> out['annual_turnover'], out['mean_gross'], out['mean_net']
+    (378.0, 1.0, -0.25)
+    >>> out['pct_long'], out['pct_short'], out['pct_flat']
+    (25.0, 25.0, 50.0)
+
+    See Also
+    --------
+    annual_turnover : the churn entry alone.
+    gross_exposure : the per-bar gross exposure series.
+    net_exposure : the per-bar net exposure series.
+
+    """
+    gross = gross_exposure(W)
+    net = net_exposure(W)
+    n = net.shape[0]
+
+    return {
+        'annual_turnover': annual_turnover(W, period=period),
+        'mean_gross': float(np.mean(gross)),
+        'max_gross': float(np.max(gross)),
+        'mean_net': float(np.mean(net)),
+        'min_net': float(np.min(net)),
+        'max_net': float(np.max(net)),
+        'pct_long': float(np.sum(net > 0) / n * 100.0),
+        'pct_short': float(np.sum(net < 0) / n * 100.0),
+        'pct_flat': float(np.sum(net == 0) / n * 100.0),
+    }
