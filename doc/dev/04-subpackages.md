@@ -21,32 +21,52 @@ modernisation).
 ## Public API surface (what callers import)
 
 - **`core`** — `PriceSeries`; the protocols (`DataSource`/`FeatureTransform`/
-  `SignalModel`/`Allocator`/`CostModel`/`Metric`).
+  `SignalModel`/`Allocator`/`CostModel`/`Metric`); executable checks
+  (`check_conforms`/`assert_causal`) and duck-typed `from_pandas`/`to_pandas`/
+  `to_polars` seams.
 - **`data`** — `load()`, `CSVSource`/`ParquetSource`, `align`/`resample`,
-  `train_test_split`/`walk_forward`.
+  `train_test_split`/`walk_forward`/`combinatorial_purged_cv`, and intraday
+  session utilities (`session_mask`/`session_id`/`session_bounds`/
+  `split_sessions`).
 - **`features`** — momentums (EMA/SMA/WMA…), indicators (RSI/MACD/Bollinger/…),
-  `filters`, `scale`, `engineering`, `regime`, `money_management`. Numba `@njit`
-  kernels live in the `.py` modules (no `_cy` twins).
+  `filters`, `scale`, `engineering` (+ `fracdiff`), `regime`, `money_management`,
+  `horizon` (`horizon_returns`); **`cross_section`** (`cs_rank`/`cs_zscore`/
+  `cs_neutralize`…), pairwise **`roll_functions`** (`roll_cov`/`roll_corr`/
+  `roll_beta`/`cross_corr`), **`labels`** (`triple_barrier`/`meta_labels`/
+  uniqueness weights). Numba `@njit` kernels live in the `.py` modules (no `_cy`
+  twins).
 - **`metrics`** — `sharpe`, `sortino`, `calmar`, `diversified_ratio`,
   `annual_return`/`annual_volatility`, `drawdown`/`mdd`, `perf_*`, `roll_*`
-  variants, plus one-call `summary`.
+  variants, one-call `summary`; **`risk`** (VaR/CVaR/CDaR, `tail_dependence`),
+  **`benchmark`** (alpha/beta/TE/IR/capture), **`factor`** (quantile returns,
+  rolling IC, IC decay), turnover/exposure and **`trades`** analytics.
 - **`signal` / `portfolio`** — `sign`/`threshold`/`rank`/vol-target mappers +
   anti-churn `ema_smooth`/`deadband`/`min_hold` + `SignalPipeline`; allocation
-  (`ERC`/`HRP`/`IVP`/`MDP`/`MVP`, `rolling_allocation()`) and sizing
-  (`kelly_fraction`/`vol_target`/`transaction_cost`).
-- **`models`** — econometric (`ARMA`/`GARCH` family via `get_parameters`) and
-  neural (`MultiLayerPerceptron`, `RollMultiLayerPerceptron`, RNN/`GRU`/`LSTM`,
-  attention, `TemporalConvNet`, `Transformer`), `StackingEnsemble`; custom losses
-  under `models/loss/` (Sharpe/Sortino/Calmar/Omega/directional/hybrid);
-  `ObjectiveModel` (objective-aligned training — net-of-cost, mini-batch) in
-  `models/objective.py`; training utils in `models/training.py`.
+  (`ERC`/`HRP`/`IVP`/`MDP`/`MVP`/**`RBP`**, `rolling_allocation()`, opt-in `cov=`
+  over **`covariance`** estimators), risk **`attribution`**, **`constraints`**
+  (`project_weights`), **`rebalance`** policies, and sizing
+  (`kelly_fraction`/`vol_target`/**`book_vol_target`**/`transaction_cost`).
+- **`models` / `estimator`** — econometric (`ARMA`/`GARCH` family via
+  `get_parameters`, + GJR/EGARCH kernels) and neural (`MultiLayerPerceptron`,
+  `RollMultiLayerPerceptron`, RNN/`GRU`/`LSTM`, attention, `TemporalConvNet`,
+  `Transformer`), `StackingEnsemble`; losses under `models/loss/`
+  (Sharpe/Sortino/Calmar/Omega/directional/hybrid/**pinball**); `ObjectiveModel`
+  (objective-aligned training — net-of-cost, mini-batch, + cross-asset
+  `pretrain_pooled`/save-load); **`QuantileModel`**, uncertainty wrappers
+  (**`DeepEnsemble`**/**`MCDropout`**), causal **`conformal`** intervals, purged
+  **`tuning`** (`walk_forward_search`); training utils in `models/training.py`;
+  **`estimator.fit_volatility`** (GARCH/GJR/EGARCH MLE → `VolatilityResult`).
 - **`backtest` / `plot` / `strategy`** — `backtest()` + `BacktestResult` +
-  `ProportionalCost`; `tearsheet`/`tearsheet_text`; `Strategy` +
-  `run_walk_forward`. (The legacy live-viz objects `PlotBackTest`/
+  cost models (`ProportionalCost`/`MarketImpactCost`/**`HoldingCost`**/
+  **`CompositeCost`**) + **capacity** (`capacity_curve`/`breakeven_fee`);
+  `tearsheet`/`tearsheet_text`/**`factor_tearsheet`**/**`plot_exposure`**;
+  `Strategy` + `run_walk_forward`. (The legacy live-viz objects `PlotBackTest`/
   `DynaPlotBackTest`/`display_perf` remain as lazy submodules, off the eager
   surface.)
 - **`research`** (namespaced as `fynance.research.*`, not flattened) — `Experiment`,
-  `run_experiment`, `write_report`, `gbm`/`regime_switching`. Driven by the
+  `run_experiment`, `write_report`, `gbm`/`regime_switching`, guards
+  (`permutation_test`/`deflated_sharpe_ratio`), **`bootstrap`** (block/stationary),
+  **`overfit`** (PBO/CSCV) and **`importance`** (walk-forward MDA). Driven by the
   user-level `/run-strategy` skill. Artifacts go only to a caller-provided
   `output_dir`.
 

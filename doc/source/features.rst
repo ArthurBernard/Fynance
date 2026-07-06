@@ -116,6 +116,7 @@ Common parameters across modules:
    features.cross_section
    features.engineering
    features.filters
+   features.horizon
    features.indicators
    features.labels
    features.ohlcv
