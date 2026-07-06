@@ -46,13 +46,6 @@ Le harnais `fynance.research` est **livré** (S1–S3) : `Experiment`,
 - [ ] Explorateur **Streamlit** au-dessus du Ledger (parcourir / filtrer / comparer
   les runs persistés) — interactif, plus tardif.
 
-## 8. GARCH family (épic `garch-family`)
-
-- [ ] Famille GARCH complète (L) : kernels GJR/EGARCH Numba, innovations Student-t,
-  driver MLE `fit_volatility()` (params, std errors, AIC/BIC) + `.forecast(h)` /
-  `.simulate()` ; passthrough `model=`/`dist=` dans `features/garch.py`.
-  Comble le stub `estimator.estimation()`.
-
 ## 9. ML bricks (épic `ml-bricks`)
 
 - [ ] Pretraining cross-asset pour `ObjectiveModel` : `pretrain_pooled`/
