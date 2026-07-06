@@ -16,6 +16,7 @@ downstream, never here.
 
 # Local
 from . import (
+    bootstrap,
     compare,
     experiment,
     guards,
@@ -26,6 +27,7 @@ from . import (
     runner,
     synthetic,
 )
+from .bootstrap import *
 from .compare import *
 from .experiment import *
 from .guards import *
@@ -37,6 +39,7 @@ from .runner import *
 from .synthetic import *
 
 __all__: list[str] = []
+__all__ += bootstrap.__all__
 __all__ += experiment.__all__
 __all__ += synthetic.__all__
 __all__ += runner.__all__

@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Block / stationary bootstrap.** `fynance.research.bootstrap`:
+  `resample_paths` (circular + Politis-Romano stationary, Numba kernels),
+  `bootstrap_metric` (percentile CIs on any metric) and
+  `block_permutation_test` — a dependence-preserving null complementing
+  `guards.permutation_test`.
 - **Probability of backtest overfitting.** `pbo` in
   `fynance.research.overfit`: CSCV diagnostic over a `(T, n_configs)`
   returns panel (rank logits, `prob_oos_loss`, IS→OOS degradation slope),
