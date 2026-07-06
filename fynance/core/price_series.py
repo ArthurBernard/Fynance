@@ -179,6 +179,93 @@ class PriceSeries:
             freq=freq,
         )
 
+    @classmethod
+    def from_pandas(cls, obj: Any, freq: str | None = None) -> PriceSeries:
+        """ Build a :class:`PriceSeries` from a duck-typed pandas-like object.
+
+        Accepts anything exposing ``.to_numpy()`` or ``.values`` -- a
+        :class:`pandas.Series`, a single-column :class:`pandas.DataFrame`, or
+        a minimal look-alike. No pandas import happens in this method: it is
+        pure duck typing, so any object satisfying the protocol works (this is
+        what lets the test suite exercise it with a pandas-free shim).
+
+        Parameters
+        ----------
+        obj : Any
+            Duck-typed pandas-like object (``Series`` or single-column
+            ``DataFrame``).
+        freq : str, optional
+            Frequency tag carried onto the series.
+
+        Returns
+        -------
+        PriceSeries
+
+        Raises
+        ------
+        TypeError
+            If ``obj`` exposes neither ``.to_numpy()`` nor ``.values``.
+        ValueError
+            If the extracted array is 2-D with more than one column (an
+            ambiguous, multi-column ``DataFrame``).
+
+        Notes
+        -----
+        Unlike :meth:`from_polars` (which drops the index -- polars frames
+        rarely carry a meaningful one), :class:`PriceSeries` is built here
+        with its ``index`` attribute populated from ``obj.index`` whenever
+        that attribute is present (e.g. a pandas ``Series``'s ``DatetimeIndex``),
+        converted through :func:`numpy.asarray`. It is only left at the
+        default ``0..n-1`` range when ``obj`` exposes no ``.index`` at all,
+        as with the minimal duck-typed shim used in the tests.
+
+        Examples
+        --------
+        >>> import pandas as pd
+        >>> s = pd.Series([100., 101., 99.], name="px")
+        >>> PriceSeries.from_pandas(s).values
+        array([100., 101.,  99.])
+
+        """
+        if hasattr(obj, "to_numpy"):
+            values = obj.to_numpy()
+
+        elif hasattr(obj, "values"):
+            values = obj.values
+
+        else:
+
+            raise TypeError(
+                "from_pandas() requires an object exposing .to_numpy() or "
+                f".values; got {type(obj)!r}"
+            )
+
+        values = np.asarray(values)
+
+        if values.ndim == 2:
+
+            if values.shape[1] != 1:
+
+                raise ValueError(
+                    "from_pandas() requires a Series or a single-column "
+                    f"DataFrame; got shape {values.shape}"
+                )
+
+            values = values[:, 0]
+
+        index = getattr(obj, "index", None)
+        if index is not None:
+            index = np.asarray(index)
+
+        name = getattr(obj, "name", None)
+        if name is None:
+            columns = getattr(obj, "columns", None)
+
+            if columns is not None and len(columns) == 1:
+                name = columns[0]
+
+        return cls(values, index=index, name=name, freq=freq)
+
     # -- Dunders ----------------------------------------------------------
 
     def __len__(self) -> int:
@@ -446,6 +533,58 @@ class PriceSeries:
 
         # Copy: the stored array is read-only, which torch warns about.
         return torch.as_tensor(self.values.copy(), dtype=dtype, device=device)
+
+    def to_pandas(self) -> Any:
+        """ Return this series as a :class:`pandas.Series` (lazy import).
+
+        Raises
+        ------
+        ImportError
+            If pandas is not installed, with a clear, actionable message.
+
+        Examples
+        --------
+        >>> PriceSeries([100., 101., 99.], name="px").to_pandas()
+        0    100.0
+        1    101.0
+        2     99.0
+        Name: px, dtype: float64
+
+        """
+        try:
+            import pandas as pd
+
+        except ImportError as exc:
+
+            raise ImportError("install pandas to use to_pandas()") from exc
+
+        return pd.Series(self.values, index=self.index, name=self.name)
+
+    def to_polars(self) -> Any:
+        """ Return this series as a :class:`polars.Series` (lazy import).
+
+        Raises
+        ------
+        ImportError
+            If polars is not installed, with a clear, actionable message.
+            (polars is a hard dependency of ``fynance``, so this branch is not
+            normally reachable in this package's own environment; it exists so
+            the method degrades gracefully wherever it is vendored or reused.)
+
+        Examples
+        --------
+        >>> PriceSeries([1., 2., 3.], name="px").to_polars().to_list()
+        [1.0, 2.0, 3.0]
+
+        """
+        try:
+            import polars as pl
+
+        except ImportError as exc:
+
+            raise ImportError("install polars to use to_polars()") from exc
+
+        return pl.Series(self.name, self.values)
 
     def pipe(
         self,

@@ -251,3 +251,145 @@ def test_from_polars_lone_string_column_raises_clean_error():
     ).with_columns(pl.col("date").str.to_date())
     with pytest.raises(ValueError, match="value_col is ambiguous"):
         PriceSeries.from_polars(df)
+
+
+# -- pandas/polars seams ---------------------------------------------------
+
+class _DuckSeries:
+    """ Minimal pandas-Series look-alike; no pandas import anywhere. """
+
+    def __init__(self, values, index=None, name=None):
+        self.values = np.asarray(values, dtype=np.float64)
+
+        if index is not None:
+            self.index = np.asarray(index)
+
+        self.name = name
+
+    def to_numpy(self):
+        return self.values
+
+
+def test_from_pandas_duck_typed_shim_values_attribute():
+    # A shim exposing only `.values` (no `.to_numpy()`, no pandas import).
+    class _ValuesOnly:
+        values = np.array([1.0, 2.0, 3.0])
+
+    ps = PriceSeries.from_pandas(_ValuesOnly())
+    assert np.array_equal(ps.values, [1.0, 2.0, 3.0])
+    # no .index on the shim -> default 0..n-1 range
+    assert np.array_equal(ps.index, np.arange(3))
+
+
+def test_from_pandas_duck_typed_shim_to_numpy_and_index_carried():
+    shim = _DuckSeries([10.0, 20.0, 30.0], index=[5, 6, 7], name="px")
+    ps = PriceSeries.from_pandas(shim)
+    assert np.array_equal(ps.values, [10.0, 20.0, 30.0])
+    assert np.array_equal(ps.index, [5, 6, 7])
+    assert ps.name == "px"
+
+
+def test_from_pandas_rejects_object_without_values_or_to_numpy():
+    with pytest.raises(TypeError, match="to_numpy"):
+        PriceSeries.from_pandas(object())
+
+
+def test_from_pandas_rejects_multi_column_frame():
+    class _MultiCol:
+        def to_numpy(self):
+            return np.zeros((4, 2))
+
+    with pytest.raises(ValueError, match="single-column"):
+        PriceSeries.from_pandas(_MultiCol())
+
+
+def test_from_pandas_real_pandas_series_roundtrip():
+    pd = pytest.importorskip("pandas")
+    s = pd.Series(
+        [100.0, 101.0, 99.5],
+        index=pd.RangeIndex(3),
+        name="px",
+    )
+    ps = PriceSeries.from_pandas(s)
+    assert np.array_equal(ps.values, s.to_numpy())
+    assert ps.name == "px"
+    assert np.array_equal(ps.index, s.index.to_numpy())
+
+
+def test_from_pandas_single_column_dataframe():
+    pd = pytest.importorskip("pandas")
+    df = pd.DataFrame({"px": [1.0, 2.0, 3.0]})
+    ps = PriceSeries.from_pandas(df)
+    assert np.array_equal(ps.values, [1.0, 2.0, 3.0])
+    assert ps.name == "px"
+
+
+def test_to_pandas_roundtrip_exact_values():
+    pd = pytest.importorskip("pandas")
+    ps = PriceSeries([100.0, 101.0, 99.5], index=[7, 8, 9], name="px")
+    s = ps.to_pandas()
+    assert isinstance(s, pd.Series)
+    assert np.array_equal(s.to_numpy(), ps.values)
+    assert np.array_equal(s.index.to_numpy(), ps.index)
+    assert s.name == "px"
+
+    back = PriceSeries.from_pandas(s)
+    assert np.array_equal(back.values, ps.values)
+    assert np.array_equal(back.index, ps.index)
+    assert back.name == ps.name
+
+
+def test_to_polars_roundtrip_exact_values():
+    pl = pytest.importorskip("polars")
+    ps = PriceSeries([1.0, 2.0, 3.0], name="px")
+    s = ps.to_polars()
+    assert isinstance(s, pl.Series)
+    assert np.array_equal(s.to_numpy(), ps.values)
+    assert s.name == "px"
+
+
+def test_to_pandas_lazy_import_error_message(monkeypatch):
+    import builtins
+
+    real_import = builtins.__import__
+
+    def _fake_import(name, *args, **kwargs):
+        if name == "pandas":
+
+            raise ImportError("No module named 'pandas'")
+
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", _fake_import)
+
+    with pytest.raises(ImportError, match="install pandas to use to_pandas"):
+        PriceSeries([1.0, 2.0]).to_pandas()
+
+
+def test_to_polars_lazy_import_error_message(monkeypatch):
+    import builtins
+
+    real_import = builtins.__import__
+
+    def _fake_import(name, *args, **kwargs):
+        if name == "polars":
+
+            raise ImportError("No module named 'polars'")
+
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", _fake_import)
+
+    with pytest.raises(ImportError, match="install polars to use to_polars"):
+        PriceSeries([1.0, 2.0]).to_polars()
+
+
+def test_import_fynance_stays_pandas_free():
+    # pandas is not a fynance dependency (all pandas seams lazy-import it
+    # inside their methods); importing the package must not pull it in.
+    import subprocess
+    import sys
+
+    code = "import fynance, sys; print('pandas' in sys.modules)"
+    out = subprocess.check_output([sys.executable, "-c", code], text=True)
+    assert out.strip() == "False"

@@ -12,7 +12,9 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
 - **Core**: `PriceSeries` (thin numpy-backed value object — composition, not
   `ndarray` subclassing; price↔return identities, numpy/torch bridges, `.pipe`)
   and the pipeline protocols (`DataSource`/`FeatureTransform`/`SignalModel`/
-  `Allocator`/`CostModel`/`Metric`).
+  `Allocator`/`CostModel`/`Metric`); `core.checks` (`check_conforms` +
+  the `assert_causal` lookahead probe) and duck-typed `from_pandas`/
+  `to_pandas`/`to_polars` seams on `PriceSeries`/`OHLCV`/`BacktestResult`.
 - **Data**: `load()` dispatcher + CSV/Parquet adapters, causal `align`/`resample`,
   and no-lookahead `train_test_split`/`walk_forward` (embargo/purge).
 - **Features**: technical indicators (RSI/MACD/Bollinger/CCI/HMA/ROC/realized-vol/

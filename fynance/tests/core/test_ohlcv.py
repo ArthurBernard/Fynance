@@ -119,3 +119,116 @@ def test_from_polars():
     bars = OHLCV.from_polars(df)
     assert bars.columns == ('high', 'close')
     assert np.array_equal(bars.high, [2.0, 3.0])
+
+
+# -- pandas seams -----------------------------------------------------------
+
+class _DuckFrame:
+    """ Minimal pandas-DataFrame look-alike; no pandas import anywhere. """
+
+    class _Col:
+        def __init__(self, values):
+            self._values = np.asarray(values, dtype=np.float64)
+
+        def to_numpy(self):
+            return self._values
+
+    def __init__(self, data):
+        self._data = {k: self._Col(v) for k, v in data.items()}
+        self.columns = list(data.keys())
+
+    def __getitem__(self, key):
+        return self._data[key]
+
+
+def test_from_pandas_duck_typed_shim_case_insensitive():
+    df = _DuckFrame({"Close": [1.0, 2.0], "High": [2.0, 3.0], "x": [9.0, 9.0]})
+    bars = OHLCV.from_pandas(df)
+    assert bars.columns == ('high', 'close')
+    assert np.array_equal(bars.high, [2.0, 3.0])
+    assert np.array_equal(bars.close, [1.0, 2.0])
+
+
+def test_from_pandas_missing_close_raises_naming_it():
+    df = _DuckFrame({"open": [1.0, 2.0], "high": [2.0, 3.0]})
+    with pytest.raises(ValueError, match="close"):
+        OHLCV.from_pandas(df)
+
+
+def test_from_pandas_missing_volume_is_optional():
+    # OHLCV itself treats volume as optional (see class docstring): from_pandas
+    # must not raise when the volume column is absent, even though `columns`
+    # defaults to naming it.
+    df = _DuckFrame({"open": [1.0], "high": [2.0], "low": [0.5], "close": [1.5]})
+    bars = OHLCV.from_pandas(df)
+    assert not bars.has('volume')
+    assert bars.columns == ('open', 'high', 'low', 'close')
+
+
+def test_from_pandas_missing_open_high_low_also_optional():
+    # Same leniency documented for volume applies to open/high/low: only
+    # `close` is hard-required, matching the class's own optionality.
+    df = _DuckFrame({"close": [1.0, 2.0, 3.0]})
+    bars = OHLCV.from_pandas(df)
+    assert bars.columns == ('close',)
+
+
+def test_from_pandas_custom_columns_mapping():
+    df = _DuckFrame({
+        "Open": [1.0], "High": [2.0], "Low": [0.5], "Close": [1.5], "Vol": [10.0],
+    })
+    bars = OHLCV.from_pandas(
+        df, columns=("Open", "High", "Low", "Close", "Vol")
+    )
+    assert bars.columns == ('open', 'high', 'low', 'close', 'volume')
+    assert np.array_equal(bars.volume, [10.0])
+
+
+def test_from_pandas_real_pandas_roundtrip():
+    pd = pytest.importorskip("pandas")
+    df = pd.DataFrame({
+        "open": [1.0, 2.0], "high": [2.0, 3.0], "low": [0.5, 1.5],
+        "close": [1.5, 2.5], "volume": [10.0, 20.0],
+    })
+    bars = OHLCV.from_pandas(df)
+    assert bars.columns == ('open', 'high', 'low', 'close', 'volume')
+    assert np.array_equal(bars.close, [1.5, 2.5])
+    assert np.array_equal(bars.volume, [10.0, 20.0])
+
+
+def test_to_pandas_columns_and_dtypes():
+    pd = pytest.importorskip("pandas")
+    bars = _synthetic(10)
+    df = bars.to_pandas()
+    assert isinstance(df, pd.DataFrame)
+    assert list(df.columns) == list(bars.columns)
+    assert df.shape == (10, 5)
+    for col in bars.columns:
+        assert df[col].dtype == np.float64
+        assert np.array_equal(df[col].to_numpy(), getattr(bars, col))
+
+
+def test_to_pandas_roundtrip_via_from_pandas():
+    pytest.importorskip("pandas")
+    bars = _synthetic(15)
+    df = bars.to_pandas()
+    rebuilt = OHLCV.from_pandas(df)
+    assert rebuilt == bars
+
+
+def test_to_pandas_lazy_import_error_message(monkeypatch):
+    import builtins
+
+    real_import = builtins.__import__
+
+    def _fake_import(name, *args, **kwargs):
+        if name == "pandas":
+
+            raise ImportError("No module named 'pandas'")
+
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", _fake_import)
+
+    with pytest.raises(ImportError, match="install pandas to use to_pandas"):
+        OHLCV(close=[1.0, 2.0]).to_pandas()

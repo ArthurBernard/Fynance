@@ -45,10 +45,3 @@ Le harnais `fynance.research` est **livré** (S1–S3) : `Experiment`,
 
 - [ ] Explorateur **Streamlit** au-dessus du Ledger (parcourir / filtrer / comparer
   les runs persistés) — interactif, plus tardif.
-
-## 10. DX one-offs (épic `dx-oneoffs`)
-
-- [ ] `core/checks.py` : `check_conforms(obj, protocol)` + `assert_causal(func)` —
-  sonde de lookahead exécutable, dogfoodée dans les tests fynance.
-- [ ] Seams DataFrame duck-typées : `to_polars`/`from_pandas` sur `PriceSeries`/
-  `OHLCV`/`BacktestResult` (sans dépendance pandas/polars).
