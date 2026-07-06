@@ -14,5 +14,7 @@ Vectorized backtesting engine and result. Plotting/reporting lives in
    BacktestResult
    ProportionalCost
    MarketImpactCost
+   HoldingCost
+   CompositeCost
    set_text_stats
    BacktestNeuralNet
