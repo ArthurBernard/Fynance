@@ -57,7 +57,7 @@ from .loss import (
 )
 from .lstm import LongShortTermMemory, LSTMCell
 from .mlp import MultiLayerPerceptron
-from .objective import ObjectiveModel
+from .objective import ObjectiveModel, pretrain_pooled
 from .regime_model import RegimeMoE
 from .rnn import RecurrentNeuralNetwork
 from .rolling import CVResult, RollMultiLayerPerceptron, _RollingBasis
@@ -86,6 +86,7 @@ __all__ = [
     'MultiLayerPerceptron',
     # objective-aligned training
     'ObjectiveModel',
+    'pretrain_pooled',
     # regime-conditioned architecture
     'RegimeMoE',
     # rnn / gru / lstm

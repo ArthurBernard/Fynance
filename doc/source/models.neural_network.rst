@@ -43,6 +43,18 @@ high-frequency settings (use the same value as the backtest's
 Feed it through the research harness via the ``X`` path with ``y`` = returns; see
 :doc:`research_workflow`.
 
+**Cross-asset pretraining & persistence.**
+:func:`~fynance.models.pretrain_pooled` trains one net on a **pool** of aligned
+``(X_i, y_i)`` assets to learn a *shared* signal — each asset stays a contiguous
+segment and mini-batches never cross an asset join, so the turnover carry and
+temporal order stay intact per asset. The usual workflow then adapts per asset:
+:meth:`~fynance.models.objective.ObjectiveModel.clone` a copy with the pretrained
+weights and :meth:`~fynance.models.objective.ObjectiveModel.finetune` it on that
+asset's own data (``freeze_trunk=True`` trains only the head). A trained model
+round-trips to disk with
+:meth:`~fynance.models.objective.ObjectiveModel.save` /
+:meth:`~fynance.models.objective.ObjectiveModel.load`.
+
 .. rubric:: Regime-conditioned architecture
 
 :class:`~fynance.models.regime_model.RegimeMoE` conditions an objective-aligned
@@ -71,4 +83,5 @@ from a designated positive price/level column of ``X`` (``regime_col``). It reus
    _base.BaseNeuralNet
    mlp.MultiLayerPerceptron
    objective.ObjectiveModel
+   objective.pretrain_pooled
    regime_model.RegimeMoE
