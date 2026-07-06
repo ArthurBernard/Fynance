@@ -78,7 +78,41 @@ c'est bien ici que ça vit, la campagne elle-même reste dans le repo privé.
   faire refléter ce coût dans les KPIs du moteur (petit chantier moteur isolé,
   API `backtest()` stable à préserver).
 
-## 4. Outillage / CI (maintenance)
+## 4. Crypto-perp & guardrails de recherche (déposé 2026-07-06 par fynance-research)
+
+Trois briques data-agnostiques identifiées par la campagne allweather-wave (E59–E74,
+233 trials — voir le journal du repo privé). Chacune corrige un biais *mesuré* du
+harnais, pas une envie spéculative.
+
+- [ ] **Coût de funding perp signé par jambe.** Le standard de recherche actuel
+  applique un forfait a-priori (11 %/an sur le notionnel long) qui **mal-signe les
+  books de carry** : un book long des coins à funding négatif / short des coins à
+  funding positif *reçoit* du funding sur ses deux jambes (constaté E59/E67/E69 —
+  le forfait retranche ~0.2 de Sharpe à un book qui devrait être crédité). La série
+  réelle est désormais dans le store dccd
+  (`<exchange>/funding/<PAIR>_PERP/<year>.parquet`, colonnes `TS/rate/mark_price`,
+  settlements 8 h, Binance/Bybit/krakenfutures, 2019+) : il manque la brique de coût
+  qui crédite/débite `position × rate` à chaque settlement **par signe de jambe** —
+  un `FundingCost(rate_series)` composable via `CompositeCost` (primitives v2.13.0
+  déjà livrées), avec fallback taux-constant quand aucune série n'est fournie.
+  Remplace le forfait sur le chemin perp.
+- [ ] **Nulls de permutation corrects pour books de position.** Deux pièges
+  documentés par la campagne : (a) réordonner les *returns nets* d'un book est
+  Sharpe-invariant — le p=1.0 est mécanique (E67) ; le null correct **désaligne
+  positions ↔ forward-returns**. (b) Sur un book long-biaisé d'actifs à fort drift,
+  le bootstrap par blocs fabrique des chemins synthétiques *plus* trendy que le réel
+  (perm mean 1.52 > réel 1.07 → p ininterprétable, E62) ; il faut une variante
+  **dé-driftée / sign-flip**, ou le benchmark always-long comme null explicite.
+  À loger à côté de `block_permutation_test` dans `fynance.research`.
+- [ ] **IC outillé : t HAC/Newey-West, Fama-MacBeth, IC incrémental.** Chaque agent
+  de screen de la campagne a re-dérivé le même trio : t de Newey-West sur la série
+  d'IC quotidiens (fenêtres qui se recouvrent), IC panel Fama-MacBeth, et l'**IC
+  incrémental** après résidualisation OLS sur un signal de contrôle (la barre
+  « pas une copie du régime prix » qui a tué E57/E65-échos/E72). Promouvoir en
+  utilitaires à côté d'`information_coefficient`/`ic_summary` dans
+  `fynance.metrics` pour arrêter la re-dérivation feuille à feuille.
+
+## 5. Outillage / CI (maintenance)
 
 - [ ] **Actions GitHub sur Node.js 20 déprécié.** Le run `release.yml` avertit
   que `actions/checkout@v4` et `softprops/action-gh-release@v2` ciblent Node 20
