@@ -3,12 +3,15 @@
 
 """ Tests for time-ordered splits (no lookahead). """
 
+# Built-in packages
+import math
+
 # Third-party packages
 import numpy as np
 import pytest
 
 # Local packages
-from fynance.data import train_test_split, walk_forward
+from fynance.data import combinatorial_purged_cv, train_test_split, walk_forward
 
 
 def test_train_test_split_fraction():
@@ -97,3 +100,98 @@ def test_walk_forward_rejects_nonpositive_step():
         next(walk_forward(5, train=2, test=1, step=0))
     with pytest.raises(ValueError, match="step"):
         next(walk_forward(5, train=2, test=1, step=-1))
+
+
+# --------------------------------------------------------------------------- #
+#   combinatorial_purged_cv                                                   #
+# --------------------------------------------------------------------------- #
+
+
+def test_cpcv_split_count():
+    folds = list(combinatorial_purged_cv(100, n_groups=6, n_test_groups=2))
+    assert len(folds) == math.comb(6, 2)
+
+
+def test_cpcv_each_group_appears_comb_times():
+    n_groups, n_test_groups = 6, 2
+    folds = list(combinatorial_purged_cv(120, n_groups=n_groups, n_test_groups=n_test_groups))
+
+    # sizes as equal as possible -> 120 / 6 = 20 per group, so group g owns
+    # indices [20*g, 20*g + 20).
+    group_size = 120 // n_groups
+    counts = np.zeros(n_groups, dtype=np.int64)
+    for _, test_idx in folds:
+        groups_in_test = {int(i) // group_size for i in test_idx}
+        assert len(groups_in_test) == n_test_groups  # groups are never split
+        for g in groups_in_test:
+            counts[g] += 1
+
+    assert np.all(counts == math.comb(n_groups - 1, n_test_groups - 1))
+
+
+def test_cpcv_train_test_disjoint():
+    for train_idx, test_idx in combinatorial_purged_cv(100, n_groups=6, n_test_groups=2, purge=3, embargo=2):
+        assert len(set(train_idx.tolist()) & set(test_idx.tolist())) == 0
+
+
+def test_cpcv_purge_removes_boundary_bars():
+    # Hand-checked: T=20, 4 groups (size 5 each) -> group 1 = [5, 10). With
+    # purge=2, train drops bars {3, 4} just before and {10, 11} just after.
+    folds = list(combinatorial_purged_cv(20, n_groups=4, n_test_groups=1, purge=2))
+    train_idx, test_idx = folds[1]  # combo (1,) -> test group [5, 10)
+    assert test_idx.tolist() == [5, 6, 7, 8, 9]
+    assert train_idx.tolist() == [0, 1, 2, 12, 13, 14, 15, 16, 17, 18, 19]
+    assert 3 not in train_idx and 4 not in train_idx
+    assert 10 not in train_idx and 11 not in train_idx
+
+
+def test_cpcv_embargo_removes_post_test_bars():
+    # Same layout, purge=0 this time: only the embargo trims the 2 bars
+    # {10, 11} immediately after the test group's end; nothing before it.
+    folds = list(combinatorial_purged_cv(20, n_groups=4, n_test_groups=1, purge=0, embargo=2))
+    train_idx, test_idx = folds[1]
+    assert test_idx.tolist() == [5, 6, 7, 8, 9]
+    assert train_idx.tolist() == [0, 1, 2, 3, 4, 12, 13, 14, 15, 16, 17, 18, 19]
+    assert 10 not in train_idx and 11 not in train_idx
+
+
+def test_cpcv_indices_in_range_sorted_unique():
+    for train_idx, test_idx in combinatorial_purged_cv(50, n_groups=5, n_test_groups=2, purge=2, embargo=1):
+        for idx in (train_idx, test_idx):
+            assert idx.dtype == np.int64
+            assert np.all(idx >= 0) and np.all(idx < 50)
+            assert np.all(np.diff(idx) > 0)  # strictly increasing -> sorted & unique
+
+
+def test_cpcv_rejects_bad_n_test_groups():
+    with pytest.raises(ValueError, match="n_test_groups"):
+        list(combinatorial_purged_cv(50, n_groups=5, n_test_groups=0))
+    with pytest.raises(ValueError, match="n_test_groups"):
+        list(combinatorial_purged_cv(50, n_groups=5, n_test_groups=5))
+    with pytest.raises(ValueError, match="n_test_groups"):
+        list(combinatorial_purged_cv(50, n_groups=5, n_test_groups=6))
+
+
+def test_cpcv_rejects_n_groups_over_T():
+    with pytest.raises(ValueError, match="n_groups"):
+        list(combinatorial_purged_cv(4, n_groups=5, n_test_groups=1))
+
+
+@pytest.mark.parametrize("h", [0, 3])
+def test_cpcv_purge_no_train_within_h_of_test_boundary(h):
+    # Property: with purge >= h, no train index lies within h bars before a
+    # test block start or after a test block end (no embargo confound: 0).
+    T, n_groups, n_test_groups = 60, 6, 2
+    group_size = T // n_groups
+    for train_idx, test_idx in combinatorial_purged_cv(
+        T, n_groups=n_groups, n_test_groups=n_test_groups, purge=h, embargo=0,
+    ):
+        # Recover contiguous test blocks' [start, end) boundaries from test_idx.
+        test_groups = sorted({int(i) // group_size for i in test_idx})
+        boundaries = [(g * group_size, (g + 1) * group_size) for g in test_groups]
+
+        train_set = set(train_idx.tolist())
+        for start, end in boundaries:
+            for offset in range(1, h + 1):
+                assert start - offset not in train_set
+                assert end + offset - 1 not in train_set

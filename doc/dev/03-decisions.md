@@ -72,7 +72,7 @@ Template:
 
 <!-- new entries below, newest first -->
 
-### 2026-07-06 — Anti-overfitting guards epic (PRs #249, epic)  [accepted]
+### 2026-07-06 — Anti-overfitting guards epic (PRs #249–#250, epic)  [accepted]
 
 - **Choice**: complete the overfitting-guard triad as four parallel bricks —
   purged walk-forward HP search (`models.tuning`, grid/random only) exposing

@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Combinatorial purged cross-validation.** `combinatorial_purged_cv` in
+  `fynance.data.split`: every C(n_groups, n_test_groups) group combination
+  becomes an out-of-sample path, with purge windows around test-group
+  boundaries and post-test embargo (AFML) — many OOS paths instead of one.
 - **Purged walk-forward hyperparameter search.** `walk_forward_search` in
   `fynance.models.tuning`: grid/random search evaluated out-of-fold on the
   purged walk-forward splitter, returning a `SearchResult` whose `n_trials`
