@@ -53,49 +53,72 @@ is usable standalone; `fynance.strategy.Strategy` is an *optional* orchestrator.
 
 **Core** `fynance.core` — `PriceSeries` value object (thin, numpy-backed) and the
 pipeline protocols (`DataSource`, `FeatureTransform`, `SignalModel`, `Allocator`,
-`CostModel`, `Metric`).
+`CostModel`, `Metric`); executable conformance/causality checks (`check_conforms`,
+`assert_causal`) and duck-typed pandas/polars seams (`from_pandas`/`to_pandas`).
 
 **Data** `fynance.data` — file adapters (`load` for CSV/Parquet → `PriceSeries`),
-alignment/resampling, and no-lookahead temporal splits (`train_test_split`,
-`walk_forward`).
+alignment/resampling, no-lookahead temporal splits (`train_test_split`,
+`walk_forward`, combinatorial-purged `combinatorial_purged_cv`) and vendor-agnostic
+intraday session utilities (`session_mask`/`session_id`/`split_sessions`).
 
 **Features** `fynance.features` — technical indicators (Bollinger, RSI, MACD, ROC,
 realized volatility, rolling skew/kurtosis/autocorr, …), OHLCV indicators (ATR,
 ADX, Williams %R, OBV, VWAP), a causal GARCH(1,1) conditional-volatility feature,
-momentums (SMA, EMA, WMA) and adaptive windows, scaling (incl. rolling rank),
-statistics, feature engineering (multi-resolution, Granger causality) and
-market-regime detection.
+momentums (SMA, EMA, WMA) and adaptive windows, **NaN-aware cross-sectional
+operators** (`cs_rank`/`cs_zscore`/`cs_neutralize`, …), **pairwise rolling stats**
+(`roll_corr`/`roll_beta`, `cross_corr`), **fractional differentiation** (`fracdiff`),
+**AFML labeling** (`triple_barrier`, `meta_labels`, uniqueness weights), scaling
+(incl. rolling rank), statistics, feature engineering (multi-resolution, Granger
+causality) and market-regime detection.
 
 **Metrics** `fynance.metrics` — performance/evaluation metrics (Sharpe, Sortino,
-Calmar, drawdown, …) and a one-call `summary`.
+Calmar, drawdown, …) and a one-call `summary`; **tail risk** (VaR/CVaR/CDaR,
+tail dependence), **benchmark-relative** metrics (alpha, beta, tracking error,
+information ratio, capture), **factor evaluation** (quantile returns, rolling IC,
+IC decay), and turnover/exposure and per-trade analytics.
 
 **Signal** `fynance.signal` — prediction → position mappers (`sign`, `threshold`,
 `rank`, vol-targeting) and a model+mapper pipeline.
 
-**Portfolio** `fynance.portfolio` — allocation (ERC, HRP, IVP, MDP, MVP) and
-sizing (fractional Kelly, volatility targeting, transaction costs).
+**Portfolio** `fynance.portfolio` — allocation (ERC, HRP, IVP, MDP, MVP, plus
+risk-budgeting `RBP`) with an opt-in `cov=` seam over conditioned **covariance
+estimators** (Ledoit-Wolf, EWMA, factor, Marchenko-Pastur denoising); risk
+**attribution**, an exposure-**constraints** overlay (`project_weights`),
+**rebalancing policies** (calendar/band/turnover-cap, lot discretization) and
+sizing (fractional Kelly, single-series and book-level volatility targeting,
+transaction costs).
 
 **Backtest** `fynance.backtest` — vectorized engine (`backtest`: positions +
-returns/prices + cost → `BacktestResult`) and cost models (`ProportionalCost`
-and the non-linear `MarketImpactCost`).
+returns/prices + cost → `BacktestResult`), cost models (`ProportionalCost`, the
+non-linear `MarketImpactCost`, per-bar `HoldingCost` and `CompositeCost` stacking)
+and capacity analysis (`capacity_curve`, `breakeven_fee`).
 
-**Plot** `fynance.plot` — composable matplotlib figures and a one-call
-`tearsheet` report.
+**Plot** `fynance.plot` — composable matplotlib figures and one-call `tearsheet`
+and `factor_tearsheet` reports.
 
-**Models** `fynance.models` — econometric models (MA, ARMA, ARMA-GARCH) and
-PyTorch nets (MLP, RNN, GRU, LSTM, MultiHeadAttention, TCN, Transformer), a
-direction+magnitude stacking ensemble, `RegimeMoE` (regime-conditioned
-mixture-of-experts), differentiable losses (Sharpe, Sortino, Calmar, Omega,
-directional, hybrid), and robust-training utilities.
+**Models** `fynance.models` — econometric models (MA, ARMA, ARMA-GARCH, plus
+GJR/EGARCH kernels) and PyTorch nets (MLP, RNN, GRU, LSTM, MultiHeadAttention,
+TCN, Transformer), a direction+magnitude stacking ensemble, `RegimeMoE`
+(regime-conditioned mixture-of-experts), objective-aligned training with
+cross-asset pretraining, distributional `QuantileModel`, uncertainty wrappers
+(`DeepEnsemble`, `MCDropout`), causal conformal intervals, purged walk-forward
+hyperparameter search, differentiable losses (Sharpe, Sortino, Calmar, Omega,
+directional, hybrid, pinball), and robust-training utilities.
+
+**Estimator** `fynance.estimator` — volatility-model MLE: `fit_volatility` fits
+GARCH / GJR-GARCH / EGARCH with Gaussian or Student-t innovations, returning a
+`VolatilityResult` (AIC/BIC, conditional vol, forecast, simulate).
 
 **Strategy** `fynance.strategy` — optional orchestrator composing the maillons
 end-to-end, with single-run and walk-forward evaluation.
 
 **Research** `fynance.research` — data-agnostic experiment harness: `Experiment`
 (serializable run record), `run_experiment` (seeded, cost-aware, walk-forward),
-`write_report` (portable markdown + tearsheet PNG + notebook) and synthetic data
-generators (`gbm`, `regime_switching`). Results are written only to a
-caller-provided `output_dir` — fynance never stores them itself.
+`write_report` (portable markdown + tearsheet PNG + notebook), synthetic data
+generators (`gbm`, `regime_switching`) and overfitting guards (permutation and
+block bootstrap, deflated Sharpe, PBO/CSCV, walk-forward MDA feature importance).
+Results are written only to a caller-provided `output_dir` — fynance never stores
+them itself.
 
 ## Quick start
 
