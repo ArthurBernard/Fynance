@@ -72,6 +72,24 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-07-06 — Metrics & trade analytics epic (PRs #253, epic)  [accepted]
+
+- **Choice**: four additive metric families — benchmark-relative two-curve
+  metrics (`metrics.benchmark`, kept OUT of the scalar `METRICS` registry:
+  they take `(X, B)`); tail-risk (`metrics.risk`: VaR/CVaR/CDaR with
+  historical/gaussian/Cornish-Fisher estimators, registered in `summary()`);
+  turnover/exposure analytics (`metrics.trading` + optional tearsheet panel
+  behind a default-off kwarg); trade-level round-trips (`metrics.trades`
+  structured arrays + `BacktestResult` conveniences).
+- **Why**: the map's bluntest metric gaps — no two-curve function at all,
+  no VaR/ES, no per-trade statistics; empyrical/pyfolio/vectorbt set the
+  practitioner expectation.
+- **Rejected alternatives**: registering two-input metrics in the scalar
+  registry (breaks the `summary()` contract); pandas-based trade logs
+  (structured numpy arrays match the house labels.py precedent);
+  interpolated historical quantiles (deterministic order statistic keeps
+  hand tests exact and tail_dependence symmetric).
+
 ### 2026-07-06 — Anti-overfitting guards epic (PRs #249–#252, epic)  [accepted]
 
 - **Choice**: complete the overfitting-guard triad as four parallel bricks —
