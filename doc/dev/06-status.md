@@ -101,7 +101,9 @@ ideation catalog) is being executed epic by epic; `portfolio-risk` (§3) is
 **done** (PRs #235–#240, released as **v2.12.0**) and `factor-research` (§4)
 is **done** (PRs #243–#248: cross-sectional ops, pairwise rolling stats,
 factor suite `metrics.factor`/`plot.factor`, `fracdiff`, AFML labels,
-walk-forward MDA in `research.importance`). The v2.9.0 **library
+walk-forward MDA in `research.importance`), as is `anti-overfitting` (§5,
+PRs #249–#252: purged walk-forward HP search with `n_trials` → deflated
+Sharpe, CSCV/PBO, block/stationary bootstrap, CPCV splitter). The v2.9.0 **library
 bricks** all shipped (OHLCV indicators, causal GARCH-volatility feature,
 adaptive windows, `RegimeMoE`, `MarketImpactCost`), and the **2026-06 audit**
 was fully remediated across two passes (v2.10.0: PRs #188–#196; v2.10.1: PRs

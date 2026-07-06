@@ -21,6 +21,9 @@ adapters live downstream.
    permutation_test
    probabilistic_sharpe_ratio
    deflated_sharpe_ratio
+   resample_paths
+   bootstrap_metric
+   block_permutation_test
    ImportanceResult
    walk_forward_mda
    PBOResult

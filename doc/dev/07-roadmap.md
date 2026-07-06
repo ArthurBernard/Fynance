@@ -46,15 +46,6 @@ Le harnais `fynance.research` est **livré** (S1–S3) : `Experiment`,
 - [ ] Explorateur **Streamlit** au-dessus du Ledger (parcourir / filtrer / comparer
   les runs persistés) — interactif, plus tardif.
 
-## 5. Anti-overfitting guards (épic `anti-overfitting`)
-
-- [ ] Recherche d'hyperparamètres walk-forward purgée (grid/random, sans optuna) ;
-  expose `n_trials` → `deflated_sharpe_ratio`.
-- [ ] Diagnostic PBO / CSCV sur panel de configs (+ `returns_panel()` depuis le Ledger).
-- [ ] Bootstrap par blocs (circular + stationary) : IC de confiance sur métriques +
-  `block_permutation_test` (null préservant la dépendance sérielle).
-- [ ] Splitter CPCV (combinatorial purged cross-validation).
-
 ## 6. Metrics & trade analytics (épic `metrics-analytics`)
 
 - [ ] Métriques de queue : VaR/CVaR (historique, gaussien, Cornish-Fisher), CDaR,
