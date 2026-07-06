@@ -152,6 +152,8 @@ class ConformalWrapper:
         """ Initialize the wrapper (see class docstring for parameters). """
         if not 0 < alpha < 1:
             raise ValueError(f"alpha must be in (0, 1), got {alpha}")
+        if window <= 0:
+            raise ValueError(f"window must be a positive integer, got {window}")
 
         self.model = model
         self.alpha = alpha

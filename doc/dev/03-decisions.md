@@ -72,6 +72,26 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-07-06 — Post-release adversarial review + corrections (PR #272)  [accepted]
+
+- **Choice**: after shipping the 2026-07 backlog (PRs #235-#268, released as
+  v2.13.0), ran a 9-subsystem adversarial code review (opus reviewers + a
+  refute-biased verifier per finding). Fixed the 5 confirmed findings in one
+  batch with a regression test each: CPCV embargo now stacks beyond the purge
+  (de Prado semantics); MDP clamps `low_bound` to `1/N` (allocation-API
+  consistency); `book_vol_target` gets the book-wipeout guard its sibling
+  `rebalance._drift_step` already had; `CompositeCost.components` disambiguates
+  a third same-class same-key collision by index; `ConformalWrapper` validates
+  `window > 0`.
+- **Why**: all five are the "green suite isn't enough" class the CI gates
+  cannot catch (silently-wrong numbers / a causality leak on degenerate or
+  rare inputs). None was critical/high and 4 of 9 subsystems came back clean,
+  but the CPCV embargo gap is a real train/test leak worth fixing before the
+  splitter is used in anger.
+- **Rejected alternatives**: leaving them as documented sharp edges (a
+  causality leak in a CV splitter is not an acceptable sharp edge); five
+  separate PRs (they are one coherent, low-risk correction pass).
+
 ### 2026-07-06 — DX one-offs epic (PRs #267–#268, epic)  [accepted]
 
 - **Choice**: two developer-experience bricks — `core.checks`

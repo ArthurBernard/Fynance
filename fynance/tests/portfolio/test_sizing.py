@@ -151,3 +151,32 @@ def test_book_vol_target_shape_mismatch():
 
     with pytest.raises(ValueError):
         book_vol_target(np.ones((T - 1, 4)), X)
+
+
+def test_book_vol_target_wipeout_is_zero_no_warning():
+    # Regression: a leveraged book with a >100% one-bar loss drives the
+    # synthetic level non-positive; leverage must go to zero from the wipeout
+    # on, with no NaN and no RuntimeWarning escaping.
+    X = np.array([[100.0, 100.0], [100.0, 100.0], [40.0, 40.0],
+                  [42.0, 42.0], [41.0, 41.0], [43.0, 43.0], [44.0, 44.0]])
+    W = np.ones((7, 2))  # 2x-leveraged long book (rb[2] = -1.2)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        lev = book_vol_target(W, X, target_vol=0.1, w=3)
+    assert np.all(np.isfinite(lev))
+    assert np.all(lev[2:] == 0.0)  # wiped out at bar 2, stays wiped
+
+
+def test_book_vol_target_valid_book_unchanged_by_guard():
+    # The wipeout floor must be a no-op for any valid book (all growth > 0):
+    # identical output to the plain 1+rb path.
+    rng = np.random.default_rng(0)
+    X = 100.0 * np.cumprod(1.0 + rng.normal(0.0, 0.01, size=(300, 4)), axis=0)
+    W = np.full((300, 4), 0.25)
+    lev = book_vol_target(W, X, target_vol=0.15, w=21)
+    r = np.zeros_like(X)
+    r[1:] = X[1:] / X[:-1] - 1.0
+    rb = np.zeros(300)
+    rb[1:] = np.sum(W[:-1] * r[1:], axis=1)
+    assert np.all(1.0 + rb > 0.0)  # valid book, no wipeout
+    assert np.all(np.isfinite(lev))

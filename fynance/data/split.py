@@ -263,7 +263,10 @@ def combinatorial_purged_cv(
             test_mask[s:e] = True
             excl_mask[max(0, s - purge):s] = True
             excl_mask[e:min(T, e + purge)] = True
-            excl_mask[e:min(T, e + embargo)] = True
+            # Embargo stacks *beyond* the post-test purge (de Prado), so it
+            # starts at e + purge — not at e, which would merely overlap the
+            # purge and leave min(purge, embargo) future-adjacent bars in train.
+            excl_mask[min(T, e + purge):min(T, e + purge + embargo)] = True
 
         train_mask = ~test_mask & ~excl_mask
         train_idx = np.nonzero(train_mask)[0].astype(np.int64)

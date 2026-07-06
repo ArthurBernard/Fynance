@@ -308,11 +308,14 @@ class CompositeCost:
         key already produced by an earlier model recurs, the *later*
         occurrence is disambiguated by prefixing it with its owning class
         name, e.g. ``"transaction"`` then ``"MarketImpactCost.transaction"``.
-        The merged values sum to :meth:`__call__`.
+        A third collision on the same class+key (e.g. several stacked
+        ``ProportionalCost``) is further disambiguated by the model's index,
+        ``"ProportionalCost[2].transaction"``, so no contribution is ever
+        overwritten. The merged values always sum to :meth:`__call__`.
         """
         merged: dict[str, NDArray[np.float64]] = {}
 
-        for model in self.models:
+        for i, model in enumerate(self.models):
             cls_name = type(model).__name__
             if hasattr(model, "components"):
                 comps = model.components(weights)
@@ -321,9 +324,12 @@ class CompositeCost:
                 comps = {cls_name: model(weights)}
 
             for key, value in comps.items():
-                if key in merged:
-                    key = f"{cls_name}.{key}"
+                out_key = key
+                if out_key in merged:
+                    out_key = f"{cls_name}.{key}"
+                if out_key in merged:
+                    out_key = f"{cls_name}[{i}].{key}"
 
-                merged[key] = np.asarray(value, dtype=np.float64)
+                merged[out_key] = np.asarray(value, dtype=np.float64)
 
         return merged
