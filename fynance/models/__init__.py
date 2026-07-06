@@ -28,6 +28,7 @@ from . import (
     _base,
     _recurrent_base,
     attention,
+    conformal,
     econometric_models,
     ensemble,
     gru,
@@ -43,6 +44,7 @@ from . import (
 )
 from ._base import BaseNeuralNet
 from .attention import MultiHeadAttention, ScaledDotProductAttention
+from .conformal import ConformalWrapper, rolling_conformal
 from .econometric_models import ARMA, ARMA_GARCH, ARMAX_GARCH, MA, get_parameters
 from .ensemble import StackingEnsemble
 from .gru import GatedRecurrentUnit, GRUCell
@@ -77,6 +79,9 @@ __all__ = [
     # attention
     'MultiHeadAttention',
     'ScaledDotProductAttention',
+    # conformal
+    'ConformalWrapper',
+    'rolling_conformal',
     # econometric_models
     'ARMA',
     'ARMA_GARCH',

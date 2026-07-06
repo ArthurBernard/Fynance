@@ -89,6 +89,7 @@ architectures.
    :hidden:
 
    models.attention
+   models.conformal
    models.econometric_models
    models.ensemble
    models.loss
