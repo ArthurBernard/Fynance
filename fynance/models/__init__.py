@@ -67,6 +67,7 @@ from .tcn import TemporalConvNet
 from .training import EarlyStopping, exp_sample_weights
 from .transformer import PositionalEncoding, Transformer
 from .tuning import SearchResult, walk_forward_search
+from .uncertainty import DeepEnsemble, MCDropout
 
 # Frozen public surface for the 1.x series — names listed here are
 # guaranteed to remain importable from ``fynance.models`` until the
@@ -123,4 +124,7 @@ __all__ = [
     # tuning
     'SearchResult',
     'walk_forward_search',
+    # uncertainty
+    'DeepEnsemble',
+    'MCDropout',
 ]
