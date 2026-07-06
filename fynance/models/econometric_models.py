@@ -21,10 +21,14 @@ Main entry points
 - :func:`ARMA_GARCH` — ARMA with GARCH(p, q) conditional variance.
 - :func:`ARMAX_GARCH` — ARMA-GARCH with exogenous regressors.
 - :func:`get_parameters` — fit the parameters of any of the above.
+- :func:`loglik_garch` — GARCH-family (GARCH / GJR / EGARCH) log-likelihood
+  under normal or standardized Student-t innovations, the objective for a
+  maximum-likelihood fit driver.
 
 """
 
 # Built-in packages
+import math
 
 # External packages
 import numpy as np
@@ -121,6 +125,91 @@ def _armax_garch(y, x, phi, psi, theta, alpha, beta, c, omega, p, q, Q, P):
         u[t] = y[t] - c - armax
         h[t] = np.sqrt(omega + arch)
     return u, h
+
+
+@njit(cache=True)
+def _gjr_garch(y, omega, alpha, gamma, beta):
+    """ GJR-GARCH(1, 1) conditional std recursion (numba kernel).
+
+    Variance recursion
+    ``sigma_t^2 = omega + (alpha + gamma * 1[y_{t-1} < 0]) * y_{t-1}^2
+    + beta * sigma_{t-1}^2`` with ``sigma_0^2 = omega`` (only the constant
+    survives at t=0, matching the `_arma_garch` convention). ``y`` is used
+    as the mean-zero innovation series. Returns the conditional standard
+    deviation ``h_t = sigma_t``. With ``gamma == 0`` the ``h`` path is
+    identical to the vanilla `_arma_garch` filter.
+    """
+    T = y.size
+    h = np.zeros(T)
+    h[0] = np.sqrt(omega)
+    for t in range(1, T):
+        ind = 1.0 if y[t - 1] < 0.0 else 0.0
+        arch = (alpha + gamma * ind) * y[t - 1] ** 2 + beta * h[t - 1] ** 2
+        h[t] = np.sqrt(omega + arch)
+    return h
+
+
+@njit(cache=True)
+def _egarch(y, omega, alpha, gamma, beta, mean_abs_z):
+    """ EGARCH(1, 1) conditional std recursion (numba kernel).
+
+    Log-variance recursion
+    ``ln sigma_t^2 = omega + beta * ln sigma_{t-1}^2
+    + alpha * (|z_{t-1}| - mean_abs_z) + gamma * z_{t-1}`` with
+    ``z_t = y_t / sigma_t`` and ``ln sigma_0^2 = omega`` (only the constant
+    survives at t=0, matching the `_arma_garch` convention). ``mean_abs_z``
+    is E|z| for the innovation distribution, supplied by the caller
+    (``sqrt(2 / pi)`` for the normal, :func:`_mean_abs_standardized_t` for a
+    standardized Student-t). Returns the conditional standard deviation
+    ``h_t = sigma_t``.
+    """
+    T = y.size
+    h = np.zeros(T)
+    log_var = omega
+    h[0] = np.exp(0.5 * log_var)
+    for t in range(1, T):
+        z = y[t - 1] / h[t - 1]
+        log_var = (omega + beta * log_var
+                   + alpha * (abs(z) - mean_abs_z) + gamma * z)
+        h[t] = np.exp(0.5 * log_var)
+    return h
+
+
+@njit(cache=True)
+def _mean_abs_standardized_t(nu):
+    """ E|z| for a unit-variance Student-t (nu > 2) innovation (numba kernel).
+
+    ``E|z| = 2 * sqrt(nu - 2) * Gamma((nu + 1) / 2)
+    / ((nu - 1) * sqrt(pi) * Gamma(nu / 2))``.
+    """
+    ratio = math.exp(math.lgamma((nu + 1.0) / 2.0) - math.lgamma(nu / 2.0))
+    return 2.0 * math.sqrt(nu - 2.0) * ratio / ((nu - 1.0) * math.sqrt(math.pi))
+
+
+@njit(cache=True)
+def _loglik_normal(y, h):
+    """ Gaussian log-likelihood given conditional std ``h`` (numba kernel). """
+    T = y.size
+    const = -0.5 * math.log(2.0 * math.pi)
+    ll = 0.0
+    for t in range(T):
+        ll += const - math.log(h[t]) - 0.5 * (y[t] / h[t]) ** 2
+    return ll
+
+
+@njit(cache=True)
+def _loglik_t(y, h, nu):
+    """ Standardized Student-t (nu > 2) log-likelihood given ``h`` (numba). """
+    T = y.size
+    const = (math.lgamma((nu + 1.0) / 2.0) - math.lgamma(nu / 2.0)
+             - 0.5 * math.log(math.pi * (nu - 2.0)))
+    ll = 0.0
+    for t in range(T):
+        z2 = (y[t] / h[t]) ** 2
+        ll += (const - math.log(h[t])
+               - 0.5 * (nu + 1.0) * math.log(1.0 + z2 / (nu - 2.0)))
+    return ll
+
 
 __all__ = [
     'get_parameters', 'MA', 'ARMA', 'ARMA_GARCH', 'ARMAX_GARCH'
@@ -453,3 +542,144 @@ def ARMAX_GARCH(y, x, phi, psi, theta, alpha, beta, c, omega, p, q, Q, P):
     )
 
     return u, h
+
+
+# =========================================================================== #
+#                        GARCH-FAMILY LOG-LIKELIHOODS                         #
+# =========================================================================== #
+
+
+_SQRT_2_OVER_PI = math.sqrt(2.0 / math.pi)
+
+
+def loglik_garch(
+    params: np.ndarray,
+    y: np.ndarray,
+    model: str = 'garch',
+    dist: str = 'normal',
+) -> float:
+    r""" Log-likelihood of a GARCH-family volatility model.
+
+    Runs the conditional-variance recursion of the selected ``model`` over the
+    mean-zero series ``y`` and returns the total log-likelihood of the
+    innovations under the chosen ``dist``. The value is a *log-likelihood*
+    (higher is better, to be **maximised**); invalid parameter regions map to
+    ``-np.inf`` so a maximiser (or a minimiser of its negative) is repelled
+    from them without exceptions being raised. Intended as the objective for a
+    scipy maximum-likelihood driver (built in a later step).
+
+    Parameters
+    ----------
+    params : np.ndarray[np.float64, ndim=1]
+        Flat parameter vector, laid out per ``model`` (all variance
+        parameters first, ``nu`` appended last when ``dist='t'``):
+
+        - ``model='garch'`` : ``(omega, alpha, beta)``
+        - ``model='gjr'``   : ``(omega, alpha, gamma, beta)``
+        - ``model='egarch'``: ``(omega, alpha, gamma, beta)``
+
+        With ``dist='t'`` the degrees of freedom ``nu`` (``> 2``) is appended
+        as the final element.
+    y : np.ndarray[np.float64, ndim=1]
+        Mean-zero innovation (return) series.
+    model : {'garch', 'gjr', 'egarch'}, optional
+        Conditional-variance specification. ``'garch'`` is the vanilla
+        GARCH(1, 1); ``'gjr'`` adds a leverage term
+        ``gamma * 1[y_{t-1} < 0] * y_{t-1}^2``; ``'egarch'`` models the
+        log-variance. Default is ``'garch'``.
+    dist : {'normal', 't'}, optional
+        Innovation density: Gaussian, or standardized (unit-variance)
+        Student-t with ``nu > 2`` degrees of freedom. Default is ``'normal'``.
+
+    Returns
+    -------
+    float
+        Total log-likelihood (higher is better), or ``-np.inf`` when the
+        parameters leave the admissible region (see Notes).
+
+    Notes
+    -----
+    Admissible regions (outside them the return is ``-np.inf``):
+
+    - ``garch`` : ``omega > 0``, ``alpha >= 0``, ``beta >= 0``,
+      ``alpha + beta < 1`` (stationarity).
+    - ``gjr`` : ``omega > 0``, ``alpha >= 0``, ``beta >= 0``,
+      ``alpha + gamma >= 0`` (variance non-negativity),
+      ``alpha + beta + gamma / 2 < 1`` (stationarity, symmetric innovations).
+    - ``egarch`` : ``|beta| < 1`` only (the log-variance form needs no
+      non-negativity constraint).
+    - ``dist='t'`` : ``nu > 2`` (finite variance).
+
+    The conditional variance is initialised at ``sigma_0^2 = omega`` (GARCH,
+    GJR) or ``ln sigma_0^2 = omega`` (EGARCH): only the constant survives at
+    ``t = 0``, matching the :func:`_arma_garch` convention. The EGARCH
+    ``E|z|`` term is ``sqrt(2 / pi)`` for the normal and
+    ``2 * sqrt(nu - 2) * Gamma((nu + 1) / 2) / ((nu - 1) * sqrt(pi)
+    * Gamma(nu / 2))`` for the standardized Student-t.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> rng = np.random.default_rng(0)
+    >>> y = rng.standard_normal(500)
+    >>> ll = loglik_garch([0.1, 0.05, 0.9], y, model='garch', dist='normal')
+    >>> bool(ll < 0.0)
+    True
+    >>> loglik_garch([-1.0, 0.05, 0.9], y, model='garch')  # omega <= 0
+    -inf
+
+    """
+    y = np.asarray(y, dtype=np.float64).reshape(-1)
+    params = np.asarray(params, dtype=np.float64).reshape(-1)
+    model = model.lower()
+    dist = dist.lower()
+
+    # Split off the Student-t degrees of freedom, if any.
+    if dist == 't':
+        nu = float(params[-1])
+        core = params[:-1]
+        if nu <= 2.0:
+            return -np.inf
+    elif dist == 'normal':
+        nu = 0.0
+        core = params
+    else:
+        raise ValueError(f"Unknown dist: {dist!r}")
+
+    # Parse per model, validate the admissible region, run the filter.
+    if model == 'garch':
+        omega, alpha, beta = core[0], core[1], core[2]
+        if omega <= 0.0 or alpha < 0.0 or beta < 0.0 or alpha + beta >= 1.0:
+            return -np.inf
+        h = _gjr_garch(y, omega, alpha, 0.0, beta)
+
+    elif model == 'gjr':
+        omega, alpha, gamma, beta = core[0], core[1], core[2], core[3]
+        if (omega <= 0.0 or alpha < 0.0 or beta < 0.0 or alpha + gamma < 0.0
+                or alpha + beta + 0.5 * gamma >= 1.0):
+            return -np.inf
+        h = _gjr_garch(y, omega, alpha, gamma, beta)
+
+    elif model == 'egarch':
+        omega, alpha, gamma, beta = core[0], core[1], core[2], core[3]
+        if abs(beta) >= 1.0:
+            return -np.inf
+        if dist == 't':
+            mean_abs_z = _mean_abs_standardized_t(nu)
+        else:
+            mean_abs_z = _SQRT_2_OVER_PI
+        h = _egarch(y, omega, alpha, gamma, beta, mean_abs_z)
+
+    else:
+        raise ValueError(f"Unknown model: {model!r}")
+
+    # Innovation log-density.
+    if dist == 't':
+        ll = _loglik_t(y, h, nu)
+    else:
+        ll = _loglik_normal(y, h)
+
+    if not np.isfinite(ll):
+        return -np.inf
+
+    return float(ll)

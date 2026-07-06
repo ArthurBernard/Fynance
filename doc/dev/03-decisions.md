@@ -72,6 +72,24 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-07-06 — GARCH family epic (PRs #255, epic)  [accepted]
+
+- **Choice**: extend the volatility family inside
+  `models.econometric_models` (single-implementation policy): GJR-GARCH and
+  EGARCH Numba filters + `loglik_garch` with Gaussian/Student-t innovations
+  (kernels return `-inf` on inadmissible regions instead of raising); the
+  scipy MLE driver, `VolatilityResult` (std errors, AIC/BIC, forecast,
+  simulate) and the `features/garch.py` `model=`/`dist=` passthrough land as
+  a second leaf on top.
+- **Why**: GARCH(1,1)-normal systematically underestimates tail vol on
+  equity-like series; `estimator.estimation()` was an explicit stub with no
+  working MLE path anywhere; asymmetry (GJR/EGARCH) and fat tails
+  (Student-t) are the two standard remedies.
+- **Rejected alternatives**: depending on `arch` (heavy, duplicates the
+  house kernels); exceptions inside kernels (breaks nopython + optimizer
+  workflows); a separate garch subpackage (violates the no-duplication
+  policy).
+
 ### 2026-07-06 — Metrics & trade analytics epic (PRs #253–#254, epic)  [accepted]
 
 - **Choice**: four additive metric families — benchmark-relative two-curve

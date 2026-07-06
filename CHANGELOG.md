@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **GJR-GARCH / EGARCH kernels.** Numba filters `_gjr_garch` / `_egarch`
+  and `loglik_garch(params, y, model, dist)` (Gaussian and Student-t
+  innovations, distribution-correct E|z| centering for EGARCH) in
+  `models.econometric_models` — the likelihood layer for the upcoming
+  `fit_volatility` MLE driver.
 - **Tail-risk metrics.** New `fynance.metrics.risk`: `var` / `cvar`
   (historical, Gaussian, Cornish-Fisher), `cdar` (mean of the α worst
   drawdowns), causal `roll_var`/`roll_cvar`, and pairwise lower-tail
