@@ -72,6 +72,22 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-07-06 — Backtest-realism epic (PRs #258, epic)  [accepted]
+
+- **Choice**: ship execution realism as composable, causal `(T, N)`
+  transforms that sit between the allocator/signal and the vectorized
+  `backtest()` engine (rebalancing policies, lot discretization, delay,
+  holding costs, capacity analysis, session utilities) rather than rewriting
+  the engine into an event-driven loop.
+- **Why**: the vectorized-first engine is the house design; a transform layer
+  keeps every brick usable standalone and preserves the frozen engine while
+  closing the gap between paper weights and implementable weights (the PM's
+  main lever against churn — the portfolio-side counterpart of the shipped
+  signal-side anti-churn mappers).
+- **Rejected alternatives**: an event-driven backtester (large rewrite,
+  breaks the vectorized contract); per-allocator rebalancing flags (couples
+  the frozen allocation API to execution concerns).
+
 ### 2026-07-06 — GARCH family epic (PRs #255, epic)  [accepted]
 
 - **Choice**: extend the volatility family inside

@@ -32,6 +32,13 @@ Portfolio allocation algorithms and rolling walk-forward wrappers.
       Least-distance projection of weights onto a box, gross-leverage
       cap, net-exposure range and named group bounds.
 
+   .. grid-item-card:: :octicon:`sync;1.2em;sd-mr-1` Rebalancing & delay
+      :link: portfolio.rebalance
+      :link-type: doc
+
+      Calendar, no-trade band and turnover-capped rebalancing with weight
+      drift, whole-lot discretization and execution delay.
+
    .. grid-item-card:: :octicon:`pin;1.2em;sd-mr-1` Position sizing
       :link: portfolio.sizing
       :link-type: doc
@@ -53,4 +60,5 @@ Portfolio allocation algorithms and rolling walk-forward wrappers.
    portfolio.attribution
    portfolio.constraints
    portfolio.covariance
+   portfolio.rebalance
    portfolio.sizing
