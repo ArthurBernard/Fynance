@@ -14,6 +14,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Deprecated
+
+### Removed
+
+## [2.13.1] - 2026-07-06
+
+### Fixed
+
 - **Post-review corrections** (5 issues from the v2.13.0 adversarial review, all
   bounded to degenerate/rare inputs, each with a regression test):
   `combinatorial_purged_cv` now stacks the embargo *beyond* the post-test purge
@@ -26,10 +34,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   same-class same-key collision by model index (no component silently
   overwritten, sum invariant preserved); `ConformalWrapper` rejects a
   non-positive `window` with a clear `ValueError` at construction.
-
-### Deprecated
-
-### Removed
 
 ## [2.13.0] - 2026-07-06
 
