@@ -17,6 +17,7 @@ alignment/resampling, and no-lookahead temporal splits.
    resample
    train_test_split
    walk_forward
+   combinatorial_purged_cv
 
 Custom sources
 ==============

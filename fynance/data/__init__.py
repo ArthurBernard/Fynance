@@ -7,8 +7,8 @@
 
 The only I/O boundary of the library. File adapters turn local CSV/Parquet into
 :class:`~fynance.core.PriceSeries`; :func:`align`/:func:`resample` reconcile
-multiple series; :func:`train_test_split`/:func:`walk_forward` build no-lookahead
-evaluation indices.
+multiple series; :func:`train_test_split`/:func:`walk_forward`/
+:func:`combinatorial_purged_cv` build no-lookahead evaluation indices.
 
 """
 
@@ -17,7 +17,7 @@ from .align import align, resample
 from .base import BaseDataSource, get_source, load, register
 from .csv import CSVSource
 from .parquet import ParquetSource
-from .split import train_test_split, walk_forward
+from .split import combinatorial_purged_cv, train_test_split, walk_forward
 
 __all__ = [
     'BaseDataSource',
@@ -30,4 +30,5 @@ __all__ = [
     'resample',
     'train_test_split',
     'walk_forward',
+    'combinatorial_purged_cv',
 ]
