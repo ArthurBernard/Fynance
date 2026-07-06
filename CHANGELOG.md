@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Probability of backtest overfitting.** `pbo` in
+  `fynance.research.overfit`: CSCV diagnostic over a `(T, n_configs)`
+  returns panel (rank logits, `prob_oos_loss`, IS→OOS degradation slope),
+  plus `returns_panel()` to build the input from `Experiment` objects.
 - **Combinatorial purged cross-validation.** `combinatorial_purged_cv` in
   `fynance.data.split`: every C(n_groups, n_test_groups) group combination
   becomes an out-of-sample path, with purge windows around test-group
