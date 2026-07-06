@@ -72,7 +72,7 @@ Template:
 
 <!-- new entries below, newest first -->
 
-### 2026-07-06 — Metrics & trade analytics epic (PRs #253, epic)  [accepted]
+### 2026-07-06 — Metrics & trade analytics epic (PRs #253–#254, epic)  [accepted]
 
 - **Choice**: four additive metric families — benchmark-relative two-curve
   metrics (`metrics.benchmark`, kept OUT of the scalar `METRICS` registry:
