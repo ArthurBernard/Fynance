@@ -22,8 +22,11 @@ shipped, `03-decisions.md` for *why*. Keep it short and true.
 > Voir `CHANGELOG.md` / `03-decisions.md`. L'épic **harnais R&D multi-actifs /
 > panel** (2026-06-23) est **livré** : 5 PR (#215–#219) — `ObjectiveModel` panel,
 > losses book-aware + `RankingLoss`, `information_coefficient`/`horizon_returns`,
-> walk-forward + attribution par actif, report de book. Il ne reste que l'item
-> optionnel ci-dessous.
+> walk-forward + attribution par actif, report de book. Le backlog §3–§10 vient
+> du **workflow d'idéation 2026-07** (43 propositions générées sous 6 angles,
+> scorées valeur/fit/faisabilité par panel de juges, 29 retenues) — détail
+> complet (descriptions, API sketches, scores) dans
+> `plans/_catalog/feature-catalog-2026-07.md` (local).
 
 > ⚠️ **Hors scope ici** : la recherche de stratégie sur **vraie data** (benchmarks
 > empiriques loss / architecture / normalisation, évaluation Sharpe out-of-sample,

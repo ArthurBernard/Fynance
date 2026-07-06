@@ -8,6 +8,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > Start at [`doc/dev/README.md`](doc/dev/README.md). `CLAUDE.md` stays
 > authoritative for commands and invariants.
 
+## Common conventions
+
+Shared across my repos, mirrored from `~/.claude/CLAUDE.md` (the single source of
+truth — if they ever disagree, the global file wins). Restated here so the repo
+stays self-contained:
+
+- **Git Flow** — `master` (tagged releases) ← `develop` (integration) ←
+  `feat|fix|chore|docs/<topic>`. **Never commit directly to `develop` or `master`**
+  — always a feature branch + PR into `develop`; `develop` → `master` only at release.
+- **Conventional Commits** — `feat:` `fix:` `chore:` `docs:`. **Never add
+  `Co-Authored-By` trailers** (personal repo).
+- **One PR = one concern**, small and disposable — a big plan ships as several small
+  atomic PRs, never one catch-all branch.
+- **Model: `opus`, always** — interactive sessions and every spawned subagent; a plan
+  leaf's `complexity` is effort/ordering only and never downgrades the model.
+- **Before every commit** — `pytest` and `ruff check fynance/` must pass.
+
 ## Commands
 
 ```bash
@@ -36,41 +53,7 @@ ruff check fynance/
 cd doc && make html
 ```
 
-## Git Flow
-
-**Branch model:**
-```
-master          ← stable releases only (tagged vX.Y.Z)
-  └── develop   ← integration branch
-        ├── feat/<topic>   new feature or modernization axis
-        ├── fix/<topic>    bug fix
-        ├── chore/<topic>  tooling, CI, deps
-        └── docs/<topic>   documentation only
-```
-
-**Rules — always follow these before committing or pushing:**
-1. **Never commit directly to `master`.**
-2. **Never commit directly to `develop`** — always use a feature branch + PR, even for small changes.
-3. Branch off `develop` (not `master`): `git checkout develop && git checkout -b feat/my-topic`
-4. Open a PR into `develop` when done.
-5. `develop` → `master` only at release time.
-
-**Commit style (Conventional Commits):**
-```
-feat: add TCN model
-fix: replace ** in momentums_cy.pyx for Cython 3 compat
-chore: migrate to pyproject.toml
-docs: update CONTRIBUTING
-```
-
-Do not add `Co-Authored-By` trailers to commits — this is a personal repo.
-
-**Before every commit:** run `pytest` and `ruff check fynance/`. Both must pass.
-
-**One PR = one concern, small and disposable.** Even a large plan ships as
-*several* small atomic PRs — never one fourre-tout branch.
-
-### Dev loop & docs of record
+## Dev loop & docs of record
 
 The iterative loop is tooled by user-level skills, with four tracked docs as the
 sources of truth:
@@ -91,15 +74,6 @@ test + verify) → `/finish-task` (tests, ADR, CHANGELOG, PR, archive the leaf) 
 … per leaf … → last leaf removes the roadmap line → `/release`.
 `/abandon-task` salvages the lesson + closes a bad PR; `/groom-docs` keeps
 `doc/dev/` lean and true.
-
-**Model per task** (advisory — set via `/model` or a plan leaf's `complexity`:
-`low→haiku`, `medium→sonnet`, `high→opus`):
-
-| Model | For |
-|-------|-----|
-| `opus` | judgement, design, decisions, planning, review |
-| `sonnet` | implementation — code, tests, docstrings |
-| `haiku` | mechanical fan-out (doc scans, checklists) |
 
 ## Architecture
 

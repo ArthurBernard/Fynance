@@ -23,11 +23,24 @@ moving standard deviations and rolling functions.
 
       Bollinger Band, CCI, Hull Moving Average, MACD, RSI.
 
+   .. grid-item-card:: :octicon:`tag;1.2em;sd-mr-1` Labels
+      :link: features.labels
+      :link-type: doc
+
+      Triple-barrier labels, meta-labels and overlap-aware sample weights
+      (AFML) -- targets, not features.
+
    .. grid-item-card:: :octicon:`graph;1.2em;sd-mr-1` OHLCV indicators
       :link: features.ohlcv
       :link-type: doc
 
       ATR, ADX, Williams %R (High/Low) and OBV, VWAP (Volume).
+
+   .. grid-item-card:: :octicon:`versions;1.2em;sd-mr-1` Cross-section
+      :link: features.cross_section
+      :link-type: doc
+
+      NaN-aware per-bar rank, z-score, demean, winsorize, neutralize.
 
    .. grid-item-card:: :octicon:`meter;1.2em;sd-mr-1` Statistics
       :link: features.stats
@@ -100,9 +113,11 @@ Common parameters across modules:
    :maxdepth: 1
    :hidden:
 
+   features.cross_section
    features.engineering
    features.filters
    features.indicators
+   features.labels
    features.ohlcv
    features.stats
    features.momentums

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 # Built-in packages
 from dataclasses import dataclass
+from typing import Any
 
 # Third-party packages
 import numpy as np
@@ -53,7 +54,10 @@ class BacktestResult:
     -------
     to_numpy
     to_price_series
+    to_pandas
     summary
+    trades
+    trade_summary
 
     """
 
@@ -73,6 +77,63 @@ class BacktestResult:
     def to_price_series(self) -> PriceSeries:
         """ Return the equity curve as a :class:`PriceSeries`. """
         return PriceSeries(self.equity, index=self.index, name="equity")
+
+    def to_pandas(self) -> Any:
+        """ Return this result as a :class:`pandas.DataFrame` (lazy import).
+
+        One row per time step. Always carries ``equity``, ``returns``,
+        ``gross_returns`` and ``costs``. :attr:`positions` becomes a single
+        ``positions`` column for a single-asset ``(T,)`` book, or
+        ``pos_0``..``pos_{N-1}`` columns for a multi-asset ``(T, N)`` book.
+        When present, :attr:`asset_gross_returns` similarly expands into
+        ``asset_gross_return_0``..``asset_gross_return_{N-1}`` columns, and
+        each :attr:`cost_components` entry becomes a ``cost_<name>`` column.
+        The DataFrame index is :attr:`index` when set, else pandas' default
+        ``RangeIndex``.
+
+        Raises
+        ------
+        ImportError
+            If pandas is not installed, with a clear, actionable message.
+
+        Examples
+        --------
+        >>> from fynance.backtest import backtest
+        >>> res = backtest(np.array([0.01, 0.02, -0.01]), np.ones(3))
+        >>> list(res.to_pandas().columns)
+        ['equity', 'returns', 'gross_returns', 'costs', 'positions']
+
+        """
+        try:
+            import pandas as pd
+
+        except ImportError as exc:
+
+            raise ImportError("install pandas to use to_pandas()") from exc
+
+        data: dict[str, NDArray] = {
+            "equity": self.equity,
+            "returns": self.returns,
+            "gross_returns": self.gross_returns,
+            "costs": self.costs,
+        }
+
+        if self.positions.ndim == 2:
+            for i in range(self.positions.shape[1]):
+                data[f"pos_{i}"] = self.positions[:, i]
+
+        else:
+            data["positions"] = self.positions
+
+        if self.asset_gross_returns is not None:
+            for i in range(self.asset_gross_returns.shape[1]):
+                data[f"asset_gross_return_{i}"] = self.asset_gross_returns[:, i]
+
+        if self.cost_components is not None:
+            for name, values in self.cost_components.items():
+                data[f"cost_{name}"] = values
+
+        return pd.DataFrame(data, index=self.index)
 
     def summary(self, period: int = 252) -> dict[str, float]:
         """ Standard performance summary.
@@ -95,3 +156,36 @@ class BacktestResult:
             np.sum(trades_per_year(self.positions, period=period)))
 
         return out
+
+    def trades(self) -> NDArray:
+        """ Round-trip trades extracted from the strategy's own arrays.
+
+        Delegates to :func:`fynance.metrics.trades.extract_trades` on
+        :attr:`positions` and :attr:`returns`, taken exactly as stored (see
+        that function's docstring for the alignment convention this relies
+        on).
+
+        Returns
+        -------
+        numpy.ndarray
+            Structured array, one row per trade -- see
+            :func:`~fynance.metrics.trades.extract_trades`.
+        """
+        from fynance.metrics.trades import extract_trades
+
+        return extract_trades(self.positions, self.returns)
+
+    def trade_summary(self) -> dict[str, float]:
+        """ Summary statistics of the strategy's round-trip trades.
+
+        Delegates to :func:`fynance.metrics.trades.trade_summary` on
+        :meth:`trades`.
+
+        Returns
+        -------
+        dict of str to float
+            See :func:`~fynance.metrics.trades.trade_summary`.
+        """
+        from fynance.metrics.trades import trade_summary as _trade_summary
+
+        return _trade_summary(self.trades())

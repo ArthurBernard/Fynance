@@ -12,7 +12,9 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
 - **Core**: `PriceSeries` (thin numpy-backed value object — composition, not
   `ndarray` subclassing; price↔return identities, numpy/torch bridges, `.pipe`)
   and the pipeline protocols (`DataSource`/`FeatureTransform`/`SignalModel`/
-  `Allocator`/`CostModel`/`Metric`).
+  `Allocator`/`CostModel`/`Metric`); `core.checks` (`check_conforms` +
+  the `assert_causal` lookahead probe) and duck-typed `from_pandas`/
+  `to_pandas`/`to_polars` seams on `PriceSeries`/`OHLCV`/`BacktestResult`.
 - **Data**: `load()` dispatcher + CSV/Parquet adapters, causal `align`/`resample`,
   and no-lookahead `train_test_split`/`walk_forward` (embargo/purge).
 - **Features**: technical indicators (RSI/MACD/Bollinger/CCI/HMA/ROC/realized-vol/
@@ -21,10 +23,21 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
   momentums (SMA/EMA/WMA + std variants), **adaptive windows** (`adaptive_roll`/
   `adaptive_volatility`), scaling (z-score, rolling rank), statistics, money
   management (`iso_vol`), feature engineering (multi-resolution, Granger,
-  incremental moments) and k-means market-regime detection.
+  incremental moments), k-means market-regime detection, and the
+  **factor-research bricks (2026-07, PRs #243–#248)**: NaN-aware
+  cross-sectional operators (`cs_rank`/`cs_zscore`/`cs_demean`/
+  `cs_winsorize`/`cs_neutralize`), pairwise rolling stats
+  (`roll_cov`/`roll_corr`/`roll_beta`, `cross_corr`), fixed-width
+  fractional differentiation (`fracdiff`), and the AFML labeling stack
+  (`triple_barrier`/`meta_labels`/`uniqueness_weights` — training targets
+  for purged splits).
 - **Metrics**: `fynance.metrics` (Sharpe/Sortino/Calmar/diversified-ratio,
   annual return/vol, drawdown/mdd, perf_*, roll_*, **`information_coefficient`**
-  rank-IC) + one-call `summary`.
+  rank-IC) + one-call `summary`; **2026-07 additions (PRs #253–#257)**:
+  benchmark-relative family (`benchmark` — alpha/beta/TE/IR/capture),
+  tail risk (`risk` — VaR/CVaR/CDaR + `tail_dependence`), turnover/exposure
+  analytics and round-trip **trade analytics** (`trades` +
+  `BacktestResult.trades()`).
 - **Multi-asset / panel harness**: `ObjectiveModel` trains a position book
   `(T, N)` from a panel `X`; book-aware ratio losses + `RankingLoss`;
   `Strategy`/`run_walk_forward`/`run_experiment` accept a `(T, N)` panel and return
@@ -38,6 +51,11 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
   losses (Sharpe/Sortino/Calmar/Omega/directional/hybrid) in `models/loss/`;
   robust-training utils (purged CV, early stopping, sample weighting) in
   `models/training.py`. All NN models conform to `SignalModel` (`fit`/`predict`).
+  **2026-07 ML bricks (PRs #263–#266)**: cross-asset pretraining + save/load on
+  `ObjectiveModel` (`pretrain_pooled`/`clone`/`finetune`), distributional
+  `QuantileModel` (+ `PinballLoss`), uncertainty wrappers (`DeepEnsemble`,
+  `MCDropout`) and causal split-`conformal` intervals; **GARCH family (PRs
+  #255/#262)**: GJR/EGARCH kernels + Student-t + `fit_volatility` MLE driver.
 - **Objective-aligned training** (`models/objective.py`): `ObjectiveModel` trains
   any `nn.Module` (MLP by default) **directly on a differentiable financial
   objective** (`SharpeLoss`/`SortinoLoss`/…) — the net outputs positions, the loss
@@ -47,13 +65,22 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
   Plugs into the harness via the `X` path with `signal=identity`, `y=returns`.
 - **Signal / Portfolio**: `signal/` mappers (`sign`/`threshold`/`rank`/
   vol-targeting + **anti-churn** `ema_smooth`/`deadband`/`min_hold` +
-  `SignalPipeline`); `portfolio/` allocation (ERC/HRP/IVP/MDP/MVP) + sizing
-  (fractional Kelly, vol-targeting, transaction costs).
+  `SignalPipeline`); `portfolio/` allocation (ERC/HRP/IVP/MDP/MVP + **`RBP`**
+  risk budgeting) + sizing (fractional Kelly, vol-targeting — single-series
+  `vol_target` and book-level **`book_vol_target`** — transaction costs);
+  **portfolio-risk bricks (2026-07, PRs #235–#240)**: conditioned covariance
+  estimators (`covariance` — Ledoit-Wolf/EWMA/factor/Marchenko-Pastur) behind
+  an opt-in `cov=` seam on every allocator, ex-ante/rolling risk
+  **attribution**, and a least-distance exposure-**constraints** overlay
+  (`project_weights`).
 - **Backtest / Plot**: vectorized `backtest()` engine → `BacktestResult`, cost
-  models (`ProportionalCost` + **`MarketImpactCost`** — a convex, super-linear
-  market-impact term on top of the linear fee); reporting via `fynance.plot`
-  (`tearsheet`, composable figures, lazy matplotlib so `import fynance` stays
-  matplotlib-free).
+  models (`ProportionalCost` + **`MarketImpactCost`** + **`HoldingCost`** /
+  **`CompositeCost`** — borrow/financing/cash carry, composable stacking);
+  **rebalancing policies** (`portfolio.rebalance` — calendar/band/turnover-cap +
+  `discretize`/`delay`), **capacity analysis** (`capacity_curve`/`breakeven_fee`)
+  and **intraday session utilities** (`data.sessions`); reporting via
+  `fynance.plot` (`tearsheet`, composable figures, lazy matplotlib so
+  `import fynance` stays matplotlib-free).
 - **Research harness** (`fynance.research`, S1–S3 complete): `Experiment`
   (serializable spec + code + seed + metrics + curves), `run_experiment` (seeded,
   cost-aware, walk-forward; no-lookahead probe; records a **provenance** block —
@@ -83,7 +110,14 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
 
 ## In progress / active surface
 
-Nothing is currently in flight (`develop` is clean). The v2.9.0 **library
+The **2026-07 feature backlog** (roadmap §2–§10, from the judge-scored
+ideation catalog) is being executed epic by epic; `portfolio-risk` (§3) is
+**done** (PRs #235–#240, released as **v2.12.0**) and `factor-research` (§4)
+is **done** (PRs #243–#248: cross-sectional ops, pairwise rolling stats,
+factor suite `metrics.factor`/`plot.factor`, `fracdiff`, AFML labels,
+walk-forward MDA in `research.importance`), as is `anti-overfitting` (§5,
+PRs #249–#252: purged walk-forward HP search with `n_trials` → deflated
+Sharpe, CSCV/PBO, block/stationary bootstrap, CPCV splitter). The v2.9.0 **library
 bricks** all shipped (OHLCV indicators, causal GARCH-volatility feature,
 adaptive windows, `RegimeMoE`, `MarketImpactCost`), and the **2026-06 audit**
 was fully remediated across two passes (v2.10.0: PRs #188–#196; v2.10.1: PRs
@@ -99,9 +133,10 @@ which depends on fynance. This public repo stays data-agnostic and result-free.
 
 ## Known gaps / sharp edges (by design or deferred)
 
-- **`estimator.estimation()`** is an explicit experimental stub: it raises
-  `NotImplementedError` and points to `models.econometric_models.get_parameters`
-  (the Numba-backed authoritative path).
+- **`estimator.estimation()`** remains an ARMA-oriented experimental stub
+  (`NotImplementedError`), now pointing to `estimator.fit_volatility` for the
+  volatility-model MLE path shipped in 2026-07 (PRs #255/#262: GJR/EGARCH
+  kernels + Student-t + the `fit_volatility` driver with forecast/simulate).
 - **Legacy `backtest` plot stack** (`PlotBackTest`/`DynaPlotBackTest`/
   `display_perf`) still powers `RollMultiLayerPerceptron` live-training viz; it is
   off the eager public surface (lazy-imported submodules) and conceptually

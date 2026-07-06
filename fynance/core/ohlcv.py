@@ -202,6 +202,80 @@ class OHLCV:
 
         return cls.from_dict(mapping)
 
+    @classmethod
+    def from_pandas(
+        cls,
+        df: Any,
+        columns: tuple[str, ...] = _FIELDS,
+    ) -> OHLCV:
+        """ Build from a pandas-like DataFrame (columns matched case-insensitively).
+
+        Unlike :meth:`from_polars` (which scans ``data.columns`` for the fixed
+        canonical names), ``columns`` here lets the caller declare the
+        DataFrame's actual column name for each OHLCV field, in
+        ``(open, high, low, close, volume)`` order; matching against
+        ``df.columns`` is case-insensitive on both sides.
+
+        Parameters
+        ----------
+        df : Any
+            Duck-typed DataFrame-like object: only ``df.columns`` (an
+            iterable of ``str``) and column access ``df[name]`` (exposing
+            ``.to_numpy()`` or ``.values``) are required -- no pandas import
+            happens in this method.
+        columns : tuple of str
+            The DataFrame's column name for each canonical field, in
+            ``(open, high, low, close, volume)`` order. Defaults to the
+            canonical names themselves. A shorter tuple leaves the trailing
+            fields unrequested (treated as absent, see below).
+
+        Returns
+        -------
+        OHLCV
+
+        Raises
+        ------
+        ValueError
+            If the column mapped to ``close`` -- the only field
+            :class:`OHLCV` requires -- cannot be found in ``df``. Every other
+            field follows :class:`OHLCV`'s own optionality (only ``close`` is
+            required at construction, see the class docstring): when its
+            column is absent, that field is simply omitted rather than
+            raising. This is why ``volume`` -- the field most often missing
+            from real OHLC feeds -- can be dropped from ``columns`` or absent
+            from ``df`` with no error; the same leniency applies to
+            ``open``/``high``/``low``.
+
+        Examples
+        --------
+        >>> import pandas as pd
+        >>> df = pd.DataFrame({"Close": [1., 2.], "High": [2., 3.]})
+        >>> OHLCV.from_pandas(df).columns
+        ('high', 'close')
+
+        """
+        available = {str(c).lower(): c for c in df.columns}
+        mapping: dict[str, Any] = {}
+
+        for field, col in zip(_FIELDS, columns):
+            key = str(col).lower()
+
+            if key not in available:
+
+                if field == 'close':
+
+                    raise ValueError(
+                        f"OHLCV.from_pandas: column {col!r} (field 'close') "
+                        f"not found; available columns: {list(df.columns)}"
+                    )
+
+                continue
+
+            raw = df[available[key]]
+            mapping[field] = raw.to_numpy() if hasattr(raw, "to_numpy") else raw.values
+
+        return cls.from_dict(mapping)
+
     # -- Field access -----------------------------------------------------
 
     def _get(self, field: str) -> NDArray[np.float64]:
@@ -266,6 +340,35 @@ class OHLCV:
             return np.empty((0, 0), dtype=np.float64)
 
         return np.column_stack([self._data[f] for f in self.columns])
+
+    def to_pandas(self) -> Any:
+        """ Return the present fields as a :class:`pandas.DataFrame` (lazy import).
+
+        Columns follow :attr:`columns` (canonical OHLCV order).
+
+        Raises
+        ------
+        ImportError
+            If pandas is not installed, with a clear, actionable message.
+
+        Examples
+        --------
+        >>> OHLCV(close=[1., 2.], high=[2., 3.]).to_pandas()
+           high  close
+        0   2.0    1.0
+        1   3.0    2.0
+
+        """
+        try:
+            import pandas as pd
+
+        except ImportError as exc:
+
+            raise ImportError("install pandas to use to_pandas()") from exc
+
+        return pd.DataFrame(
+            {f: self._data[f] for f in self.columns}, columns=list(self.columns)
+        )
 
     # -- Dunders ----------------------------------------------------------
 

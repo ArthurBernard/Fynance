@@ -24,6 +24,9 @@ Main entry points
   ranking objective for a panel of assets.
 - :class:`HybridLoss` — convex combination of two losses with a fixed or
   learnable weight.
+- :class:`PinballLoss` — asymmetric quantile ("pinball") loss for
+  multi-quantile regression (see
+  :class:`~fynance.models.quantile.QuantileModel`).
 
 Notes
 -----
@@ -42,9 +45,10 @@ from .calmar import CalmarLoss
 from .directional import DirectionalAccuracyLoss
 from .hybrid import HybridLoss
 from .omega import OmegaLoss
+from .pinball import PinballLoss
 from .ranking import RankingLoss
 from .sharpe import SharpeLoss
 from .sortino import SortinoLoss
 
 __all__ = ['BaseLoss', 'CalmarLoss', 'DirectionalAccuracyLoss', 'HybridLoss',
-           'OmegaLoss', 'RankingLoss', 'SharpeLoss', 'SortinoLoss']
+           'OmegaLoss', 'PinballLoss', 'RankingLoss', 'SharpeLoss', 'SortinoLoss']

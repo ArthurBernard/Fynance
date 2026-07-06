@@ -15,8 +15,13 @@ alignment/resampling, and no-lookahead temporal splits.
    ParquetSource
    align
    resample
+   session_mask
+   session_id
+   session_bounds
+   split_sessions
    train_test_split
    walk_forward
+   combinatorial_purged_cv
 
 Custom sources
 ==============

@@ -54,6 +54,12 @@ architectures.
 
       Direction + magnitude stacking with an out-of-fold meta-model.
 
+   .. grid-item-card:: :octicon:`graph;1.2em;sd-mr-1` Uncertainty
+      :link: models.uncertainty
+      :link-type: doc
+
+      Deep ensembles and MC Dropout predictive-uncertainty wrappers.
+
    .. grid-item-card:: :octicon:`flame;1.2em;sd-mr-1` Loss functions
       :link: models.loss
       :link-type: doc
@@ -72,11 +78,18 @@ architectures.
 
       Walk-forward evaluation wrappers for time-series models.
 
+   .. grid-item-card:: :octicon:`checklist;1.2em;sd-mr-1` Purged walk-forward tuning
+      :link: models.tuning
+      :link-type: doc
+
+      Grid/random hyperparameter search scored on purged walk-forward folds.
+
 .. toctree::
    :maxdepth: 1
    :hidden:
 
    models.attention
+   models.conformal
    models.econometric_models
    models.ensemble
    models.loss
@@ -86,3 +99,5 @@ architectures.
    models.tcn
    models.training
    models.transformer
+   models.tuning
+   models.uncertainty

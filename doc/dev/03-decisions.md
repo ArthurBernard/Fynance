@@ -72,6 +72,191 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-07-06 — DX one-offs epic (PRs #267–#268, epic)  [accepted]
+
+- **Choice**: two developer-experience bricks — `core.checks`
+  (`check_conforms` + `assert_causal`, an executable lookahead probe) and
+  duck-typed DataFrame seams (`from_pandas`/`to_pandas`/`to_polars` on
+  `PriceSeries`/`OHLCV`/`BacktestResult`, no pandas/polars import at module
+  level).
+- **Why**: causality is the core invariant yet users writing custom
+  transforms had no tool to verify it (`runtime_checkable` only checks method
+  names); pandas/polars interop is the most-requested ergonomic gap.
+- **Rejected alternatives**: a hard pandas dependency (kept optional via lazy
+  import + duck typing); a scikit-learn-style `check_estimator` import (the
+  probe is ~40 lines of numpy, no dependency).
+
+### 2026-07-06 — ML bricks epic (PRs #263–#266, epic)  [accepted]
+
+- **Choice**: four PyTorch bricks that all conform to `SignalModel` and stay
+  inside `models/` — cross-asset pretraining/persistence on `ObjectiveModel`
+  (segment-aware pooled batching so no batch crosses an asset join),
+  distributional forecasting (`PinballLoss` + `QuantileModel`), uncertainty
+  wrappers (`DeepEnsemble`, `MCDropout`) and causal split-conformal
+  intervals.
+- **Why**: per-asset histories are short (pretraining/transfer is the
+  standard remedy); point forecasts hide risk (quantiles + intervals); no
+  first-class uncertainty API existed.
+- **Rejected alternatives**: subclassing `nn.Module` for the wrappers
+  (composition matches the `ObjectiveModel`/`RegimeMoE`/`StackingEnsemble`
+  precedent); a house Gaussian-NLL loss (reuse `torch.nn.GaussianNLLLoss`);
+  reusing `MultiLayerPerceptron`'s output-activation for `QuantileModel`
+  (its ReLU head clips symmetric quantiles — a dedicated unbounded head).
+
+### 2026-07-06 — Backtest-realism epic (PRs #258–#261, epic)  [accepted]
+
+- **Choice**: ship execution realism as composable, causal `(T, N)`
+  transforms that sit between the allocator/signal and the vectorized
+  `backtest()` engine (rebalancing policies, lot discretization, delay,
+  holding costs, capacity analysis, session utilities) rather than rewriting
+  the engine into an event-driven loop.
+- **Why**: the vectorized-first engine is the house design; a transform layer
+  keeps every brick usable standalone and preserves the frozen engine while
+  closing the gap between paper weights and implementable weights (the PM's
+  main lever against churn — the portfolio-side counterpart of the shipped
+  signal-side anti-churn mappers).
+- **Rejected alternatives**: an event-driven backtester (large rewrite,
+  breaks the vectorized contract); per-allocator rebalancing flags (couples
+  the frozen allocation API to execution concerns).
+
+### 2026-07-06 — GARCH family epic (PRs #255, #262, epic)  [accepted]
+
+- **Choice**: extend the volatility family inside
+  `models.econometric_models` (single-implementation policy): GJR-GARCH and
+  EGARCH Numba filters + `loglik_garch` with Gaussian/Student-t innovations
+  (kernels return `-inf` on inadmissible regions instead of raising); the
+  scipy MLE driver, `VolatilityResult` (std errors, AIC/BIC, forecast,
+  simulate) and the `features/garch.py` `model=`/`dist=` passthrough land as
+  a second leaf on top.
+- **Why**: GARCH(1,1)-normal systematically underestimates tail vol on
+  equity-like series; `estimator.estimation()` was an explicit stub with no
+  working MLE path anywhere; asymmetry (GJR/EGARCH) and fat tails
+  (Student-t) are the two standard remedies.
+- **Rejected alternatives**: depending on `arch` (heavy, duplicates the
+  house kernels); exceptions inside kernels (breaks nopython + optimizer
+  workflows); a separate garch subpackage (violates the no-duplication
+  policy).
+
+### 2026-07-06 — Metrics & trade analytics epic (PRs #253–#254, #256–#257, epic)  [accepted]
+
+- **Choice**: four additive metric families — benchmark-relative two-curve
+  metrics (`metrics.benchmark`, kept OUT of the scalar `METRICS` registry:
+  they take `(X, B)`); tail-risk (`metrics.risk`: VaR/CVaR/CDaR with
+  historical/gaussian/Cornish-Fisher estimators, registered in `summary()`);
+  turnover/exposure analytics (`metrics.trading` + optional tearsheet panel
+  behind a default-off kwarg); trade-level round-trips (`metrics.trades`
+  structured arrays + `BacktestResult` conveniences).
+- **Why**: the map's bluntest metric gaps — no two-curve function at all,
+  no VaR/ES, no per-trade statistics; empyrical/pyfolio/vectorbt set the
+  practitioner expectation.
+- **Rejected alternatives**: registering two-input metrics in the scalar
+  registry (breaks the `summary()` contract); pandas-based trade logs
+  (structured numpy arrays match the house labels.py precedent);
+  interpolated historical quantiles (deterministic order statistic keeps
+  hand tests exact and tail_dependence symmetric).
+
+### 2026-07-06 — Anti-overfitting guards epic (PRs #249–#252, epic)  [accepted]
+
+- **Choice**: complete the overfitting-guard triad as four parallel bricks —
+  purged walk-forward HP search (`models.tuning`, grid/random only) exposing
+  `n_trials` straight into `deflated_sharpe_ratio`; CSCV/PBO diagnostic
+  (`research.overfit`); block/stationary bootstrap (`research.bootstrap`,
+  dependence-preserving null as a drop-in analogue of `permutation_test`);
+  CPCV splitter in `data.split`.
+- **Why**: the guards module had permutation + DSR but nothing diagnosing
+  selection bias across a *family* of tried configs, and every HP sweep was
+  a hand-rolled leak-prone loop hiding its trial count; the iid permutation
+  null destroys autocorrelation.
+- **Rejected alternatives**: an optuna dependency (grid/random suffice; no
+  heavy dep); modifying `permutation_test` in place (the block variant is
+  additive, old semantics preserved); White's Reality Check / SPA (PBO is
+  the assumption-light standard and fits the Ledger data we already have).
+
+### 2026-07-05 — Cross-sectional factor research epic (PRs #243–#248, epic)  [accepted]
+
+Gives fynance the *input half* of the factor workflow the v2.11 panel harness
+consumes. Six parallel leaves, key choices:
+
+- **Choice**: pairwise rolling kernels (`roll_cov/corr/beta`, `cross_corr`)
+  live in `features.roll_functions` (not metrics) so the future
+  benchmark-relative metrics can reuse them; windows are trailing and include
+  `t` (house convention, matches `roll_min`); cross-sectional operators
+  (`cs_*`) are NaN-aware per bar (panels with dead assets are the norm);
+  AFML labels (`triple_barrier`, `meta_labels`, uniqueness weights) are
+  documented as **training targets that read future prices by design** — to
+  be consumed only through purged splits; MDA importance fits once per fold
+  and permutes the test window only (no per-feature refit); the factor suite
+  splits metrics (`metrics.factor`) from figures (`plot.factor`) to keep
+  `import fynance` matplotlib-free.
+- **Why**: the mapped gap was blunt — everything was single-asset
+  time-series; the panel training stack (`ObjectiveModel`, `RankingLoss`,
+  per-bar IC) had no tooling to build/evaluate the factor panels it consumes.
+- **Rejected alternatives**: depending on alphalens (abandoned upstream,
+  pandas-first); pandas-based implementations (numpy is the lingua franca);
+  putting labels in `data/` (they are feature-layer transforms of prices).
+
+### 2026-07-05 — Constraint overlay as least-distance projection (PR #239)  [accepted]
+
+- **Choice**: enforce book-level limits (box / gross / net / group) as a
+  *post-hoc least-distance projection* (`portfolio.constraints.project_weights`,
+  SLSQP on the split `v = p - m` so `sum(|v|)` becomes linear), with a fast
+  clip-and-scale path when only box+gross are active, rather than baking the
+  constraints into each allocator's optimizer.
+- **Why**: an overlay composes with *any* weight source (allocators, signal
+  mappers, `ObjectiveModel` books) and keeps the frozen allocation API
+  untouched; the split formulation keeps the QP smooth for SLSQP (already the
+  house optimizer); the fast path covers the common case ~322x faster
+  (measured on a (500, 12) book).
+- **Rejected alternatives**: per-allocator constraint parameters (N x API
+  surface, still leaves signal-side books unconstrained); a dedicated QP
+  solver dependency like cvxpy/osqp (heavy dependency for one projection);
+  exact soft-thresholding closed form for the gross cap (only valid without
+  box/net/group interactions).
+
+### 2026-07-05 — Risk budgeting as a separate `RBP` allocator (PR #238)  [accepted]
+
+- **Choice**: ship risk budgeting as a new `RBP(X, budgets=None, cov=None)`
+  function with the Roncalli least-squares objective
+  `sum_i (w_i (Sigma w)_i - b_i w'Sigma w)^2`, sharing ERC's scaffolding
+  (unit-trace rescale, SLSQP, bound clamping) — not as a `budgets=` parameter
+  on `ERC`.
+- **Why**: `portfolio.allocation` is a frozen API — a new function is purely
+  additive and leaves ERC's contract untouched; `budgets=None` reproduces ERC
+  within optimizer tolerance (regression-tested at 1e-4), and budget matching
+  is verified through `portfolio.attribution` (ex-ante error ~8e-7 on
+  synthetic panels, ~7e-4 through the rolling path).
+- **Rejected alternatives**: extending `ERC`'s signature (behavior-drift risk
+  in the stable API); Roncalli's log-barrier / fixed-point formulation
+  (cleaner convexity but a second optimizer pattern to maintain for no
+  observed accuracy gain here).
+
+### 2026-07-05 — Conditioned covariance estimators as interchangeable callables (PR #235)  [accepted]
+
+- **Choice**: ship covariance conditioning as a standalone
+  `portfolio.covariance` module of `(T, N) -> (N, N)` callables — closed-form
+  Ledoit-Wolf (three targets), RiskMetrics EWMA on a Numba kernel, PCA factor
+  model, Marchenko-Pastur clipping — rather than baking estimators into each
+  allocator. The allocators gain an opt-in `cov=` callable (landed in PR #236),
+  `None` keeping today's `np.cov` path bit-for-bit; `MDP`'s `cov=` path
+  evaluates the diversification ratio from the fixed matrix instead of
+  recomputing `np.cov` per optimizer iteration.
+- **Why**: raw `np.cov` on short windows is the dominant source of MVP/ERC
+  weight instability; the closed forms need numpy only (no new dependency);
+  a callable seam preserves the frozen `portfolio.allocation` API and makes
+  the estimators reusable elsewhere (the `portfolio.attribution` diagnostics
+  landed in PR #237 on the same seam, validating that ERC equalizes
+  contributions).
+  Verified OOS on synthetic two-block panels: condition number 97.4 -> 91.1
+  (LW) / 82.5 (denoised); mean MVP OOS vol 0.005909 -> 0.005790 over 20 seeds.
+- **Rejected alternatives**: depending on scikit-learn (heavy dependency for a
+  ~40-line closed form); nonlinear/oracle shrinkage (unwarranted complexity —
+  can land later as just another callable); per-allocator estimator flags
+  (couples the stable API to an estimator zoo).
+- **Epic closed** in PR #240 with `book_vol_target` (the multi-asset
+  counterpart of `vol_target`, `W[t-1] -> r[t]` timing), completing roadmap
+  §3 (covariance seam #235/#236, attribution #237, `RBP` #238, constraint
+  overlay #239).
+
 ### 2026-06-23 — Multi-asset / panel R&D harness (PRs #215–#219, epic)  [accepted]
 
 Took the research harness from single-asset to **multi-pair**: a model predicts a

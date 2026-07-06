@@ -18,15 +18,47 @@ Portfolio allocation algorithms and rolling walk-forward wrappers.
       (MDP), Minimum Variance Portfolio (MVP, MVP_uc) and a rolling
       walk-forward wrapper.
 
+   .. grid-item-card:: :octicon:`list-ordered;1.2em;sd-mr-1` Risk decomposition
+      :link: portfolio.attribution
+      :link-type: doc
+
+      Marginal and absolute risk contributions of assets to portfolio
+      volatility, with causal rolling decomposition.
+
+   .. grid-item-card:: :octicon:`shield-lock;1.2em;sd-mr-1` Constraint projection
+      :link: portfolio.constraints
+      :link-type: doc
+
+      Least-distance projection of weights onto a box, gross-leverage
+      cap, net-exposure range and named group bounds.
+
+   .. grid-item-card:: :octicon:`sync;1.2em;sd-mr-1` Rebalancing & delay
+      :link: portfolio.rebalance
+      :link-type: doc
+
+      Calendar, no-trade band and turnover-capped rebalancing with weight
+      drift, whole-lot discretization and execution delay.
+
    .. grid-item-card:: :octicon:`pin;1.2em;sd-mr-1` Position sizing
       :link: portfolio.sizing
       :link-type: doc
 
       Fractional Kelly, volatility targeting and transaction costs.
 
+   .. grid-item-card:: :octicon:`graph;1.2em;sd-mr-1` Conditioned covariance
+      :link: portfolio.covariance
+      :link-type: doc
+
+      Sample covariance, Ledoit-Wolf shrinkage, exponentially weighted,
+      factor-model and Marchenko-Pastur denoised estimators.
+
 .. toctree::
    :maxdepth: 1
    :hidden:
 
    portfolio.allocation
+   portfolio.attribution
+   portfolio.constraints
+   portfolio.covariance
+   portfolio.rebalance
    portfolio.sizing

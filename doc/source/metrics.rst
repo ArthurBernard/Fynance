@@ -34,6 +34,23 @@ Drawdown
    drawdown
    mdd
 
+Tail risk
+=========
+
+Value-at-Risk, Conditional Value-at-Risk (Expected Shortfall) and Conditional
+Drawdown-at-Risk. Like the ratios above, ``var``/``cvar``/``cdar`` take a
+price/equity curve (returns are derived internally); ``tail_dependence`` is the
+exception — it takes a ``(T, N)`` returns panel directly, mirroring
+:func:`information_coefficient`'s pair convention.
+
+.. autosummary::
+   :toctree: generated/
+
+   var
+   cvar
+   cdar
+   tail_dependence
+
 Rolling versions
 ================
 
@@ -46,6 +63,81 @@ Rolling versions
    roll_annual_volatility
    roll_drawdown
    roll_mdd
+   roll_var
+   roll_cvar
+
+Benchmark-relative
+==================
+
+Score a strategy *against* a benchmark rather than in isolation: beta and
+Jensen's alpha decompose the strategy's return into a benchmark-driven part
+and a residual, while tracking error, the information ratio and the up/down
+capture ratios describe the active (strategy-minus-benchmark) return. Every
+function takes two aligned price/level curves ``(X, B)`` (see
+:mod:`fynance.metrics.benchmark`).
+
+.. autosummary::
+   :toctree: generated/
+
+   beta
+   alpha
+   tracking_error
+   information_ratio
+   capture_ratio
+   benchmark_summary
+   roll_beta_benchmark
+
+Factor analysis
+===============
+
+Alphalens-style evaluation of a cross-sectional factor on a data-agnostic
+``(T, N)`` panel. The alignment convention matches
+:func:`information_coefficient` — ``factor[t]`` is paired with the return
+realized *after* the factor is known.
+
+.. autosummary::
+   :toctree: generated/
+
+   information_coefficient
+   quantile_returns
+   roll_information_coefficient
+   ic_decay
+   ic_summary
+   factor_rank_autocorr
+   QuantileResult
+
+Trading exposure & turnover
+============================
+
+Position-level analytics — how a book trades (churn) and sits (leverage,
+long/short bias) — taking a weight/position series rather than an equity
+curve, so (like the factor helpers above) these are intentionally kept out
+of the ``METRICS`` registry.
+
+.. autosummary::
+   :toctree: generated/
+
+   turnover_series
+   annual_turnover
+   gross_exposure
+   net_exposure
+   exposure_summary
+
+Trade analytics
+===============
+
+Round-trip trade extraction from a position book -- distinct from the
+churn/turnover metrics above (:func:`sign_changes`, :func:`trades_per_year`):
+these describe individual trades (entry/exit, side, realized return) rather
+than how often the position flips. See also
+:meth:`~fynance.backtest.result.BacktestResult.trades` and
+:meth:`~fynance.backtest.result.BacktestResult.trade_summary`.
+
+.. autosummary::
+   :toctree: generated/
+
+   extract_trades
+   trade_summary
 
 Aggregated report
 =================
@@ -57,7 +149,8 @@ Aggregated report
 
 :func:`summary` is driven by the ``METRICS`` registry — a name → callable
 mapping (``annual_return``, ``annual_volatility``, ``sharpe``, ``sortino``,
-``calmar``, ``max_drawdown``) you can read or extend.
+``calmar``, ``max_drawdown``, ``var``, ``cvar``, ``cdar``) you can read or
+extend.
 
 .. autodata:: METRICS
    :no-value:

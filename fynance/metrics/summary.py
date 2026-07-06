@@ -26,17 +26,21 @@ from fynance.metrics.ratios import (
     sortino,
 )
 from fynance.metrics.returns import annual_return
+from fynance.metrics.risk import cdar, cvar, var
 
 __all__ = ['METRICS', 'summary']
 
 # Registry of scalar metrics taking an equity/price curve -> float.
-METRICS: dict[str, Callable[..., NDArray]] = {
+METRICS: dict[str, Callable[..., NDArray | float]] = {
     'annual_return': annual_return,
     'annual_volatility': annual_volatility,
     'sharpe': sharpe,
     'sortino': sortino,
     'calmar': calmar,
     'max_drawdown': mdd,
+    'var': var,
+    'cvar': cvar,
+    'cdar': cdar,
 }
 
 
@@ -56,7 +60,10 @@ def summary(prices: NDArray, period: int = 252, rf: float = 0.0) -> dict[str, fl
     -------
     dict of str to float
         ``annual_return``, ``annual_volatility``, ``sharpe``, ``sortino``,
-        ``calmar`` and ``max_drawdown``.
+        ``calmar``, ``max_drawdown``, ``var``, ``cvar`` and ``cdar`` (the last
+        three at the default ``alpha=0.05``, historical method — call
+        :func:`~fynance.metrics.var` / :func:`~fynance.metrics.cvar` /
+        :func:`~fynance.metrics.cdar` directly for other tail parameters).
 
     Examples
     --------
@@ -64,7 +71,7 @@ def summary(prices: NDArray, period: int = 252, rf: float = 0.0) -> dict[str, fl
     >>> eq = np.array([100., 101., 103., 102., 105., 107.])
     >>> s = summary(eq)
     >>> sorted(s)
-    ['annual_return', 'annual_volatility', 'calmar', 'max_drawdown', 'sharpe', 'sortino']
+    ['annual_return', 'annual_volatility', 'calmar', 'cdar', 'cvar', 'max_drawdown', 'sharpe', 'sortino', 'var']
 
     """
     p = np.asarray(prices, dtype=np.float64)
@@ -81,4 +88,7 @@ def summary(prices: NDArray, period: int = 252, rf: float = 0.0) -> dict[str, fl
         'sortino': float(sortino(p, period=period, log=log)),
         'calmar': float(calmar(p, period=period)),
         'max_drawdown': float(mdd(p)),
+        'var': float(var(p)),
+        'cvar': float(cvar(p)),
+        'cdar': float(cdar(p)),
     }

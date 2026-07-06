@@ -17,6 +17,8 @@ features.
 
    features.filters
    features.indicators
+   features.labels
+   features.cross_section
    features.stats
    features.momentums
    features.roll_functions
@@ -26,11 +28,13 @@ features.
 
 # Submodule imports
 from . import (
+    cross_section,
     engineering,
     filters,
     garch,
     horizon,
     indicators,
+    labels,
     momentums,
     money_management,
     ohlcv,
@@ -39,11 +43,13 @@ from . import (
     scale,
     stats,
 )
+from .cross_section import *
 from .engineering import *
 from .filters import *
 from .garch import *
 from .horizon import *
 from .indicators import *
+from .labels import *
 from .momentums import *
 from .money_management import *
 from .ohlcv import *
@@ -52,11 +58,13 @@ from .roll_functions import *
 from .scale import *
 from .stats import *
 
-__all__ = engineering.__all__
+__all__ = cross_section.__all__
+__all__ += engineering.__all__
 __all__ += regime.__all__
 __all__ += filters.__all__
 __all__ += garch.__all__
 __all__ += horizon.__all__
+__all__ += labels.__all__
 __all__ += momentums.__all__
 __all__ += indicators.__all__
 __all__ += money_management.__all__

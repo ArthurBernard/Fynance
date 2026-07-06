@@ -20,6 +20,7 @@
     models.econometric_models
     models.rolling
     models.loss
+    models.tuning
 
 """
 
@@ -27,6 +28,7 @@ from . import (
     _base,
     _recurrent_base,
     attention,
+    conformal,
     econometric_models,
     ensemble,
     gru,
@@ -38,9 +40,11 @@ from . import (
     tcn,
     training,
     transformer,
+    tuning,
 )
 from ._base import BaseNeuralNet
 from .attention import MultiHeadAttention, ScaledDotProductAttention
+from .conformal import ConformalWrapper, rolling_conformal
 from .econometric_models import ARMA, ARMA_GARCH, ARMAX_GARCH, MA, get_parameters
 from .ensemble import StackingEnsemble
 from .gru import GatedRecurrentUnit, GRUCell
@@ -50,18 +54,22 @@ from .loss import (
     DirectionalAccuracyLoss,
     HybridLoss,
     OmegaLoss,
+    PinballLoss,
     SharpeLoss,
     SortinoLoss,
 )
 from .lstm import LongShortTermMemory, LSTMCell
 from .mlp import MultiLayerPerceptron
-from .objective import ObjectiveModel
+from .objective import ObjectiveModel, pretrain_pooled
+from .quantile import QuantileModel
 from .regime_model import RegimeMoE
 from .rnn import RecurrentNeuralNetwork
 from .rolling import CVResult, RollMultiLayerPerceptron, _RollingBasis
 from .tcn import TemporalConvNet
 from .training import EarlyStopping, exp_sample_weights
 from .transformer import PositionalEncoding, Transformer
+from .tuning import SearchResult, walk_forward_search
+from .uncertainty import DeepEnsemble, MCDropout
 
 # Frozen public surface for the 1.x series — names listed here are
 # guaranteed to remain importable from ``fynance.models`` until the
@@ -71,6 +79,9 @@ __all__ = [
     # attention
     'MultiHeadAttention',
     'ScaledDotProductAttention',
+    # conformal
+    'ConformalWrapper',
+    'rolling_conformal',
     # econometric_models
     'ARMA',
     'ARMA_GARCH',
@@ -83,6 +94,9 @@ __all__ = [
     'MultiLayerPerceptron',
     # objective-aligned training
     'ObjectiveModel',
+    'pretrain_pooled',
+    # distributional (quantile) regression
+    'QuantileModel',
     # regime-conditioned architecture
     'RegimeMoE',
     # rnn / gru / lstm
@@ -109,6 +123,13 @@ __all__ = [
     'CalmarLoss',
     'HybridLoss',
     'OmegaLoss',
+    'PinballLoss',
     'SharpeLoss',
     'SortinoLoss',
+    # tuning
+    'SearchResult',
+    'walk_forward_search',
+    # uncertainty
+    'DeepEnsemble',
+    'MCDropout',
 ]

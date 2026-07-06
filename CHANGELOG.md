@@ -18,6 +18,194 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.13.0] - 2026-07-06
+
+### Added
+
+- **DataFrame seams.** Duck-typed `from_pandas` / `to_pandas` / `to_polars`
+  on `PriceSeries`, `OHLCV` and `BacktestResult` (`BacktestResult.to_pandas`)
+  — pandas/polars stay optional (lazy import, no module-level dependency;
+  `import fynance` remains pandas-free).
+- **Protocol conformance & causality checks.** New `fynance.core.checks`:
+  `check_conforms(obj, protocol)` smoke-runs a protocol's methods on seeded
+  synthetic data with actionable errors, and `assert_causal(func)` probes for
+  lookahead by perturbing the future and asserting the past is unchanged —
+  the no-lookahead house rule as an executable check, usable in downstream
+  test suites.
+
+- **Causal conformal prediction.** `ConformalWrapper` (split-conformal
+  prediction intervals with a trailing calibration window) and
+  `rolling_conformal` (walk-forward train/calibrate/predict) in
+  `fynance.models.conformal` — distribution-free coverage on any
+  `SignalModel` regressor.
+- **Uncertainty wrappers.** `DeepEnsemble` (seeded member ensemble, mean +
+  epistemic std) and `MCDropout` (dropout-at-inference sampling) in
+  `fynance.models.uncertainty` — both `SignalModel`-conforming with
+  `predict_std`.
+- **Distributional forecasting.** `PinballLoss` (multi-quantile) in
+  `fynance.models.loss` and `QuantileModel` (`SignalModel` with a
+  per-quantile head, non-crossing enforced at predict time,
+  `predict_quantiles`) in `fynance.models.quantile`.
+- **Cross-asset pretraining & persistence for `ObjectiveModel`.**
+  `save`/`load`/`clone`, `finetune(freeze_trunk=)` (warm-start from current
+  weights, optionally freezing the trunk) and `pretrain_pooled` (pool aligned
+  `(X_i, y_i)` across assets; mini-batches never cross an asset join) — also
+  closes the model's save/load gap.
+
+- **GARCH MLE fit driver.** `fit_volatility(y, model, dist)` in
+  `fynance.estimator` fits GARCH / GJR-GARCH / EGARCH with Gaussian or
+  Student-t innovations via scipy MLE, returning a `VolatilityResult`
+  (params + numerical-Hessian std errors, AIC/BIC, conditional vol,
+  `.forecast(h)`, `.simulate()`); `features.garch_volatility` gains
+  `model=`/`dist=` passthrough (defaults bit-for-bit unchanged), and the
+  `estimator.estimation()` stub now points here.
+- **Intraday session utilities.** Vendor-agnostic `session_mask` /
+  `session_id` / `session_bounds` / `split_sessions` in
+  `fynance.data.sessions`: tag/slice intraday trading sessions on epoch-second
+  timestamp arrays with a fixed `utc_offset` (integer-arithmetic weekday math,
+  overnight sessions supported; DST explicitly out of scope, no pandas/pytz).
+- **Capacity analysis.** `capacity_curve` (net Sharpe / net annual return /
+  total cost vs a sweep of AUM levels via a caller-supplied
+  AUM→CostModel factory) and `breakeven_fee` (bisection for the fee at which
+  net Sharpe hits zero) in `fynance.backtest.capacity`.
+- **Holding costs & composite cost stacking.** `HoldingCost` (per-bar
+  borrow on short gross, financing on leverage above 1, cash-rate credit on
+  idle cash) and `CompositeCost` (sum of any cost models, merged
+  `components()` breakdown) in `fynance.backtest.cost`.
+- **Rebalancing policies & execution frictions.** New
+  `fynance.portfolio.rebalance`: causal `(T, N)` book transforms —
+  `rebalance_calendar` / `rebalance_band` (full or to-edge) /
+  `rebalance_turnover_cap` (weights drift with returns between trades),
+  `discretize` (round to tradeable share lots, suppress sub-min-notional
+  trades) and `delay` — composable between allocator/signal and `backtest()`.
+
+- **Trade-level analytics.** New `fynance.metrics.trades`: `extract_trades`
+  (round-trip structured array — entry/exit/side/compounded return/bars,
+  Numba scan, per-asset on `(T, N)` books) and `trade_summary` (win rate,
+  profit factor, payoff, expectancy, streaks, holding stats);
+  `BacktestResult.trades()` / `.trade_summary()` conveniences.
+- **Turnover & exposure analytics.** `turnover_series`, `annual_turnover`,
+  `gross_exposure`, `net_exposure`, `exposure_summary` in
+  `fynance.metrics.trading`, plus `plot_exposure` and an opt-in
+  `show_exposure` tearsheet panel (default output unchanged).
+- **GJR-GARCH / EGARCH kernels.** Numba filters `_gjr_garch` / `_egarch`
+  and `loglik_garch(params, y, model, dist)` (Gaussian and Student-t
+  innovations, distribution-correct E|z| centering for EGARCH) in
+  `models.econometric_models` — the likelihood layer for the upcoming
+  `fit_volatility` MLE driver.
+- **Tail-risk metrics.** New `fynance.metrics.risk`: `var` / `cvar`
+  (historical, Gaussian, Cornish-Fisher), `cdar` (mean of the α worst
+  drawdowns), causal `roll_var`/`roll_cvar`, and pairwise lower-tail
+  `tail_dependence` on `(T, N)` panels; scalar metrics registered in
+  `summary()`.
+- **Benchmark-relative metrics.** New `fynance.metrics.benchmark`:
+  `beta`, `alpha` (annualized Jensen), `tracking_error`,
+  `information_ratio`, up/down `capture_ratio`, `benchmark_summary` and
+  `roll_beta_benchmark` (reusing the `features.roll_functions` kernel).
+- **Block / stationary bootstrap.** `fynance.research.bootstrap`:
+  `resample_paths` (circular + Politis-Romano stationary, Numba kernels),
+  `bootstrap_metric` (percentile CIs on any metric) and
+  `block_permutation_test` — a dependence-preserving null complementing
+  `guards.permutation_test`.
+- **Probability of backtest overfitting.** `pbo` in
+  `fynance.research.overfit`: CSCV diagnostic over a `(T, n_configs)`
+  returns panel (rank logits, `prob_oos_loss`, IS→OOS degradation slope),
+  plus `returns_panel()` to build the input from `Experiment` objects.
+- **Combinatorial purged cross-validation.** `combinatorial_purged_cv` in
+  `fynance.data.split`: every C(n_groups, n_test_groups) group combination
+  becomes an out-of-sample path, with purge windows around test-group
+  boundaries and post-test embargo (AFML) — many OOS paths instead of one.
+- **Purged walk-forward hyperparameter search.** `walk_forward_search` in
+  `fynance.models.tuning`: grid/random search evaluated out-of-fold on the
+  purged walk-forward splitter, returning a `SearchResult` whose `n_trials`
+  feeds `deflated_sharpe_ratio` — trial accounting honest by construction.
+
+- **AFML labeling stack.** New `fynance.features.labels` module:
+  `triple_barrier` (path-aware profit-take / stop-loss / vertical-barrier
+  labels on a Numba scan, volatility-scaled barriers), `meta_labels`
+  (did-the-bet-pay binary target), `label_concurrency` and
+  `uniqueness_weights` (overlap-aware sample weights). Documented as
+  training TARGETS (they read future prices by design) to be consumed only
+  through purged splits.
+- **Factor analysis suite.** New `fynance.metrics.factor`
+  (`quantile_returns` -> `QuantileResult`, `roll_information_coefficient`,
+  `ic_decay` over non-overlapping horizons, `ic_summary` with ICIR/t-stat/
+  hit-rate, `factor_rank_autocorr`) and `fynance.plot.factor`
+  (`plot_quantile_returns`, `plot_ic_series`, `plot_ic_decay` and the
+  composed 2x2 `factor_tearsheet`) — alphalens-style factor evaluation on
+  data-agnostic `(T, N)` panels.
+- **Walk-forward feature importance (MDA).** `walk_forward_mda` in
+  `fynance.research.importance`: permutation importance evaluated
+  out-of-fold on the purged walk-forward splitter — fit once per fold,
+  permute the test window only, seeded; returns an `ImportanceResult`
+  (per-feature mean/std score drop + baseline).
+- **Fractional differentiation.** `fracdiff(X, d, tol)` in
+  `fynance.features.engineering`: fixed-width-window fractional
+  differentiation (AFML ch. 5) on a Numba kernel — stationarize while
+  keeping maximal memory; strictly causal, NaN warm-up head.
+- **Cross-sectional operators.** New `fynance.features.cross_section`
+  module: NaN-aware per-bar panel transforms `cs_rank` (average-tie
+  percentile ranks), `cs_zscore`, `cs_demean` (optionally weighted),
+  `cs_winsorize` and `cs_neutralize` (per-bar OLS residualization against
+  exposure panels) — the input half of the `(T, N)` factor workflow.
+- **Pairwise rolling statistics.** `roll_cov` / `roll_corr` / `roll_beta`
+  (trailing two-series moments on Numba kernels, window inclusive of `t`)
+  and `cross_corr` (lead-lag correlation profile) in
+  `fynance.features.roll_functions`.
+
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## [2.12.0] - 2026-07-05
+
+### Added
+
+- **Book-level vol targeting.** `book_vol_target(W, X, ...)` in
+  `fynance.portfolio.sizing`: causal `(T,)` leverage series targeting a
+  constant volatility for a whole `(T, N)` position book (weights decided at
+  `t-1` earn the return over `(t-1, t]`) — the multi-asset counterpart of
+  `vol_target`.
+- **Exposure-constraint overlay.** New `fynance.portfolio.constraints`
+  module: `project_weights` projects a weight vector or `(T, N)` book onto a
+  feasible set — per-asset box, gross-leverage cap, net-exposure range, named
+  group bounds — as a least-distance SLSQP projection (split `v = p - m`
+  formulation), with a fast clip-and-scale path for box+gross and an
+  interval-arithmetic infeasibility pre-check.
+- **Risk-budgeting allocation.** New `RBP(X, budgets=None, ...)` allocator
+  (generalized ERC, Roncalli least-squares objective): weights whose risk
+  contributions match an arbitrary budget vector; `budgets=None` reproduces
+  `ERC`, and the `cov=` seam / `rolling_allocation` forwarding apply.
+- **Risk attribution.** New `fynance.portfolio.attribution` module:
+  `marginal_risk` (∂σₚ/∂w), `risk_contribution` (absolute or percentage,
+  summing to σₚ / 1) and the causal `roll_risk_contribution` walking a
+  `(T, N)` weight path against a trailing covariance window (accepts the
+  same `cov=` estimators as the allocators).
+- **Allocator `cov=` seam.** The six allocators (`ERC`/`HRP`/`IVP`/`MVP`/
+  `MVP_uc`/`MDP`) accept an opt-in `cov=` callable mapping the `(T, N)`
+  training window to an `(N, N)` covariance matrix (e.g.
+  `portfolio.covariance.ledoit_wolf`); the default `None` keeps the
+  sample-covariance path bit-for-bit, and `rolling_allocation` forwards
+  `cov=` through its existing `**kwargs`.
+- **Conditioned covariance estimators.** New `fynance.portfolio.covariance`
+  module: `sample_cov`, closed-form `ledoit_wolf` shrinkage (identity /
+  constant-correlation / diagonal targets), RiskMetrics-style `ewma_cov`
+  (Numba kernel), PCA `factor_cov` (low-rank + diagonal, PSD by construction)
+  and Marchenko-Pastur `denoise_cov` — interchangeable `(T, N) → (N, N)`
+  callables, groundwork for the allocators' opt-in `cov=` seam.
+
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
 ## [2.11.2] - 2026-06-25
 
 ### Added
