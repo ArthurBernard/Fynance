@@ -23,5 +23,8 @@ adapters live downstream.
    deflated_sharpe_ratio
    ImportanceResult
    walk_forward_mda
+   PBOResult
+   pbo
+   returns_panel
    gbm
    regime_switching

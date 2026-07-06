@@ -21,6 +21,7 @@ from . import (
     guards,
     importance,
     ledger,
+    overfit,
     report,
     runner,
     synthetic,
@@ -30,6 +31,7 @@ from .experiment import *
 from .guards import *
 from .importance import *
 from .ledger import *
+from .overfit import *
 from .report import *
 from .runner import *
 from .synthetic import *
@@ -41,5 +43,6 @@ __all__ += runner.__all__
 __all__ += report.__all__
 __all__ += guards.__all__
 __all__ += importance.__all__
+__all__ += overfit.__all__
 __all__ += compare.__all__
 __all__ += ledger.__all__
