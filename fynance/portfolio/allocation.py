@@ -999,6 +999,12 @@ def MDP(
         return np.ones([1, 1])
 
     up_bound = max(up_bound, 1 / N)
+    # Clamp low_bound so the box stays compatible with the sum-to-one
+    # constraint: with low_bound > 1/N every feasible weight already exceeds
+    # its share, the box+equality set is infeasible and SLSQP would silently
+    # return weights summing to more than one (as ERC/RBP/MVP_uc already
+    # guard against).
+    low_bound = min(low_bound, 1 / N)
 
     if cov is None:
         # Set function to minimize: diversified_ratio recomputes the

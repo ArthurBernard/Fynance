@@ -18,6 +18,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.13.1] - 2026-07-06
+
+### Fixed
+
+- **Post-review corrections** (5 issues from the v2.13.0 adversarial review, all
+  bounded to degenerate/rare inputs, each with a regression test):
+  `combinatorial_purged_cv` now stacks the embargo *beyond* the post-test purge
+  (`e+purge : e+purge+embargo`) instead of overlapping it, so no future-adjacent
+  bar leaks back into train when both `purge>0` and `embargo>0`; `MDP` clamps
+  `low_bound` to `1/N` like the sibling allocators (an infeasible box no longer
+  silently yields weights summing to more than one); `book_vol_target` guards a
+  book wipeout (one-bar book return <= -1) so leverage goes to zero with no NaN
+  or `RuntimeWarning`; `CompositeCost.components` disambiguates a third
+  same-class same-key collision by model index (no component silently
+  overwritten, sum invariant preserved); `ConformalWrapper` rejects a
+  non-positive `window` with a clear `ValueError` at construction.
+
 ## [2.13.0] - 2026-07-06
 
 ### Added

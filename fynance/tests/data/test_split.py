@@ -195,3 +195,20 @@ def test_cpcv_purge_no_train_within_h_of_test_boundary(h):
             for offset in range(1, h + 1):
                 assert start - offset not in train_set
                 assert end + offset - 1 not in train_set
+
+
+def test_cpcv_embargo_stacks_on_purge():
+    # Regression: embargo must be applied *beyond* the post-test purge, not
+    # overlap it. With purge=2 and embargo=2, the post-test exclusion after a
+    # test group ending at bar e must span [e, e+4), not [e, e+2).
+    folds = list(
+        combinatorial_purged_cv(20, n_groups=4, n_test_groups=1, purge=2, embargo=2)
+    )
+    # Groups are [0,5),[5,10),[10,15),[15,20); pick the combo whose test is
+    # group 1 = [5, 10) so both boundaries sit inside the series.
+    train, test = next((tr, te) for tr, te in folds if te[0] == 5)
+    assert test.tolist() == [5, 6, 7, 8, 9]
+    # bars 10,11 purged; bars 12,13 embargoed -> none may be in train.
+    for leaked in (10, 11, 12, 13):
+        assert leaked not in train
+    assert 14 in train  # first bar past purge+embargo is back in train

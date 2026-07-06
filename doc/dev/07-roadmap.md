@@ -45,3 +45,35 @@ Le harnais `fynance.research` est **livré** (S1–S3) : `Experiment`,
 
 - [ ] Explorateur **Streamlit** au-dessus du Ledger (parcourir / filtrer / comparer
   les runs persistés) — interactif, plus tardif.
+
+## 3. Multi-actifs non-crypto — calendrier & coûts (prérequis d'honnêteté)
+
+Déposé 2026-07-04 par fynance-research : sa prochaine campagne (book trend /
+cross-section sur un univers ETF, données via dccd) est **bloquée** par deux
+hypothèses crypto câblées dans le harnais. Code de librairie data-agnostique —
+c'est bien ici que ça vit, la campagne elle-même reste dans le repo privé.
+
+> **MàJ 2026-07-06 (v2.13.0) — primitives livrées, reste le câblage.** L'épic
+> `backtest-realism` a livré les briques data-agnostiques de ces deux items ;
+> ce qui reste est leur intégration dans le chemin walk-forward.
+
+- [ ] **Calendrier de sessions.** _Primitives livrées_ : `fynance.data.sessions`
+  (`session_mask`/`session_id`/`session_bounds`/`split_sessions`) tague et
+  découpe les sessions sur des timestamps epoch. _Reste_ : les câbler dans
+  `walk_forward` (coupure train/test sur frontières de séance), l'agrégation
+  intra-session, et traiter le **gap overnight** comme un rendement à part (pas
+  un pas intraday) — sans régresser le chemin crypto 24/7 par défaut. NB : DST
+  est hors scope de `data.sessions` (offset fixe) — à trancher ici.
+- [ ] **Modèle de coûts actions.** _Primitives livrées_ : `HoldingCost`
+  (commission implicite via `ProportionalCost`, **borrow** du short, financement
+  du levier, crédit de cash) + `CompositeCost` pour empiler. _Reste_ : le
+  brancher par **configuration** (pas par fork) sur le chemin de recherche
+  actions, en remplacement du couple taker-fee + funding-perp crypto.
+- [ ] **Coût du turnover implicite d'un book qui drift.** Remonté par les agents
+  pendant l'épic `backtest-realism` : le coût turnover du moteur `backtest()`
+  **sous-compte** le trading réel d'un book dont les poids dérivent avec les
+  rendements entre deux rebalancements — il mesure `Σ|E_t − E_{t-1}|` (equity)
+  au lieu du trade effectif `Σ|w_t − drift(w_{t-1}, r_t)|`. Les briques
+  `portfolio.rebalance` produisent déjà le book effectif correct ; il reste à
+  faire refléter ce coût dans les KPIs du moteur (petit chantier moteur isolé,
+  API `backtest()` stable à préserver).

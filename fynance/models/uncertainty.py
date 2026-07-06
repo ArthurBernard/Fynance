@@ -202,8 +202,6 @@ class MCDropout:
     Ghahramani, 2016, "Dropout as a Bayesian Approximation"). The spread across
     those passes — :meth:`predict_std` — is the epistemic-uncertainty proxy.
 
-    Technique
-    ---------
     A plain ``model.eval()`` freezes dropout too (no stochasticity left to
     sample from). :meth:`predict` / :meth:`predict_std` instead first put the
     *whole* model in eval mode (so batch-norm and similar layers behave as at

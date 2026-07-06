@@ -38,9 +38,9 @@ todo/
 done/
 TODO.md
 
-# Developer docs: descriptive pack + roadmap are tracked (mirrors dccd);
-# only the plan trees and archived snapshots stay local
-doc/dev/plans/*/
+# Developer docs: descriptive pack, roadmap and plan trees are tracked
+# (mirrors dccd — the plan PR lands the tree before code so leaf branches
+# inherit it); only archived snapshots stay local
 doc/dev/_archive/
 
 # Local output of examples/research_workflow.py (results live in a downstream repo)

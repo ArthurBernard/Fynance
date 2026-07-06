@@ -10,6 +10,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Common conventions
 
+<!-- mirror of ~/.claude/CLAUDE.md — synced 2026-07-04 -->
+
 Shared across my repos, mirrored from `~/.claude/CLAUDE.md` (the single source of
 truth — if they ever disagree, the global file wins). Restated here so the repo
 stays self-contained:
@@ -21,8 +23,11 @@ stays self-contained:
   `Co-Authored-By` trailers** (personal repo).
 - **One PR = one concern**, small and disposable — a big plan ships as several small
   atomic PRs, never one catch-all branch.
-- **Model: `opus`, always** — interactive sessions and every spawned subagent; a plan
-  leaf's `complexity` is effort/ordering only and never downgrades the model.
+- **Model: session model for judgement, tiered execution** — sessions,
+  orchestration and the judgement skills run on the session model (set in
+  `~/.claude/settings.json`); plan-leaf execution runs at the tier derived from
+  the leaf's `complexity` (`low→haiku / medium→sonnet / high→session model`),
+  escalating one tier on failed tests/verification.
 - **Before every commit** — `pytest` and `ruff check fynance/` must pass.
 
 ## Commands
@@ -61,7 +66,7 @@ sources of truth:
 | Doc | Holds | Updated by |
 |-----|-------|-----------|
 | `doc/dev/07-roadmap.md` | open work — single source *index* (**tracked**, mirrors dccd) | `/pick-task` reads · `/finish-task`, `/abandon-task` update |
-| `doc/dev/plans/<epic>/` | open work *detail* — durable plan trees (**local/gitignored**; the format `README.md` is tracked) | `/plan` writes · `/execute-leaf` reads · `/finish-task` archives |
+| `doc/dev/plans/<epic>/` | open work *detail* — durable plan trees (**tracked**, mirrors dccd; the plan PR lands them before code) | `/plan` writes · `/execute-leaf` reads · `/finish-task` archives |
 | `doc/dev/03-decisions.md` | the *why* — ADR journal (+ settled rationale) | `/finish-task` (accepted), `/abandon-task` (rejected/tombstone) |
 | `doc/dev/06-status.md` | where things stand | `/finish-task`, `/groom-docs` |
 
