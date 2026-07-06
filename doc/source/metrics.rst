@@ -34,6 +34,23 @@ Drawdown
    drawdown
    mdd
 
+Tail risk
+=========
+
+Value-at-Risk, Conditional Value-at-Risk (Expected Shortfall) and Conditional
+Drawdown-at-Risk. Like the ratios above, ``var``/``cvar``/``cdar`` take a
+price/equity curve (returns are derived internally); ``tail_dependence`` is the
+exception — it takes a ``(T, N)`` returns panel directly, mirroring
+:func:`information_coefficient`'s pair convention.
+
+.. autosummary::
+   :toctree: generated/
+
+   var
+   cvar
+   cdar
+   tail_dependence
+
 Rolling versions
 ================
 
@@ -46,6 +63,8 @@ Rolling versions
    roll_annual_volatility
    roll_drawdown
    roll_mdd
+   roll_var
+   roll_cvar
 
 Benchmark-relative
 ==================
@@ -97,7 +116,8 @@ Aggregated report
 
 :func:`summary` is driven by the ``METRICS`` registry — a name → callable
 mapping (``annual_return``, ``annual_volatility``, ``sharpe``, ``sortino``,
-``calmar``, ``max_drawdown``) you can read or extend.
+``calmar``, ``max_drawdown``, ``var``, ``cvar``, ``cdar``) you can read or
+extend.
 
 .. autodata:: METRICS
    :no-value:

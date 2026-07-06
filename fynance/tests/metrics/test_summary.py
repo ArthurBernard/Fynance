@@ -20,7 +20,8 @@ def test_summary_keys():
     eq = np.array([100., 101., 103., 102., 105., 107.])
     s = summary(eq)
     assert set(s) == {"annual_return", "annual_volatility", "sharpe",
-                      "sortino", "calmar", "max_drawdown"}
+                      "sortino", "calmar", "max_drawdown", "var", "cvar",
+                      "cdar"}
     for v in s.values():
         assert np.isfinite(v)
 

@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Tail-risk metrics.** New `fynance.metrics.risk`: `var` / `cvar`
+  (historical, Gaussian, Cornish-Fisher), `cdar` (mean of the α worst
+  drawdowns), causal `roll_var`/`roll_cvar`, and pairwise lower-tail
+  `tail_dependence` on `(T, N)` panels; scalar metrics registered in
+  `summary()`.
 - **Benchmark-relative metrics.** New `fynance.metrics.benchmark`:
   `beta`, `alpha` (annualized Jensen), `tracking_error`,
   `information_ratio`, up/down `capture_ratio`, `benchmark_summary` and
