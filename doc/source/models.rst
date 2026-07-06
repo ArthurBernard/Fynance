@@ -72,6 +72,12 @@ architectures.
 
       Walk-forward evaluation wrappers for time-series models.
 
+   .. grid-item-card:: :octicon:`checklist;1.2em;sd-mr-1` Purged walk-forward tuning
+      :link: models.tuning
+      :link-type: doc
+
+      Grid/random hyperparameter search scored on purged walk-forward folds.
+
 .. toctree::
    :maxdepth: 1
    :hidden:
@@ -86,3 +92,4 @@ architectures.
    models.tcn
    models.training
    models.transformer
+   models.tuning

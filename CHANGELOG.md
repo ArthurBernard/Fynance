@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Purged walk-forward hyperparameter search.** `walk_forward_search` in
+  `fynance.models.tuning`: grid/random search evaluated out-of-fold on the
+  purged walk-forward splitter, returning a `SearchResult` whose `n_trials`
+  feeds `deflated_sharpe_ratio` — trial accounting honest by construction.
+
 - **AFML labeling stack.** New `fynance.features.labels` module:
   `triple_barrier` (path-aware profit-take / stop-loss / vertical-barrier
   labels on a Numba scan, volatility-scaled barriers), `meta_labels`

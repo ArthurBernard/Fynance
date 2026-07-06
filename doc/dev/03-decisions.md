@@ -72,6 +72,23 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-07-06 — Anti-overfitting guards epic (PRs #249, epic)  [accepted]
+
+- **Choice**: complete the overfitting-guard triad as four parallel bricks —
+  purged walk-forward HP search (`models.tuning`, grid/random only) exposing
+  `n_trials` straight into `deflated_sharpe_ratio`; CSCV/PBO diagnostic
+  (`research.overfit`); block/stationary bootstrap (`research.bootstrap`,
+  dependence-preserving null as a drop-in analogue of `permutation_test`);
+  CPCV splitter in `data.split`.
+- **Why**: the guards module had permutation + DSR but nothing diagnosing
+  selection bias across a *family* of tried configs, and every HP sweep was
+  a hand-rolled leak-prone loop hiding its trial count; the iid permutation
+  null destroys autocorrelation.
+- **Rejected alternatives**: an optuna dependency (grid/random suffice; no
+  heavy dep); modifying `permutation_test` in place (the block variant is
+  additive, old semantics preserved); White's Reality Check / SPA (PBO is
+  the assumption-light standard and fits the Ledger data we already have).
+
 ### 2026-07-05 — Cross-sectional factor research epic (PRs #243–#248, epic)  [accepted]
 
 Gives fynance the *input half* of the factor workflow the v2.11 panel harness

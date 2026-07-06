@@ -20,6 +20,7 @@
     models.econometric_models
     models.rolling
     models.loss
+    models.tuning
 
 """
 
@@ -38,6 +39,7 @@ from . import (
     tcn,
     training,
     transformer,
+    tuning,
 )
 from ._base import BaseNeuralNet
 from .attention import MultiHeadAttention, ScaledDotProductAttention
@@ -62,6 +64,7 @@ from .rolling import CVResult, RollMultiLayerPerceptron, _RollingBasis
 from .tcn import TemporalConvNet
 from .training import EarlyStopping, exp_sample_weights
 from .transformer import PositionalEncoding, Transformer
+from .tuning import SearchResult, walk_forward_search
 
 # Frozen public surface for the 1.x series — names listed here are
 # guaranteed to remain importable from ``fynance.models`` until the
@@ -111,4 +114,7 @@ __all__ = [
     'OmegaLoss',
     'SharpeLoss',
     'SortinoLoss',
+    # tuning
+    'SearchResult',
+    'walk_forward_search',
 ]
