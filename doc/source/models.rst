@@ -54,6 +54,12 @@ architectures.
 
       Direction + magnitude stacking with an out-of-fold meta-model.
 
+   .. grid-item-card:: :octicon:`graph;1.2em;sd-mr-1` Uncertainty
+      :link: models.uncertainty
+      :link-type: doc
+
+      Deep ensembles and MC Dropout predictive-uncertainty wrappers.
+
    .. grid-item-card:: :octicon:`flame;1.2em;sd-mr-1` Loss functions
       :link: models.loss
       :link-type: doc
@@ -93,3 +99,4 @@ architectures.
    models.training
    models.transformer
    models.tuning
+   models.uncertainty

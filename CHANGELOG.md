@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Uncertainty wrappers.** `DeepEnsemble` (seeded member ensemble, mean +
+  epistemic std) and `MCDropout` (dropout-at-inference sampling) in
+  `fynance.models.uncertainty` — both `SignalModel`-conforming with
+  `predict_std`.
 - **Distributional forecasting.** `PinballLoss` (multi-quantile) in
   `fynance.models.loss` and `QuantileModel` (`SignalModel` with a
   per-quantile head, non-crossing enforced at predict time,

@@ -72,7 +72,7 @@ Template:
 
 <!-- new entries below, newest first -->
 
-### 2026-07-06 — ML bricks epic (PRs #263–#264, epic)  [accepted]
+### 2026-07-06 — ML bricks epic (PRs #263–#265, epic)  [accepted]
 
 - **Choice**: four PyTorch bricks that all conform to `SignalModel` and stay
   inside `models/` — cross-asset pretraining/persistence on `ObjectiveModel`
