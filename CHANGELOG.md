@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Intraday session utilities.** Vendor-agnostic `session_mask` /
+  `session_id` / `session_bounds` / `split_sessions` in
+  `fynance.data.sessions`: tag/slice intraday trading sessions on epoch-second
+  timestamp arrays with a fixed `utc_offset` (integer-arithmetic weekday math,
+  overnight sessions supported; DST explicitly out of scope, no pandas/pytz).
 - **Capacity analysis.** `capacity_curve` (net Sharpe / net annual return /
   total cost vs a sweep of AUM levels via a caller-supplied
   AUM→CostModel factory) and `breakeven_fee` (bisection for the fee at which

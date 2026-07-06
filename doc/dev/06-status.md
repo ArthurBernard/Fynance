@@ -67,10 +67,13 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
   **attribution**, and a least-distance exposure-**constraints** overlay
   (`project_weights`).
 - **Backtest / Plot**: vectorized `backtest()` engine → `BacktestResult`, cost
-  models (`ProportionalCost` + **`MarketImpactCost`** — a convex, super-linear
-  market-impact term on top of the linear fee); reporting via `fynance.plot`
-  (`tearsheet`, composable figures, lazy matplotlib so `import fynance` stays
-  matplotlib-free).
+  models (`ProportionalCost` + **`MarketImpactCost`** + **`HoldingCost`** /
+  **`CompositeCost`** — borrow/financing/cash carry, composable stacking);
+  **rebalancing policies** (`portfolio.rebalance` — calendar/band/turnover-cap +
+  `discretize`/`delay`), **capacity analysis** (`capacity_curve`/`breakeven_fee`)
+  and **intraday session utilities** (`data.sessions`); reporting via
+  `fynance.plot` (`tearsheet`, composable figures, lazy matplotlib so
+  `import fynance` stays matplotlib-free).
 - **Research harness** (`fynance.research`, S1–S3 complete): `Experiment`
   (serializable spec + code + seed + metrics + curves), `run_experiment` (seeded,
   cost-aware, walk-forward; no-lookahead probe; records a **provenance** block —
