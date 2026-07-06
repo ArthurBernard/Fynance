@@ -49,6 +49,11 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
   losses (Sharpe/Sortino/Calmar/Omega/directional/hybrid) in `models/loss/`;
   robust-training utils (purged CV, early stopping, sample weighting) in
   `models/training.py`. All NN models conform to `SignalModel` (`fit`/`predict`).
+  **2026-07 ML bricks (PRs #263–#266)**: cross-asset pretraining + save/load on
+  `ObjectiveModel` (`pretrain_pooled`/`clone`/`finetune`), distributional
+  `QuantileModel` (+ `PinballLoss`), uncertainty wrappers (`DeepEnsemble`,
+  `MCDropout`) and causal split-`conformal` intervals; **GARCH family (PRs
+  #255/#262)**: GJR/EGARCH kernels + Student-t + `fit_volatility` MLE driver.
 - **Objective-aligned training** (`models/objective.py`): `ObjectiveModel` trains
   any `nn.Module` (MLP by default) **directly on a differentiable financial
   objective** (`SharpeLoss`/`SortinoLoss`/…) — the net outputs positions, the loss

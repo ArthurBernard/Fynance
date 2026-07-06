@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Causal conformal prediction.** `ConformalWrapper` (split-conformal
+  prediction intervals with a trailing calibration window) and
+  `rolling_conformal` (walk-forward train/calibrate/predict) in
+  `fynance.models.conformal` — distribution-free coverage on any
+  `SignalModel` regressor.
 - **Uncertainty wrappers.** `DeepEnsemble` (seeded member ensemble, mean +
   epistemic std) and `MCDropout` (dropout-at-inference sampling) in
   `fynance.models.uncertainty` — both `SignalModel`-conforming with

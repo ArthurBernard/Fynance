@@ -46,15 +46,6 @@ Le harnais `fynance.research` est **livré** (S1–S3) : `Experiment`,
 - [ ] Explorateur **Streamlit** au-dessus du Ledger (parcourir / filtrer / comparer
   les runs persistés) — interactif, plus tardif.
 
-## 9. ML bricks (épic `ml-bricks`)
-
-- [ ] Pretraining cross-asset pour `ObjectiveModel` : `pretrain_pooled`/
-  `clone_for_asset`/`finetune` + persistance `state_dict` (comble le gap save/load).
-- [ ] Forecasting distributionnel : pertes pinball / NLL gaussienne + tête
-  `QuantileModel`.
-- [ ] `DeepEnsemble` & `MCDropout` : wrappers `SignalModel` uncertainty-aware.
-- [ ] Conformal prediction causale pour signaux de trading.
-
 ## 10. DX one-offs (épic `dx-oneoffs`)
 
 - [ ] `core/checks.py` : `check_conforms(obj, protocol)` + `assert_causal(func)` —
