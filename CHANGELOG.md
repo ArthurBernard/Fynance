@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Benchmark-relative metrics.** New `fynance.metrics.benchmark`:
+  `beta`, `alpha` (annualized Jensen), `tracking_error`,
+  `information_ratio`, up/down `capture_ratio`, `benchmark_summary` and
+  `roll_beta_benchmark` (reusing the `features.roll_functions` kernel).
 - **Block / stationary bootstrap.** `fynance.research.bootstrap`:
   `resample_paths` (circular + Politis-Romano stationary, Numba kernels),
   `bootstrap_metric` (percentile CIs on any metric) and

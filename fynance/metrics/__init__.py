@@ -15,6 +15,7 @@ Risk-adjusted ratios, return and drawdown metrics for evaluating a strategy
 import sys as _sys
 
 # Local packages
+from .benchmark import *
 from .correlation import *
 from .drawdown import *
 from .factor import *
@@ -28,14 +29,18 @@ from .trading import *
 # collide with a submodule, e.g. the ``drawdown`` function vs the module).
 # ``information_coefficient``, the factor-analysis helpers (``quantile_returns``,
 # ``roll_information_coefficient``, ``ic_decay``, ``ic_summary``,
-# ``factor_rank_autocorr``) and the trade-profile metrics (``sign_changes`` /
-# ``trades_per_year``) are exported here but intentionally NOT added to the
-# ``METRICS`` registry: that registry maps a name to a callable taking a single
-# equity/price curve (see ``summary``), whereas the IC and factor helpers take an
-# aligned (pred, real) / (factor, fwd) pair and the trade-profile metrics take a
-# position series, so none fit that single-series contract.
+# ``factor_rank_autocorr``), the trade-profile metrics (``sign_changes`` /
+# ``trades_per_year``) and the benchmark-relative metrics (``beta``, ``alpha``,
+# ``tracking_error``, ``information_ratio``, ``capture_ratio``,
+# ``benchmark_summary``, ``roll_beta_benchmark``) are exported here but
+# intentionally NOT added to the ``METRICS`` registry: that registry maps a name
+# to a callable taking a single equity/price curve (see ``summary``), whereas
+# the IC and factor helpers take an aligned (pred, real) / (factor, fwd) pair,
+# the trade-profile metrics take a position series, and the benchmark metrics
+# take an aligned (strategy, benchmark) pair, so none fit that single-series
+# contract.
 __all__ = []
-for _m in ("correlation", "returns", "ratios", "drawdown", "factor", "trading"):
+for _m in ("benchmark", "correlation", "returns", "ratios", "drawdown", "factor", "trading"):
     __all__ += _sys.modules[f"{__name__}.{_m}"].__all__
 __all__ += ['perf_strat', 'returns_strat', 'METRICS', 'summary']
 

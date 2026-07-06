@@ -47,6 +47,27 @@ Rolling versions
    roll_drawdown
    roll_mdd
 
+Benchmark-relative
+==================
+
+Score a strategy *against* a benchmark rather than in isolation: beta and
+Jensen's alpha decompose the strategy's return into a benchmark-driven part
+and a residual, while tracking error, the information ratio and the up/down
+capture ratios describe the active (strategy-minus-benchmark) return. Every
+function takes two aligned price/level curves ``(X, B)`` (see
+:mod:`fynance.metrics.benchmark`).
+
+.. autosummary::
+   :toctree: generated/
+
+   beta
+   alpha
+   tracking_error
+   information_ratio
+   capture_ratio
+   benchmark_summary
+   roll_beta_benchmark
+
 Factor analysis
 ===============
 
