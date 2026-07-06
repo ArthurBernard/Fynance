@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Rebalancing policies & execution frictions.** New
+  `fynance.portfolio.rebalance`: causal `(T, N)` book transforms —
+  `rebalance_calendar` / `rebalance_band` (full or to-edge) /
+  `rebalance_turnover_cap` (weights drift with returns between trades),
+  `discretize` (round to tradeable share lots, suppress sub-min-notional
+  trades) and `delay` — composable between allocator/signal and `backtest()`.
+
 - **Trade-level analytics.** New `fynance.metrics.trades`: `extract_trades`
   (round-trip structured array — entry/exit/side/compounded return/bars,
   Numba scan, per-asset on `(T, N)` books) and `trade_summary` (win rate,
