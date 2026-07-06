@@ -17,6 +17,7 @@ performance report. Each plot returns an ``Axes``/``Figure`` and never calls
    plot_drawdown
    plot_returns_hist
    plot_rolling_sharpe
+   plot_exposure
 
 Factor tear-sheet
 =================
