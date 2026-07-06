@@ -52,12 +52,14 @@ from .loss import (
     DirectionalAccuracyLoss,
     HybridLoss,
     OmegaLoss,
+    PinballLoss,
     SharpeLoss,
     SortinoLoss,
 )
 from .lstm import LongShortTermMemory, LSTMCell
 from .mlp import MultiLayerPerceptron
 from .objective import ObjectiveModel, pretrain_pooled
+from .quantile import QuantileModel
 from .regime_model import RegimeMoE
 from .rnn import RecurrentNeuralNetwork
 from .rolling import CVResult, RollMultiLayerPerceptron, _RollingBasis
@@ -87,6 +89,8 @@ __all__ = [
     # objective-aligned training
     'ObjectiveModel',
     'pretrain_pooled',
+    # distributional (quantile) regression
+    'QuantileModel',
     # regime-conditioned architecture
     'RegimeMoE',
     # rnn / gru / lstm
@@ -113,6 +117,7 @@ __all__ = [
     'CalmarLoss',
     'HybridLoss',
     'OmegaLoss',
+    'PinballLoss',
     'SharpeLoss',
     'SortinoLoss',
     # tuning
