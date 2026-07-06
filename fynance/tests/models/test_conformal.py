@@ -313,3 +313,12 @@ def test_smoke_conformal_wrapper_with_tiny_torch_mlp():
     interval = wrapper.predict_interval(X[-5:])
     assert interval.shape == (5, 2)
     assert np.all(interval[:, 1] > interval[:, 0])
+
+
+def test_conformal_non_positive_window_raises():
+    # Regression: window <= 0 must raise a clear ValueError at construction,
+    # not crash later with an obscure IndexError on an empty residual array.
+    with pytest.raises(ValueError, match="window"):
+        ConformalWrapper(MultiLayerPerceptron, alpha=0.1, window=0)
+    with pytest.raises(ValueError, match="window"):
+        ConformalWrapper(MultiLayerPerceptron, alpha=0.1, window=-5)

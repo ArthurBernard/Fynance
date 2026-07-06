@@ -249,3 +249,19 @@ def test_composite_components_merges_holding_terms():
     )
     comps = cost.components(w)
     assert set(comps) == {"transaction", "borrow", "financing", "cash"}
+
+
+def test_composite_components_no_overwrite_on_triple_same_class():
+    # Regression: three stacked models sharing class name AND component key
+    # must each keep their contribution (no silent overwrite), and the merged
+    # components must still sum to the composite total.
+    w = np.array([[1.0, 0.0], [0.4, 0.6], [0.4, 0.6]])
+    comp = CompositeCost(
+        [ProportionalCost(0.001), ProportionalCost(0.002), ProportionalCost(0.003)]
+    )
+    parts = comp.components(w)
+    assert len(parts) == 3  # no collision dropped a component
+    stacked = np.zeros(w.shape[0])
+    for v in parts.values():
+        stacked = stacked + v
+    np.testing.assert_allclose(stacked, comp(w), rtol=1e-12)

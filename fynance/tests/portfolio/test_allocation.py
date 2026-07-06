@@ -689,3 +689,13 @@ def test_rolling_allocation_cov_seam():
     active = np.flatnonzero(np.abs(w_mat).sum(axis=1) > 1e-9)
     assert active.size > 0
     assert np.allclose(w_mat[active].sum(axis=1), 1.0, atol=1e-4)
+
+
+def test_mdp_high_low_bound_still_sums_to_one():
+    # Regression: MDP must clamp low_bound to 1/N like ERC/RBP/MVP_uc, so an
+    # infeasible box (low_bound > 1/N) cannot silently yield weights that
+    # violate the sum-to-one constraint.
+    rng = np.random.default_rng(0)
+    X = rng.normal(0.0, 0.01, size=(300, 5))
+    w = MDP(X, low_bound=0.3)  # 0.3 > 1/5 = 0.2 -> would be infeasible unclamped
+    assert np.isclose(w.sum(), 1.0, atol=1e-6)

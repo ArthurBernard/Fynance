@@ -208,11 +208,22 @@ def book_vol_target(
     r[1:] = X[1:] / X[:-1] - 1.0
     rb = np.zeros(X.shape[0])
     rb[1:] = np.sum(W[:-1] * r[1:], axis=1)
-    L = 100.0 * np.cumprod(1.0 + rb)
+
+    # Book-wipeout guard (mirrors rebalance._drift_step): a one-bar book return
+    # <= -1 drives the synthetic level non-positive, so ``realized_volatility``
+    # would take log() of a negative number (NaN + RuntimeWarning). Floor the
+    # growth factor so the level stays positive — identical to ``1 + rb`` for
+    # any valid book where every growth factor is already positive — and force
+    # zero leverage from the first wipeout on (a wiped-out book stays wiped).
+    growth = 1.0 + rb
+    wiped = np.flatnonzero(growth <= 0.0)
+    L = 100.0 * np.cumprod(np.maximum(growth, 1e-12))
 
     vol = np.asarray(realized_volatility(L, w=w, period=period))
     with np.errstate(divide='ignore', invalid='ignore'):
         lev = np.where(vol > 0, target_vol / vol, 0.0)
+    if wiped.size:
+        lev[wiped[0]:] = 0.0
 
     return np.clip(lev, 0.0, max_leverage)
 
