@@ -5,12 +5,13 @@
 
 # Third-party
 import numpy as np
+import pytest
 import torch
 
 # Local
 from fynance.core import SignalModel
 from fynance.metrics import sharpe
-from fynance.models import ObjectiveModel, SortinoLoss
+from fynance.models import ObjectiveModel, SortinoLoss, pretrain_pooled
 
 
 def _edge_data(n=1500, seed=0):
@@ -244,3 +245,192 @@ def test_minibatch_with_cost_reduces_turnover():
                             cost=0.1, seed=0).fit(X, returns)
 
     assert _turnover(pricey.predict(X)) < _turnover(free.predict(X))
+
+
+# -- Persistence: save / load ------------------------------------------------
+
+
+def test_save_load_roundtrip_and_trainable(tmp_path):
+    # save -> load reconstructs bit-identical predictions and stays trainable.
+    X, returns = _edge_data(n=400)
+    m = ObjectiveModel(layers=(8,), epochs=20, seed=3).fit(X, returns)
+
+    path = tmp_path / "objective.pt"
+    m.save(path)
+    loaded = ObjectiveModel.load(path)
+
+    assert np.allclose(m.predict(X), loaded.predict(X), atol=1e-7)
+
+    # Continued trainability: a fit() after load runs and moves the weights.
+    before = np.asarray(loaded.predict(X)).copy()
+    loaded.fit(X, returns)
+    after = np.asarray(loaded.predict(X))
+    assert after.shape == before.shape
+    assert not np.array_equal(before, after)
+
+
+def test_save_load_preserves_config(tmp_path):
+    # The reloaded model carries the same init config (needed to reconstruct).
+    m = ObjectiveModel(layers=(8, 4), n_assets=1, epochs=13, lr=2e-3,
+                       batch_size=64, shuffle=False, cost=0.01, seed=9)
+    X, returns = _edge_data(n=200)
+    m.fit(X, returns)
+
+    path = tmp_path / "objective.pt"
+    m.save(path)
+    loaded = ObjectiveModel.load(path)
+
+    for attr in ("n_assets", "layers", "epochs", "lr", "batch_size", "shuffle",
+                 "cost", "seed"):
+        assert getattr(loaded, attr) == getattr(m, attr)
+
+
+# -- clone -------------------------------------------------------------------
+
+
+def test_clone_same_weights_independent_training():
+    X, returns = _edge_data(n=400)
+    m = ObjectiveModel(layers=(8,), epochs=20, seed=4).fit(X, returns)
+
+    clone = m.clone()
+    # Same (deep-copied) weights -> identical predictions.
+    assert np.allclose(m.predict(X), clone.predict(X), atol=1e-7)
+
+    # Training the clone leaves the original bit-identical, and the clone moves.
+    original_before = np.asarray(m.predict(X)).copy()
+    clone.fit(X, returns)
+    assert np.array_equal(original_before, np.asarray(m.predict(X)))
+    assert not np.array_equal(original_before, np.asarray(clone.predict(X)))
+
+
+# -- finetune ----------------------------------------------------------------
+
+
+def _trunk_head_names(model):
+    """ Split the net's state_dict keys into (trunk, head) parameter names. """
+    head = model._head_module()
+    head_names = set()
+    for name, mod in model.net.named_modules():
+        if mod is head:
+            for pn, _ in mod.named_parameters(recurse=False):
+                head_names.add(f"{name}.{pn}" if name else pn)
+    all_names = set(model.net.state_dict().keys())
+
+    return all_names - head_names, head_names
+
+
+def test_finetune_freeze_trunk_trains_head_only():
+    X, returns = _edge_data(n=400)
+    m = ObjectiveModel(layers=(8,), epochs=30, seed=5).fit(X, returns)
+
+    trunk_names, head_names = _trunk_head_names(m)
+    assert trunk_names and head_names  # the default MLP has both a trunk & head
+
+    before = {k: v.clone() for k, v in m.net.state_dict().items()}
+    m.finetune(X, returns, freeze_trunk=True, epochs=30)
+    after = m.net.state_dict()
+
+    # Trunk parameters are byte-identical; head parameters changed.
+    assert all(torch.equal(before[k], after[k]) for k in trunk_names)
+    assert any(not torch.equal(before[k], after[k]) for k in head_names)
+
+
+def test_finetune_no_freeze_changes_trunk():
+    X, returns = _edge_data(n=400)
+    m = ObjectiveModel(layers=(8,), epochs=30, seed=5).fit(X, returns)
+
+    trunk_names, _ = _trunk_head_names(m)
+    before = {k: v.clone() for k, v in m.net.state_dict().items()}
+    m.finetune(X, returns, freeze_trunk=False, epochs=30)
+    after = m.net.state_dict()
+
+    assert any(not torch.equal(before[k], after[k]) for k in trunk_names)
+
+
+def test_finetune_before_fit_raises():
+    X, returns = _edge_data(n=100)
+    with pytest.raises(RuntimeError):
+        ObjectiveModel().finetune(X, returns)
+
+
+# -- pretrain_pooled ---------------------------------------------------------
+
+
+def test_pretrain_pooled_batches_never_cross_joins():
+    # Segment lengths that batch_size does NOT divide: a naive global-contiguous
+    # batching over the concatenation WOULD span a join -> the check has teeth.
+    lengths = [1000, 800]
+    bs = 256
+    assert any(L % bs != 0 for L in lengths)
+
+    Xs, ys = [], []
+    for i, L in enumerate(lengths):
+        X, r = _edge_data(n=L, seed=i)
+        Xs.append(X)
+        ys.append(r)
+
+    model = ObjectiveModel(layers=(8,), epochs=2, batch_size=bs, seed=0)
+    pretrain_pooled(model, Xs, ys)
+
+    offsets = np.cumsum([0] + lengths)
+    for si, a, b in model._batch_plan:
+        assert 0 <= a < b <= lengths[si]                 # slice within a segment
+        g0, g1 = offsets[si] + a, offsets[si] + b        # global index range ...
+        assert offsets[si] <= g0 < g1 <= offsets[si + 1]  # ... inside one asset
+    # Every asset contributed at least one batch.
+    assert {si for si, _, _ in model._batch_plan} == set(range(len(lengths)))
+
+
+def _shared_signal_asset(n, seed, beta=0.01, noise=0.02):
+    """ An asset whose first feature is a planted linear driver of its return. """
+    rng = np.random.default_rng(seed)
+    s = rng.standard_normal(n).astype(np.float32)          # the shared signal
+    nf = rng.standard_normal(n).astype(np.float32)         # a noise feature
+    r = (beta * s + rng.standard_normal(n) * noise).astype(np.float32)
+    X = np.column_stack([s, nf]).astype(np.float32)
+
+    return X, r
+
+
+def _heldout_sharpe(model, X, r):
+    pos = np.asarray(model.predict(X)).reshape(-1)
+
+    return sharpe(np.cumprod(1 + pos * r), period=252)
+
+
+def test_pretrain_pooled_beats_single_asset():
+    # Two assets share a planted linear signal (different noise). Pooling
+    # asset-0's train slice with asset-1's should beat training on asset-0's
+    # slice alone, judged on asset-0's held-out slice. Averaged over 3 seeds to
+    # stay robust to the idiosyncratic noise.
+    n = 150
+    singles, pooleds = [], []
+    for seed in range(3):
+        X0, r0 = _shared_signal_asset(2 * n, seed)
+        X0tr, r0tr, X0te, r0te = X0[:n], r0[:n], X0[n:], r0[n:]
+        X1, r1 = _shared_signal_asset(n, seed + 1000)
+
+        single = ObjectiveModel(layers=(8,), epochs=60, lr=5e-3,
+                                seed=seed).fit(X0tr, r0tr)
+        pooled = ObjectiveModel(layers=(8,), epochs=60, lr=5e-3, seed=seed)
+        pretrain_pooled(pooled, [X0tr, X1], [r0tr, r1])
+
+        singles.append(_heldout_sharpe(single, X0te, r0te))
+        pooleds.append(_heldout_sharpe(pooled, X0te, r0te))
+
+    assert np.mean(pooleds) > np.mean(singles)
+
+
+def test_pretrain_pooled_mismatched_lengths_raises():
+    X, r = _edge_data(n=100)
+    with pytest.raises(ValueError):
+        pretrain_pooled(ObjectiveModel(epochs=2), [X, X], [r])
+    with pytest.raises(ValueError):
+        pretrain_pooled(ObjectiveModel(epochs=2), [], [])
+
+
+def test_pretrain_pooled_mismatched_features_raises():
+    X, r = _edge_data(n=100)
+    X_wide = np.column_stack([X, X]).astype(np.float32)  # 4 features vs 2
+    with pytest.raises(ValueError):
+        pretrain_pooled(ObjectiveModel(epochs=2), [X, X_wide], [r, r])

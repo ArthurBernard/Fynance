@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Cross-asset pretraining & persistence for `ObjectiveModel`.**
+  `save`/`load`/`clone`, `finetune(freeze_trunk=)` (warm-start from current
+  weights, optionally freezing the trunk) and `pretrain_pooled` (pool aligned
+  `(X_i, y_i)` across assets; mini-batches never cross an asset join) — also
+  closes the model's save/load gap.
+
 - **GARCH MLE fit driver.** `fit_volatility(y, model, dist)` in
   `fynance.estimator` fits GARCH / GJR-GARCH / EGARCH with Gaussian or
   Student-t innovations via scipy MLE, returning a `VolatilityResult`

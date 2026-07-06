@@ -72,6 +72,23 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-07-06 — ML bricks epic (PRs #263, epic)  [accepted]
+
+- **Choice**: four PyTorch bricks that all conform to `SignalModel` and stay
+  inside `models/` — cross-asset pretraining/persistence on `ObjectiveModel`
+  (segment-aware pooled batching so no batch crosses an asset join),
+  distributional forecasting (`PinballLoss` + `QuantileModel`), uncertainty
+  wrappers (`DeepEnsemble`, `MCDropout`) and causal split-conformal
+  intervals.
+- **Why**: per-asset histories are short (pretraining/transfer is the
+  standard remedy); point forecasts hide risk (quantiles + intervals); no
+  first-class uncertainty API existed.
+- **Rejected alternatives**: subclassing `nn.Module` for the wrappers
+  (composition matches the `ObjectiveModel`/`RegimeMoE`/`StackingEnsemble`
+  precedent); a house Gaussian-NLL loss (reuse `torch.nn.GaussianNLLLoss`);
+  reusing `MultiLayerPerceptron`'s output-activation for `QuantileModel`
+  (its ReLU head clips symmetric quantiles — a dedicated unbounded head).
+
 ### 2026-07-06 — Backtest-realism epic (PRs #258–#261, epic)  [accepted]
 
 - **Choice**: ship execution realism as composable, causal `(T, N)`
