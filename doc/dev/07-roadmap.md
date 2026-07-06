@@ -77,3 +77,12 @@ c'est bien ici que ça vit, la campagne elle-même reste dans le repo privé.
   `portfolio.rebalance` produisent déjà le book effectif correct ; il reste à
   faire refléter ce coût dans les KPIs du moteur (petit chantier moteur isolé,
   API `backtest()` stable à préserver).
+
+## 4. Outillage / CI (maintenance)
+
+- [ ] **Actions GitHub sur Node.js 20 déprécié.** Le run `release.yml` avertit
+  que `actions/checkout@v4` et `softprops/action-gh-release@v2` ciblent Node 20
+  (forcé sur Node 24 par les runners pour l'instant, cassera à terme). Bumper
+  ces actions vers leurs versions Node 24 quand elles sortent (surveiller aussi
+  les workflows `ci.yml`). Repéré au tag v2.13.1 (2026-07-06) — sans impact
+  immédiat, purement préventif.
