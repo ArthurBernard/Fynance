@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Holding costs & composite cost stacking.** `HoldingCost` (per-bar
+  borrow on short gross, financing on leverage above 1, cash-rate credit on
+  idle cash) and `CompositeCost` (sum of any cost models, merged
+  `components()` breakdown) in `fynance.backtest.cost`.
 - **Rebalancing policies & execution frictions.** New
   `fynance.portfolio.rebalance`: causal `(T, N)` book transforms —
   `rebalance_calendar` / `rebalance_band` (full or to-edge) /
