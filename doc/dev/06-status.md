@@ -126,9 +126,10 @@ which depends on fynance. This public repo stays data-agnostic and result-free.
 
 ## Known gaps / sharp edges (by design or deferred)
 
-- **`estimator.estimation()`** is an explicit experimental stub: it raises
-  `NotImplementedError` and points to `models.econometric_models.get_parameters`
-  (the Numba-backed authoritative path).
+- **`estimator.estimation()`** remains an ARMA-oriented experimental stub
+  (`NotImplementedError`), now pointing to `estimator.fit_volatility` for the
+  volatility-model MLE path shipped in 2026-07 (PRs #255/#262: GJR/EGARCH
+  kernels + Student-t + the `fit_volatility` driver with forecast/simulate).
 - **Legacy `backtest` plot stack** (`PlotBackTest`/`DynaPlotBackTest`/
   `display_perf`) still powers `RollMultiLayerPerceptron` live-training viz; it is
   off the eager public surface (lazy-imported submodules) and conceptually

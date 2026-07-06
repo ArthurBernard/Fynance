@@ -85,3 +85,75 @@ def test_bad_min_train_raises():
         garch_volatility(r, min_train=100)
     with pytest.raises(ValueError, match="min_train"):
         garch_volatility(r, min_train=1)
+
+
+# --------------------------------------------------------------------------- #
+#                    model= / dist= passthrough (additive)                    #
+# --------------------------------------------------------------------------- #
+
+# Golden values captured from the UNMODIFIED develop implementation (before the
+# model= / dist= passthrough was added), on ``_simulate_garch()`` (the default
+# DGP). The default path must remain bit-for-bit identical.
+_GOLDEN_DEFAULT = {
+    500: 0.008607834883228261,
+    501: 0.008713191698838677,
+    750: 0.008089790529001382,
+    999: 0.008529123281159049,
+    1250: 0.008801664065656356,
+    1499: 0.007836187008735469,
+}
+_GOLDEN_REFIT_200 = {
+    500: 0.008607834883228261,
+    501: 0.008713191698838677,
+    750: 0.007586396186527904,
+    999: 0.008043871085146348,
+    1250: 0.053165718827182365,
+    1499: 0.4263395993181483,
+}
+
+
+def test_default_path_bitwise_golden():
+    # The default (garch / normal) estimation path is untouched: it reproduces
+    # the golden captured from develop, bit-for-bit, with and without refit.
+    r, _ = _simulate_garch()
+    once = garch_volatility(r, min_train=500)
+    refit = garch_volatility(r, min_train=500, refit=200)
+    for i, v in _GOLDEN_DEFAULT.items():
+        assert once[i] == v, i
+    for i, v in _GOLDEN_REFIT_200.items():
+        assert refit[i] == v, i
+
+
+def test_default_kwargs_match_positional_default():
+    # Passing the defaults explicitly hits the same path as omitting them.
+    r, _ = _simulate_garch()
+    base = garch_volatility(r, min_train=500)
+    explicit = garch_volatility(r, min_train=500, model='garch', dist='normal')
+    assert np.array_equal(base, explicit, equal_nan=True)
+
+
+@pytest.mark.parametrize('model,dist', [('gjr', 't'), ('egarch', 'normal')])
+def test_non_default_model_dist_shape_and_warmup(model, dist):
+    r, _ = _simulate_garch(T=900)
+    sigma = garch_volatility(r, min_train=500, model=model, dist=dist)
+    assert sigma.shape == r.shape
+    assert np.all(np.isnan(sigma[:500]))
+    valid = sigma[500:]
+    assert np.all(valid >= 0.0) and not np.any(np.isnan(valid))
+
+
+@pytest.mark.parametrize('model,dist', [('gjr', 't'), ('egarch', 'normal')])
+def test_non_default_path_is_causal_truncation(model, dist):
+    # sigma_t is F_{t-1}-measurable for the gjr / egarch feature paths too:
+    # extending the series with future observations leaves sigma_t bit-identical
+    # (truncation-based no-lookahead check, as for the default path).
+    r, _ = _simulate_garch(T=900)
+    t = 800
+    truncated = garch_volatility(
+        r[:t], min_train=500, model=model, dist=dist,
+    )[-1]
+    extended = garch_volatility(
+        r[:t + 50], min_train=500, model=model, dist=dist,
+    )[t - 1]
+
+    assert truncated == extended

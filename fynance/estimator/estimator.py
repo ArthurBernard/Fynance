@@ -45,7 +45,9 @@ def estimation(y, x0, p=0, q=0, Q=0, P=0, cons=True, model='arch'):
     raise NotImplementedError(
         "fynance.estimator.estimation is experimental and not implemented; "
         "use fynance.models.econometric_models.get_parameters for ARMA/GARCH "
-        "parameter estimation (the Numba-backed, authoritative path)."
+        "parameter estimation (the Numba-backed, authoritative path), or "
+        "fynance.estimator.fit_volatility for maximum-likelihood GARCH-family "
+        "volatility estimation."
     )
 
 

@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **GARCH MLE fit driver.** `fit_volatility(y, model, dist)` in
+  `fynance.estimator` fits GARCH / GJR-GARCH / EGARCH with Gaussian or
+  Student-t innovations via scipy MLE, returning a `VolatilityResult`
+  (params + numerical-Hessian std errors, AIC/BIC, conditional vol,
+  `.forecast(h)`, `.simulate()`); `features.garch_volatility` gains
+  `model=`/`dist=` passthrough (defaults bit-for-bit unchanged), and the
+  `estimator.estimation()` stub now points here.
 - **Intraday session utilities.** Vendor-agnostic `session_mask` /
   `session_id` / `session_bounds` / `split_sessions` in
   `fynance.data.sessions`: tag/slice intraday trading sessions on epoch-second

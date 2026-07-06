@@ -88,7 +88,7 @@ Template:
   breaks the vectorized contract); per-allocator rebalancing flags (couples
   the frozen allocation API to execution concerns).
 
-### 2026-07-06 — GARCH family epic (PRs #255, epic)  [accepted]
+### 2026-07-06 — GARCH family epic (PRs #255, #262, epic)  [accepted]
 
 - **Choice**: extend the volatility family inside
   `models.econometric_models` (single-implementation policy): GJR-GARCH and

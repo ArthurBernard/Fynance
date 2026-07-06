@@ -35,6 +35,7 @@ from scipy.optimize import minimize
 
 # Local packages
 from fynance.estimator.estimator import target_function
+from fynance.estimator.volatility import _filter_vol, fit_volatility
 from fynance.models.econometric_models import ARMA_GARCH, get_parameters
 
 __all__ = ['garch_volatility']
@@ -100,12 +101,15 @@ def garch_volatility(
     returns: ArrayLike,
     refit: int | None = None,
     min_train: int = 250,
+    model: str = 'garch',
+    dist: str = 'normal',
 ) -> NDArray[np.float64]:
-    r""" Causal GARCH(1,1) conditional-volatility feature.
+    r""" Causal GARCH-family conditional-volatility feature.
 
-    Fits a GARCH(1,1) on a training prefix and forward-filters the conditional
-    volatility :math:`\sigma_t` over the whole series. The first ``min_train``
-    values are ``NaN`` (the warmup whose parameters would be in-sample).
+    Fits a GARCH(1,1)-family model on a training prefix and forward-filters the
+    conditional volatility :math:`\sigma_t` over the whole series. The first
+    ``min_train`` values are ``NaN`` (the warmup whose parameters would be
+    in-sample).
 
     Parameters
     ----------
@@ -118,6 +122,10 @@ def garch_volatility(
     min_train : int, optional
         Length of the initial training prefix; values before it are ``NaN``.
         Default 250.
+    model : {'garch', 'gjr', 'egarch'}, optional
+        Conditional-variance specification. Default ``'garch'``.
+    dist : {'normal', 't'}, optional
+        Innovation density. Default ``'normal'``.
 
     Returns
     -------
@@ -129,6 +137,17 @@ def garch_volatility(
     ------
     ValueError
         If ``min_train`` is not in ``[2, len(returns))``.
+
+    Notes
+    -----
+    With the defaults (``model='garch'``, ``dist='normal'``) the estimation
+    path is the historical one: each block is fit with the ARMA-GARCH
+    likelihood (:func:`fynance.estimator.estimator.target_function`), so its
+    output is bit-for-bit unchanged. Any non-default ``model`` / ``dist`` routes
+    each block through :func:`fynance.estimator.fit_volatility` (which demeans
+    the training prefix, fits by maximum likelihood, then the fitted parameters
+    forward-filter the demeaned full series). Both paths stay strictly causal:
+    the training mean and the parameters depend only on the block's own past.
 
     Examples
     --------
@@ -153,6 +172,10 @@ def garch_volatility(
             f"min_train must be in [2, len(returns)), got {min_train}"
         )
 
+    model = model.lower()
+    dist = dist.lower()
+    is_default = model == 'garch' and dist == 'normal'
+
     sigma = np.full(n, np.nan, dtype=np.float64)
 
     # Block starts: where each parameter regime takes effect.
@@ -165,10 +188,16 @@ def garch_volatility(
     bounds = starts + [n]
     for k, start in enumerate(starts):
         end = bounds[k + 1]
-        params = _fit_garch11(r[:start])
         # sigma_t depends on the past only, so filtering the full series with
         # these (past-fit) params and slicing [start:end] stays causal.
-        h = _filter_sigma(r, params)
+        if is_default:
+            params = _fit_garch11(r[:start])
+            h = _filter_sigma(r, params)
+        else:
+            mu = float(np.mean(r[:start]))
+            res = fit_volatility(r[:start], model=model, dist=dist)
+            h = _filter_vol(r - mu, model, dist, res.params)
+
         sigma[start:end] = h[start:end]
 
     return sigma

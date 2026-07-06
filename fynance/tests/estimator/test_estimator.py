@@ -20,6 +20,13 @@ def test_estimation_raises_not_implemented():
         estimation(y, x0=np.zeros(2), model="arma")
 
 
+def test_estimation_message_points_to_fit_volatility():
+    # The stub also routes callers to the new MLE volatility driver.
+    y = np.array([0.1, -0.2, 0.3, 0.0, -0.1])
+    with pytest.raises(NotImplementedError, match="fit_volatility"):
+        estimation(y, x0=np.zeros(2), model="arma")
+
+
 def test_loglikelihood_matches_formula():
     rng = np.random.RandomState(0)
     u = rng.randn(50)
