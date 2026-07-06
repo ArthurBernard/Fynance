@@ -46,15 +46,6 @@ Le harnais `fynance.research` est **livré** (S1–S3) : `Experiment`,
 - [ ] Explorateur **Streamlit** au-dessus du Ledger (parcourir / filtrer / comparer
   les runs persistés) — interactif, plus tardif.
 
-## 7. Backtest realism (épic `backtest-realism`)
-
-- [ ] Politiques de rebalancement + frictions : calendaire / no-trade band / budget
-  de turnover, `discretize()` (lots), `delay(steps)` — transforms composables.
-- [ ] Coûts de portage composables : borrow, financement, cash rate (stacking).
-- [ ] Analyse de capacité : Sharpe net vs AUM + breakeven cost rate (via
-  `MarketImpactCost`).
-- [ ] Utilitaires sessions & calendriers intraday.
-
 ## 8. GARCH family (épic `garch-family`)
 
 - [ ] Famille GARCH complète (L) : kernels GJR/EGARCH Numba, innovations Student-t,
