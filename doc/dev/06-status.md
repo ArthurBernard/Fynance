@@ -21,7 +21,14 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
   momentums (SMA/EMA/WMA + std variants), **adaptive windows** (`adaptive_roll`/
   `adaptive_volatility`), scaling (z-score, rolling rank), statistics, money
   management (`iso_vol`), feature engineering (multi-resolution, Granger,
-  incremental moments) and k-means market-regime detection.
+  incremental moments), k-means market-regime detection, and the
+  **factor-research bricks (2026-07, PRs #243–#248)**: NaN-aware
+  cross-sectional operators (`cs_rank`/`cs_zscore`/`cs_demean`/
+  `cs_winsorize`/`cs_neutralize`), pairwise rolling stats
+  (`roll_cov`/`roll_corr`/`roll_beta`, `cross_corr`), fixed-width
+  fractional differentiation (`fracdiff`), and the AFML labeling stack
+  (`triple_barrier`/`meta_labels`/`uniqueness_weights` — training targets
+  for purged splits).
 - **Metrics**: `fynance.metrics` (Sharpe/Sortino/Calmar/diversified-ratio,
   annual return/vol, drawdown/mdd, perf_*, roll_*, **`information_coefficient`**
   rank-IC) + one-call `summary`.
@@ -91,7 +98,10 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
 
 The **2026-07 feature backlog** (roadmap §2–§10, from the judge-scored
 ideation catalog) is being executed epic by epic; `portfolio-risk` (§3) is
-**done** (PRs #235–#240). The v2.9.0 **library
+**done** (PRs #235–#240, released as **v2.12.0**) and `factor-research` (§4)
+is **done** (PRs #243–#248: cross-sectional ops, pairwise rolling stats,
+factor suite `metrics.factor`/`plot.factor`, `fracdiff`, AFML labels,
+walk-forward MDA in `research.importance`). The v2.9.0 **library
 bricks** all shipped (OHLCV indicators, causal GARCH-volatility feature,
 adaptive windows, `RegimeMoE`, `MarketImpactCost`), and the **2026-06 audit**
 was fully remediated across two passes (v2.10.0: PRs #188–#196; v2.10.1: PRs

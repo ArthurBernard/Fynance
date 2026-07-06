@@ -23,6 +23,13 @@ moving standard deviations and rolling functions.
 
       Bollinger Band, CCI, Hull Moving Average, MACD, RSI.
 
+   .. grid-item-card:: :octicon:`tag;1.2em;sd-mr-1` Labels
+      :link: features.labels
+      :link-type: doc
+
+      Triple-barrier labels, meta-labels and overlap-aware sample weights
+      (AFML) -- targets, not features.
+
    .. grid-item-card:: :octicon:`graph;1.2em;sd-mr-1` OHLCV indicators
       :link: features.ohlcv
       :link-type: doc
@@ -110,6 +117,7 @@ Common parameters across modules:
    features.engineering
    features.filters
    features.indicators
+   features.labels
    features.ohlcv
    features.stats
    features.momentums

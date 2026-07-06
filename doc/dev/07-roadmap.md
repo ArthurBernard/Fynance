@@ -46,18 +46,6 @@ Le harnais `fynance.research` est **livré** (S1–S3) : `Experiment`,
 - [ ] Explorateur **Streamlit** au-dessus du Ledger (parcourir / filtrer / comparer
   les runs persistés) — interactif, plus tardif.
 
-## 4. Cross-sectional factor research (épic `factor-research`)
-
-- [ ] Opérateurs cross-sectionnels NaN-aware (`features/cross_section.py`) :
-  `cs_rank`/`cs_zscore`/`cs_demean`/`cs_winsorize`/`cs_neutralize` sur panels (T,N).
-- [ ] Statistiques roulantes par paires : `roll_corr`/`roll_beta`/`cross_corr`
-  (lead-lag) — kernel réutilisé par les métriques benchmark (§6).
-- [ ] Suite d'analyse factorielle : quantile portfolios + spread, rolling IC,
-  IC decay, `factor_tearsheet()`.
-- [ ] Différentiation fractionnaire (FFD fixed-width).
-- [ ] Labeling triple-barrière + meta-labeling + poids d'unicité (AFML).
-- [ ] Feature importance par permutation walk-forward (MDA).
-
 ## 5. Anti-overfitting guards (épic `anti-overfitting`)
 
 - [ ] Recherche d'hyperparamètres walk-forward purgée (grid/random, sans optuna) ;
