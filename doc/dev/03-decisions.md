@@ -72,7 +72,7 @@ Template:
 
 <!-- new entries below, newest first -->
 
-### 2026-07-06 — DX one-offs epic (PRs #267, epic)  [accepted]
+### 2026-07-06 — DX one-offs epic (PRs #267–#268, epic)  [accepted]
 
 - **Choice**: two developer-experience bricks — `core.checks`
   (`check_conforms` + `assert_causal`, an executable lookahead probe) and

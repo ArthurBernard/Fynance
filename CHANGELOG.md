@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **DataFrame seams.** Duck-typed `from_pandas` / `to_pandas` / `to_polars`
+  on `PriceSeries`, `OHLCV` and `BacktestResult` (`BacktestResult.to_pandas`)
+  — pandas/polars stay optional (lazy import, no module-level dependency;
+  `import fynance` remains pandas-free).
 - **Protocol conformance & causality checks.** New `fynance.core.checks`:
   `check_conforms(obj, protocol)` smoke-runs a protocol's methods on seeded
   synthetic data with actionable errors, and `assert_causal(func)` probes for
