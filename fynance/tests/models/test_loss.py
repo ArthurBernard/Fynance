@@ -15,6 +15,7 @@ from fynance.models.loss import (
     CalmarLoss,
     DirectionalAccuracyLoss,
     OmegaLoss,
+    PinballLoss,
     RankingLoss,
     SharpeLoss,
     SortinoLoss,
@@ -444,3 +445,77 @@ class TestRankingLoss:
     def test_non_tensor_raises(self):
         with pytest.raises(TypeError):
             RankingLoss()(np.zeros((T, 3)), np.zeros((T, 3)))
+
+
+# ---------------------------------------------------------------------------
+# Distributional loss: PinballLoss
+# ---------------------------------------------------------------------------
+
+class TestPinballLoss:
+    def test_median_tau_equals_half_mae(self):
+        # tau=0.5 -> loss is exactly 0.5 * MAE, for any pred/target.
+        target = torch.tensor([1.0, 2.0, 3.0, 10.0])
+        pred = torch.tensor([[2.0], [1.0], [5.0], [8.0]])
+        e = target - pred.squeeze(-1)
+        expected = 0.5 * e.abs().mean()
+        loss = PinballLoss(taus=0.5)(pred, target)
+        assert loss.shape == torch.Size([])
+        assert torch.isclose(loss, expected)
+
+    def test_asymmetric_known_value(self):
+        # tau=0.9: under-prediction (e>0) costs 0.9*e, over-prediction (e<0)
+        # costs 0.1*|e|. target=0, pred=[1, -1] -> e=[-1, 1] ->
+        # losses = [0.1*1, 0.9*1] = [0.1, 0.9] -> mean 0.5.
+        target = torch.tensor([0.0, 0.0])
+        pred = torch.tensor([[1.0], [-1.0]])
+        loss = PinballLoss(taus=0.9)(pred, target)
+        assert loss.item() == pytest.approx(0.5)
+
+    def test_multi_tau_matches_mean_of_single_tau_losses(self):
+        rng = np.random.default_rng(0)
+        target = torch.from_numpy(rng.standard_normal(20).astype(np.float32))
+        base_pred = torch.from_numpy(rng.standard_normal(20).astype(np.float32))
+        taus = (0.1, 0.5, 0.9)
+        pred = torch.stack([base_pred + 0.1 * i for i in range(3)], dim=-1)
+        multi = PinballLoss(taus=taus)(pred, target)
+        singles = torch.stack([
+            PinballLoss(taus=t)(pred[:, i:i + 1], target)
+            for i, t in enumerate(taus)
+        ])
+        assert torch.isclose(multi, singles.mean())
+
+    def test_taus_sorted_regardless_of_input_order(self):
+        assert PinballLoss(taus=(0.9, 0.1, 0.5)).taus == (0.1, 0.5, 0.9)
+
+    def test_single_float_tau_wrapped(self):
+        assert PinballLoss(taus=0.3).taus == (0.3,)
+
+    def test_invalid_tau_raises(self):
+        with pytest.raises(ValueError):
+            PinballLoss(taus=1.5)
+
+        with pytest.raises(ValueError):
+            PinballLoss(taus=())
+
+    def test_gradient_flow(self):
+        target = torch.from_numpy(RNG.standard_normal(T).astype(np.float32))
+        pred = torch.from_numpy(
+            RNG.standard_normal((T, 3)).astype(np.float32)
+        ).requires_grad_(True)
+        loss = PinballLoss(taus=(0.1, 0.5, 0.9))(pred, target)
+        loss.backward()
+        assert pred.grad is not None
+        assert torch.isfinite(pred.grad).all()
+        assert pred.grad.abs().sum() > 0
+
+    def test_non_tensor_raises(self):
+        with pytest.raises(TypeError):
+            PinballLoss()(np.zeros((T, 3)), np.zeros(T))
+
+    def test_wrong_trailing_dim_raises(self):
+        with pytest.raises(ValueError):
+            PinballLoss(taus=(0.1, 0.5, 0.9))(torch.randn(T, 2), torch.randn(T))
+
+    def test_target_shape_mismatch_raises(self):
+        with pytest.raises(ValueError):
+            PinballLoss(taus=0.5)(torch.randn(T, 1), torch.randn(T, 2))

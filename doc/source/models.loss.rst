@@ -16,3 +16,4 @@ Differentiable financial loss functions for PyTorch training. They are drop-in P
    CalmarLoss
    OmegaLoss
    HybridLoss
+   PinballLoss

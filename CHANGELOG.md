@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Distributional forecasting.** `PinballLoss` (multi-quantile) in
+  `fynance.models.loss` and `QuantileModel` (`SignalModel` with a
+  per-quantile head, non-crossing enforced at predict time,
+  `predict_quantiles`) in `fynance.models.quantile`.
 - **Cross-asset pretraining & persistence for `ObjectiveModel`.**
   `save`/`load`/`clone`, `finetune(freeze_trunk=)` (warm-start from current
   weights, optionally freezing the trunk) and `pretrain_pooled` (pool aligned

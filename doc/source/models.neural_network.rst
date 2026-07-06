@@ -55,6 +55,28 @@ round-trips to disk with
 :meth:`~fynance.models.objective.ObjectiveModel.save` /
 :meth:`~fynance.models.objective.ObjectiveModel.load`.
 
+.. rubric:: Distributional (quantile) regression
+
+:class:`~fynance.models.quantile.QuantileModel` trains a feed-forward trunk with
+one output per target quantile (default ``taus=(0.1, 0.5, 0.9)``) on
+:class:`~fynance.models.loss.PinballLoss`, giving a **distributional** forecast
+instead of a single point estimate. Unlike ``ObjectiveModel``, ``fit(X, y)`` reads
+``y`` as an ordinary supervised target (e.g. the next-bar return), not a returns
+series to combine with positions. It is a ``SignalModel``: ``predict(X)`` returns
+the median (or nearest-to-0.5 ``tau``) column, shape ``(T,)``; the full band is
+available through
+:meth:`~fynance.models.quantile.QuantileModel.predict_quantiles`, shape
+``(T, n_taus)``. Quantile columns are trained independently (no crossing penalty),
+so non-crossing is enforced **at predict time** by sorting along the quantile
+axis::
+
+    from fynance.models import QuantileModel
+
+    model = QuantileModel(taus=(0.1, 0.5, 0.9), layers=(16, 8), epochs=200, seed=0)
+    model.fit(X, y)
+    point = model.predict(X)              # (T,) median column
+    q10, q50, q90 = model.predict_quantiles(X).T
+
 .. rubric:: Regime-conditioned architecture
 
 :class:`~fynance.models.regime_model.RegimeMoE` conditions an objective-aligned
@@ -84,4 +106,5 @@ from a designated positive price/level column of ``X`` (``regime_col``). It reus
    mlp.MultiLayerPerceptron
    objective.ObjectiveModel
    objective.pretrain_pooled
+   quantile.QuantileModel
    regime_model.RegimeMoE
