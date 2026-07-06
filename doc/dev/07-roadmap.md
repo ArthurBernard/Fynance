@@ -46,16 +46,6 @@ Le harnais `fynance.research` est **livré** (S1–S3) : `Experiment`,
 - [ ] Explorateur **Streamlit** au-dessus du Ledger (parcourir / filtrer / comparer
   les runs persistés) — interactif, plus tardif.
 
-## 6. Metrics & trade analytics (épic `metrics-analytics`)
-
-- [ ] Métriques de queue : VaR/CVaR (historique, gaussien, Cornish-Fisher), CDaR,
-  tail dependence ; variantes roulantes causales ; registry `summary()`.
-- [ ] Métriques benchmark-relative (`metrics/benchmark.py`) : alpha/beta, tracking
-  error, IR, capture ratios + overlay tearsheet.
-- [ ] Analytics turnover & exposition (métriques + panneau tearsheet).
-- [ ] Analytics par trade : extraction round-trips (Numba) + `trade_summary()`
-  (win rate, profit factor, expectancy, streaks).
-
 ## 7. Backtest realism (épic `backtest-realism`)
 
 - [ ] Politiques de rebalancement + frictions : calendaire / no-trade band / budget

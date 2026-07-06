@@ -54,6 +54,8 @@ class BacktestResult:
     to_numpy
     to_price_series
     summary
+    trades
+    trade_summary
 
     """
 
@@ -95,3 +97,36 @@ class BacktestResult:
             np.sum(trades_per_year(self.positions, period=period)))
 
         return out
+
+    def trades(self) -> NDArray:
+        """ Round-trip trades extracted from the strategy's own arrays.
+
+        Delegates to :func:`fynance.metrics.trades.extract_trades` on
+        :attr:`positions` and :attr:`returns`, taken exactly as stored (see
+        that function's docstring for the alignment convention this relies
+        on).
+
+        Returns
+        -------
+        numpy.ndarray
+            Structured array, one row per trade -- see
+            :func:`~fynance.metrics.trades.extract_trades`.
+        """
+        from fynance.metrics.trades import extract_trades
+
+        return extract_trades(self.positions, self.returns)
+
+    def trade_summary(self) -> dict[str, float]:
+        """ Summary statistics of the strategy's round-trip trades.
+
+        Delegates to :func:`fynance.metrics.trades.trade_summary` on
+        :meth:`trades`.
+
+        Returns
+        -------
+        dict of str to float
+            See :func:`~fynance.metrics.trades.trade_summary`.
+        """
+        from fynance.metrics.trades import trade_summary as _trade_summary
+
+        return _trade_summary(self.trades())

@@ -90,7 +90,7 @@ Template:
   workflows); a separate garch subpackage (violates the no-duplication
   policy).
 
-### 2026-07-06 — Metrics & trade analytics epic (PRs #253–#254 + #256, epic)  [accepted]
+### 2026-07-06 — Metrics & trade analytics epic (PRs #253–#254, #256–#257, epic)  [accepted]
 
 - **Choice**: four additive metric families — benchmark-relative two-curve
   metrics (`metrics.benchmark`, kept OUT of the scalar `METRICS` registry:

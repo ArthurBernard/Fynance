@@ -5,10 +5,12 @@
 
 # Third-party packages
 import numpy as np
+import pytest
 
 # Local packages
 from fynance.backtest import backtest
 from fynance.core import PriceSeries
+from fynance.metrics.trades import TRADE_DTYPE, extract_trades, trade_summary
 
 
 def test_summary_keys_and_finiteness():
@@ -43,3 +45,40 @@ def test_to_price_series():
 def test_max_drawdown_nonnegative():
     res = backtest(np.array([0.1, -0.5, 0.2]), np.ones(3), shift=False)
     assert res.summary()["max_drawdown"] >= 0.0
+
+
+def test_trades_matches_standalone_extract_trades():
+    rng = np.random.default_rng(7)
+    returns = rng.normal(0.0005, 0.01, 200)
+    positions = rng.choice([-1.0, 0.0, 1.0], size=200, p=[0.3, 0.2, 0.5])
+    res = backtest(returns, positions, shift=False)
+
+    out = res.trades()
+    ref = extract_trades(res.positions, res.returns)
+
+    assert out.dtype == TRADE_DTYPE
+    assert np.array_equal(out, ref)
+
+
+def test_trade_summary_matches_standalone_trade_summary():
+    rng = np.random.default_rng(11)
+    returns = rng.normal(0.0005, 0.01, 200)
+    positions = rng.choice([-1.0, 0.0, 1.0], size=200, p=[0.3, 0.2, 0.5])
+    res = backtest(returns, positions, shift=False)
+
+    out = res.trade_summary()
+    ref = trade_summary(res.trades())
+
+    assert out.keys() == ref.keys()
+    for key in out:
+        if np.isnan(ref[key]):
+            assert np.isnan(out[key])
+        else:
+            assert out[key] == pytest.approx(ref[key])
+
+
+def test_trades_empty_positions_edge():
+    res = backtest(np.zeros(10), np.zeros(10), shift=False)
+    out = res.trades()
+    assert out.shape[0] == 0
+    assert res.trade_summary()["n_trades"] == 0.0

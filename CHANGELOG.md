@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Trade-level analytics.** New `fynance.metrics.trades`: `extract_trades`
+  (round-trip structured array — entry/exit/side/compounded return/bars,
+  Numba scan, per-asset on `(T, N)` books) and `trade_summary` (win rate,
+  profit factor, payoff, expectancy, streaks, holding stats);
+  `BacktestResult.trades()` / `.trade_summary()` conveniences.
 - **Turnover & exposure analytics.** `turnover_series`, `annual_turnover`,
   `gross_exposure`, `net_exposure`, `exposure_summary` in
   `fynance.metrics.trading`, plus `plot_exposure` and an opt-in

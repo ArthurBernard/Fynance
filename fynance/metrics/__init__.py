@@ -24,6 +24,7 @@ from .returns import *
 from .returns import perf_strat, returns_strat  # noqa: F401
 from .risk import *
 from .summary import METRICS, summary  # noqa: F401
+from .trades import *
 from .trading import *
 
 # Aggregate __all__ via sys.modules (the star imports above rebind names that
@@ -33,18 +34,21 @@ from .trading import *
 # ``factor_rank_autocorr``), the trade-profile metrics (``sign_changes`` /
 # ``trades_per_year``), the benchmark-relative metrics (``beta``, ``alpha``,
 # ``tracking_error``, ``information_ratio``, ``capture_ratio``,
-# ``benchmark_summary``, ``roll_beta_benchmark``) and ``tail_dependence`` are
-# exported here but intentionally NOT added to the ``METRICS`` registry: that
-# registry maps a name to a callable taking a single equity/price curve (see
+# ``benchmark_summary``, ``roll_beta_benchmark``), ``tail_dependence`` and the
+# trade-level analytics (``extract_trades`` / ``trade_summary``) are exported
+# here but intentionally NOT added to the ``METRICS`` registry: that registry
+# maps a name to a callable taking a single equity/price curve (see
 # ``summary``), whereas the IC and factor helpers take an aligned
-# (pred, real) / (factor, fwd) pair, the trade-profile metrics take a position
-# series, the benchmark metrics take an aligned (strategy, benchmark) pair,
-# and ``tail_dependence`` takes a ``(T, N)`` returns panel, so none fit that
-# single-series contract. ``var``/``cvar``/``cdar`` (from ``risk``) do fit it
-# and are registered (see ``summary.METRICS``); their rolling variants
-# (``roll_var``/``roll_cvar``) are not, same as ``roll_sharpe``/``roll_calmar``.
+# (pred, real) / (factor, fwd) pair, the trade-profile / trade-level metrics
+# take a position (and, for the latter, a returns) series, the benchmark
+# metrics take an aligned (strategy, benchmark) pair, and ``tail_dependence``
+# takes a ``(T, N)`` returns panel, so none fit that single-series contract.
+# ``var``/``cvar``/``cdar`` (from ``risk``) do fit it and are registered (see
+# ``summary.METRICS``); their rolling variants (``roll_var``/``roll_cvar``)
+# are not, same as ``roll_sharpe``/``roll_calmar``.
 __all__ = []
-for _m in ("benchmark", "correlation", "returns", "ratios", "drawdown", "factor", "risk", "trading"):
+for _m in ("benchmark", "correlation", "returns", "ratios", "drawdown",
+           "factor", "risk", "trades", "trading"):
     __all__ += _sys.modules[f"{__name__}.{_m}"].__all__
 __all__ += ['perf_strat', 'returns_strat', 'METRICS', 'summary']
 

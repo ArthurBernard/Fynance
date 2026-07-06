@@ -31,7 +31,11 @@ so an agent doesn't re-investigate settled ground or assume a known stub is a bu
   for purged splits).
 - **Metrics**: `fynance.metrics` (Sharpe/Sortino/Calmar/diversified-ratio,
   annual return/vol, drawdown/mdd, perf_*, roll_*, **`information_coefficient`**
-  rank-IC) + one-call `summary`.
+  rank-IC) + one-call `summary`; **2026-07 additions (PRs #253–#257)**:
+  benchmark-relative family (`benchmark` — alpha/beta/TE/IR/capture),
+  tail risk (`risk` — VaR/CVaR/CDaR + `tail_dependence`), turnover/exposure
+  analytics and round-trip **trade analytics** (`trades` +
+  `BacktestResult.trades()`).
 - **Multi-asset / panel harness**: `ObjectiveModel` trains a position book
   `(T, N)` from a panel `X`; book-aware ratio losses + `RankingLoss`;
   `Strategy`/`run_walk_forward`/`run_experiment` accept a `(T, N)` panel and return
