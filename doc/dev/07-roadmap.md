@@ -53,14 +53,27 @@ cross-section sur un univers ETF, données via dccd) est **bloquée** par deux
 hypothèses crypto câblées dans le harnais. Code de librairie data-agnostique —
 c'est bien ici que ça vit, la campagne elle-même reste dans le repo privé.
 
-- [ ] **Calendrier de sessions.** Le walk-forward et les features supposent une
-  grille continue 24/7 ; les marchés actions ont des sessions, jours fériés,
-  demi-séances, timezones — et le gap overnight n'est pas un rendement intraday
-  comme un autre. Il faut un calendrier de marché injectable (sessions valides,
-  agrégation intra-session, coupure train/test sur frontières de séance) sans
-  régresser le chemin crypto 24/7 par défaut.
-- [ ] **Modèle de coûts actions.** Remplacer (par configuration, pas par fork) le
-  couple taker-fee + funding-perp par : commission par ordre, **coût d'emprunt du
-  short** (borrow, variable — l'équivalent économique du funding mais asymétrique)
-  et intérêt de marge sur le levier. Sans ça, aucun backtest actions n'est honnête
-  — même exigence que le 0.26 %/side côté crypto.
+> **MàJ 2026-07-06 (v2.13.0) — primitives livrées, reste le câblage.** L'épic
+> `backtest-realism` a livré les briques data-agnostiques de ces deux items ;
+> ce qui reste est leur intégration dans le chemin walk-forward.
+
+- [ ] **Calendrier de sessions.** _Primitives livrées_ : `fynance.data.sessions`
+  (`session_mask`/`session_id`/`session_bounds`/`split_sessions`) tague et
+  découpe les sessions sur des timestamps epoch. _Reste_ : les câbler dans
+  `walk_forward` (coupure train/test sur frontières de séance), l'agrégation
+  intra-session, et traiter le **gap overnight** comme un rendement à part (pas
+  un pas intraday) — sans régresser le chemin crypto 24/7 par défaut. NB : DST
+  est hors scope de `data.sessions` (offset fixe) — à trancher ici.
+- [ ] **Modèle de coûts actions.** _Primitives livrées_ : `HoldingCost`
+  (commission implicite via `ProportionalCost`, **borrow** du short, financement
+  du levier, crédit de cash) + `CompositeCost` pour empiler. _Reste_ : le
+  brancher par **configuration** (pas par fork) sur le chemin de recherche
+  actions, en remplacement du couple taker-fee + funding-perp crypto.
+- [ ] **Coût du turnover implicite d'un book qui drift.** Remonté par les agents
+  pendant l'épic `backtest-realism` : le coût turnover du moteur `backtest()`
+  **sous-compte** le trading réel d'un book dont les poids dérivent avec les
+  rendements entre deux rebalancements — il mesure `Σ|E_t − E_{t-1}|` (equity)
+  au lieu du trade effectif `Σ|w_t − drift(w_{t-1}, r_t)|`. Les briques
+  `portfolio.rebalance` produisent déjà le book effectif correct ; il reste à
+  faire refléter ce coût dans les KPIs du moteur (petit chantier moteur isolé,
+  API `backtest()` stable à préserver).
