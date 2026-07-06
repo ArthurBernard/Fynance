@@ -72,6 +72,20 @@ Template:
 
 <!-- new entries below, newest first -->
 
+### 2026-07-06 — DX one-offs epic (PRs #267, epic)  [accepted]
+
+- **Choice**: two developer-experience bricks — `core.checks`
+  (`check_conforms` + `assert_causal`, an executable lookahead probe) and
+  duck-typed DataFrame seams (`from_pandas`/`to_pandas`/`to_polars` on
+  `PriceSeries`/`OHLCV`/`BacktestResult`, no pandas/polars import at module
+  level).
+- **Why**: causality is the core invariant yet users writing custom
+  transforms had no tool to verify it (`runtime_checkable` only checks method
+  names); pandas/polars interop is the most-requested ergonomic gap.
+- **Rejected alternatives**: a hard pandas dependency (kept optional via lazy
+  import + duck typing); a scikit-learn-style `check_estimator` import (the
+  probe is ~40 lines of numpy, no dependency).
+
 ### 2026-07-06 — ML bricks epic (PRs #263–#266, epic)  [accepted]
 
 - **Choice**: four PyTorch bricks that all conform to `SignalModel` and stay

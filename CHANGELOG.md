@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Protocol conformance & causality checks.** New `fynance.core.checks`:
+  `check_conforms(obj, protocol)` smoke-runs a protocol's methods on seeded
+  synthetic data with actionable errors, and `assert_causal(func)` probes for
+  lookahead by perturbing the future and asserting the past is unchanged —
+  the no-lookahead house rule as an executable check, usable in downstream
+  test suites.
+
 - **Causal conformal prediction.** `ConformalWrapper` (split-conformal
   prediction intervals with a trailing calibration window) and
   `rolling_conformal` (walk-forward train/calibrate/predict) in
