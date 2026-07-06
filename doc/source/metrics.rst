@@ -123,6 +123,22 @@ of the ``METRICS`` registry.
    net_exposure
    exposure_summary
 
+Trade analytics
+===============
+
+Round-trip trade extraction from a position book -- distinct from the
+churn/turnover metrics above (:func:`sign_changes`, :func:`trades_per_year`):
+these describe individual trades (entry/exit, side, realized return) rather
+than how often the position flips. See also
+:meth:`~fynance.backtest.result.BacktestResult.trades` and
+:meth:`~fynance.backtest.result.BacktestResult.trade_summary`.
+
+.. autosummary::
+   :toctree: generated/
+
+   extract_trades
+   trade_summary
+
 Aggregated report
 =================
 
