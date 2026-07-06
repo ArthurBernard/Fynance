@@ -15,8 +15,9 @@ longer pulls matplotlib.
 
 """
 
-from . import backtest_neural_net, cost, engine, print_stats, result
+from . import backtest_neural_net, capacity, cost, engine, print_stats, result
 from .backtest_neural_net import *
+from .capacity import *
 from .cost import *
 from .engine import *
 from .print_stats import *
@@ -27,3 +28,4 @@ __all__ += cost.__all__
 __all__ += engine.__all__
 __all__ += result.__all__
 __all__ += backtest_neural_net.__all__
+__all__ += capacity.__all__

@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Capacity analysis.** `capacity_curve` (net Sharpe / net annual return /
+  total cost vs a sweep of AUM levels via a caller-supplied
+  AUM→CostModel factory) and `breakeven_fee` (bisection for the fee at which
+  net Sharpe hits zero) in `fynance.backtest.capacity`.
 - **Holding costs & composite cost stacking.** `HoldingCost` (per-bar
   borrow on short gross, financing on leverage above 1, cash-rate credit on
   idle cash) and `CompositeCost` (sum of any cost models, merged

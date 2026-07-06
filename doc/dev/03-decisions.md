@@ -72,7 +72,7 @@ Template:
 
 <!-- new entries below, newest first -->
 
-### 2026-07-06 — Backtest-realism epic (PRs #258–#259, epic)  [accepted]
+### 2026-07-06 — Backtest-realism epic (PRs #258–#260, epic)  [accepted]
 
 - **Choice**: ship execution realism as composable, causal `(T, N)`
   transforms that sit between the allocator/signal and the vectorized
