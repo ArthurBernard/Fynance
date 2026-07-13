@@ -80,6 +80,28 @@ c'est bien ici que ça vit, la campagne elle-même reste dans le repo privé.
 
 ## 4. Outillage / CI (maintenance)
 
+- [ ] **`fynance.backtest` dynamic-plot cassé sur matplotlib récent (overhaul).**
+  Le module de plot dynamique (`BacktestNeuralNet`, `dynamic_plot_backtest`,
+  `plot_backtest`, `plot_tools`) a bit-rotté contre matplotlib moderne + une
+  dérive d'API interne. Bugs identifiés en le consommant depuis fynance-research
+  (matplotlib 3.10, 2026-07-13) :
+  1. **[FAIT]** kwarg `LineWidth=` (camelCase, supprimé par mpl ≥ 3.7) →
+     `AttributeError Line2D.set()`. Corrigé en `linewidth=` (10 occurrences,
+     `plot_backtest.py` + `plot_tools.py`), branche `fix/mpl-linewidth-kwargs`.
+  2. **[À FAIRE]** `PlotBackTest.plot` forwarde les kwargs de LIGNE
+     (`label`, `color`) de `test_plot_kw`/`eval_plot_kw`/`train_plot_kw` dans
+     `ax.legend(**kwargs)` → `TypeError: Legend.__init__() got an unexpected
+     keyword argument 'label'`. Dérive d'API : le parent attend `names` + une
+     palette seaborn (`col`), la couche dynamique (`DynaPlot*`) passe `label` +
+     une couleur solide (`color`). Il faut réaligner l'interface
+     parent/enfant (consommer `label`/`color` explicitement, ne laisser filer
+     que les vrais kwargs de légende) plutôt que rustiner.
+  Faire une passe propre de tout le module avec un **test de non-régression**
+  (smoke `BacktestNeuralNet(plot_loss=True, plot_perf=True).plot_loss(...)`
+  sous backend Agg) pour figer la compat matplotlib. En attendant, préférer les
+  fonctions modernes `fynance.plot.*` (`plot_equity`, `plot_rolling_sharpe`,
+  `plot_drawdown`) qui sont saines.
+
 - [ ] **Actions GitHub sur Node.js 20 déprécié.** Le run `release.yml` avertit
   que `actions/checkout@v4` et `softprops/action-gh-release@v2` ciblent Node 20
   (forcé sur Node 24 par les runners pour l'instant, cassera à terme). Bumper

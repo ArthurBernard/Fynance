@@ -117,19 +117,19 @@ def display_perf(
         x_axis,
         100 * perf_est,
         color=sns.xkcd_rgb["pale red"],
-        LineWidth=2.
+        linewidth=2.
     )
     ax_perf.plot(
         x_axis,
         100 * perf_ivo,
         color=sns.xkcd_rgb["medium green"],
-        LineWidth=1.8
+        linewidth=1.8
     )
     ax_perf.plot(
         x_axis,
         100 * perf_idx,
         color=sns.xkcd_rgb["denim blue"],
-        LineWidth=1.5
+        linewidth=1.5
     )
 
     # Set notify motion function
@@ -170,19 +170,19 @@ def display_perf(
             x_axis,
             100 * drawdown(perf_est),
             color=sns.xkcd_rgb["pale red"],
-            LineWidth=1.4
+            linewidth=1.4
         )
         ax_dd.plot(
             x_axis,
             100 * drawdown(perf_ivo),
             color=sns.xkcd_rgb["medium green"],
-            LineWidth=1.2
+            linewidth=1.2
         )
         ax_dd.plot(
             x_axis,
             100 * drawdown(perf_idx),
             color=sns.xkcd_rgb["denim blue"],
-            LineWidth=1.
+            linewidth=1.
         )
         ax_dd.set_ylabel('% DrawDown')
         ax_dd.set_title('DrawDown in percentage')
@@ -193,19 +193,19 @@ def display_perf(
             x_axis,
             roll_sharpe(perf_est, period=period, w=win),
             color=sns.xkcd_rgb["pale red"],
-            LineWidth=1.4
+            linewidth=1.4
         )
         ax_roll.plot(
             x_axis,
             roll_sharpe(perf_ivo, period=period, w=win),
             color=sns.xkcd_rgb["medium green"],
-            LineWidth=1.2
+            linewidth=1.2
         )
         ax_roll.plot(
             x_axis,
             roll_sharpe(perf_idx, period=period, w=win),
             color=sns.xkcd_rgb["denim blue"],
-            LineWidth=1.
+            linewidth=1.
         )
         ax_roll.set_ylabel('Sharpe ratio')
         ax_roll.set_yscale('log')

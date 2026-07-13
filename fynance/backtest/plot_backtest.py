@@ -160,7 +160,7 @@ class PlotBackTest:
         col = sns.color_palette(col, N)
 
         # Set graphs
-        h = self.ax.plot(x, y, LineWidth=lw)
+        h = self.ax.plot(x, y, linewidth=lw)
 
         # Set name lines
         if names is None:
